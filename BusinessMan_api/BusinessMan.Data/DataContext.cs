@@ -23,5 +23,6 @@ namespace BusinessMan.Data
         public DbSet<Invoice> Invoices { get; set; }
         public DbSet<Business> Businesses { get; set; }
         public DbSet<Example> Examples { get; set; }
+        public DbSet<FileDto> UploadedFiles { get; set; }
     }
 }

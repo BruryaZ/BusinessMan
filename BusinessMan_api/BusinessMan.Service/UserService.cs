@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace BusinessMan.Service
 {
-    // TODO: Implement the UserService class
+    // TODO: Implement the UserService class 
     public class UserService(IRepositoryManager repositoryManager) : IService<User>
     {
         private readonly IRepositoryManager _repositoryManager = repositoryManager;
