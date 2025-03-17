@@ -1,4 +1,5 @@
-﻿using BusinessMan.Core.Models;
+﻿using BusinessMan.Core.DTO_s;
+using BusinessMan.Core.Models;
 using BusinessMan.Core.Services;
 using BusinessMan.Data.Repositories;
 using System;
@@ -9,26 +10,26 @@ using System.Threading.Tasks;
 
 namespace BusinessMan.Service
 {
-    public class FileUploadService(IRepositoryManager repositoryManager) : IService<FileUpload>
+    public class FileUploadService(IRepositoryManager repositoryManager) : IService<FileDto>
     {
         private readonly IRepositoryManager _repositoryManager = repositoryManager;
-        public async Task<FileUpload?> GetByIdAsync(int id)
+        public async Task<FileDto?> GetByIdAsync(int id)
         {
             return await _repositoryManager.Files.GetByIdAsync(id);
         }
-        public async Task<IEnumerable<FileUpload>> GetListAsync()
+        public async Task<IEnumerable<FileDto>> GetListAsync()
         {
             return await _repositoryManager.Files.GetAllAsync();
         }
-        public async Task<FileUpload> AddAsync(FileUpload FileUpload)
+        public async Task<FileDto> AddAsync(FileDto FileUpload)
         {
             return await _repositoryManager.Files.AddAsync(FileUpload);
         }
-        public async Task DeleteAsync(FileUpload item)
+        public async Task DeleteAsync(FileDto item)
         {
             await _repositoryManager.Files.DeleteAsync(item);
         }
-        public async Task<FileUpload?> UpdateAsync(int id, FileUpload item)
+        public async Task<FileDto?> UpdateAsync(int id, FileDto item)
         {
             return await _repositoryManager.Files.UpdateAsync(id, item);
         }

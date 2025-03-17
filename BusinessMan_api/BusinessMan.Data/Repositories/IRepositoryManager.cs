@@ -1,4 +1,5 @@
-﻿using BusinessMan.Core.Models;
+﻿using BusinessMan.Core.DTO_s;
+using BusinessMan.Core.Models;
 using BusinessMan.Core.Repositories;
 using System;
 using System.Collections.Generic;
@@ -14,7 +15,7 @@ namespace BusinessMan.Data.Repositories
         IRepository<Invoice> Invoice { get; }
         IRepository<Business> Business { get; }
         IRepository<Example> Examples { get; }
-        IRepository<FileUpload> Files { get; }
+        IRepository<FileDto> Files { get; }
         Task SaveAsync();
     }
 }

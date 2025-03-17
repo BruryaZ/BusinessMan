@@ -1,4 +1,5 @@
 using BusinessMan.Core;
+using BusinessMan.Core.DTO_s;
 using BusinessMan.Core.Models;
 using BusinessMan.Core.Repositories;
 using BusinessMan.Core.Services;
@@ -31,6 +32,8 @@ builder.Services.AddScoped<IService<Example>, ExampleService>();
 builder.Services.AddScoped<IService<Invoice>, InvoiceService>();
 builder.Services.AddScoped<IService<Business>, BusinessService>();
 builder.Services.AddScoped<IService<User>, UserService>();
+builder.Services.AddScoped<IRepository<FileDto>, Repository<FileDto>>();
+builder.Services.AddScoped<IService<FileDto>, FileUploadService>();
 
 // הזרקת קובץ הנתונים 
 builder.Services.AddDbContext<DataContext>();

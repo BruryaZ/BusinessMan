@@ -1,4 +1,5 @@
-﻿using BusinessMan.Core.Models;
+﻿using BusinessMan.Core.DTO_s;
+using BusinessMan.Core.Models;
 using BusinessMan.Core.Repositories;
 using System;
 using System.Collections.Generic;
@@ -8,21 +9,24 @@ using System.Threading.Tasks;
 
 namespace BusinessMan.Data.Repositories
 {
-    public class RepositoryManager:IRepositoryManager
+    public class RepositoryManager : IRepositoryManager
     {
         private readonly DataContext _dataContext;
         public IRepository<User> User { get; }
         public IRepository<Example> Examples { get; }
         public IRepository<Invoice> Invoice { get; }
         public IRepository<Business> Business { get; }
+        public IRepository<FileDto> Files { get; }
 
-        public RepositoryManager(DataContext context, IRepository<User> users, IRepository<Invoice> invoices, IRepository<Business> business, IRepository<Example> examples)
+
+        public RepositoryManager(DataContext context, IRepository<User> users, IRepository<Invoice> invoices, IRepository<Business> business, IRepository<Example> examples, IRepository<FileDto> files)
         {
             _dataContext = context;
             User = users;
             Invoice = invoices;
             Examples = examples;
             Business = business;
+            Files = files;
         }
         public async Task SaveAsync()
         {
