@@ -14,7 +14,7 @@ namespace BusinessMan.Data.Repositories
         IRepository<Invoice> Invoice { get; }
         IRepository<Business> Business { get; }
         IRepository<Example> Examples { get; }
-        IRepository<FileDto> Files { get; }
+        IRepository<FileUpload> Files { get; }
         Task SaveAsync();
     }
 }

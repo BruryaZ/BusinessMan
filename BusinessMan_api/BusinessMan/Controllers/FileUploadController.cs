@@ -1,4 +1,5 @@
-﻿using BusinessMan.Core.Models;
+﻿using AutoMapper;
+using BusinessMan.Core.Models;
 using BusinessMan.Core.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -9,10 +10,12 @@ namespace BusinessMan.API.Controllers
     public class FileUploadController : Controller
     {
         private readonly IService<FileDto> _fileService;
+        private readonly IMapper _mapper;
 
-        public FileUploadController(IService<FileDto> fileService)
+        public FileUploadController(IService<FileDto> fileService, IMapper mapper)
         {
             _fileService = fileService;
+            _mapper = mapper;
         }
 
         // GET: api/<FileUploadController>
@@ -20,7 +23,8 @@ namespace BusinessMan.API.Controllers
         public async Task<ActionResult<IEnumerable<FileDto>>> GetAsync()
         {
             var files = await _fileService.GetListAsync();
-            return Ok(files);
+            var filesDto = _mapper.Map<IEnumerable<FileDto>>(files);
+            return Ok(filesDto);
         }
 
         // GET api/<FileUploadController>/5
@@ -30,7 +34,9 @@ namespace BusinessMan.API.Controllers
             var file = await _fileService.GetByIdAsync(id);
             if (file == null)
                 return NotFound();
-            return Ok(file);
+
+            var fileDto = _mapper.Map<FileDto>(file);
+            return Ok(fileDto);
         }
 
         // POST api/<FileUploadController>
@@ -50,13 +56,12 @@ namespace BusinessMan.API.Controllers
                 return BadRequest("סוג הקובץ אינו נתמך.");
             }
 
-            // כאן תוכל להמיר את FileUploadDto ל-FileDto לפני השמירה
-            var fileDto = new FileDto
-            {
-                FileName = fileUpload.FileName,
-                // מלא את שאר השדות הנדרשים, כמו FilePath, CreatedAt, וכו'
-            };
+            // שמירת הקובץ במערכת (למשל, במערכת הקבצים)
+            var filePath = Path.Combine("path_to_storage", fileUpload.FileName);
+            // TODO: Save file to AWS S3.
 
+            // יצירת קובץ חדש כדי שמידע כבד ולא רלוונטי לא ישמר במסד הנתונים ולא יעבור בין שכבות האפליקציה ללא צורך
+            var fileDto  = _mapper.Map<FileDto>(fileUpload);
             var createdFile = await _fileService.AddAsync(fileDto);
             return Ok(createdFile);
         }
@@ -70,6 +75,10 @@ namespace BusinessMan.API.Controllers
             {
                 return NotFound();
             }
+
+            // שמירת הקובץ במערכת (למשל, במערכת הקבצים)
+            var filePath = Path.Combine("path_to_storage", fileUpload.FileName);
+            // TODO: Save file to AWS S3.
             return Ok(updatedFile);
         }
 
@@ -83,6 +92,11 @@ namespace BusinessMan.API.Controllers
                 return NotFound();
             }
             await _fileService.DeleteAsync(file);
+
+            // מחיקת הקובץ מהמערכת (למשל, ממערכת הקבצים)
+            var filePath = Path.Combine("path_to_storage", file.FileName);
+            // TODO: Save file to AWS S3.
+
             return NoContent();
         }
     }

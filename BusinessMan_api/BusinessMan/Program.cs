@@ -1,3 +1,4 @@
+using BusinessMan.Core;
 using BusinessMan.Core.Models;
 using BusinessMan.Core.Repositories;
 using BusinessMan.Core.Services;
@@ -85,6 +86,7 @@ builder.Services.AddSwaggerGen(options =>
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 var app = builder.Build();
 
