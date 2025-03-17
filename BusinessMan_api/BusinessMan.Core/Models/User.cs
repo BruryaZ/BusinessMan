@@ -24,8 +24,8 @@ namespace BusinessMan.Core.Models
         public string UpdatedBy { get; set; } // עודכן על ידי
 
         // אובייקטים לקשרים בין הטבלאות
+        public int BusinessId { get; set; } // מזהה ייחודי לעסק
         public Business Business { get; set; }
         public List<Invoice> Invoices { get; set; }
-        public int BusinessId { get; set; } // מזהה ייחודי לעסק
     }
 }

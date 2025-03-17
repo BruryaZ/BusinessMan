@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BusinessMan.Core.Models
+namespace BusinessMan.Core.DTO_s
 {
-    public class Invoice
+    public class InvoiceDto
     {
         public int Id { get; set; } // מזהה ייחודי
         public string AmountDebit { get; set; } // סכום חובה
@@ -22,7 +22,5 @@ namespace BusinessMan.Core.Models
         // אובייקטים לקשרים בין הטבלאות
         public int UserId { get; set; } // מזהה המשתמש (קשר לטבלת Users)
         public int BusinessId { get; set; } // מזהה ייחודי לעסק
-        public Business Business { get; set; }
-        public User User { get; set; }
     }
 }

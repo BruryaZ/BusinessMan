@@ -1,4 +1,6 @@
-﻿using BusinessMan.Core.Models;
+﻿using AutoMapper;
+using BusinessMan.Core.DTO_s;
+using BusinessMan.Core.Models;
 using BusinessMan.Core.Services;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Http;
@@ -11,67 +13,65 @@ namespace BusinessMan.API.Controllers
     public class UserController : Controller
     {
         private readonly IService<User> _allUsers;
+        private readonly IMapper _mapper;
 
-        public UserController(IService<User> users)
+        public UserController(IService<User> Users, IMapper mapper)
         {
-            _allUsers = users;
+            _allUsers = Users;
+            _mapper = mapper;
         }
 
         // GET: api/<UserController>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<User>>> GetAsync()
+        public async Task<ActionResult<IEnumerable<UserDto>>> GetAsync()
         {
-            var user = await _allUsers.GetListAsync();
-            //var UsersDTO = _mapper.Map<IEnumerable<User>>(Users);
+            var users = await _allUsers.GetListAsync();
+            var UsersDTO = _mapper.Map<IEnumerable<UserDto>>(users); // מיפוי ל-DTO
 
-            return Ok(user);
+            return Ok(UsersDTO); // החזר את ה-DTOs
         }
 
         // GET api/<UserController>/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<User>> GetAsync(int id)
+        public async Task<ActionResult<UserDto>> GetAsync(int id)
         {
             var user = await _allUsers.GetByIdAsync(id);
             if (user == null)
                 return NotFound();
-            //return Ok(_mapper.Map<User>(User));
-            return Ok(user);
+
+            return Ok(_mapper.Map<UserDto>(user)); // החזר את ה-DTO
         }
 
         // POST api/<UserController>
         [HttpPost]
-        public async Task<ActionResult<User>> PostAsync([FromBody] User value)
+        public async Task<ActionResult<UserDto>> PostAsync([FromBody] User value)
         {
-            //var User = _mapper.Map<User>(value);
             var createdUser = await _allUsers.AddAsync(value);
-            //return Ok(_mapper.Map<User>(createdUser));
-            return Ok(createdUser);
+            return Ok(_mapper.Map<UserDto>(createdUser)); // החזר את ה-DTO
         }
 
         // PUT api/<UserController>/5
         [HttpPut("{id}")]
-        public async Task<ActionResult<User>> PutAsync(int id, [FromBody] User value)
+        public async Task<ActionResult<UserDto>> PutAsync(int id, [FromBody] User value)
         {
-            //var updatedUser = await _allUsers.UpdateAsync(id, _mapper.Map<User>(value));
             var updatedUser = await _allUsers.UpdateAsync(id, value);
             if (updatedUser == null)
             {
                 return NotFound();
             }
-            //return Ok(_mapper.Map<User>(updatedUser));
-            return Ok(updatedUser);
+            return Ok(_mapper.Map<UserDto>(updatedUser)); // החזר את ה-DTO
         }
 
         // DELETE api/<UserController>/5
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteAsync(int id)
         {
-            var User = await _allUsers.GetByIdAsync(id);
+            var user = await _allUsers.GetByIdAsync(id);
             if (User is null)
             {
                 return NotFound();
             }
-            await _allUsers.DeleteAsync(User);
+            await _allUsers.DeleteAsync(user);
             return NoContent();
         }
     }

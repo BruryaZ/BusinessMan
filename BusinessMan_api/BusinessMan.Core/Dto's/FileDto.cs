@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BusinessMan.Core.Models
+namespace BusinessMan.Core.DTO_s
 {
     public class FileDto
     {
