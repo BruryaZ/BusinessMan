@@ -10,28 +10,43 @@ using System.Threading.Tasks;
 
 namespace BusinessMan.Service
 {
-    public class FileUploadService(IRepositoryManager repositoryManager) : IService<FileDto>
+    public class FileUploadService : IService<FileDto>
     {
-        private readonly IRepositoryManager _repositoryManager = repositoryManager;
+        private readonly IRepositoryManager _repositoryManager;
+
+        public FileUploadService(IRepositoryManager repositoryManager)
+        {
+            _repositoryManager = repositoryManager;
+        }
+
         public async Task<FileDto?> GetByIdAsync(int id)
         {
             return await _repositoryManager.Files.GetByIdAsync(id);
         }
+
         public async Task<IEnumerable<FileDto>> GetListAsync()
         {
             return await _repositoryManager.Files.GetAllAsync();
         }
-        public async Task<FileDto> AddAsync(FileDto FileUpload)
+
+        public async Task<FileDto> AddAsync(FileDto fileUpload)
         {
-            return await _repositoryManager.Files.AddAsync(FileUpload);
+            await _repositoryManager.Files.AddAsync(fileUpload);
+            await _repositoryManager.SaveAsync(); 
+            return fileUpload;
         }
+
         public async Task DeleteAsync(FileDto item)
         {
             await _repositoryManager.Files.DeleteAsync(item);
+            await _repositoryManager.SaveAsync(); 
         }
+
         public async Task<FileDto?> UpdateAsync(int id, FileDto item)
         {
-            return await _repositoryManager.Files.UpdateAsync(id, item);
+            var updatedFile = await _repositoryManager.Files.UpdateAsync(id, item);
+            await _repositoryManager.SaveAsync(); 
+            return updatedFile;
         }
     }
 }

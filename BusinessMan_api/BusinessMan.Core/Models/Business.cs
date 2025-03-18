@@ -31,6 +31,6 @@ namespace BusinessMan.Core.Models
 
         // אובייקטים לקשרים בין הטבלאות
         public List<User> Users { get; set; }
-        public List<Invoice> invoices { get; set; }
+        public List<Invoice> Invoices { get; set; }
     }
 }

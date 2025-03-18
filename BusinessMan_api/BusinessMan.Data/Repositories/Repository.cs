@@ -36,7 +36,7 @@ namespace BusinessMan.Data.Repositories
 
         public async Task<T?> GetByIdAsync(int id)
         {
-            return await _dbSet.FindAsync(id);
+            return await _dbSet.SingleAsync();
         }
 
         public async Task<T> UpdateAsync(int id, T entity)

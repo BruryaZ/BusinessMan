@@ -10,28 +10,43 @@ using System.Threading.Tasks;
 namespace BusinessMan.Service
 {
     // TODO: Implement the UserService class
-    public class InvoiceService(IRepositoryManager repositoryManager) : IService<Invoice>
+    public class InvoiceService : IService<Invoice>
     {
-        private readonly IRepositoryManager _repositoryManager = repositoryManager;
+        private readonly IRepositoryManager _repositoryManager;
+
+        public InvoiceService(IRepositoryManager repositoryManager)
+        {
+            _repositoryManager = repositoryManager;
+        }
+
         public async Task<Invoice?> GetByIdAsync(int id)
         {
             return await _repositoryManager.Invoice.GetByIdAsync(id);
         }
+
         public async Task<IEnumerable<Invoice>> GetListAsync()
         {
             return await _repositoryManager.Invoice.GetAllAsync();
         }
+
         public async Task<Invoice> AddAsync(Invoice invoice)
         {
-            return await _repositoryManager.Invoice.AddAsync(invoice);
+            await _repositoryManager.Invoice.AddAsync(invoice);
+            await _repositoryManager.SaveAsync();
+            return invoice;
         }
+
         public async Task DeleteAsync(Invoice invoice)
         {
             await _repositoryManager.Invoice.DeleteAsync(invoice);
+            await _repositoryManager.SaveAsync(); 
         }
+
         public async Task<Invoice?> UpdateAsync(int id, Invoice item)
         {
-            return await _repositoryManager.Invoice.UpdateAsync(id, item);
+            var updatedInvoice = await _repositoryManager.Invoice.UpdateAsync(id, item);
+            await _repositoryManager.SaveAsync(); 
+            return updatedInvoice;
         }
     }
 }
