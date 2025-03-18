@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "businessman_users": {
+    "businessman_developer": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -13,7 +13,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/businessman_users",
+            "outputPath": "dist/businessman_developer",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [
@@ -64,10 +64,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "businessman_users:build:production"
+              "buildTarget": "businessman_developer:build:production"
             },
             "development": {
-              "buildTarget": "businessman_users:build:development"
+              "buildTarget": "businessman_developer:build:development"
             }
           },
           "defaultConfiguration": "development"

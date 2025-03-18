@@ -1,5 +1,5 @@
 {
-  "name": "businessman_users",
+  "name": "businessman_developer",
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
@@ -7,7 +7,7 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "serve:ssr:businessman_users": "node dist/businessman_users/server/server.mjs"
+    "serve:ssr:businessman_developer": "node dist/businessman_developer/server/server.mjs"
   },
   "private": true,
   "dependencies": {
