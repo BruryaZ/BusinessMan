@@ -1,6 +1,5 @@
 import './App.css';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import UserRegistration from './components/UserRegistration';
 import AdminLogin from './components/AdminLogin';
 import UploadFiles from './components/UploadFiles';
 import DataViweing from './components/DataViweing';
@@ -9,30 +8,36 @@ import BusinessTable from './components/BusinessTable';
 import { BusinessImpl } from './models/Business';
 import ProductionReports from './components/ProductionReports';
 import UserManagemet from './components/UserManagemet';
+import WorkerRegistation from './components/WorkerRegistration';
+import AuthContext from './context/AuthContext';
+import AdminRegister from './components/AdminRegister';
 
 function App() {
   return (
+    <AuthContext>
     <Router>
-      <nav>
-        <Link to="/user-registration">User Registration</Link>
+      <nav dir="rtl">
+        <Link to="/worker-registration">רישום עובדים</Link>
         <span>   |   </span>
-        <Link to="/admin-login">Admin Login</Link>
+        <Link to="/admin-login">כניסת מנהל</Link>
         <span>   |   </span>
-        <Link to="/upload-file">Upload Files</Link>
+        <Link to="/upload-file">העלאת קבצים</Link>
         <span>   |   </span>
-        <Link to="/data-viweing">Data Viewing</Link>
+        <Link to="/data-viweing">צפייה בנתונים</Link>
         <span>   |   </span>
-        <Link to="/">Home</Link>
+        <Link to="/">בית</Link>
         <span>   |   </span>
-        <Link to='/user-management'>User Management</Link>
+        <Link to='/user-management'>ניהול משתמשים</Link>
         <span>   |   </span>
-        <Link to="/production-reports">Production Report</Link>
+        <Link to="/production-reports">דו"ח ייצור</Link>
         <span>   |   </span>
-        <Link to="/business-table">Business Table</Link>
+        <Link to="/business-table">טבלת עסקים</Link>
+        <span>   |   </span>
+        <Link to="admin-register">רישום מנהל</Link>
       </nav>
 
       <Routes>
-        <Route path="/user-registration" element={<UserRegistration />} />
+        <Route path="/worker-registration" element={<WorkerRegistation />} />
         <Route path='/admin-login' element={<AdminLogin />} />
         <Route path='/upload-file' element={<UploadFiles />} />
         <Route path='/data-viweing' element={<DataViweing />} />
@@ -40,8 +45,10 @@ function App() {
         <Route path='/production-reports' element={<ProductionReports/>}/>
         <Route path='/user-management' element={<UserManagemet/>}/>
         <Route path='/' element={<Home />} />
+        <Route path='admin-register' element={<AdminRegister />} />
       </Routes>
     </Router>
+    </AuthContext>
   );
 }
 

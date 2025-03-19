@@ -1,6 +1,8 @@
-import { useState } from "react"
+import { useContext, useState } from "react"
 import { Admin } from "../models/Admin"
 import * as Yup from 'yup'
+import axios from "axios"
+import { detailsContext } from "../context/AuthContext"
 
 const validationSchema = Yup.object().shape({
     email: Yup.string().email('אימייל לא חוקי').required('אימייל הוא שדה חובה'),
@@ -11,13 +13,22 @@ const validationSchema = Yup.object().shape({
 const AdmineLogin = () => {
     const [admin, setSdmin] = useState<Admin>({})
     const [errors, setErrors] = useState<string[]>([])
+    const url = 'https://businessman-api.onrender.com'
+    const authDetails = useContext(detailsContext)
 
-    const handleSubmit = (admin: Admin) => (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = (admin: Admin) => async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
-        validationSchema.isValid(admin).then(valid => {
+        validationSchema.isValid(admin).then(async valid => {
             setErrors([]);
             if (valid) {
                 console.log('Admin:', admin)
+                try {
+                    const { data } = await axios.get<any>(`${url}...`) // TODO 
+                    // authDetails.setMyBusinessName('aaa')
+                }
+                catch (e) {
+                    console.log(e);
+                }
             }
         }).catch((err) => {
             if (err instanceof Yup.ValidationError) {

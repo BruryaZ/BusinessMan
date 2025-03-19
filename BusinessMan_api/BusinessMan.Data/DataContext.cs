@@ -25,6 +25,7 @@ namespace BusinessMan.Data
         //}
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
+
             optionsBuilder.UseSqlServer(@"Server=(localdb)\MSSQLLocalDB;Database=businessman_db");
         }
         public DbSet<User> Users { get; set; }
@@ -32,6 +33,7 @@ namespace BusinessMan.Data
         public DbSet<Business> Businesses { get; set; }
         public DbSet<Example> Examples { get; set; }
         public DbSet<FileDto> UploadedFiles { get; set; }
+        public DbSet<Email> EmailList { get; set; }
 
         //protected override void OnModelCreating(ModelBuilder modelBuilder)
         //{

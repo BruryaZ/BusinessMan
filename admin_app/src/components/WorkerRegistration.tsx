@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { User } from '../models/User';
 import * as Yup from 'yup';
 
-const UserRegistration: React.FC = () => {
+const WorkerRegistation: React.FC = () => {
     const [user, setUser] = useState<User>({
         id: 0,
         firstName: '',
@@ -71,4 +71,4 @@ const UserRegistration: React.FC = () => {
     );
 };
 
-export default UserRegistration;
+export default WorkerRegistation;
