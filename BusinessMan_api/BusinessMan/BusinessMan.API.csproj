@@ -21,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\BusinessMan.Core\BusinessMan.Core.csproj" />
     <ProjectReference Include="..\BusinessMan.Data\BusinessMan.Data.csproj" />
     <ProjectReference Include="..\BusinessMan.Service\BusinessMan.Service.csproj" />
   </ItemGroup>

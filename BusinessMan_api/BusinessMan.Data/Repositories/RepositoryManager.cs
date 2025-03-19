@@ -17,9 +17,9 @@ namespace BusinessMan.Data.Repositories
         public IRepository<Invoice> Invoice { get; }
         public IRepository<Business> Business { get; }
         public IRepository<FileDto> Files { get; }
+        public IRepository<Email>? EmailList { get; }
 
-
-        public RepositoryManager(DataContext context, IRepository<User> users, IRepository<Invoice> invoices, IRepository<Business> business, IRepository<Example> examples, IRepository<FileDto> files)
+        public RepositoryManager(DataContext context, IRepository<User> users, IRepository<Invoice> invoices, IRepository<Business> business, IRepository<Example> examples, IRepository<FileDto> files, IRepository<Email> emails)
         {
             _dataContext = context;
             User = users;
@@ -27,6 +27,7 @@ namespace BusinessMan.Data.Repositories
             Examples = examples;
             Business = business;
             Files = files;
+            EmailList = emails;
         }
         public async Task SaveAsync()
         {

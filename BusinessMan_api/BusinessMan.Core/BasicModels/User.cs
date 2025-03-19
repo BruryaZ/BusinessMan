@@ -19,13 +19,13 @@ namespace BusinessMan.Core.Models
         public string Status { get; set; } = "active"; // מצב המשתמש (active/inactive)
         public DateTime LastLogin { get; set; } = DateTime.Now; // תאריך כניסה אחרונה
         public DateTime CreatedAt { get; set; } = DateTime.Now; // תאריך יצירה
-        public string CreatedBy { get; set; } // נוצר על ידי
+        public string CreatedBy { get; set; } = "";  // נוצר על ידי
         public DateTime UpdatedAt { get; set; } = DateTime.Now; // תאריך עדכון
-        public string UpdatedBy { get; set; } // עודכן על ידי
+        public string UpdatedBy { get; set; } = "";// עודכן על ידי
 
         // אובייקטים לקשרים בין הטבלאות
-        public int BusinessId { get; set; } // מזהה ייחודי לעסק
-        public Business Business { get; set; }
-        public List<Invoice> Invoices { get; set; }
+        public int? BusinessId { get; set; } // מזהה ייחודי לעסק
+        public Business? Business { get; set; }
+        public List<Invoice>? Invoices { get; set; }
     }
 }

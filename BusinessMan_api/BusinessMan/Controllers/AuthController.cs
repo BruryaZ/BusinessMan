@@ -1,4 +1,5 @@
 ﻿using BusinessMan.Core.Models;
+using BusinessMan.Core.Repositories;
 using BusinessMan.Data;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -16,11 +17,13 @@ namespace BusinessMan.API.Controllers
     {
         private readonly DataContext _context;
         private readonly IConfiguration _configuration;
+        private readonly IUserRepository _userRepository;
 
-        public AuthController(DataContext context, IConfiguration configuration)
+        public AuthController(DataContext context, IConfiguration configuration, IUserRepository userRepository)
         {
             _context = context;
             _configuration = configuration;
+            _userRepository = userRepository;
         }
 
         [HttpPost("login")]
@@ -100,6 +103,9 @@ namespace BusinessMan.API.Controllers
             // הסר את האימייל מהרשימה
             _context.EmailList.Remove(emailToRemove);
             await _context.SaveChangesAsync();
+
+            // הסרת המשתמש מרשימת שמשתמשים
+            var res = await _userRepository.RemoveByEmailAsync(emailAddress);
 
             return Ok(new { message = "Email removed from the list successfully." });
         }

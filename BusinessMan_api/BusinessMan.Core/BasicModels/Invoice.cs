@@ -20,9 +20,9 @@ namespace BusinessMan.Core.Models
         public string UpdatedBy { get; set; } // עודכן על ידי
 
         // אובייקטים לקשרים בין הטבלאות
-        public int UserId { get; set; } // מזהה המשתמש (קשר לטבלת Users)
-        public int BusinessId { get; set; } // מזהה ייחודי לעסק
-        public Business Business { get; set; }
-        public User User { get; set; }
+        public int? UserId { get; set; } // מזהה המשתמש (קשר לטבלת Users)
+        public int? BusinessId { get; set; } // מזהה ייחודי לעסק
+        public Business? Business { get; set; }
+        public User? User { get; set; }
     }
 }

@@ -1,6 +1,9 @@
-﻿using BusinessMan.Core.Models;
+﻿using BusinessMan.Core.Extentions;
+using BusinessMan.Core.Models;
+using BusinessMan.Core.Repositories;
 using BusinessMan.Core.Services;
 using BusinessMan.Data.Repositories;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,10 +16,14 @@ namespace BusinessMan.Service
     public class UserService : IService<User>
     {
         private readonly IRepositoryManager _repositoryManager;
+        private readonly IEmailService _emailService;
+        private readonly IUserRepository _userRepository;
 
-        public UserService(IRepositoryManager repositoryManager)
+        public UserService(IRepositoryManager repositoryManager, IEmailService emailService, IUserRepository userRepository)
         {
             _repositoryManager = repositoryManager;
+            _emailService = emailService;
+            _userRepository = userRepository;
         }
 
         public async Task<User?> GetByIdAsync(int id)
@@ -31,6 +38,20 @@ namespace BusinessMan.Service
 
         public async Task<User> AddAsync(User user)
         {
+            // בדיקה שהמייל ברשימה
+            var isExists = await _emailService.EmailExistsAsync(user.Email);
+            if (!isExists)
+            {
+                throw new NotFoundException("Email does not exist. You do not have permission to perform this action.");
+            }
+
+            // בדיקה שהיוזר אינו קיים
+            var userExists = await _userRepository.FirstOrDefaultAsync(u => u.Email == user.Email);
+            if (userExists != default)
+            {
+                throw new Exceptions("The user already exists. User cannot be added.");
+            }
+
             await _repositoryManager.User.AddAsync(user);
             await _repositoryManager.SaveAsync(); 
             return user;
@@ -47,6 +68,19 @@ namespace BusinessMan.Service
             var updatedUser = await _repositoryManager.User.UpdateAsync(id, item);
             await _repositoryManager.SaveAsync();
             return updatedUser;
+        }
+
+        public async Task<bool> RemoveUserByEmailAsync(string emailAddress)
+        {
+            var userToRemove = await _userRepository.FirstOrDefaultAsync(u => u.Email == emailAddress);
+            if (userToRemove == null)
+            {
+                return false; // המשתמש לא נמצא
+            }
+
+            _repositoryManager.User.DeleteAsync(userToRemove);
+            await _repositoryManager.SaveAsync();
+            return true; // המחיקה בוצעה בהצלחה
         }
     }
 }

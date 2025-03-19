@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using BusinessMan.Core.DTO_s;
+using BusinessMan.Core.Extentions;
 using BusinessMan.Core.Models;
 using BusinessMan.Core.Services;
 using Microsoft.AspNetCore.Cors.Infrastructure;
@@ -14,7 +15,6 @@ namespace BusinessMan.API.Controllers
     {
         private readonly IService<User> _allUsers;
         private readonly IMapper _mapper;
-
         public UserController(IService<User> Users, IMapper mapper)
         {
             _allUsers = Users;
@@ -44,10 +44,26 @@ namespace BusinessMan.API.Controllers
 
         // POST api/<UserController>
         [HttpPost]
-        public async Task<ActionResult<UserDto>> PostAsync([FromBody] User value)
+        public async Task<ActionResult<UserDto>> PostAsync([FromBody] UserPostModel value)
         {
-            var createdUser = await _allUsers.AddAsync(value);
-            return Ok(_mapper.Map<UserDto>(createdUser)); // החזר את ה-DTO
+            try
+            {
+                User userToAdd = _mapper.Map<User>(value);
+                var createdUser = await _allUsers.AddAsync(userToAdd);
+                return Ok(_mapper.Map<UserDto>(createdUser)); // מחזירה את המשתמש שנוסף
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(ex.Message); // מחזירה 404 במקרה של מייל לא קיים
+            }
+            catch (Exceptions ex)
+            {
+                return Conflict(ex.Message); // מחזירה 409 במקרה של קונפליקט
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error: " + ex.Message); // מחזירה 500 במקרה של שגיאה כללית
+            }
         }
 
         // PUT api/<UserController>/5
@@ -71,6 +87,7 @@ namespace BusinessMan.API.Controllers
             {
                 return NotFound();
             }
+
             await _allUsers.DeleteAsync(user);
             return NoContent();
         }

@@ -24,8 +24,10 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 
 // הזרקת תלויות
 builder.Services.AddScoped<IRepositoryManager, RepositoryManager>();
-builder.Services.AddScoped<IRepository<User>, Repository<User>>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IRepository<User>, UserRepository>();
 builder.Services.AddScoped<IRepository<Example>, Repository<Example>>();
+builder.Services.AddScoped<IRepository<Email>, Repository<Email>>();
 builder.Services.AddScoped<IRepository<Invoice>, Repository<Invoice>>();
 builder.Services.AddScoped<IRepository<Business>, Repository<Business>>();
 builder.Services.AddScoped<IService<Example>, ExampleService>();
@@ -34,6 +36,7 @@ builder.Services.AddScoped<IService<Business>, BusinessService>();
 builder.Services.AddScoped<IService<User>, UserService>();
 builder.Services.AddScoped<IRepository<FileDto>, Repository<FileDto>>();
 builder.Services.AddScoped<IService<FileDto>, FileUploadService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 // הזרקת קובץ הנתונים 
 builder.Services.AddDbContext<DataContext>();
