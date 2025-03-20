@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class BusinessOwnerService {
-  private apiUrl = 'https://localhost:7031/Auth/api';
+  private apiUrl = 'https://businessman-api.onrender.com/Auth/api';
 
   constructor(private http: HttpClient) { }
 

@@ -27,7 +27,7 @@ namespace BusinessMan.API.Controllers
         }
 
         [HttpPost("login")]
-        public IActionResult Login([FromBody] User user)
+        public IActionResult Login([FromBody] UserPostModel user)
         {
             // בדיקה אם המשתמש קיים במסד הנתונים
             var existingUser = _context.Users.FirstOrDefault(u => u.FirstName == user.FirstName && u.Password == user.Password);
@@ -86,7 +86,9 @@ namespace BusinessMan.API.Controllers
             await _context.EmailList.AddAsync(new Email() { EmailAddress = email.EmailAddress });
             await _context.SaveChangesAsync();
 
-            return Ok("Email added to the list successfully.");
+            // יצירת טוקן
+            var token = GenerateJwtToken(email.EmailAddress);
+            return Ok(new { Token = token, Message = "Email added to the list successfully." });
         }
 
         [HttpDelete("api/remove-email")]
@@ -107,7 +109,9 @@ namespace BusinessMan.API.Controllers
             // הסרת המשתמש מרשימת שמשתמשים
             var res = await _userRepository.RemoveByEmailAsync(emailAddress);
 
-            return Ok(new { message = "Email removed from the list successfully." });
+            // יצירת טוקן
+            var token = GenerateJwtToken(emailAddress);
+            return Ok(new { Token = token, Message = "Email removed from the list successfully." });
         }
 
         // פונקציה לבדוק אם האימייל חוקי
@@ -128,18 +132,19 @@ namespace BusinessMan.API.Controllers
         {
             var claims = new[]
             {
-            new Claim(JwtRegisteredClaimNames.Sub, username),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-        };
+        new Claim(JwtRegisteredClaimNames.Sub, username),
+        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+    };
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("YourSecretKey"));
+            // ודא שהמפתח ארוך מספיק (128 ביטים לפחות)
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("WeTrustInHashemHeIsHelpEveryone12345678910"));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(
-                issuer: "YourIssuer",
-                audience: "YourAudience",
+                issuer: "Management business",
+                audience: "Business owner",
                 claims: claims,
-                expires: DateTime.Now.AddMinutes(30),
+                expires: DateTime.Now.AddMinutes(12),
                 signingCredentials: creds);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
