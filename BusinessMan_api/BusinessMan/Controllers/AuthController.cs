@@ -1,6 +1,7 @@
 ﻿using BusinessMan.Core.Models;
 using BusinessMan.Core.Repositories;
 using BusinessMan.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -13,7 +14,8 @@ namespace BusinessMan.API.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class AuthController : ControllerBase
+    [AllowAnonymous] // מאפשר גישה ללא הזדהות לכל הפעולות ב-controller
+    public class AuthController : Controller
     {
         private readonly DataContext _context;
         private readonly IConfiguration _configuration;
