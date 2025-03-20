@@ -1,16 +1,14 @@
 import { Component } from '@angular/core';
 import { BusinessOwnerService } from '../../services/business-owner.service';
-import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 
 @Component({
-  selector: 'app-admin-register',
+  selector: 'app-user-management',
   standalone: true,
-  imports: [FormsModule],
-  templateUrl: './admin-register.component.html',
-  styleUrl: './admin-register.component.css'
+  imports: [],
+  templateUrl: './user-management.component.html',
+  styleUrl: './user-management.component.css'
 })
-export class AdminRegisterComponent {
+export class UserManagementComponent {
   email_to_add: string = '';
   email_to_remove: string = '';
 

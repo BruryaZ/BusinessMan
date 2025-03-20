@@ -1,7 +1,8 @@
 import { Routes } from '@angular/router';
-import { AdminRegisterComponent } from './components/admin-register/admin-register.component';
+import { LoginComponent } from './components/login/login.component';
+import { UserManagementComponent } from './components/user-management/user-management.component';
 
 export const routes: Routes = [
-    { path: '', component: AdminRegisterComponent },
-    { path: 'admin-register-component', component: AdminRegisterComponent },
+    { path: '', component: LoginComponent },
+    { path: 'user-management', component: UserManagementComponent },
 ];
