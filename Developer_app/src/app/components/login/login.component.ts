@@ -39,6 +39,7 @@ export class LoginComponent {
     this.http.post<any>(`${this.apiUrl}/Auth/login`, payload).subscribe(response => {
       const token = response.token;
       localStorage.setItem('authToken', token);
+      console.log("Login succuessed")
     }, error => {
       console.error('Login failed');
     });

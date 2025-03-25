@@ -8,7 +8,7 @@ namespace BusinessMan.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [AllowAnonymous] // מאפשר גישה ללא הזדהות לכל הפעולות ב-controller
+    //[AllowAnonymous] // מאפשר גישה ללא הזדהות לכל הפעולות ב-controller
     public class ExampleController : Controller
     {
         private readonly IService<Example> _Example;

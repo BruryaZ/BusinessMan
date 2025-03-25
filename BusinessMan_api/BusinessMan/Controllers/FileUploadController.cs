@@ -5,9 +5,14 @@ using BusinessMan.Core.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using Microsoft.AspNetCore.Http;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace BusinessMan.API.Controllers
 {
+    [Route("api/[controller]")]
+    [ApiController]
     public class FileUploadController : Controller
     {
         private readonly IService<FileDto> _fileService;
@@ -41,16 +46,16 @@ namespace BusinessMan.API.Controllers
         }
 
         // POST api/<FileUploadController>
-        [HttpPost]
-        public async Task<ActionResult<FileDto>> PostAsync([FromForm] FileUpload fileUpload)
+        [HttpPost("upload")]
+        public async Task<IActionResult> Upload(IFormFile fileUpload)
         {
-            if (fileUpload.FileContent.Length > 50 * 1024 * 1024) // 50MB
+            if (fileUpload.Length > 50 * 1024 * 1024) // 50MB
             {
                 return BadRequest("גודל הקובץ חורג מהמגבלה המותרת.");
             }
 
             // בדיקת סוג הקובץ
-            var allowedExtensions = new[] { ".jpg", ".png", ".pdf", ".docx" };
+            var allowedExtensions = new[] { ".jpg", ".png", ".pdf", ".docx", ".txt" };
             var fileExtension = Path.GetExtension(fileUpload.FileName).ToLower();
             if (!allowedExtensions.Contains(fileExtension))
             {
@@ -62,9 +67,9 @@ namespace BusinessMan.API.Controllers
             // TODO: Save file to AWS S3.
 
             // יצירת קובץ חדש כדי שמידע כבד ולא רלוונטי לא ישמר במסד הנתונים ולא יעבור בין שכבות האפליקציה ללא צורך
-            var fileDto  = _mapper.Map<FileDto>(fileUpload);
+            var fileDto = _mapper.Map<FileDto>(fileUpload);
             var createdFile = await _fileService.AddAsync(fileDto);
-            return Ok(createdFile);
+            return Ok("ההעלאה בוצעה בהצלחה");
         }
 
         // PUT api/<FileUploadController>/5
@@ -79,7 +84,7 @@ namespace BusinessMan.API.Controllers
 
             // שמירת הקובץ במערכת (למשל, במערכת הקבצים)
             var filePath = Path.Combine("path_to_storage", fileUpload.FileName);
-            // TODO: Save file to AWS S3.
+            // TODO: Save file at AWS S3.
             return Ok(updatedFile);
         }
 

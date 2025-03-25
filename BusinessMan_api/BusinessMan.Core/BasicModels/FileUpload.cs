@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +9,8 @@ namespace BusinessMan.Core.Models
 {
     public class FileUpload
     {
+        //public IFormFile FileContent { get; set; } // הוספתי כדי שיעבוד בסווגר
+
         public string FileName { get; set; } // שם הקובץ
         public byte[] FileContent { get; set; } // תוכן הקובץ
         public long Size { get; set; } // גודל הקובץ
