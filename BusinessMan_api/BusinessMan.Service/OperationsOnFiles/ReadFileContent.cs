@@ -26,26 +26,27 @@ namespace BusinessMan.Service.OperationsOnFiles
     public class ReadFileContent(IConfiguration configuration) 
     {
         private readonly IConfiguration _configuration = configuration;
-        public async Task<string> Read(FileDto fileUpload)
+        public static async Task<string> Read(FileDto fileUpload)
         {
             var fileExtension = System.IO.Path.GetExtension(fileUpload.FileName).ToLower();
 
             // הנח שיש לך זרם מקור ב- FileDto
             using (var stream = new MemoryStream())
             {
-                await fileUpload.FileStream.CopyToAsync(stream); // העתקת התוכן מהזרם המקורי
+                using var inputStream = fileUpload.FileContent.OpenReadStream();
+                await inputStream.CopyToAsync(stream);
                 stream.Position = 0; // החזרת המצביע להתחלה
 
                 switch (fileExtension)
                 {
+                    case ".pdf":
+                        return await ReadPdfContent(stream); // הפעלת קריאת PDF
+
                     case ".txt":
                         using (var reader = new StreamReader(stream))
                         {
                             return await reader.ReadToEndAsync();
                         }
-
-                    case ".pdf":
-                        return await ReadPdfContent(stream); // הפעלת קריאת PDF
 
                     case ".jpg":
                     case ".png":
@@ -63,12 +64,12 @@ namespace BusinessMan.Service.OperationsOnFiles
             }
         }
 
-        private async Task<string> ReadDocxContent(Stream stream)
+        private static async Task<string> ReadDocxContent(Stream stream)
         {
             using (WordprocessingDocument wordDoc = WordprocessingDocument.Open(stream, false))
             {
                 StringBuilder text = new StringBuilder();
-                Body body = wordDoc.MainDocumentPart.Document.Body;
+                Body body =  wordDoc.MainDocumentPart.Document.Body;
 
                 foreach (var paragraph in body.Elements<Paragraph>())
                 {
@@ -79,7 +80,7 @@ namespace BusinessMan.Service.OperationsOnFiles
             }
         }
 
-        private async Task<string> ReadExcelContent(Stream stream)
+        private static async Task<string> ReadExcelContent(Stream stream)
         {
             using (ExcelPackage package = new ExcelPackage(stream))
             {
@@ -99,7 +100,7 @@ namespace BusinessMan.Service.OperationsOnFiles
             }
         }
 
-        private async Task<string> ReadPdfContent(Stream stream)
+        private static async Task<string> ReadPdfContent(Stream stream)
         {
             StringBuilder text = new StringBuilder();
 
@@ -119,12 +120,15 @@ namespace BusinessMan.Service.OperationsOnFiles
             return text.ToString();
         }
 
-        private async Task<string> ReadImageContent(Stream stream, FileDto fileUpload)
+        private static async Task<string> ReadImageContent(Stream stream, FileDto fileUpload)
         {
             string tempFilePath = Path.GetTempFileName() + Path.GetExtension(fileUpload.FileName);
 
             using (var fileStream = new FileStream(tempFilePath, FileMode.Create, FileAccess.Write))
             {
+                if (fileUpload.FileContent == null)
+                    throw new InvalidOperationException("FileContent is null. ודא שהקובץ הועבר כראוי מהקליינט.");
+
                 await stream.CopyToAsync(fileStream);
             }
 
@@ -154,7 +158,7 @@ namespace BusinessMan.Service.OperationsOnFiles
             });
 
             // שימי כאן את הטקסט של החשבונית ששלפת מ-PDF
-            string invoiceText = File.ReadAllText("invoice_text.txt");
+            string invoiceText = await ReadFileContent.Read(file);
 
             var result = await service.ChatCompletion.CreateCompletion(new ChatCompletionCreateRequest
             {

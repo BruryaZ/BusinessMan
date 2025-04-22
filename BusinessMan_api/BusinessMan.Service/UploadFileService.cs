@@ -4,6 +4,7 @@ using BusinessMan.Core.Repositories;
 using BusinessMan.Core.Services;
 using BusinessMan.Data.Repositories;
 using BusinessMan.Service.OperationsOnFiles;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,11 +17,13 @@ namespace BusinessMan.Service
     {
         private ReadFileContent readFileContent;
         private readonly IRepositoryManager _repositoryManager;
+        private readonly IConfiguration _configuration;
 
-        public FileUploadService(IRepositoryManager repositoryManager, ReadFileContent readFileContent)
+        public FileUploadService(IRepositoryManager repositoryManager, ReadFileContent readFileContent, IConfiguration configuration)
         {
             _repositoryManager = repositoryManager;
             this.readFileContent = readFileContent;
+            _configuration = configuration;
         }
 
         public async Task<FileDto?> GetByIdAsync(int id)
@@ -36,8 +39,10 @@ namespace BusinessMan.Service
         public async Task<FileDto> AddAsync(FileDto fileUpload)
         {
             // חילוץ הסכומים וגיבוי הקובץ
-            var res = ReadFileContent.FileAnalysis(fileUpload);
-            string content = await readFileContent.Read(fileUpload);
+            var readFile = new ReadFileContent(_configuration);
+            var res = await readFile.FileAnalysis(fileUpload);
+            Console.WriteLine("***********The result is: "+ res);
+            //string content = await readFileContent.Read(fileUpload);
             await _repositoryManager.Files.AddAsync(fileUpload);
             await _repositoryManager.SaveAsync(); 
             return fileUpload;

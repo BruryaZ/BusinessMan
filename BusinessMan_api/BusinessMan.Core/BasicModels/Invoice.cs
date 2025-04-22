@@ -24,5 +24,9 @@ namespace BusinessMan.Core.Models
         public int? BusinessId { get; set; } // מזהה ייחודי לעסק
         public Business? Business { get; set; }
         public User? User { get; set; }
+        public override string ToString()
+        {
+            return "Amount debit: " + AmountDebit + " Amount credit: " + AmountCredit + " Invoice date: " + InvoiceDate + " Status: " + Status + " Notes: " + Notes + " Created at: " + CreatedAt + " Created by: " + CreatedBy + " Updated at: " + UpdatedAt + " Updated by: " + UpdatedBy;
+        }
     }
 }
