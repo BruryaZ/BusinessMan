@@ -65,19 +65,19 @@ namespace BusinessMan.API.Controllers
             // TODO: Save file to AWS S3.
 
             // שלב 1: שמירה זמנית (או ישירות ל־S3)
-            var fileName = "";// Path.GetFileName(fileUpload.FileName);
-            var filePath = "";//Path.Combine(_env.WebRootPath, "uploads", Guid.NewGuid() + fileName);
+            var fileName = fileUpload.Name;//TODO:: Path.GetFileName(fileUpload.FileName);
+            var filePath = fileExtension;//TODO:: Path.Combine(_env.WebRootPath, "uploads", Guid.NewGuid() + fileName);
 
             // יצירת קובץ חדש כדי שמידע כבד ולא רלוונטי לא ישמר במסד הנתונים ולא יעבור בין שכבות האפליקציה ללא צורך
             // שלב 2: יצירת DTO "רזה" להעברה לשירות
             var fileDto = new FileDto
             {
-                FileName = fileName,
+                FileName = fileName + fileExtension,
                 Size = fileUpload.Length,
                 UploadDate = DateTime.UtcNow,
-                FilePath = filePath,
+                FilePath = fileName + fileExtension,
                 FileContent = fileUpload,
-            }; 
+            };
             Console.WriteLine(fileDto + " " + fileUpload);
             var createdFile = await _fileService.AddAsync(fileDto);
 

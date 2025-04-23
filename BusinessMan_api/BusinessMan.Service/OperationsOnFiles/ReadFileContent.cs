@@ -23,7 +23,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace BusinessMan.Service.OperationsOnFiles
 {
-    public class ReadFileContent(IConfiguration configuration) 
+    public class ReadFileContent(IConfiguration configuration)
     {
         private readonly IConfiguration _configuration = configuration;
         public static async Task<string> Read(FileDto fileUpload)
@@ -69,7 +69,7 @@ namespace BusinessMan.Service.OperationsOnFiles
             using (WordprocessingDocument wordDoc = WordprocessingDocument.Open(stream, false))
             {
                 StringBuilder text = new StringBuilder();
-                Body body =  wordDoc.MainDocumentPart.Document.Body;
+                Body body = wordDoc.MainDocumentPart.Document.Body;
 
                 foreach (var paragraph in body.Elements<Paragraph>())
                 {
@@ -162,7 +162,8 @@ namespace BusinessMan.Service.OperationsOnFiles
 
             var result = await service.ChatCompletion.CreateCompletion(new ChatCompletionCreateRequest
             {
-                Model = Models.Gpt_3_5_Turbo,
+                Model = Models.Gpt_4o_mini,
+                //Model = Models.Gpt_3_5_Turbo,
                 Messages = new List<ChatMessage>
     {
         ChatMessage.FromSystem("אתה עוזר לנתח חשבוניות ולהחזיר תוצאה כ־JSON לפי מבנה קבוע."),
@@ -184,7 +185,7 @@ namespace BusinessMan.Service.OperationsOnFiles
   ""BusinessId"": null
 }}
 
-החזר את ה-JSON בלבד וללא טקסט נוסף.")
+החזר את ה-JSON בלבד וללא טקסט נוסף. החזר את התאריך בפורמט yyyy-MM-dd")
     },
                 Temperature = 0.2f
             });
@@ -194,7 +195,16 @@ namespace BusinessMan.Service.OperationsOnFiles
                 var json = result.Choices.First().Message.Content;
                 Console.WriteLine("JSON שהתקבל:\n" + json);
 
+                // הסרת סימונים ```json ו-``` אם קיימים
+                json = json.Trim().Trim('`');
+                if (json.StartsWith("json"))
+                {
+                    json = json.Substring(4).Trim();
+                }
+
+                // עכשיו אפשר לעשות Deserialize
                 var invoice = JsonSerializer.Deserialize<Invoice>(json);
+
                 Console.WriteLine($"סכום חובה: {invoice.AmountDebit}, סכום זכות: {invoice.AmountCredit}");
                 return invoice;
             }
