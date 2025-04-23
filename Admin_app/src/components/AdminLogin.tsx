@@ -3,34 +3,57 @@ import { Admin } from "../models/Admin"
 import * as Yup from 'yup'
 import axios from "axios"
 import { detailsContext } from "../context/AuthContext"
+import { AdminLoginResponse } from "../models/AdminLoginResponse"
+import { AdminRegister } from "../models/AdminRegister"
+import { useNavigate } from "react-router-dom"
 
 const validationSchema = Yup.object().shape({
     email: Yup.string().email('אימייל לא חוקי').required('אימייל הוא שדה חובה'),
-    password: Yup.string().required('סיסמא היא שדה חובה').min(4, 'סיסמא חייבת להיות לפחות 4 תווים')
+    password: Yup.string().required('סיסמא היא שדה חובה').min(3, 'סיסמא חייבת להיות לפחות 3 תווים')
 })
 
 
 const AdmineLogin = () => {
-    const [admin, setSdmin] = useState<Admin>({})
+    const nav = useNavigate()
+    const [admin, setSdmin] = useState<Admin>({ email: '', password: '' })
     const [errors, setErrors] = useState<string[]>([])
-    const url = 'https://businessman-api.onrender.com'
+    // const url = 'https://businessman-api.onrender.com'
+    const url = `https://localhost:7031`
     const authDetails = useContext(detailsContext)
 
-    const handleSubmit = (admin: Admin) => async (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = (adminRegister: AdminRegister) => async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         validationSchema.isValid(admin).then(async valid => {
+
             setErrors([]);
+
             if (valid) {
-                console.log('Admin:', admin)
                 try {
-                    const { data } = await axios.get<any>(`${url}...`) // TODO 
-                    // authDetails.setMyBusinessName('aaa')
+                    const { data } = await axios.post<AdminLoginResponse>(`${url}/Auth/api/admin-login`, adminRegister) // TODO 
+                    // הכנסת הטוקן לlocal storage
+                    if (typeof window !== 'undefined') {
+                        localStorage.setItem('token', data.token);
+                    }
+                    else{
+                        console.log('window is undefined');
+                    }
+                    // הכנסת הנתונים לקונטקסט
+                    authDetails.admin_email = data.user.email
+                    authDetails.admin_id = data.user.id
+                    authDetails.admin_name = data.user.firstName + " " + data.user.lastName
+                    authDetails.admin_role = data.user.role
+                    nav('/')
                 }
                 catch (e) {
                     console.log(e);
                 }
             }
+            else {
+                setErrors(['Validation error']);
+            }
+
         }).catch((err) => {
+            console.log('Validation error:', err.errors);
             if (err instanceof Yup.ValidationError) {
                 setErrors(err.errors);
             }

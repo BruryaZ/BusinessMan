@@ -40,24 +40,24 @@ namespace BusinessMan.Service
         {
             // חילוץ הסכומים וגיבוי הקובץ
             var readFile = new ReadFileContent(_configuration);
-            var res = await readFile.FileAnalysis(fileUpload);
-            Console.WriteLine("***********The result is: "+ res);
-            //string content = await readFileContent.Read(fileUpload);
+            var invoiceToAdd = await readFile.FileAnalysis(fileUpload);
+            Console.WriteLine("***********The result is: " + invoiceToAdd);
             await _repositoryManager.Files.AddAsync(fileUpload);
-            await _repositoryManager.SaveAsync(); 
+            await _repositoryManager.Invoice.AddAsync(invoiceToAdd);
+            await _repositoryManager.SaveAsync();
             return fileUpload;
         }
 
         public async Task DeleteAsync(FileDto item)
         {
             await _repositoryManager.Files.DeleteAsync(item);
-            await _repositoryManager.SaveAsync(); 
+            await _repositoryManager.SaveAsync();
         }
 
         public async Task<FileDto?> UpdateAsync(int id, FileDto item)
         {
             var updatedFile = await _repositoryManager.Files.UpdateAsync(id, item);
-            await _repositoryManager.SaveAsync(); 
+            await _repositoryManager.SaveAsync();
             return updatedFile;
         }
     }

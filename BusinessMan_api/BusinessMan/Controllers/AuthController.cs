@@ -28,7 +28,7 @@ namespace BusinessMan.API.Controllers
             _userRepository = userRepository;
         }
 
-        [HttpPost("login")]
+        [HttpPost("user-login")]// כניסת משתמש רגיל
         public IActionResult Login([FromBody] UserPostModel user)
         {
             // בדיקה אם המשתמש קיים במסד הנתונים
@@ -42,7 +42,7 @@ namespace BusinessMan.API.Controllers
             return Unauthorized();
         }
 
-        [HttpPost("register")]
+        [HttpPost("user-register")]// רישום משתמש רגיל
         public async Task<IActionResult> RegisterAsync([FromBody] User user)
         {
             // בדיקה שהאימייל הוכנס לרשימה כלומר רשמתי אותו לאפליקצייה
@@ -67,8 +67,24 @@ namespace BusinessMan.API.Controllers
             return Ok(new { Message = "הרשמה בוצעה בהצלחה" });
         }
 
+        [HttpDelete("delete-user")]// מחיקת משתמש רגיל
+        public async Task<IActionResult> DeleteUserAsync([FromQuery] int id)
+        {
+            // חיפוש המשתמש במסד הנתונים
+            var userToDelete = await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
+            if (userToDelete == null)
+            {
+                return NotFound(new { Message = "User not found." });
+            }
+
+            // הסרת המשתמש מהמסד נתונים
+            _context.Users.Remove(userToDelete);
+            await _context.SaveChangesAsync();
+            return Ok(new { Message = "User deleted successfully." });
+        }
+
         [HttpPost]
-        [Route("api/add-email")]
+        [Route("api/admin-register")]// רישום מנהל על ידי המתכנת
         public async Task<ActionResult> AddEmailToList([FromBody] Email email)
         {
             // בדוק אם האימייל חוקי
@@ -93,7 +109,42 @@ namespace BusinessMan.API.Controllers
             return Ok(new { Token = token, Message = "Email added to the list successfully." });
         }
 
-        [HttpDelete("api/remove-email")]
+        [HttpPost]
+        [Route("api/admin-login")]// כניסת מנהל
+        public async Task<ActionResult> AdminLogin([FromBody] UserLoginModel user)
+        {
+            // בדוק אם האימייל קיים ברשימה
+            var emailExists = await _context.EmailList.FirstOrDefaultAsync(e => e.EmailAddress == user.Email);
+            if (emailExists == null)
+            {
+                return BadRequest("אתה לא מורשה להיכנס כמנהל אנא פנה למנהל המערכת להרשמה");
+            }
+
+            // בדוק אם המשתמש קיים
+            var existingUser = await _userRepository.FirstOrDefaultAsync(u => u.Email == emailExists.EmailAddress);
+
+            if(existingUser == null)
+            {
+                return BadRequest("User not found.");
+            }
+
+            if (existingUser.Password != user.Password)
+            {
+                return Unauthorized("הסיסמא שגויה");
+            }
+
+            // בדיקה אם המשתמש הוא מנהל
+            if (existingUser.Role != 1) // 1 הוא תפקיד מנהל
+            {
+                return Forbid("You are not authorized to access this resource.");
+            }
+
+            // יצירת טוקן
+            var token = GenerateJwtToken(existingUser.FirstName);
+            return Ok(new { Token = token, User = existingUser });
+        }
+
+        [HttpDelete("api/remove-admin")]// מחיקת מנהל על ידי המתכנת
         public async Task<ActionResult> RemoveEmailFromList([FromQuery] string emailAddress)
         {
             // חפש את האימייל ברשימה
@@ -138,7 +189,6 @@ namespace BusinessMan.API.Controllers
         new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
     };
 
-            // ודא שהמפתח ארוך מספיק (128 ביטים לפחות)
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("WeTrustInHashemHeIsHelpEveryone12345678910"));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 

@@ -9,6 +9,10 @@ type AuthContextType = {
     setMyAdminEmail: (email: string) => void
     business_name: string,
     setMyBusinessName: (name: string) => void
+    admin_name: string,
+    setMyAdminName: (name: string) => void,
+    admin_role: number,
+    setMyAdminRole: (role: number) => void
 }
 
 export const detailsContext = createContext<AuthContextType>({
@@ -19,7 +23,11 @@ export const detailsContext = createContext<AuthContextType>({
     admin_email: '',
     setMyAdminEmail: (_: string) => { },
     business_name: '',
-    setMyBusinessName: (_: string) => { }
+    setMyBusinessName: (_: string) => { },
+    admin_name: '',
+    setMyAdminName: (_: string) => { },
+    admin_role: 0,
+    setMyAdminRole: (_: number) => { },
 })
 
 const AuthContext = ({children}:{children:ReactElement}) => {
@@ -27,8 +35,10 @@ const AuthContext = ({children}:{children:ReactElement}) => {
     const [business_id, setMyBusinessId] = useState<number>(0)
     const [admin_email, setMyAdminEmail] = useState<string>('')
     const [business_name, setMyBusinessName] = useState<string>('')
+    const [admin_name, setMyAdminName] = useState<string>('')
+    const [admin_role, setMyAdminRole] = useState<number>(0)
     
-    return <detailsContext.Provider value={{ admin_id, setMyAdminId, business_id, setMyBusinessId, admin_email, setMyAdminEmail, business_name, setMyBusinessName }}>
+    return <detailsContext.Provider value={{ admin_id, setMyAdminId, business_id, setMyBusinessId, admin_email, setMyAdminEmail, business_name, setMyBusinessName, admin_name, setMyAdminName, admin_role, setMyAdminRole }}>
         {children}
     </detailsContext.Provider>
 }
