@@ -55,15 +55,8 @@ namespace BusinessMan.API.Controllers
         [HttpPost("user-register")]// רישום משתמש רגיל
         public async Task<IActionResult> RegisterAsync([FromBody] UserPostModel user)
         {
-            // בדיקה שהאימייל הוכנס לרשימה כלומר רשמתי אותו לאפליקצייה
-            var emailExists = await _context.EmailList.AnyAsync(e => e.EmailAddress == user.Email);
-            if (!emailExists)
-            {
-                return BadRequest("Email not authorized to register.");
-            }
-
             // בדוק אם המשתמש כבר קיים
-            var existingUser = _context.Users.FirstOrDefault(u => u.IdNumber == user.IdNumber);
+            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.IdNumber == user.IdNumber);
 
             if (existingUser != null)
             {
@@ -72,8 +65,8 @@ namespace BusinessMan.API.Controllers
 
             // הוסף את המשתמש החדש למסד הנתונים
             var userToAdd = _mapper.Map<User>(user);  
-            _context.Users.Add(userToAdd);
-            _context.SaveChanges();
+            await _context.Users.AddAsync(userToAdd);
+            await _context.SaveChangesAsync();
 
             return Ok(new { Message = "הרשמה בוצעה בהצלחה" });
         }
@@ -95,7 +88,7 @@ namespace BusinessMan.API.Controllers
         }
 
         [HttpPost]
-        [Route("api/admin-register")]// רישום מנהל על ידי המתכנת
+        [Route("api/admin-register-by-dev")]// רישום מנהל על ידי המתכנת
         public async Task<ActionResult> AddEmailToList([FromBody] Email email)
         {
             // בדוק אם האימייל חוקי
@@ -118,6 +111,32 @@ namespace BusinessMan.API.Controllers
             // יצירת טוקן
             var token = GenerateJwtToken(email.EmailAddress);
             return Ok(new { Token = token, Message = "Email added to the list successfully." });
+        }
+
+        [HttpPost("admin-register")]// רישום מנהל
+        public async Task<IActionResult> RegisterAdminAsync([FromBody] UserPostModel user)
+        {
+            // בדיקה שהאימייל הוכנס לרשימה כלומר רשמתי אותו לאפליקצייה
+            var emailExists = await _context.EmailList.AnyAsync(e => e.EmailAddress == user.Email);
+            if (!emailExists)
+            {
+                return BadRequest("Email not authorized to register.");
+            }
+
+            // בדוק אם המשתמש כבר קיים
+            var existingUser = _context.Users.FirstOrDefault(u => u.IdNumber == user.IdNumber);
+
+            if (existingUser != null)
+            {
+                return BadRequest(new { Message = "משתמש כבר קיים" });
+            }
+
+            // הוסף את המשתמש החדש למסד הנתונים
+            var userToAdd = _mapper.Map<User>(user);
+            _context.Users.Add(userToAdd);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { Message = "הרשמה בוצעה בהצלחה" });
         }
 
         [HttpPost]

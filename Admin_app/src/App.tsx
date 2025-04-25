@@ -13,7 +13,6 @@ import RegisterBusinessData from './components/RegisterBusinessData';
 import RegisterUser from './components/UserRegister';
 
 function App() {
-  console.log("The url is: " + import.meta.env.VITE_API_URL);
   return (
     <AuthContext>
     <Router>

@@ -1,3 +1,5 @@
+using BusinessMan.API;
+using BusinessMan.API.Middlwares;
 using BusinessMan.Core;
 using BusinessMan.Core.DTO_s;
 using BusinessMan.Core.Models;
@@ -129,6 +131,9 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 //app.UseAuthorization();
+
+// My middlwares:
+app.UseAdminOnly();
 
 app.MapControllers();
 
