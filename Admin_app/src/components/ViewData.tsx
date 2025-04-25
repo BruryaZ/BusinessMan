@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState } from 'react';
 import { Business } from '../models/Business';
 import BusinessTable from './BusinessTable';
 
@@ -22,13 +22,35 @@ const business: Business = {
     updatedBy: "משתמש ב",
 };
 
-const App: React.FC = () => {
+
+function ViewData() {
+    const url = import.meta.env.VITE_API_URL
+    const [business, setBusiness] = useState<Business>({
+        id: 0,
+        businessId: 0,
+        name: "",
+        address: "",
+        email: "",
+        businessType: "",
+        income: 0,
+        expenses: 0,
+        cashFlow: 0,
+        totalAssets: 0,
+        totalLiabilities: 0,
+        netWorth: 0,
+        createdAt: new Date(),
+        createdBy: "",
+        updatedAt: new Date(),
+        updatedBy: "",
+    })
+    
+
+
     return (
         <div>
-            <h1>נתוני עסק</h1>
             <BusinessTable business={business} />
         </div>
-    );
-};
+    )
+}
 
-export default App;
+export default ViewData

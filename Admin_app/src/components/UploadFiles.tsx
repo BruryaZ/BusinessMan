@@ -1,50 +1,53 @@
-import React from 'react';
-import * as pdfjsLib from 'pdfjs-dist';
+import { useState } from "react";
+import axios from "axios";
 
-// הגדרת מקור העובד לגרסה הנכונה
-pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.worker.min.js`;
+const FileUpload = () => {
+    const [file, setFile] = useState<File | null>(null);
+    const [message, setMessage] = useState<string | null>(null);
+    const [error, setError] = useState<string | null>(null);
 
-const FileUpload: React.FC = () => {
-    const url = 'https://businessman-api.onrender.com'
+    const url = import.meta.env.VITE_API_URL
 
-    const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0]; // הקובץ הראשון
-        if (file) {
-            const allowedTypes = ['application/pdf', 'text/plain', 'image/jpeg', 'image/png']; // סוגי קבצים מותרים
-            if (allowedTypes.includes(file.type)) {
-                const formData = new FormData();
-                formData.append('file', file);
-    
-                try {
-                    const response = await fetch(`${url}/TODO: .................`, {
-                        method: 'POST',
-                        body: formData,
-                    });
-    
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-    
-                    const data = await response.json();
-                    console.log('File uploaded successfully:', data);
-                } catch (error) {
-                    console.log('Error uploading file:', error);
-                    alert('שגיאה בהעלאת הקובץ.');
-                }
-            } else {
-                alert("אנא בחר קובץ בפורמט PDF, טקסט או תמונה.");
-            }
-        } else {
-            alert("אנא בחר קובץ.");
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files.length > 0) {
+            setFile(e.target.files[0]);
+            setMessage(null);
+            setError(null);
+        }
+    };
+
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+
+        if (!file) {
+            setError("יש לבחור קובץ לפני השליחה");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("fileUpload", file);
+
+        try {
+            const response = await axios.post(`${url}/FileUpload/upload`, formData, {
+                headers: { "Content-Type": "multipart/form-data" }
+            });
+            setMessage(response.data);
+            setError(null);
+        } catch (err: any) {
+            const msg = err.response?.data || "אירעה שגיאה בהעלאת הקובץ";
+            setError(msg);
+            setMessage(null);
         }
     };
 
     return (
-        <div>
-            <input type="file" onChange={handleFileChange} accept="application/pdf" />
-            
-            
-        </div>
+        <form onSubmit={handleSubmit}>
+            <input type="file" onChange={handleFileChange} accept=".jpg,.png,.pdf,.docx,.txt" />
+            <button type="submit">העלה קובץ</button>
+
+            {message && <p style={{ color: "green" }}>{message}</p>}
+            {error && <p style={{ color: "red" }}>{error}</p>}
+        </form>
     );
 };
 

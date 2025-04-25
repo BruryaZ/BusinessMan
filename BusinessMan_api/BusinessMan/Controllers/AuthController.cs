@@ -1,4 +1,5 @@
-﻿using BusinessMan.Core.Models;
+﻿using AutoMapper;
+using BusinessMan.Core.Models;
 using BusinessMan.Core.Repositories;
 using BusinessMan.Data;
 using Microsoft.AspNetCore.Authorization;
@@ -20,30 +21,39 @@ namespace BusinessMan.API.Controllers
         private readonly DataContext _context;
         private readonly IConfiguration _configuration;
         private readonly IUserRepository _userRepository;
+        private readonly IMapper _mapper;
 
-        public AuthController(DataContext context, IConfiguration configuration, IUserRepository userRepository)
+        public AuthController(DataContext context, IConfiguration configuration, IUserRepository userRepository, IMapper mapper)
         {
             _context = context;
             _configuration = configuration;
             _userRepository = userRepository;
+            _mapper = mapper;
         }
 
         [HttpPost("user-login")]// כניסת משתמש רגיל
-        public IActionResult Login([FromBody] UserPostModel user)
+        public IActionResult Login([FromBody] UserLoginModel user)
         {
             // בדיקה אם המשתמש קיים במסד הנתונים
-            var existingUser = _context.Users.FirstOrDefault(u => u.FirstName == user.FirstName && u.Password == user.Password);
+            var existingUser = _context.Users.FirstOrDefault(u => u.Email == user.Email);
+            string token;
 
             if (existingUser != null)
+                token = GenerateJwtToken(existingUser.FirstName);
+
+            else
+                return NotFound(new { Message = "המשתמש לא קיים" });
+
+            if (user.Password != existingUser.Password)
             {
-                var token = GenerateJwtToken(existingUser.FirstName);
-                return Ok(new { Token = token });
+                return Unauthorized(new { Message = "סיסמה שגויה" });
             }
-            return Unauthorized();
+
+            return Ok(new { Token = token });
         }
 
         [HttpPost("user-register")]// רישום משתמש רגיל
-        public async Task<IActionResult> RegisterAsync([FromBody] User user)
+        public async Task<IActionResult> RegisterAsync([FromBody] UserPostModel user)
         {
             // בדיקה שהאימייל הוכנס לרשימה כלומר רשמתי אותו לאפליקצייה
             var emailExists = await _context.EmailList.AnyAsync(e => e.EmailAddress == user.Email);
@@ -53,7 +63,7 @@ namespace BusinessMan.API.Controllers
             }
 
             // בדוק אם המשתמש כבר קיים
-            var existingUser = _context.Users.FirstOrDefault(u => u.FirstName == user.FirstName);
+            var existingUser = _context.Users.FirstOrDefault(u => u.IdNumber == user.IdNumber);
 
             if (existingUser != null)
             {
@@ -61,7 +71,8 @@ namespace BusinessMan.API.Controllers
             }
 
             // הוסף את המשתמש החדש למסד הנתונים
-            _context.Users.Add(user);
+            var userToAdd = _mapper.Map<User>(user);  
+            _context.Users.Add(userToAdd);
             _context.SaveChanges();
 
             return Ok(new { Message = "הרשמה בוצעה בהצלחה" });

@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace BusinessMan.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class FileUploadController : Controller
     {

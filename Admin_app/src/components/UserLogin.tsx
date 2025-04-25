@@ -1,5 +1,4 @@
 import { useContext, useState } from "react"
-import { Admin } from "../models/Admin"
 import * as Yup from 'yup'
 import axios from "axios"
 import { detailsContext } from "../context/AuthContext"
@@ -13,28 +12,29 @@ const validationSchema = Yup.object().shape({
 })
 
 
-const AdmineLogin = () => {
+const UserLogin = () => {
     const nav = useNavigate()
-    const [admin, setAdmin] = useState<Admin>({ email: '', password: '' })
+    const [user, setUser] = useState<AdminRegister>({ email: "", password: "" })
     const [errors, setErrors] = useState<string[]>([])
     // const url = 'https://businessman-api.onrender.com'
-    const url = import.meta.env.VITE_API_URL 
+    const url = import.meta.env.VITE_API_URL
+ 
     const authDetails = useContext(detailsContext)
 
-    const handleSubmit = (adminRegister: AdminRegister) => async (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = (userLogin: AdminRegister) => async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
-        validationSchema.isValid(admin).then(async valid => {
+        validationSchema.isValid(userLogin).then(async valid => {
 
             setErrors([]);
 
             if (valid) {
                 try {
-                    const { data } = await axios.post<AdminLoginResponse>(`${url}/Auth/api/admin-login`, adminRegister) // TODO 
+                    const { data } = await axios.post<AdminLoginResponse>(`${url}/Auth/user-login`, userLogin) // TODO 
                     // הכנסת הטוקן לlocal storage
                     if (typeof window !== 'undefined') {
                         localStorage.setItem('token', data.token);
                     }
-                    else{
+                    else {
                         console.log('window is undefined');
                     }
                     // הכנסת הנתונים לקונטקסט
@@ -62,14 +62,14 @@ const AdmineLogin = () => {
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
         const { name, value } = event.target
-        setAdmin(prevAdmin => ({
-            ...prevAdmin,
+        setUser(prevUser => ({
+            ...prevUser,
             [name]: value
         }))
     }
 
     return (
-        <form onSubmit={handleSubmit(admin)}>
+        <form onSubmit={handleSubmit(user)}>
             <input type="email" name="email" placeholder="אימייל" onChange={handleChange} />
             <input type="password" name="password" placeholder="סיסמא" onChange={handleChange} />
             <button type="submit">התחבר</button>
@@ -86,4 +86,4 @@ const AdmineLogin = () => {
 
 }
 
-export default AdmineLogin
+export default UserLogin
