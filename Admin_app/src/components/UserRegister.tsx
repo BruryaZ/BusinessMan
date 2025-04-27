@@ -21,9 +21,7 @@ const UserRegister = () => {
         idNumber: "",
     })
     const [errors, setErrors] = useState<string[]>([])
-    // const url = 'https://businessman-api.onrender.com'
     const url = import.meta.env.VITE_API_URL
- 
 
     const handleSubmit = (userRegister: UserRegisterModel) => async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()

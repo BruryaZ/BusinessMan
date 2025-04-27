@@ -42,9 +42,10 @@ namespace BusinessMan.API.Controllers
 
         // POST api/<BusinessController>
         [HttpPost]
-        public async Task<ActionResult<BusinessDto>> PostAsync([FromBody] Business value)
+        public async Task<ActionResult<BusinessDto>> PostAsync([FromBody] BusinessPostModel value)
         {
-            var createdBusiness = await _allBusinesses.AddAsync(value);
+            var business = _mapper.Map<Business>(value);
+            var createdBusiness = await _allBusinesses.AddAsync(business);
             return Ok(_mapper.Map<BusinessDto>(createdBusiness));
         }
 

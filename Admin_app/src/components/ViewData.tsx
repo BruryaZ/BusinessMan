@@ -1,32 +1,34 @@
 import { useState } from 'react';
 import { Business } from '../models/Business';
 import BusinessTable from './BusinessTable';
+import axios from 'axios';
 
 //TODO: לשנות שנתוני העסק יגיעו מהשרת
-const business: Business = {
-    id: 1,
-    businessId: 101,
-    name: "עסק א",
-    address: "כתובת א",
-    email: "businessA@example.com",
-    businessType: "סוג א",
-    income: 100000,
-    expenses: 50000,
-    cashFlow: 50000,
-    totalAssets: 200000,
-    totalLiabilities: 50000,
-    netWorth: 150000,
-    createdAt: new Date(),
-    createdBy: "משתמש א",
-    updatedAt: new Date(),
-    updatedBy: "משתמש ב",
-};
+// const business: Business = {
+//     id: 2,
+//     businessId: 101,
+//     name: "עסק א",
+//     address: "כתובת א",
+//     email: "businessA@example.com",
+//     businessType: "סוג א",
+//     income: 100000,
+//     expenses: 50000,
+//     cashFlow: 50000,
+//     totalAssets: 200000,
+//     totalLiabilities: 50000,
+//     netWorth: 150000,
+//     createdAt: new Date(),
+//     createdBy: "משתמש א",
+//     updatedAt: new Date(),
+//     updatedBy: "משתמש ב",
+// };
 
 
 function ViewData() {
     const url = import.meta.env.VITE_API_URL
+    const [errors, setErrors] = useState<string[]>([])
     const [business, setBusiness] = useState<Business>({
-        id: 0,
+        id: 2,// TODO: לשנות 
         businessId: 0,
         name: "",
         address: "",
@@ -43,13 +45,50 @@ function ViewData() {
         updatedAt: new Date(),
         updatedBy: "",
     })
-    
+
+    const handleSubmit = (businessId: number) => async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault()
+        setErrors([]);
+
+        try {
+            console.log(`${url}/api/Business/${businessId}`);
+            console.log(business);
+            
+            const res = await axios.get<Business>(`${url}/api/Business/${businessId}`);
+            if (res.status !== 200) {
+                setErrors(['Error fetching business data']);
+                return;
+            }
+
+            if (!res) {
+                setErrors(['No data found']);
+                return;
+            }
+
+            setBusiness(res.data);
+        } catch (error) {
+            console.error('Error fetching business data:', error);
+            setErrors(['Error fetching business data']);
+        }
+    }
 
 
     return (
-        <div>
-            <BusinessTable business={business} />
-        </div>
+        // לדאוג להכניס את מספר העסק בכניסת המנהל TODO::
+        <form onSubmit={handleSubmit(business.id)}>
+            <div>
+                <BusinessTable business={business} />
+            </div>
+
+            <button type="submit">צפה בנתונים</button>
+            {errors.length > 0 && (
+                <ul>
+                    {errors.map((error, index) => (
+                        <li key={index}>{error}</li>
+                    ))}
+                </ul>
+            )}
+        </form>
     )
 }
 

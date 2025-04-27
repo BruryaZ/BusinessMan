@@ -16,6 +16,8 @@ namespace BusinessMan.Core
             CreateMap<FileUpload, FileDto>().ReverseMap();
             CreateMap<User, UserDto>().ReverseMap();
             CreateMap<Invoice, InvoiceDto>().ReverseMap();
+            CreateMap<Business, BusinessDto>().ReverseMap();
+            CreateMap<Business, BusinessPostModel>().ReverseMap();
             CreateMap<UserPostModel, User>()
                 .ForMember(dest => dest.Status, opt => opt.Ignore())
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
