@@ -1,5 +1,4 @@
 using BusinessMan.API;
-using BusinessMan.API.Middlwares;
 using BusinessMan.Core;
 using BusinessMan.Core.DTO_s;
 using BusinessMan.Core.Models;
@@ -53,54 +52,54 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 // הזרקת קובץ הנתונים 
 builder.Services.AddDbContext<DataContext>();
 
-//// JWT Configuration
-//builder.Services.AddAuthentication(options =>
-//{
-//    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-//    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-//})
-//.AddJwtBearer(options =>
-//{
-//    options.TokenValidationParameters = new TokenValidationParameters
-//    {
-//        ValidateIssuer = true,
-//        ValidateAudience = true,
-//        ValidateLifetime = true,
-//        ValidateIssuerSigningKey = true,
-//        ValidIssuer = builder.Configuration["JWT:Issuer"],
-//        ValidAudience = builder.Configuration["JWT:Audience"],
-//        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"]))
-//    };
-//});
+// JWT Configuration
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration["JWT:Issuer"],
+        ValidAudience = builder.Configuration["JWT:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"]))
+    };
+});
 
 // תמיכה ב swagger
 builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
 
-    //options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-    //{
-    //    Scheme = "Bearer",
-    //    BearerFormat = "JWT",
-    //    In = ParameterLocation.Header,
-    //    Name = "Authorization",
-    //    Description = "Bearer Authentication with JWT Token",
-    //    Type = SecuritySchemeType.Http
-    //});
-    //options.AddSecurityRequirement(new OpenApiSecurityRequirement
-    //{
-    //    {
-    //        new OpenApiSecurityScheme
-    //        {
-    //            Reference = new OpenApiReference
-    //            {
-    //                Id = "Bearer",
-    //                Type = ReferenceType.SecurityScheme
-    //            }
-    //        },
-    //        new List<string>()
-    //    }
-    //});
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Name = "Authorization",
+        Description = "Bearer Authentication with JWT Token",
+        Type = SecuritySchemeType.Http
+    });
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Id = "Bearer",
+                    Type = ReferenceType.SecurityScheme
+                }
+            },
+            new List<string>()
+        }
+    });
 });
 
 // שירותי CORS
@@ -130,7 +129,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-//app.UseAuthorization();
+app.UseAuthentication();
+
+app.UseAuthorization();
 
 // My middlwares:
 app.UseAdminOnly();

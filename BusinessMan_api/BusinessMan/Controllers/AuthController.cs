@@ -39,7 +39,7 @@ namespace BusinessMan.API.Controllers
             string token;
 
             if (existingUser != null)
-                token = GenerateJwtToken(existingUser.FirstName);
+                token = GenerateJwtToken(existingUser.FirstName, false);
 
             else
                 return NotFound(new { Message = "המשתמש לא קיים" });
@@ -109,7 +109,7 @@ namespace BusinessMan.API.Controllers
             await _context.SaveChangesAsync();
 
             // יצירת טוקן
-            var token = GenerateJwtToken(email.EmailAddress);
+            var token = GenerateJwtToken(email.EmailAddress, true);
             return Ok(new { Token = token, Message = "Email added to the list successfully." });
         }
 
@@ -170,7 +170,7 @@ namespace BusinessMan.API.Controllers
             }
 
             // יצירת טוקן
-            var token = GenerateJwtToken(existingUser.FirstName);
+            var token = GenerateJwtToken(existingUser.FirstName, true);
             return Ok(new { Token = token, User = existingUser });
         }
 
@@ -193,7 +193,7 @@ namespace BusinessMan.API.Controllers
             var res = await _userRepository.RemoveByEmailAsync(emailAddress);
 
             // יצירת טוקן
-            var token = GenerateJwtToken(emailAddress);
+            var token = GenerateJwtToken(emailAddress, true);
             return Ok(new { Token = token, Message = "Email removed from the list successfully." });
         }
 
@@ -211,13 +211,19 @@ namespace BusinessMan.API.Controllers
             }
         }
 
-        private string GenerateJwtToken(string username)
+        private string GenerateJwtToken(string username, bool isAdmin)
         {
-            var claims = new[]
-            {
+            var claims = new List<Claim>
+    {
         new Claim(JwtRegisteredClaimNames.Sub, username),
         new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
     };
+
+            // הוסף את ה-Claim של תפקיד אם המשתמש הוא Admin
+            if (isAdmin)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, "Admin"));
+            }
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("WeTrustInHashemHeIsHelpEveryone12345678910"));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);

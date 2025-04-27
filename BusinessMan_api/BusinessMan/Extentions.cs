@@ -1,4 +1,4 @@
-﻿using BusinessMan.API.Middlwares;
+﻿using BusinessMan.API.Middleware;
 
 namespace BusinessMan.API
 {
@@ -13,7 +13,7 @@ namespace BusinessMan.API
         /// 
         public static IApplicationBuilder UseAdminOnly(this IApplicationBuilder app)
         {
-            app.UseMiddleware<AdminOnlyMiddleware>();
+            app.UseMiddleware<AdminAuthorizationMiddleware>();
             return app;
         }
     }
