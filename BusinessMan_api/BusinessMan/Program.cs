@@ -9,6 +9,7 @@ using BusinessMan.Data.Repositories;
 using BusinessMan.Service;
 using BusinessMan.Service.OperationsOnFiles;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
@@ -50,7 +51,9 @@ builder.Services.AddScoped<ReadFileContent>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 
 // הזרקת קובץ הנתונים 
-builder.Services.AddDbContext<DataContext>();
+builder.Services.AddDbContext<DataContext>(); // ?
+//builder.Services.AddDbContext<DataContext>(options =>
+//    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // JWT Configuration
 builder.Services.AddAuthentication(options =>

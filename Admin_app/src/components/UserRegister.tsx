@@ -3,14 +3,13 @@ import * as Yup from 'yup'
 import axios from "axios"
 import { useNavigate } from "react-router-dom"
 import { UserRegisterModel } from "../models/UserRegisterModel"
+import { validationSchemaUserRegister } from "../utils/validationSchema"
 
-const validationSchema = Yup.object().shape({
-    email: Yup.string().email('אימייל לא חוקי').required('אימייל הוא שדה חובה'),
-    password: Yup.string().required('סיסמא היא שדה חובה').min(3, 'סיסמא חייבת להיות לפחות 3 תווים')
-})
+
 
 const UserRegister = () => {
     const nav = useNavigate()
+    const validationSchema = validationSchemaUserRegister
     const [user, setUser] = useState<UserRegisterModel>({
         firstName: "",
         lastName: "",

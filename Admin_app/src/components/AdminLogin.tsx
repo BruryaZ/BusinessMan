@@ -6,20 +6,17 @@ import { detailsContext } from "../context/AuthContext"
 import { AdminLoginResponse } from "../models/AdminLoginResponse"
 import { AdminRegister } from "../models/AdminRegister"
 import { useNavigate } from "react-router-dom"
+import { validationSchemaAdminLogin } from "../utils/validationSchema"
 
-const validationSchema = Yup.object().shape({
-    email: Yup.string().email('אימייל לא חוקי').required('אימייל הוא שדה חובה'),
-    password: Yup.string().required('סיסמא היא שדה חובה').min(3, 'סיסמא חייבת להיות לפחות 3 תווים')
-})
 
 
 const AdmineLogin = () => {
     const nav = useNavigate()
     const [admin, setAdmin] = useState<Admin>({ email: '', password: '' })
     const [errors, setErrors] = useState<string[]>([])
-    // const url = 'https://businessman-api.onrender.com'
     const url = import.meta.env.VITE_API_URL 
     const authDetails = useContext(detailsContext)
+    const validationSchema = validationSchemaAdminLogin
 
     const handleSubmit = (adminRegister: AdminRegister) => async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()

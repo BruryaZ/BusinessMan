@@ -5,18 +5,13 @@ import { detailsContext } from "../context/AuthContext"
 import { AdminLoginResponse } from "../models/AdminLoginResponse"
 import { AdminRegister } from "../models/AdminRegister"
 import { useNavigate } from "react-router-dom"
-
-const validationSchema = Yup.object().shape({
-    email: Yup.string().email('אימייל לא חוקי').required('אימייל הוא שדה חובה'),
-    password: Yup.string().required('סיסמא היא שדה חובה').min(3, 'סיסמא חייבת להיות לפחות 3 תווים')
-})
-
+import { validationSchemaUserLogin } from "../utils/validationSchema"
 
 const UserLogin = () => {
     const nav = useNavigate()
+    const validationSchema = validationSchemaUserLogin
     const [user, setUser] = useState<AdminRegister>({ email: "", password: "" })
     const [errors, setErrors] = useState<string[]>([])
-    // const url = 'https://businessman-api.onrender.com'
     const url = import.meta.env.VITE_API_URL
  
     const authDetails = useContext(detailsContext)

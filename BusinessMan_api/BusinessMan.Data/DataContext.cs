@@ -23,11 +23,21 @@ namespace BusinessMan.Data
         //    optionsBuilder.UseNpgsql("User Id=postgres.jzhpcydzzjymiujlfaxt;Password=b214958522;Server=aws-0-eu-central-1.pooler.supabase.com;Port=6543;Database=postgres");
         //    optionsBuilder.LogTo(message => Debug.WriteLine(message));
         //}
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
 
             optionsBuilder.UseSqlServer(@"Server=(localdb)\MSSQLLocalDB;Database=businessman_db");
         }
+
+        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        //{
+        //    if (!optionsBuilder.IsConfigured)
+        //    {
+        //        optionsBuilder.UseNpgsql("Host=db.fxmuilefdjrimtcujyfu.supabase.co;Database=postgres;Username=postgres;Password=b214958522;SSL Mode=Require;Trust Server Certificate=true");
+        //    }
+        //}
+
         public DbSet<User> Users { get; set; }
         public DbSet<Invoice> Invoices { get; set; }
         public DbSet<Business> Businesses { get; set; }
@@ -46,57 +56,107 @@ namespace BusinessMan.Data
         //}
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            // 🗃️ טבלאות
             modelBuilder.Entity<User>().ToTable("users");
             modelBuilder.Entity<Invoice>().ToTable("invoices");
             modelBuilder.Entity<Business>().ToTable("businesses");
             modelBuilder.Entity<Example>().ToTable("examples");
             modelBuilder.Entity<FileDto>().ToTable("files");
-            modelBuilder.Entity<Business>()
-                .Property(b => b.CashFlow)
-                .HasColumnType("decimal(18,2)");
+            modelBuilder.Entity<Email>().ToTable("emails");
 
-            modelBuilder.Entity<Business>()
-                .Property(b => b.CurrentRatio)
-                .HasColumnType("decimal(18,2)");
-
-            modelBuilder.Entity<Business>()
-                .Property(b => b.Expenses)
-                .HasColumnType("decimal(18,2)");
-
-            modelBuilder.Entity<Business>()
-                .Property(b => b.Income)
-                .HasColumnType("decimal(18,2)");
-
-            modelBuilder.Entity<Business>()
-                .Property(b => b.ProfitMargin)
-                .HasColumnType("decimal(18,2)");
-
-            modelBuilder.Entity<Business>()
-                .Property(b => b.QuickRatio)
-                .HasColumnType("decimal(18,2)");
-
-            modelBuilder.Entity<Business>()
-                .Property(b => b.RevenueGrowthRate)
-                .HasColumnType("decimal(18,2)");
-
-            modelBuilder.Entity<Business>()
-                .Property(b => b.TotalAssets)
-                .HasColumnType("decimal(18,2)");
-
-            modelBuilder.Entity<Business>()
-                .Property(b => b.TotalLiabilities)
-                .HasColumnType("decimal(18,2)");
+            // 📌 קשרים בין Invoice ל-User
             modelBuilder.Entity<Invoice>()
-    .HasOne(i => i.User)
-    .WithMany(u => u.Invoices)
-    .HasForeignKey(i => i.UserId)
-    .OnDelete(DeleteBehavior.Restrict); // או DeleteBehavior.NoAction
+                .HasOne(i => i.User)
+                .WithMany(u => u.Invoices)
+                .HasForeignKey(i => i.UserId)
+                .OnDelete(DeleteBehavior.Restrict); // כדי לא למחוק חשבוניות אם משתמש נמחק
 
+            // 📌 קשרים בין Invoice ל-Business
             modelBuilder.Entity<Invoice>()
                 .HasOne(i => i.Business)
                 .WithMany(b => b.Invoices)
                 .HasForeignKey(i => i.BusinessId)
-                .OnDelete(DeleteBehavior.Restrict); // או DeleteBehavior.NoAction
+                .OnDelete(DeleteBehavior.Restrict); // כדי לא למחוק חשבוניות אם עסק נמחק
+
+            // 📌 קשרים בין User ל-Business
+            modelBuilder.Entity<User>()
+                .HasOne(u => u.Business)
+                .WithMany(b => b.Users)
+                .HasForeignKey(u => u.BusinessId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // 💰 טיפוסי Decimal עם דיוק (מתאים גם ל־PostgreSQL וגם ל־SQL Server)
+            var decimalProps = new[]
+            {
+        nameof(Business.CashFlow),
+        nameof(Business.CurrentRatio),
+        nameof(Business.Expenses),
+        nameof(Business.Income),
+        nameof(Business.ProfitMargin),
+        nameof(Business.QuickRatio),
+        nameof(Business.RevenueGrowthRate),
+        nameof(Business.TotalAssets),
+        nameof(Business.TotalLiabilities)
+    };
+
+            foreach (var prop in decimalProps)
+            {
+                modelBuilder.Entity<Business>()
+                    .Property(prop)
+                    .HasColumnType("decimal(18,2)");
+            }
         }
+
+        //        modelBuilder.Entity<User>().ToTable("users");
+        //        modelBuilder.Entity<Invoice>().ToTable("invoices");
+        //        modelBuilder.Entity<Business>().ToTable("businesses");
+        //        modelBuilder.Entity<Example>().ToTable("examples");
+        //        modelBuilder.Entity<FileDto>().ToTable("files");
+        //        modelBuilder.Entity<Business>()
+        //            .Property(b => b.CashFlow)
+        //            .HasColumnType("decimal(18,2)");
+
+        //        modelBuilder.Entity<Business>()
+        //            .Property(b => b.CurrentRatio)
+        //            .HasColumnType("decimal(18,2)");
+
+        //        modelBuilder.Entity<Business>()
+        //            .Property(b => b.Expenses)
+        //            .HasColumnType("decimal(18,2)");
+
+        //        modelBuilder.Entity<Business>()
+        //            .Property(b => b.Income)
+        //            .HasColumnType("decimal(18,2)");
+
+        //        modelBuilder.Entity<Business>()
+        //            .Property(b => b.ProfitMargin)
+        //            .HasColumnType("decimal(18,2)");
+
+        //        modelBuilder.Entity<Business>()
+        //            .Property(b => b.QuickRatio)
+        //            .HasColumnType("decimal(18,2)");
+
+        //        modelBuilder.Entity<Business>()
+        //            .Property(b => b.RevenueGrowthRate)
+        //            .HasColumnType("decimal(18,2)");
+
+        //        modelBuilder.Entity<Business>()
+        //            .Property(b => b.TotalAssets)
+        //            .HasColumnType("decimal(18,2)");
+
+        //        modelBuilder.Entity<Business>()
+        //            .Property(b => b.TotalLiabilities)
+        //            .HasColumnType("decimal(18,2)");
+        //        modelBuilder.Entity<Invoice>()
+        //.HasOne(i => i.User)
+        //.WithMany(u => u.Invoices)
+        //.HasForeignKey(i => i.UserId)
+        //.OnDelete(DeleteBehavior.Restrict); // או DeleteBehavior.NoAction
+
+        //        modelBuilder.Entity<Invoice>()
+        //            .HasOne(i => i.Business)
+        //            .WithMany(b => b.Invoices)
+        //            .HasForeignKey(i => i.BusinessId)
+        //            .OnDelete(DeleteBehavior.Restrict); // או DeleteBehavior.NoAction
     }
 }
