@@ -36,9 +36,12 @@ const BusinessAndAdmin = () => {
             users: [globalContextDetails.admin],
             updateBy: globalContextDetails.admin.firstName + " " + globalContextDetails.admin.lastName,
         }
+        globalContextDetails.setAdmin(updateAdmin)
+        globalContextDetails.setBusinessGlobal(updateBusiness)
 
         try {
-            console.log(globalContextDetails);
+            console.log("globalContextDetails admin" , globalContextDetails.admin);
+            console.log("updateAdmin" , updateAdmin);
             const { data } = await axios.put<UserDto>(`${url}/api/User/${globalContextDetails.admin.id}`, { updateAdmin })
             console.log(data);
         }
@@ -63,7 +66,6 @@ const BusinessAndAdmin = () => {
             {isAdmin && <AdminRegister onSubmitSuccess={() => setAdminDone(true)} />}
             <button onClick={() => { setIsBusiness(!isBusiness) }}>רישום פרטי עסק</button>
             {isBusiness && <RegisterBusinessData onSubmitSuccess={() => setBusinessDone(true)} />}
-
         </div>
     )
 }

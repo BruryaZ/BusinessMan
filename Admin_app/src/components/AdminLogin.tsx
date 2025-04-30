@@ -2,7 +2,7 @@ import { useContext, useState } from "react"
 import { Admin } from "../models/Admin"
 import * as Yup from 'yup'
 import axios from "axios"
-import { detailsContext } from "../context/AuthContext"
+// import { detailsContext } from "../context/AuthContext"
 import { AdminLoginResponse } from "../models/AdminLoginResponse"
 import { AdminRegister } from "../models/AdminRegister"
 import { useNavigate } from "react-router-dom"
@@ -13,7 +13,7 @@ const AdmineLogin = () => {
     const [admin, setAdmin] = useState<Admin>({ email: '', password: '' })
     const [errors, setErrors] = useState<string[]>([])
     const url = import.meta.env.VITE_API_URL 
-    const authDetails = useContext(detailsContext)
+    // const authDetails = useContext(detailsContext)
     const validationSchema = validationSchemaAdminLogin
 
     const handleSubmit = (adminRegister: AdminRegister) => async (e: React.FormEvent<HTMLFormElement>) => {
@@ -32,11 +32,11 @@ const AdmineLogin = () => {
                     else{
                         console.log('window is undefined');
                     }
-                    // הכנסת הנתונים לקונטקסט TODO:: זה מיותר יש לי את כל האובייקט בקונטקטס
-                    authDetails.user_email = data.user.email
-                    authDetails.user_id = data.user.id
-                    authDetails.user_name = data.user.firstName + " " + data.user.lastName
-                    authDetails.user_role = data.user.role
+                    // // הכנסת הנתונים לקונטקסט TODO:: זה מיותר יש לי את כל האובייקט בקונטקטס
+                    // authDetails.user_email = data.user.email
+                    // authDetails.user_id = data.user.id
+                    // authDetails.user_name = data.user.firstName + " " + data.user.lastName
+                    // authDetails.user_role = data.user.role
                     nav('/')
                 }
                 catch (e) {
