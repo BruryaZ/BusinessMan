@@ -11,12 +11,14 @@ export interface User {
     role: number; // תפקיד עובד (admin / user)
     idNumber: string; // תעודת זהות
     status: string; // מצב המשתמש (active/inactive)
-    // lastLogin: Date; // תאריך כניסה אחרונה
-    // createdAt: Date; // תאריך יצירה
+    lastLogin: Date; // תאריך כניסה אחרונה
+    createdAt: Date; // תאריך יצירה
     createdBy: string; // נוצר על ידי
-    // updatedAt: Date; // תאריך עדכון
+    updatedAt: Date; // תאריך עדכון
     updatedBy: string; // עודכן על ידי
     businessId?: number; // מזהה ייחודי לעסק
     business?: Business; // אובייקט עסק
     invoices?: Invoice[]; // רשימת חשבוניות
+
+    // TODO: יכול להיות בעיות עם שדות של תאריך
 }

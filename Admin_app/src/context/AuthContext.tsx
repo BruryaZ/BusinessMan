@@ -10,7 +10,7 @@ type AuthContextType = {
     business_name: string,
     setMyBusinessName: (name: string) => void
     user_name: string,
-    setMyuserName: (name: string) => void,
+    setMyuserName: (name: string) => void
     user_role: number,
     setMyuserRole: (role: number) => void
 }

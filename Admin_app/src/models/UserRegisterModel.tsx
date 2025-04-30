@@ -7,3 +7,4 @@ export interface UserRegisterModel {
     role: number; // תפקיד עובד (admin / user) // 1 = admin, 2 = user, 3 = bookkeeper
     idNumber: string; // תעודת זהות
 }
+

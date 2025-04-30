@@ -45,6 +45,7 @@ namespace BusinessMan.Service
 
         public async Task<Invoice?> UpdateAsync(int id, Invoice item)
         {
+            item.UpdatedAt = DateTime.Now;
             var updatedInvoice = await _repositoryManager.Invoice.UpdateAsync(id, item);
             await _repositoryManager.SaveAsync(); 
             return updatedInvoice;

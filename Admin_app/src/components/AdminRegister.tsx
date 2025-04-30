@@ -5,12 +5,13 @@ import { useNavigate } from "react-router-dom"
 import { UserRegisterModel } from "../models/UserRegisterModel"
 import { validationSchemaUserRegister } from "../utils/validationSchema"
 import { globalContext } from "../context/GlobalContext"
-import { convertToUser } from "../utils/converToUser"
+import { UserDto } from "../models/UserDto"
+import { converFromUserDto } from "../utils/convertFromUserDto"
 
-const UserRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => {
+const AdminRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => {
     const nav = useNavigate()
     const validationSchema = validationSchemaUserRegister
-    const [myUser, setMyUser] = useState<UserRegisterModel>({
+    const [myAdmin, setMyAdmin] = useState<UserRegisterModel>({
         firstName: "",
         lastName: "",
         email: "",
@@ -23,24 +24,23 @@ const UserRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => 
     const globalContextDetails = useContext(globalContext)
     const url = import.meta.env.VITE_API_URL
 
-    const handleSubmit = (userRegister: UserRegisterModel) => async (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = (adminRegister: UserRegisterModel) => async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
 
-        console.log(userRegister);
+        console.log(adminRegister);
 
-        validationSchema.isValid(userRegister).then(async valid => {
+        validationSchema.isValid(adminRegister).then(async valid => {
             setErrors([]);
             if (valid) {
                 try {                               // TODO: type 
-                    const { data } = await axios.post<UserRegisterModel>(`${url}/Auth/user-register`, userRegister) // TODO 
+                    const { data } = await axios.post<UserDto>(`${url}/Auth/admin-register`, adminRegister) // TODO 
                     console.log(data);
                     if (data.role == 2)
-                        globalContextDetails.setUser(convertToUser(data))
+                        globalContextDetails.setUser(converFromUserDto(data))
                     else if (data.role == 1)
-                        globalContextDetails.setAdmin(convertToUser(data))
-                    if (onSubmitSuccess) 
+                        globalContextDetails.setAdmin(converFromUserDto(data))
+                    if (onSubmitSuccess)
                         onSubmitSuccess();
-                    nav('/')
                 }
                 catch (e) {
                     console.log(e);
@@ -60,21 +60,21 @@ const UserRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => 
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
         const { name, value } = event.target
-        setMyUser(prevUser => ({
+        setMyAdmin(prevUser => ({
             ...prevUser,
-            [name]: name === 'role' ? Number(value) : value
+            [name]: name === 'role' ? Number(value) : value,
+            role: 1
         }))
     }
 
     return (
-        <form onSubmit={handleSubmit(myUser)}>
+        <form onSubmit={handleSubmit(myAdmin)}>
             <input type="text" name="firstName" placeholder="שם פרטי" onChange={handleChange} />
             <input type="text" name="lastName" placeholder="שם משפחה" onChange={handleChange} />
             <input type="text" name="phone" placeholder="טלפון" onChange={handleChange} />
             <input type="text" name="idNumber" placeholder="מספר תעודת זהות" onChange={handleChange} />
             <input type="password" name="password" placeholder="סיסמא" onChange={handleChange} />
             {/* <input type="password" name="confirmPassword" placeholder="אשר סיסמא" onChange={handleChange} /> */}
-            <input type="text" name="role" placeholder="תפקיד" onChange={handleChange} />
             <input type="email" name="email" placeholder="אימייל" onChange={handleChange} />
             <button type="submit">שמור</button>
 
@@ -89,4 +89,4 @@ const UserRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => 
     )
 }
 
-export default UserRegister
+export default AdminRegister

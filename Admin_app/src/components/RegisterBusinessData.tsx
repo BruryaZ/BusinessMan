@@ -6,7 +6,7 @@ import axios from "axios";
 import { globalContext } from "../context/GlobalContext";
 import { convertToBusiness } from "../utils/convertToBusiness";
 
-const RegisterBusinessData = () => {
+const RegisterBusinessData = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => {
   const url = import.meta.env.VITE_API_URL
   const [errors, setErrors] = useState<string[]>([])
   const validationSchema = validationSchemaBusinessRegister
@@ -50,9 +50,10 @@ const RegisterBusinessData = () => {
       setErrors([]);
       if (valid) {
         try {
-          const { data } = await axios.post<BusinessPostModel>(`${url}//api/Business`, businessDetails)
+          const { data } = await axios.post<BusinessPostModel>(`${url}/api/Business`, businessDetails)
           console.log(data);
           globalContextDetails.setBusinessGlobal(convertToBusiness(businessDetails))
+          if (onSubmitSuccess) onSubmitSuccess();
         }
         catch (e) {
           console.log(e);

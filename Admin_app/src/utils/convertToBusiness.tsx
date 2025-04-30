@@ -3,7 +3,7 @@ import { BusinessPostModel } from "../models/BusinessPostModel";
 
 export const convertToBusiness = (businessPost: BusinessPostModel): Business => {
     return {
-        id: 0, 
+        id: businessPost.id, 
         netWorth:  businessPost.expenses - businessPost.income, // חישוב שווי נקי
         businessId: businessPost.businessId,
         name: businessPost.name,

@@ -12,12 +12,12 @@ type GlobalContextType = {
 }
 
 export const globalContext = createContext<GlobalContextType>({
+    user: {} as User,
+    setUser: (_: User) => { },
     business_global: {} as Business,
     setBusinessGlobal: (_: Business) => { },
     admin: {} as User,
-    setAdmin: (_: User) => { },
-    user: {} as User,
-    setUser: (_: User) => { },
+    setAdmin: (_: User) => { }
 })
 
 const GlobalContext = ({children}:{children:ReactElement}) => {

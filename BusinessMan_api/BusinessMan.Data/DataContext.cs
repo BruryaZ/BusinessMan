@@ -24,11 +24,11 @@ namespace BusinessMan.Data
         //    optionsBuilder.LogTo(message => Debug.WriteLine(message));
         //}
 
-        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        //{
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
 
-        //    optionsBuilder.UseSqlServer(@"Server=(localdb)\MSSQLLocalDB;Database=businessman_db");
-        //}
+            optionsBuilder.UseSqlServer(@"Server=(localdb)\MSSQLLocalDB;Database=businessman_db");
+        }
 
         //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         //{
@@ -62,7 +62,7 @@ namespace BusinessMan.Data
             modelBuilder.Entity<Business>().ToTable("businesses");
             modelBuilder.Entity<Example>().ToTable("examples");
             modelBuilder.Entity<FileDto>().ToTable("files");
-            modelBuilder.Entity<Email>().ToTable("emails");
+            modelBuilder.Entity<Email>().ToTable("EmailList");
 
             // 📌 קשרים בין Invoice ל-User
             modelBuilder.Entity<Invoice>()

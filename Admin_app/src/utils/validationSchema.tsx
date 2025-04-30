@@ -1,7 +1,6 @@
 import * as Yup from 'yup';
 
 export const validationSchemaBusinessRegister = Yup.object().shape({
-  id: Yup.number().required('מזהה ייחודי הוא שדה חובה'),
   businessId: Yup.number().required('מזהה ייחודי לעסק הוא שדה חובה'),
   name: Yup.string().required('שם העסק הוא שדה חובה'),
   address: Yup.string().required('כתובת העסק היא שדה חובה'),
@@ -12,21 +11,11 @@ export const validationSchemaBusinessRegister = Yup.object().shape({
   cashFlow: Yup.number().required('תזרים מזומנים של העסק הוא שדה חובה').positive('תזרים חייב להיות חיובי'),
   totalAssets: Yup.number().required('סך הנכסים של העסק הוא שדה חובה').positive('סך הנכסים חייב להיות חיובי'),
   totalLiabilities: Yup.number().required('סך ההתחייבויות של העסק הוא שדה חובה').positive('סך ההתחייבויות חייב להיות חיובי'),
-  netWorth: Yup.number().required('שווי נקי הוא שדה חובה').positive('שווי נקי חייב להיות חיובי'),
-  revenueGrowthRate: Yup.number().nullable().positive('שיעור צמיחת ההכנסות חייב להיות חיובי'),
-  profitMargin: Yup.number().nullable().positive('שיעור הרווח חייב להיות חיובי'),
-  currentRatio: Yup.number().nullable().positive('יחס נוכחי חייב להיות חיובי'),
-  quickRatio: Yup.number().nullable().positive('יחס מהיר חייב להיות חיובי'),
-  createdAt: Yup.date().nullable(),
-  createdBy: Yup.string().nullable(),
-  updatedAt: Yup.date().nullable(),
-  updatedBy: Yup.string().nullable(),
-  users: Yup.array().of(Yup.object().shape({
-      // הגדר כאן את מבנה המשתמשים אם יש צורך
-  })).nullable(),
-  invoices: Yup.array().of(Yup.object().shape({
-      // הגדר כאן את מבנה החשבוניות אם יש צורך
-  })).nullable(),
+  // netWorth: Yup.number().required('שווי נקי הוא שדה חובה').positive('שווי נקי חייב להיות חיובי'),
+  // revenueGrowthRate: Yup.number().nullable().positive('שיעור צמיחת ההכנסות חייב להיות חיובי'),
+  // profitMargin: Yup.number().nullable().positive('שיעור הרווח חייב להיות חיובי'),
+  // currentRatio: Yup.number().nullable().positive('יחס נוכחי חייב להיות חיובי'),
+  // quickRatio: Yup.number().nullable().positive('יחס מהיר חייב להיות חיובי'),
 });
 
 export const validationSchemaAdminLogin = Yup.object().shape({

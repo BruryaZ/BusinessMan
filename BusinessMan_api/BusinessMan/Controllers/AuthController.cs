@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using BusinessMan.Core.DTO_s;
 using BusinessMan.Core.Models;
 using BusinessMan.Core.Repositories;
 using BusinessMan.Data;
@@ -53,7 +54,7 @@ namespace BusinessMan.API.Controllers
         }
 
         [HttpPost("user-register")]// רישום משתמש רגיל
-        public async Task<IActionResult> RegisterAsync([FromBody] UserPostModel user)
+        public async Task<ActionResult<UserDto>> RegisterAsync([FromBody] UserPostModel user)
         {
             // בדוק אם המשתמש כבר קיים
             var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.IdNumber == user.IdNumber);
@@ -68,7 +69,7 @@ namespace BusinessMan.API.Controllers
             await _context.Users.AddAsync(userToAdd);
             await _context.SaveChangesAsync();
 
-            return Ok(new { Message = "הרשמה בוצעה בהצלחה" });
+            return Ok(_mapper.Map<UserDto>(userToAdd));
         }
 
         [HttpDelete("delete-user")]// מחיקת משתמש רגיל
@@ -114,7 +115,7 @@ namespace BusinessMan.API.Controllers
         }
 
         [HttpPost("admin-register")]// רישום מנהל
-        public async Task<IActionResult> RegisterAdminAsync([FromBody] UserPostModel user)
+        public async Task<ActionResult<UserDto>> RegisterAdminAsync([FromBody] UserPostModel user)
         {
             // בדיקה שהאימייל הוכנס לרשימה כלומר רשמתי אותו לאפליקצייה
             var emailExists = await _context.EmailList.AnyAsync(e => e.EmailAddress == user.Email);

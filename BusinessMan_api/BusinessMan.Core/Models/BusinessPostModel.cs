@@ -8,6 +8,7 @@ namespace BusinessMan.Core.Models
 {
     public class BusinessPostModel
     {
+        public int id { get; set; }
         public int BusinessId { get; set; } // מזהה ייחודי לעסק
         public string Name { get; set; } // שם העסק
         public string Address { get; set; } // כתובת העסק

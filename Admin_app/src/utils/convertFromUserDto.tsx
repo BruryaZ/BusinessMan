@@ -1,13 +1,13 @@
 import { User } from "../models/User";
-import { UserRegisterModel } from "../models/UserRegisterModel";
+import { UserDto } from "../models/UserDto";
 
-export const convertToUser = (userRegister: UserRegisterModel): User => {
+export const converFromUserDto = (userRegister: UserDto): User => {
     return {
-        id: 0, 
+        id: userRegister.id, 
         firstName: userRegister.firstName,
         lastName: userRegister.lastName,
         email: userRegister.email,
-        password: userRegister.password, // יש לוודא שהסיסמה מוצפנת
+        password: '******', // יש לוודא שהסיסמה מוצפנת
         phone: userRegister.phone,
         role: userRegister.role,
         idNumber: userRegister.idNumber,

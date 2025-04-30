@@ -1,4 +1,5 @@
 export interface BusinessPostModel {
+    id: number,
     businessId: number; // מזהה ייחודי לעסק
     name: string; // שם העסק
     address: string; // כתובת העסק
