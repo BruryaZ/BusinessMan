@@ -17,6 +17,9 @@ using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddDbContext<DataContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 // הוספת קובץ appsettings.Development.json
 builder.Configuration
     .AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true);
@@ -52,8 +55,8 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 
 // הזרקת קובץ הנתונים 
 //builder.Services.AddDbContext<DataContext>(); // ?
-builder.Services.AddDbContext<DataContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+//builder.Services.AddDbContext<DataContext>(options =>
+//    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // JWT Configuration
 builder.Services.AddAuthentication(options =>
