@@ -8,8 +8,6 @@ import { AdminRegister } from "../models/AdminRegister"
 import { useNavigate } from "react-router-dom"
 import { validationSchemaAdminLogin } from "../utils/validationSchema"
 
-
-
 const AdmineLogin = () => {
     const nav = useNavigate()
     const [admin, setAdmin] = useState<Admin>({ email: '', password: '' })
@@ -34,7 +32,7 @@ const AdmineLogin = () => {
                     else{
                         console.log('window is undefined');
                     }
-                    // הכנסת הנתונים לקונטקסט
+                    // הכנסת הנתונים לקונטקסט TODO:: זה מיותר יש לי את כל האובייקט בקונטקטס
                     authDetails.user_email = data.user.email
                     authDetails.user_id = data.user.id
                     authDetails.user_name = data.user.firstName + " " + data.user.lastName

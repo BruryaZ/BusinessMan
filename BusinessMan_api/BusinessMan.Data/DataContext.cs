@@ -24,17 +24,17 @@ namespace BusinessMan.Data
         //    optionsBuilder.LogTo(message => Debug.WriteLine(message));
         //}
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
+        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        //{
 
-            optionsBuilder.UseSqlServer(@"Server=(localdb)\MSSQLLocalDB;Database=businessman_db");
-        }
+        //    optionsBuilder.UseSqlServer(@"Server=(localdb)\MSSQLLocalDB;Database=businessman_db");
+        //}
 
         //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         //{
         //    if (!optionsBuilder.IsConfigured)
         //    {
-        //        optionsBuilder.UseNpgsql("Host=db.fxmuilefdjrimtcujyfu.supabase.co;Database=postgres;Username=postgres;Password=b214958522;SSL Mode=Require;Trust Server Certificate=true");
+        //        optionsBuilder.UseNpgsql("User Id=postgres.fxmuilefdjrimtcujyfu;Password=b214958522;Server=aws-0-eu-central-1.pooler.supabase.com;Port=6543;Database=postgres");
         //    }
         //}
 

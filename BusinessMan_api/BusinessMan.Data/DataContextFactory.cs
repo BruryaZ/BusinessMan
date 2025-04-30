@@ -13,7 +13,7 @@ namespace BusinessMan.Data
         public DataContext CreateDbContext(string[] args)
         {
             var optionsBuilder = new DbContextOptionsBuilder<DataContext>();
-            optionsBuilder.UseNpgsql("Host=db.fxmuilefdjrimtcujyfu.supabase.co;Database=postgres;Username=postgres;Password=b214958522;SSL Mode=Require;Trust Server Certificate=true");
+            optionsBuilder.UseNpgsql("postgresql://postgres:mnVEUeJjwMbLclwATfTYVZVWytPctAKf@caboose.proxy.rlwy.net:58725/railway");
 
             return new DataContext(optionsBuilder.Options);
         }
