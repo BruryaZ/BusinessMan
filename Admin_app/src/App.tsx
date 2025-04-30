@@ -9,8 +9,8 @@ import { BusinessImpl } from './models/Business';
 import ProductionReports from './components/ProductionReports';
 import UserManagemet from './components/UserManagemet';
 import AuthContext from './context/AuthContext';
-import RegisterBusinessData from './components/RegisterBusinessData';
 import RegisterUser from './components/UserRegister';
+import BusinessAndAdmin from './components/BusinessAndAdmin';
 
 function App() {
   return (
@@ -35,7 +35,7 @@ function App() {
         <span>   |   </span>
         <Link to="/business-table">טבלת עסקים</Link>
         <span>   |   </span>
-        <Link to="/register-business-data">רישום נתוני העסק</Link>
+        <Link to='/new-business-registation'>רישום עסק חדש</Link>
       </nav>
 
       <Routes>
@@ -47,8 +47,8 @@ function App() {
         <Route path='/production-reports' element={<ProductionReports/>}/>
         <Route path='/user-management' element={<UserManagemet/>}/>
         <Route path='/' element={<Home />} />
-        <Route path='/register-business-data' element={<RegisterBusinessData/>} />
         <Route path='/user-login' element={<AdminLogin />} />
+        <Route path='/new-business-registation' element={<BusinessAndAdmin />} />
       </Routes>
     </Router>
     </AuthContext>

@@ -1,8 +1,4 @@
-import { Invoice } from "./Invoices";
-import { User } from "./User";
-
-export interface BusinessRegisterModel {
-    id: number; // מזהה ייחודי
+export interface BusinessPostModel {
     businessId: number; // מזהה ייחודי לעסק
     name: string; // שם העסק
     address: string; // כתובת העסק
@@ -13,17 +9,6 @@ export interface BusinessRegisterModel {
     cashFlow: number; // תזרים מזומנים של העסק
     totalAssets: number; // סך הנכסים של העסק
     totalLiabilities: number; // סך ההתחייבויות של העסק
-    netWorth: number; // שווי נקי
-    revenueGrowthRate?: number; // שיעור צמיחת ההכנסות
-    profitMargin?: number; // שיעור הרווח
-    currentRatio?: number; // יחס נוכחי
-    quickRatio?: number; // יחס מהיר
-    createdAt?: Date; // תאריך יצירה
-    createdBy?: string; // נוצר על ידי
-    updatedAt?: Date; // תאריך עדכון
-    updatedBy?: string; // עודכן על ידי
-    users?: User[]; // רשימת משתמשים
-    invoices?: Invoice[]; // רשימת חשבוניות
 }
 
 // export class BusinessImpl implements RegisterModel {

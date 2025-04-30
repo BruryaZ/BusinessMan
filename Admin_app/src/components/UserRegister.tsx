@@ -4,8 +4,9 @@ import axios from "axios"
 import { useNavigate } from "react-router-dom"
 import { UserRegisterModel } from "../models/UserRegisterModel"
 import { validationSchemaUserRegister } from "../utils/validationSchema"
-
-
+import { createContext } from "vm"
+import { globalContext } from "../context/GlobalContext"
+import { convertToUser } from "../utils/converToUser"
 
 const UserRegister = () => {
     const nav = useNavigate()
@@ -20,19 +21,24 @@ const UserRegister = () => {
         idNumber: "",
     })
     const [errors, setErrors] = useState<string[]>([])
+    const globalContextDetails = createContext(globalContext)
     const url = import.meta.env.VITE_API_URL
 
     const handleSubmit = (userRegister: UserRegisterModel) => async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
 
         console.log(userRegister);
-        
+
         validationSchema.isValid(userRegister).then(async valid => {
             setErrors([]);
             if (valid) {
                 try {                               // TODO: type 
                     const { data } = await axios.post<UserRegisterModel>(`${url}/Auth/user-register`, userRegister) // TODO 
                     console.log(data);
+                    if (data.role == 2)
+                        globalContextDetails.setUser(convertToUser(data))
+                    else if (data.role == 1)
+                        globalContextDetails.setAdmin(convertToUser(data))
                     nav('/')
                 }
                 catch (e) {
@@ -56,7 +62,7 @@ const UserRegister = () => {
         setUser(prevUser => ({
             ...prevUser,
             [name]: name === 'role' ? Number(value) : value
-          }))          
+        }))
     }
 
     return (
@@ -69,7 +75,7 @@ const UserRegister = () => {
             {/* <input type="password" name="confirmPassword" placeholder="אשר סיסמא" onChange={handleChange} /> */}
             <input type="text" name="role" placeholder="תפקיד" onChange={handleChange} />
             <input type="email" name="email" placeholder="אימייל" onChange={handleChange} />
-            <button type="submit">התחבר</button>
+            <button type="submit">שמור</button>
 
             {errors.length > 0 && (
                 <ul>

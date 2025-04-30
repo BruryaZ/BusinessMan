@@ -1,11 +1,16 @@
-import { useState } from "react"
+import { useContext, useState } from "react"
 import { validationSchemaBusinessRegister } from "../utils/validationSchema";
-import { BusinessRegisterModel } from "../models/BusinessRegisterModel";
+import * as Yup from "yup";
+import { BusinessPostModel } from "../models/BusinessPostModel";
+import axios from "axios";
+import { globalContext } from "../context/GlobalContext";
+import { convertToBusiness } from "../utils/convertToBusiness";
 
 const RegisterBusinessData = () => {
   const url = import.meta.env.VITE_API_URL
   const [errors, setErrors] = useState<string[]>([])
   const validationSchema = validationSchemaBusinessRegister
+  const globalContextDetails = useContext(globalContext)
   const [businessData, setBusinessData] = useState({
     id: 0,
     businessId: 0,
@@ -39,56 +44,105 @@ const RegisterBusinessData = () => {
     }));
   };
 
-  const handleSubmit = (businessDetails: BusinessRegisterModel) => async (e: React.FormEvent<HTMLFormElement>) => {
-    
+  const handleSubmit = (businessDetails: BusinessPostModel) => async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    validationSchema.isValid(businessDetails).then(async valid => {
+      setErrors([]);
+      if (valid) {
+        try {
+          const { data } = await axios.post<BusinessPostModel>(`${url}//api/Business`, businessDetails)
+          console.log(data);
+          globalContextDetails.setBusinessGlobal(convertToBusiness(businessDetails))
+        }
+        catch (e) {
+          console.log(e);
+        }
+      }
+      else {
+        setErrors(['Validation error']);
+      }
+    }).catch((err) => {
+      console.log('Validation error:', err.errors);
+      if (err instanceof Yup.ValidationError) {
+        setErrors(err.errors);
+      }
+    }
+    );
+    setErrors([]);
   }
 
   return (
-    <form>
+    <form onSubmit={handleSubmit(businessData)}>
+      <input
+        type="number"
+        name="businessId"
+        placeholder="מזהה ייחודי לעסק"
+        onChange={handleChange}
+      />
       <input
         type="text"
         name="name"
         placeholder="שם העסק"
-        value={businessData.name}
         onChange={handleChange}
       />
       <input
         type="text"
         name="address"
         placeholder="כתובת העסק"
-        value={businessData.address}
         onChange={handleChange}
       />
       <input
         type="email"
         name="email"
         placeholder="אימייל של העסק"
-        value={businessData.email}
         onChange={handleChange}
       />
       <input
         type="text"
         name="businessType"
         placeholder="סוג העסק"
-        value={businessData.businessType}
         onChange={handleChange}
       />
       <input
         type="number"
         name="income"
         placeholder="הכנסות העסק"
-        value={businessData.income}
         onChange={handleChange}
       />
       <input
         type="number"
         name="expenses"
         placeholder="הוצאות העסק"
-        value={businessData.expenses}
+        onChange={handleChange}
+      />
+      <input
+        type="number"
+        name="cashFlow"
+        placeholder="תזרים מזומנים"
+        onChange={handleChange}
+      />
+      <input
+        type="number"
+        name="totalAssets"
+        placeholder="סך הנכסים"
+        onChange={handleChange}
+      />
+      <input
+        type="number"
+        name="totalLiabilities"
+        placeholder="סך ההתחייבויות"
         onChange={handleChange}
       />
 
       <button type="submit">שמור</button>
+      
+      {errors.length > 0 && (
+                <ul>
+                    {errors.map((error, index) => (
+                        <li key={index}>{error}</li>
+                    ))}
+                </ul>
+            )}
     </form>
   );
 }

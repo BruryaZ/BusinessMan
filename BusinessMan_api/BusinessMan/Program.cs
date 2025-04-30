@@ -51,9 +51,9 @@ builder.Services.AddScoped<ReadFileContent>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 
 // הזרקת קובץ הנתונים 
-builder.Services.AddDbContext<DataContext>(); // ?
-//builder.Services.AddDbContext<DataContext>(options =>
-//    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+//builder.Services.AddDbContext<DataContext>(); // ?
+builder.Services.AddDbContext<DataContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // JWT Configuration
 builder.Services.AddAuthentication(options =>
