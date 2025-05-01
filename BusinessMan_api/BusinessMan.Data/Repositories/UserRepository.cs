@@ -50,6 +50,8 @@ namespace BusinessMan.Data.Repositories
         public async Task<User> UpdateAsync(int id, User entity)
         {
             _dbSet.Update(entity);
+            Console.WriteLine("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            Console.WriteLine(entity.BusinessId);
             await _context.SaveChangesAsync(); // שמירה על השינויים
             return entity;
         }

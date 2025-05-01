@@ -30,6 +30,7 @@ const BusinessAndAdmin = () => {
             business: globalContextDetails.business_global,
             role: 1,
             updateBy: globalContextDetails.admin.firstName + " " + globalContextDetails.admin.lastName,
+            // id: 
         }
         const updateBusiness = {
             ...globalContextDetails.business_global,

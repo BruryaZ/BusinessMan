@@ -41,7 +41,7 @@ export const defaultUser: User = {
     createdBy: '',
     updatedAt: new Date(),
     updatedBy: '',
-    businessId: 0,
-    business: defaultBusiness,
+    businessId: null,
+    business: null,
     invoices: [],
   };

@@ -20,10 +20,10 @@ namespace BusinessMan.Core.Models
         public string UpdatedBy { get; set; } // עודכן על ידי
 
         // אובייקטים לקשרים בין הטבלאות
-        public int? UserId { get; set; } // מזהה המשתמש (קשר לטבלת Users)
-        public int? BusinessId { get; set; } // מזהה ייחודי לעסק
-        public Business? Business { get; set; }
-        public User? User { get; set; }
+        public int? UserId { get; set; } = null;// מזהה המשתמש (קשר לטבלת Users)
+        public int? BusinessId { get; set; } = null; // מזהה ייחודי לעסק
+        public Business? Business { get; set; } = null;
+        public User? User { get; set; } = null;
         public override string ToString()
         {
             return "Amount debit: " + AmountDebit + " Amount credit: " + AmountCredit + " Invoice date: " + InvoiceDate + " Status: " + Status + " Notes: " + Notes + " Created at: " + CreatedAt + " Created by: " + CreatedBy + " Updated at: " + UpdatedAt + " Updated by: " + UpdatedBy;

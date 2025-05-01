@@ -16,9 +16,8 @@ export interface User {
     createdBy: string; // נוצר על ידי
     updatedAt: Date; // תאריך עדכון
     updatedBy: string; // עודכן על ידי
-    businessId?: number; // מזהה ייחודי לעסק
-    business?: Business; // אובייקט עסק
+    businessId: number | null; // מזהה ייחודי לעסק
+    business?: Business | null; // אובייקט עסק
     invoices?: Invoice[]; // רשימת חשבוניות
-
     // TODO: יכול להיות בעיות עם שדות של תאריך
 }

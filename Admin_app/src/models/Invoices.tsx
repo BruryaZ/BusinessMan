@@ -14,6 +14,6 @@ export interface Invoice {
     updatedBy?: string; // עודכן על ידי
     business?: Business; // אובייקט עסק
     user?: User; // אובייקט משתמש
-    userId: number; // מזהה המשתמש (קשר לטבלת Users)
-    businessId: number; // מזהה ייחודי לעסק
+    userId?: number; // מזהה המשתמש (קשר לטבלת Users)
+    businessId?: number; // מזהה ייחודי לעסק
 }

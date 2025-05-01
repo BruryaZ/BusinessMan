@@ -30,7 +30,7 @@ namespace BusinessMan.Core.Models
         public string UpdatedBy { get; set; } = ""; // עודכן על ידי
 
         // אובייקטים לקשרים בין הטבלאות
-        public List<User>? Users { get; set; }
-        public List<Invoice>? Invoices { get; set; }
+        public List<User>? Users { get; set; } = new List<User>();
+        public List<Invoice>? Invoices { get; set; } = new List<Invoice>();
     }
 }

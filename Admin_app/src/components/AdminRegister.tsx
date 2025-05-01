@@ -42,8 +42,8 @@ const AdminRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) =>
                     }
                     if (onSubmitSuccess)
                         onSubmitSuccess();
-                    console.log("!!! ", globalContextDetails.admin);
-                    console.log("!!! ", globalContextDetails.user);
+                    console.log("globalContextDetails admin!!! ", globalContextDetails.admin);
+                    console.log("globalContextDetails user!!! ", globalContextDetails.user);
                     
                 } catch (e) {
                     console.log(e);
