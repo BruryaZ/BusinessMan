@@ -11,6 +11,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace BusinessMan.API.Controllers
 {
@@ -33,10 +34,10 @@ namespace BusinessMan.API.Controllers
         }
 
         [HttpPost("user-login")]// כניסת משתמש רגיל
-        public IActionResult Login([FromBody] UserLoginModel user)
+        public async Task<IActionResult> Login([FromBody] UserLoginModel user)
         {
             // בדיקה אם המשתמש קיים במסד הנתונים
-            var existingUser = _context.Users.FirstOrDefault(u => u.Email == user.Email);
+            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == user.Email);
             string token;
 
             if (existingUser != null)
@@ -134,10 +135,12 @@ namespace BusinessMan.API.Controllers
 
             // הוסף את המשתמש החדש למסד הנתונים
             var userToAdd = _mapper.Map<User>(user);
-            _context.Users.Add(userToAdd);
+            var createUserEntry = await _context.Users.AddAsync(userToAdd);
+            var createUser = createUserEntry.Entity;
             await _context.SaveChangesAsync();
+            var userWithId = await _userRepository.GetByIdAsync(createUser.Id);
 
-            return Ok(new { Message = "הרשמה בוצעה בהצלחה" });
+            return Ok(_mapper.Map<UserDto>(createUser));
         }
 
         [HttpPost]
@@ -175,7 +178,7 @@ namespace BusinessMan.API.Controllers
             return Ok(new { Token = token, User = existingUser });
         }
 
-        [HttpDelete("api/remove-admin")]// מחיקת מנהל על ידי המתכנת
+        [HttpDelete("api/remove-admin-by-dev")]// מחיקת מנהל על ידי המתכנת
         public async Task<ActionResult> RemoveEmailFromList([FromQuery] string emailAddress)
         {
             // חפש את האימייל ברשימה

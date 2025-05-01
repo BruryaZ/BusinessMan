@@ -27,20 +27,24 @@ const AdminRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) =>
     const handleSubmit = (adminRegister: UserRegisterModel) => async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        console.log(adminRegister);
-
         validationSchema.isValid(adminRegister).then(async valid => {
             setErrors([]);
             if (valid) {
                 try {
                     const { data } = await axios.post<UserDto>(`${url}/Auth/admin-register`, adminRegister);
-                    console.log(data);
+                    console.log("data ", data);
                     if (data.role == 2)
                         globalContextDetails.setUser(converFromUserDto(data));
                     else if (data.role == 1)
+                    {
                         globalContextDetails.setAdmin(converFromUserDto(data));
+                        console.log("admin!!!!!!!!!!!!!!!!");
+                    }
                     if (onSubmitSuccess)
                         onSubmitSuccess();
+                    console.log("!!! ", globalContextDetails.admin);
+                    console.log("!!! ", globalContextDetails.user);
+                    
                 } catch (e) {
                     console.log(e);
                 }

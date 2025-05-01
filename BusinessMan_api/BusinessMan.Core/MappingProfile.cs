@@ -15,6 +15,7 @@ namespace BusinessMan.Core
         {
             CreateMap<FileUpload, FileDto>().ReverseMap();
             CreateMap<User, UserDto>().ReverseMap();
+            CreateMap<User, UserPostModel>().ReverseMap();
             CreateMap<Invoice, InvoiceDto>().ReverseMap();
             CreateMap<Business, BusinessDto>().ReverseMap();
             CreateMap<Business, BusinessPostModel>().ReverseMap();
