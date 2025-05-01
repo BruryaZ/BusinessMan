@@ -19,6 +19,6 @@ namespace BusinessMan.Core.DTO_s
         public DateTime LastLogin { get; set; } // תאריך כניסה אחרונה
         public DateTime CreatedAt { get; set; } // תאריך יצירה
         public DateTime UpdatedAt { get; set; } // תאריך עדכון
-        public int BusinessId { get; set; } // מזהה ייחודי לעסק
+        public int? BusinessId { get; set; } // מזהה ייחודי לעסק
     }
 }

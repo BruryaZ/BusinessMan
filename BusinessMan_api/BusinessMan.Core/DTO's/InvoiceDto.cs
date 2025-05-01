@@ -20,7 +20,7 @@ namespace BusinessMan.Core.DTO_s
         public string UpdatedBy { get; set; } // עודכן על ידי
 
         // אובייקטים לקשרים בין הטבלאות
-        public int UserId { get; set; } // מזהה המשתמש (קשר לטבלת Users)
-        public int BusinessId { get; set; } // מזהה ייחודי לעסק
+        public int? UserId { get; set; } // מזהה המשתמש (קשר לטבלת Users)
+        public int? BusinessId { get; set; } // מזהה ייחודי לעסק
     }
 }

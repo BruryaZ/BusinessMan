@@ -38,12 +38,9 @@ const AdminRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) =>
                     else if (data.role == 1)
                     {
                         globalContextDetails.setAdmin(converFromUserDto(data));
-                        console.log("admin!!!!!!!!!!!!!!!!");
                     }
                     if (onSubmitSuccess)
                         onSubmitSuccess();
-                    console.log("globalContextDetails admin!!! ", globalContextDetails.admin);
-                    console.log("globalContextDetails user!!! ", globalContextDetails.user);
                     
                 } catch (e) {
                     console.log(e);

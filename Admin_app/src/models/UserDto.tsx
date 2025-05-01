@@ -10,5 +10,5 @@ export interface UserDto {
     lastLogin: Date; // תאריך כניסה אחרונה
     createdAt: Date; // תאריך יצירה
     updateAt: Date; // תאריך עדכון
-    businessId: number; // מזהה ייחודי לעסק 
+    businessId: number | null; // מזהה ייחודי לעסק 
 }

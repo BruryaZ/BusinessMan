@@ -10,6 +10,9 @@ import { convertToUser } from "../utils/converToUser"
 const UserRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => {
     const nav = useNavigate()
     const validationSchema = validationSchemaUserRegister
+    const [errors, setErrors] = useState<string[]>([])
+    const globalContextDetails = useContext(globalContext)
+    const url = import.meta.env.VITE_API_URL
     const [myUser, setMyUser] = useState<UserRegisterModel>({
         firstName: "",
         lastName: "",
@@ -19,9 +22,14 @@ const UserRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => 
         role: 0,
         idNumber: "",
     })
-    const [errors, setErrors] = useState<string[]>([])
-    const globalContextDetails = useContext(globalContext)
-    const url = import.meta.env.VITE_API_URL
+    
+    const handleChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
+        const { name, value } = event.target
+        setMyUser(prevUser => ({
+            ...prevUser,
+            [name]: name === 'role' ? Number(value) : value
+        }))
+    }
 
     const handleSubmit = (userRegister: UserRegisterModel) => async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
@@ -33,7 +41,7 @@ const UserRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => 
             if (valid) {
                 try {                               // TODO: type 
                     const { data } = await axios.post<UserRegisterModel>(`${url}/Auth/user-register`, userRegister) // TODO 
-                    console.log(data);
+                    // console.log(data);
                     if (data.role == 2)
                         globalContextDetails.setUser(convertToUser(data))
                     else if (data.role == 1)
@@ -56,14 +64,6 @@ const UserRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => 
                 setErrors(err.errors);
             }
         });
-    }
-
-    const handleChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
-        const { name, value } = event.target
-        setMyUser(prevUser => ({
-            ...prevUser,
-            [name]: name === 'role' ? Number(value) : value
-        }))
     }
 
     return (

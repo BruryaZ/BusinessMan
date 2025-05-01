@@ -15,10 +15,10 @@ const BusinessAndAdmin = () => {
     const url = import.meta.env.VITE_API_URL
 
     useEffect(() => {
-        if (businessDone && adminDone) {
-            updateObjects()
+        if (businessDone && adminDone) {  // OK
+            updateObjects() 
             // שניהם הסתיימו => אפשר להמשיך לשלב הבא או לנווט
-            console.log("הטפסים הסתיימו בהצלחה");
+            console.log("הטפסים נוספו בהצלחה");
         }
     }, [businessDone, adminDone]);
 
@@ -30,7 +30,6 @@ const BusinessAndAdmin = () => {
             business: globalContextDetails.business_global,
             role: 1,
             updateBy: globalContextDetails.admin.firstName + " " + globalContextDetails.admin.lastName,
-            // id: 
         }
         const updateBusiness = {
             ...globalContextDetails.business_global,
@@ -41,20 +40,19 @@ const BusinessAndAdmin = () => {
         globalContextDetails.setBusinessGlobal(updateBusiness)
 
         try {
-            console.log("globalContextDetails admin" , globalContextDetails.admin);
-            console.log("updateAdmin" , updateAdmin);
-            const { data } = await axios.put<UserDto>(`${url}/api/User/${globalContextDetails.admin.id}`, { updateAdmin })
-            console.log(data);
+            console.log("updateAdmin ", updateAdmin);
+            console.log("updateBusiness ", updateBusiness);
+            
+            const { data } = await axios.put<UserDto>(`${url}/api/User/${globalContextDetails.admin.id}`,  updateAdmin )
         }
         catch (e) {
             console.log(e);
         }
 
         try {
-            const { data } = await axios.put<BusinessResponsePutModel>(`${url}/api/Business/${globalContextDetails.business_global.id}`, { updateBusiness })
+            const { data } = await axios.put<BusinessResponsePutModel>(`${url}/api/Business/${globalContextDetails.business_global.id}`, updateBusiness )
             globalContextDetails.setBusinessGlobal(updateBusiness)
             globalContextDetails.setAdmin(updateAdmin)
-            console.log(data);
         }
         catch (e) {
             console.log(e);

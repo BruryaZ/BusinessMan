@@ -52,7 +52,10 @@ const RegisterBusinessData = ({ onSubmitSuccess }: { onSubmitSuccess?: () => voi
         try {
           const { data } = await axios.post<BusinessPostModel>(`${url}/api/Business`, businessDetails);
           console.log("The data", data);
-          globalContextDetails.setBusinessGlobal(convertToBusiness(businessDetails));
+          globalContextDetails.setBusinessGlobal(convertToBusiness(data));
+          console.log("globalContextDetails.business_global", globalContextDetails.business_global);
+          console.log("convertToBusiness(data)", convertToBusiness(data));
+          
           if (onSubmitSuccess) onSubmitSuccess();
         } catch (e) {
           console.log(e);
