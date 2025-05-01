@@ -8,6 +8,7 @@ using System;
 using Microsoft.AspNetCore.Http;
 using System.IO;
 using System.Threading.Tasks;
+using Amazon.S3;
 
 namespace BusinessMan.API.Controllers
 {
@@ -17,11 +18,17 @@ namespace BusinessMan.API.Controllers
     {
         private readonly IService<FileDto> _fileService;
         private readonly IMapper _mapper;
+        private readonly IAmazonS3 _s3Client;
+        private readonly string _bucketName;
+        private readonly IConfiguration _configuration;
 
-        public FileUploadController(IService<FileDto> fileService, IMapper mapper)
+        public FileUploadController(IService<FileDto> fileService, IMapper mapper, IAmazonS3 amazonS3, IConfiguration configuration)
         {
             _fileService = fileService;
             _mapper = mapper;
+            _s3Client = amazonS3;
+            _configuration = configuration;
+            _bucketName = configuration["AWS:BucketName"] ?? throw new ArgumentNullException("AWS:BucketName");
         }
 
         // GET: api/<FileUploadController>
@@ -49,39 +56,56 @@ namespace BusinessMan.API.Controllers
         [HttpPost("upload")]
         public async Task<IActionResult> Upload(IFormFile fileUpload)
         {
-            if (fileUpload.Length > 50 * 1024 * 1024) // 50MB
-            {
-                return BadRequest("גודל הקובץ חורג מהמגבלה המותרת.");
-            }
+            if (fileUpload == null || fileUpload.Length == 0)
+                return BadRequest("לא נבחר קובץ.");
 
-            // בדיקת סוג הקובץ
+            if (fileUpload.Length > 50 * 1024 * 1024) // מגבלת 50MB
+                return BadRequest("גודל הקובץ חורג מהמגבלה המותרת.");
+
+            // בדיקת סוג קובץ מותר
             var allowedExtensions = new[] { ".jpg", ".png", ".pdf", ".docx", ".txt" };
             var fileExtension = Path.GetExtension(fileUpload.FileName).ToLower();
             if (!allowedExtensions.Contains(fileExtension))
-            {
                 return BadRequest("סוג הקובץ אינו נתמך.");
-            }
 
-            // TODO: Save file to AWS S3.
+            var fileName = Path.GetFileNameWithoutExtension(fileUpload.FileName);
+            var key = $"uploads/{Guid.NewGuid()}_{fileName}{fileExtension}";
 
-            // שלב 1: שמירה זמנית (או ישירות ל־S3)
-            var fileName = fileUpload.Name;//TODO:: Path.GetFileName(fileUpload.FileName);
-            var filePath = fileExtension;//TODO:: Path.Combine(_env.WebRootPath, "uploads", Guid.NewGuid() + fileName);
-
-            // יצירת קובץ חדש כדי שמידע כבד ולא רלוונטי לא ישמר במסד הנתונים ולא יעבור בין שכבות האפליקציה ללא צורך
-            // שלב 2: יצירת DTO "רזה" להעברה לשירות
-            var fileDto = new FileDto
+            try
             {
-                FileName = fileName + fileExtension,
-                Size = fileUpload.Length,
-                UploadDate = DateTime.UtcNow,
-                FilePath = fileName + fileExtension,
-                FileContent = fileUpload,
-            };
-            Console.WriteLine(fileDto + " " + fileUpload);
-            var createdFile = await _fileService.AddAsync(fileDto);
+                using var stream = fileUpload.OpenReadStream();
 
-            return Ok("ההעלאה בוצעה בהצלחה");
+                var uploadRequest = new Amazon.S3.Transfer.TransferUtilityUploadRequest
+                {
+                    InputStream = stream,
+                    BucketName = _bucketName,
+                    Key = key,
+                    ContentType = fileUpload.ContentType,
+                    CannedACL = S3CannedACL.BucketOwnerFullControl
+                };
+
+                var transferUtility = new Amazon.S3.Transfer.TransferUtility(_s3Client);
+                await transferUtility.UploadAsync(uploadRequest);
+
+                string fileUrl = $"https://{_bucketName}.s3.{_s3Client.Config.RegionEndpoint.SystemName}.amazonaws.com/{key}";
+
+                var fileDto = new FileDto
+                {
+                    FileName = $"{fileName}{fileExtension}",
+                    Size = fileUpload.Length,
+                    UploadDate = DateTime.UtcNow,
+                    FilePath = fileUrl,
+                    FileContent = fileUpload
+                };
+
+                var createdFile = await _fileService.AddAsync(fileDto);
+
+                return Ok(new { message = "ההעלאה הצליחה", fileUrl });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"אירעה שגיאה בהעלאת הקובץ: {ex.Message}");
+            }
         }
 
         // PUT api/<FileUploadController>/5

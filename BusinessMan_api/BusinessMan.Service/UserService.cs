@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace BusinessMan.Service
 {
     // TODO: Implement the UserService class 
-    public class UserService : IService<User>
+    public class UserService : IService<User> //TODO
     {
         private readonly IRepositoryManager _repositoryManager;
         private readonly IEmailService _emailService;
@@ -79,9 +79,30 @@ namespace BusinessMan.Service
                 return false; // המשתמש לא נמצא
             }
 
-            _repositoryManager.User.DeleteAsync(userToRemove);
+            await _repositoryManager.User.DeleteAsync(userToRemove);
             await _repositoryManager.SaveAsync();
             return true; // המחיקה בוצעה בהצלחה
+        }
+
+        //////
+        //public async Task<User?> AuthenticateAsync(string username, string password)
+        //{
+        //    var user = await _userRepository.GetByUsernameAsync(username);
+        //    if (user != null && user.PasswordHash == Hash(password)) 
+        //        return user;
+
+        //    return null;
+        //}
+
+        public async Task<User?> GetUserWithBusinessAsync(int userId)
+        {
+            return await _userRepository.GetWithBusinessAsync(userId);
+        }
+
+        private string Hash(string password)
+        {
+            // הצפנת סיסמה פשוטה – החליפי ב־BCrypt/Hash
+            return Convert.ToBase64String(Encoding.UTF8.GetBytes(password));
         }
     }
 }

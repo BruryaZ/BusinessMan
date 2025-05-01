@@ -12,5 +12,7 @@ namespace BusinessMan.Core.Repositories
     {
         Task<bool> RemoveByEmailAsync(string email);
         Task<User> FirstOrDefaultAsync(Expression<Func<User, bool>> predicate);
+        Task<User?> GetByUsernameAsync(string username);
+        Task<User?> GetWithBusinessAsync(int userId);
     }
 }

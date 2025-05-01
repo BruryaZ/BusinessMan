@@ -68,5 +68,19 @@ namespace BusinessMan.Data.Repositories
             await _context.SaveChangesAsync();
             return true; // המחיקה בוצעה בהצלחה
         }
+
+        // פונקציה למציאת משתמש לפי שם משתמש
+        public async Task<User?> GetByUsernameAsync(string username)
+        {
+            return await _context.Users.FirstOrDefaultAsync(u => u.FirstName == username);
+        }
+
+        // פונקציה למציאת משתמש לפי מזהה וכולל את העסק
+        public async Task<User?> GetWithBusinessAsync(int userId)
+        {
+            return await _context.Users
+                                 .Include(u => u.Business)  // טוען גם את הנתונים של העסק
+                                 .FirstOrDefaultAsync(u => u.Id == userId);
+        }
     }
 }

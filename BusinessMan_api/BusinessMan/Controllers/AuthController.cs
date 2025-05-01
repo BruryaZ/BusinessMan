@@ -2,7 +2,9 @@
 using BusinessMan.Core.DTO_s;
 using BusinessMan.Core.Models;
 using BusinessMan.Core.Repositories;
+using BusinessMan.Core.Services;
 using BusinessMan.Data;
+using BusinessMan.Service;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -17,20 +19,24 @@ namespace BusinessMan.API.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    [AllowAnonymous] // מאפשר גישה ללא הזדהות לכל הפעולות ב-controller
+    [AllowAnonymous] // מאפשר גישה ללא הזדהות לכל הפעולות ב-controller // TODO להסיר
     public class AuthController : Controller
     {
         private readonly DataContext _context;
         private readonly IConfiguration _configuration;
         private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
+        private readonly AuthService _authService;
+        private readonly IUserService _userService;
 
-        public AuthController(DataContext context, IConfiguration configuration, IUserRepository userRepository, IMapper mapper)
+        public AuthController(DataContext context, IConfiguration configuration, IUserRepository userRepository, IMapper mapper, AuthService authService, IUserService userService)
         {
             _context = context;
             _configuration = configuration;
             _userRepository = userRepository;
             _mapper = mapper;
+            _authService = authService;
+            _userService = userService;
         }
 
         [HttpPost("user-login")]// כניסת משתמש רגיל
@@ -38,20 +44,19 @@ namespace BusinessMan.API.Controllers
         {
             // בדיקה אם המשתמש קיים במסד הנתונים
             var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == user.Email);
-            string token;
 
             if (existingUser != null)
-                token = GenerateJwtToken(existingUser.FirstName, false);
-
-            else
-                return NotFound(new { Message = "המשתמש לא קיים" });
-
-            if (user.Password != existingUser.Password)
             {
-                return Unauthorized(new { Message = "סיסמה שגויה" });
-            }
+                if (user.Password != existingUser.Password)
+                {
+                    return Unauthorized(new { Message = "סיסמה שגויה" });
+                }
 
-            return Ok(new { Token = token });
+                var token = _authService.GenerateJwtToken(existingUser.Id, existingUser.BusinessId, existingUser.FirstName, existingUser.Role);
+                return Ok(new { Token = token });
+
+            }
+            return NotFound(new { Message = "המשתמש לא קיים" });
         }
 
         [HttpPost("user-register")]// רישום משתמש רגיל
@@ -66,7 +71,7 @@ namespace BusinessMan.API.Controllers
             }
 
             // הוסף את המשתמש החדש למסד הנתונים
-            var userToAdd = _mapper.Map<User>(user);  
+            var userToAdd = _mapper.Map<User>(user);
             await _context.Users.AddAsync(userToAdd);
             await _context.SaveChangesAsync();
 
@@ -111,8 +116,9 @@ namespace BusinessMan.API.Controllers
             await _context.SaveChangesAsync();
 
             // יצירת טוקן
-            var token = GenerateJwtToken(email.EmailAddress, true);
-            return Ok(new { Token = token, Message = "Email added to the list successfully." });
+            //var token = GenerateJwtToken(email.EmailAddress, true);
+            // החזרת טוקן
+            return Ok(new { Message = "Email added to the list successfully." });
         }
 
         [HttpPost("admin-register")]// רישום מנהל
@@ -159,7 +165,7 @@ namespace BusinessMan.API.Controllers
             // בדוק אם המשתמש קיים
             var existingUser = await _userRepository.FirstOrDefaultAsync(u => u.Email == emailExists.EmailAddress);
 
-            if(existingUser == null)
+            if (existingUser == null)
             {
                 return BadRequest("User not found.");
             }
@@ -176,7 +182,7 @@ namespace BusinessMan.API.Controllers
             }
 
             // יצירת טוקן
-            var token = GenerateJwtToken(existingUser.FirstName, true);
+            var token = _authService.GenerateJwtToken(existingUser.Id, existingUser.BusinessId, existingUser.FirstName, existingUser.Role);
             return Ok(new { Token = token, User = existingUser });
         }
 
@@ -199,8 +205,32 @@ namespace BusinessMan.API.Controllers
             var res = await _userRepository.RemoveByEmailAsync(emailAddress);
 
             // יצירת טוקן
-            var token = GenerateJwtToken(emailAddress, true);
-            return Ok(new { Token = token, Message = "Email removed from the list successfully." });
+            return Ok(new { Message = "Email removed from the list successfully." });
+        }
+
+        // פעולה להחזרת פרופיל משתמש
+        [Authorize]  // דרישת התחברות עם JWT Token
+        [HttpGet("profile")]
+        public async Task<IActionResult> GetProfile()
+        {
+            // חילוץ מזהה המשתמש מהטוקן
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+
+            // קבלת פרטי המשתמש יחד עם פרטי העסק
+            var user = await _userService.GetUserWithBusinessAsync(userId);
+
+            // אם לא נמצא משתמש או שהמשתמש לא מחובר
+            if (user == null)
+            {
+                return Unauthorized();  // או NotFound()
+            }
+
+            // החזרת נתוני המשתמש והעסק
+            return Ok(new
+            {
+                user.FirstName,
+                BusinessName = user.Business.Name
+            });
         }
 
         // פונקציה לבדוק אם האימייל חוקי
@@ -217,31 +247,5 @@ namespace BusinessMan.API.Controllers
             }
         }
 
-        private string GenerateJwtToken(string username, bool isAdmin)
-        {
-            var claims = new List<Claim>
-    {
-        new Claim(JwtRegisteredClaimNames.Sub, username),
-        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-    };
-
-            // הוסף את ה-Claim של תפקיד אם המשתמש הוא Admin
-            if (isAdmin)
-            {
-                claims.Add(new Claim(ClaimTypes.Role, "Admin"));
-            }
-
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("WeTrustInHashemHeIsHelpEveryone12345678910"));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-            var token = new JwtSecurityToken(
-                issuer: "Management business",
-                audience: "Business owner",
-                claims: claims,
-                expires: DateTime.Now.AddMinutes(12),
-                signingCredentials: creds);
-
-            return new JwtSecurityTokenHandler().WriteToken(token);
-        }
     }
 }

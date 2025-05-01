@@ -1,3 +1,6 @@
+using Amazon.Runtime;
+using Amazon;
+using Amazon.S3;
 using BusinessMan.API;
 using BusinessMan.Core;
 using BusinessMan.Core.DTO_s;
@@ -10,6 +13,7 @@ using BusinessMan.Service;
 using BusinessMan.Service.OperationsOnFiles;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
@@ -47,7 +51,7 @@ builder.Services.AddScoped<IRepository<Business>, Repository<Business>>();
 builder.Services.AddScoped<IService<Example>, ExampleService>();
 builder.Services.AddScoped<IService<Invoice>, InvoiceService>();
 builder.Services.AddScoped<IService<Business>, BusinessService>();
-builder.Services.AddScoped<IService<User>, UserService>();
+builder.Services.AddScoped<IService<User>, UserService>();// מיותר?
 builder.Services.AddScoped<IRepository<FileDto>, Repository<FileDto>>();
 builder.Services.AddScoped<IService<FileDto>, FileUploadService>();
 builder.Services.AddScoped<ReadFileContent>();
@@ -106,6 +110,22 @@ builder.Services.AddSwaggerGen(options =>
             new List<string>()
         }
     });
+});
+
+// AWS הוספת שירותי 
+builder.Services.AddAWSService<IAmazonS3>();
+builder.Services.AddSingleton<IAmazonS3>(sp =>
+{
+    var configuration = sp.GetRequiredService<IConfiguration>();
+    var credentials = new BasicAWSCredentials(
+        configuration["AWS:AccessKey"],
+        configuration["AWS:SecretKey"]
+    );
+    var clientConfig = new AmazonS3Config
+    {
+        RegionEndpoint = RegionEndpoint.GetBySystemName(configuration["AWS:Region"])
+    };
+    return new AmazonS3Client(credentials, clientConfig);
 });
 
 // שירותי CORS

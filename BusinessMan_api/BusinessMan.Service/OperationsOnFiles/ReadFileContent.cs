@@ -20,50 +20,54 @@ using DocumentFormat.OpenXml.EMMA;
 using System.Text.Json;
 using BusinessMan.Core.Models;
 using Microsoft.Extensions.Configuration;
+using Amazon.S3;
+using Amazon.S3.Model;
 
 namespace BusinessMan.Service.OperationsOnFiles
 {
     public class ReadFileContent(IConfiguration configuration)
     {
         private readonly IConfiguration _configuration = configuration;
+
         public static async Task<string> Read(FileDto fileUpload)
         {
-            var fileExtension = System.IO.Path.GetExtension(fileUpload.FileName).ToLower();
+            var fileExtension = Path.GetExtension(fileUpload.FileName).ToLower();
 
-            // הנח שיש לך זרם מקור ב- FileDto
-            using (var stream = new MemoryStream())
+            Stream stream;
+
+            if (fileUpload.FileContent != null)
             {
+                // הקובץ הגיע מהקליינט (בזיכרון)
+                stream = new MemoryStream();
                 using var inputStream = fileUpload.FileContent.OpenReadStream();
                 await inputStream.CopyToAsync(stream);
-                stream.Position = 0; // החזרת המצביע להתחלה
-
-                switch (fileExtension)
-                {
-                    case ".pdf":
-                        return await ReadPdfContent(stream); // הפעלת קריאת PDF
-
-                    case ".txt":
-                        using (var reader = new StreamReader(stream))
-                        {
-                            return await reader.ReadToEndAsync();
-                        }
-
-                    case ".jpg":
-                    case ".png":
-                        return await ReadImageContent(stream, fileUpload); // קריאת טקסט מתמונה
-
-                    case ".docx":
-                        return await ReadDocxContent(stream); // קריאה מקובץ Word
-
-                    case ".xlsx":
-                        return await ReadExcelContent(stream); // קריאה מקובץ Excel
-
-                    default:
-                        return "סוג הקובץ אינו נתמך לקריאה.";
-                }
+                stream.Position = 0;
             }
-        }
+            else if (!string.IsNullOrEmpty(fileUpload.FilePath) && fileUpload.FilePath.Contains("s3"))
+            {
+                // הקובץ שמור ב-S3 - נשלוף אותו
+                var s3Client = new AmazonS3Client(); 
+                var bucketName = "businessfiles235"; 
+                var key = GetS3KeyFromUrl(fileUpload.FilePath); 
 
+                var getRequest = new GetObjectRequest
+                {
+                    BucketName = bucketName,
+                    Key = key
+                };
+
+                using var response = await s3Client.GetObjectAsync(getRequest);
+                stream = new MemoryStream();
+                await response.ResponseStream.CopyToAsync(stream);
+                stream.Position = 0;
+            }
+            else
+            {
+                throw new InvalidOperationException("אין קובץ זמין לעיבוד - לא נמצא תוכן בקובץ ולא כתובת S3.");
+            }
+
+            return await HandleStreamByExtension(fileExtension, stream, fileUpload);
+        }
         private static async Task<string> ReadDocxContent(Stream stream)
         {
             using (WordprocessingDocument wordDoc = WordprocessingDocument.Open(stream, false))
@@ -206,6 +210,8 @@ namespace BusinessMan.Service.OperationsOnFiles
                 var invoice = JsonSerializer.Deserialize<Invoice>(json);
 
                 Console.WriteLine($"סכום חובה: {invoice.AmountDebit}, סכום זכות: {invoice.AmountCredit}");
+                // הוספת הסכומים לעסק הרלוונטי
+
                 return invoice;
             }
             else
@@ -213,6 +219,25 @@ namespace BusinessMan.Service.OperationsOnFiles
                 Console.WriteLine("שגיאה: " + result.Error?.Message);
                 return null;
             }
+        }
+        private static string GetS3KeyFromUrl(string url)
+        {
+            // לדוגמה, מתוך URL בסגנון: https://s3.amazonaws.com/your-bucket-name/invoices/filename.pdf
+            var uri = new Uri(url);
+            return uri.AbsolutePath.TrimStart('/').Split('/', 2).Last(); // "invoices/filename.pdf"
+        }
+
+        private static async Task<string> HandleStreamByExtension(string extension, Stream stream, FileDto file)
+        {
+            return extension switch
+            {
+                ".pdf" => await ReadPdfContent(stream),
+                ".txt" => await new StreamReader(stream).ReadToEndAsync(),
+                ".jpg" or ".png" => await ReadImageContent(stream, file),
+                ".docx" => await ReadDocxContent(stream),
+                ".xlsx" => await ReadExcelContent(stream),
+                _ => "סוג הקובץ אינו נתמך לקריאה."
+            };
         }
     }
 }
