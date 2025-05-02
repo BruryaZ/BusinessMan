@@ -1,4 +1,5 @@
 ﻿using BusinessMan.API.Middleware;
+using BusinessMan.API.Middlwares;
 
 namespace BusinessMan.API
 {
@@ -14,6 +15,12 @@ namespace BusinessMan.API
         public static IApplicationBuilder UseAdminOnly(this IApplicationBuilder app)
         {
             app.UseMiddleware<AdminAuthorizationMiddleware>();
+            return app;
+        }
+
+        public static IApplicationBuilder UseUserContext(this IApplicationBuilder app)
+        {
+            app.UseMiddleware<UserContextMiddleware>();
             return app;
         }
     }

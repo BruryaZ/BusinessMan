@@ -26,10 +26,10 @@ namespace BusinessMan.API.Controllers
         private readonly IConfiguration _configuration;
         private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
-        private readonly AuthService _authService;
+        private readonly IAuthService _authService;
         private readonly IUserService _userService;
 
-        public AuthController(DataContext context, IConfiguration configuration, IUserRepository userRepository, IMapper mapper, AuthService authService, IUserService userService)
+        public AuthController(DataContext context, IConfiguration configuration, IUserRepository userRepository, IMapper mapper, IAuthService authService, IUserService userService)
         {
             _context = context;
             _configuration = configuration;

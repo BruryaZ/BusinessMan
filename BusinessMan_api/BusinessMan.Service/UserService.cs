@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace BusinessMan.Service
 {
     // TODO: Implement the UserService class 
-    public class UserService : IService<User> //TODO
+    public class UserService : IUserService
     {
         private readonly IRepositoryManager _repositoryManager;
         private readonly IEmailService _emailService;
@@ -103,6 +103,11 @@ namespace BusinessMan.Service
         {
             // הצפנת סיסמה פשוטה – החליפי ב־BCrypt/Hash
             return Convert.ToBase64String(Encoding.UTF8.GetBytes(password));
+        }
+
+        public Task<User?> AuthenticateAsync(string username, string password)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -51,11 +51,12 @@ builder.Services.AddScoped<IRepository<Business>, Repository<Business>>();
 builder.Services.AddScoped<IService<Example>, ExampleService>();
 builder.Services.AddScoped<IService<Invoice>, InvoiceService>();
 builder.Services.AddScoped<IService<Business>, BusinessService>();
-builder.Services.AddScoped<IService<User>, UserService>();// מיותר?
+builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IRepository<FileDto>, Repository<FileDto>>();
 builder.Services.AddScoped<IService<FileDto>, FileUploadService>();
 builder.Services.AddScoped<ReadFileContent>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 // הזרקת קובץ הנתונים 
 builder.Services.AddDbContext<DataContext>(); // ?
@@ -160,7 +161,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 // My middlwares:
-app.UseAdminOnly();
+//app.UseAdminOnly(); // TODO
+app.UseUserContext();
 
 app.MapControllers();
 

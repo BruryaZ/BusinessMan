@@ -1,4 +1,5 @@
 ﻿using BusinessMan.Core.Models;
+using BusinessMan.Core.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -11,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace BusinessMan.Service
 {
-    public class AuthService(IConfiguration configuration)
+    public class AuthService(IConfiguration configuration) : IAuthService
     {
         private readonly IConfiguration _configuration = configuration;
         // Generate JWT token for user login

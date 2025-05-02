@@ -27,5 +27,4 @@ namespace BusinessMan.API.Middlwares
             await _next(context);
         }
     }
-
 }
