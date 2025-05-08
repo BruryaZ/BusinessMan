@@ -246,6 +246,5 @@ namespace BusinessMan.API.Controllers
                 return false;
             }
         }
-
     }
 }

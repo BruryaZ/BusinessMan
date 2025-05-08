@@ -140,6 +140,9 @@ builder.Services.AddCors(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
+// הוספת הזרקת תלויות ל-HttpContext
+builder.Services.AddHttpContextAccessor();
+
 var app = builder.Build();
 
 // הוספת-CORS

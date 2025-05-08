@@ -18,9 +18,15 @@ namespace BusinessMan.API.Middlwares
             var userIdClaim = context.User.FindFirst(ClaimTypes.NameIdentifier);
             var businessIdClaim = context.User.FindFirst("business_id");
 
+            Console.WriteLine($"UserIdClaim: {userIdClaim?.Value}");
+            Console.WriteLine($"BusinessIdClaim: {businessIdClaim?.Value}");
+
             if (userIdClaim != null && int.TryParse(userIdClaim.Value, out int userId))
             {
                 var user = await userService.GetUserWithBusinessAsync(userId);
+
+                Console.WriteLine($"Fetched User: {System.Text.Json.JsonSerializer.Serialize(user)}");
+
                 context.Items["CurrentUser"] = user;
             }
 
