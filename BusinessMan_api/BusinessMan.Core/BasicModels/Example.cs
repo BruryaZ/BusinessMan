@@ -11,6 +11,7 @@ namespace BusinessMan.Core.Models
     public class Example
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         [Column("id")]
         public int Id { get; set; }
         [Column("num")]

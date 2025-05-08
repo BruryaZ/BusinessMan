@@ -31,6 +31,8 @@ const AdminRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) =>
             setErrors([]);
             if (valid) {
                 try {
+                    console.log("adminRegister ", adminRegister);
+                    
                     const { data } = await axios.post<UserDto>(`${url}/Auth/admin-register`, adminRegister);
                     console.log("data ", data);
                     if (data.role == 2)

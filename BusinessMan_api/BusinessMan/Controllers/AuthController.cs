@@ -144,7 +144,6 @@ namespace BusinessMan.API.Controllers
             var createUserEntry = await _context.Users.AddAsync(userToAdd);
             var createUser = createUserEntry.Entity;
             Console.WriteLine(userToAdd.BusinessId);
-            Console.WriteLine("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
             await _context.SaveChangesAsync();
             var userWithId = await _userRepository.GetByIdAsync(createUser.Id);
 

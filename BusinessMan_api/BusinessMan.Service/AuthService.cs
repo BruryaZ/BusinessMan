@@ -16,8 +16,7 @@ namespace BusinessMan.Service
     {
         private readonly IConfiguration _configuration = configuration;
         // Generate JWT token for user login
-    
-    
+   
         public UserLoginResponse GenerateJwtToken(int userId, int? businessId, string userName, int role)
         {
             var claims = new[]
