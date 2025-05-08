@@ -24,9 +24,9 @@ namespace BusinessMan.Core.Models
         public decimal ProfitMargin { get; set; } = 0.00m; // שיעור הרווח
         public decimal CurrentRatio { get; set; } = 0.00m; // יחס נוכחי
         public decimal QuickRatio { get; set; } = 0.00m; // יחס מהיר
-        public DateTime CreatedAt { get; set; } = DateTime.Now; // תאריך יצירה
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow; // תאריך יצירה
         public string CreatedBy { get; set; } = "";// נוצר על ידי
-        public DateTime UpdatedAt { get; set; } = DateTime.Now; // תאריך עדכון
+        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow; // תאריך עדכון
         public string UpdatedBy { get; set; } = ""; // עודכן על ידי
 
         // אובייקטים לקשרים בין הטבלאות

@@ -17,10 +17,10 @@ namespace BusinessMan.Core.Models
         public int Role { get; set; } // תפקיד עובד (admin / user) // 1 = admin, 2 = user, 3 = bookkeeper
         public string IdNumber { get; set; } // תעודת זהות
         public string Status { get; set; } = "active"; // מצב המשתמש (active/inactive)
-        public DateTime LastLogin { get; set; } = DateTime.Now; // תאריך כניסה אחרונה
-        public DateTime CreatedAt { get; set; } = DateTime.Now; // תאריך יצירה
+        public DateTime LastLogin { get; set; } = DateTime.UtcNow; // תאריך כניסה אחרונה
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow; // תאריך יצירה
         public string CreatedBy { get; set; } = "";  // נוצר על ידי
-        public DateTime UpdatedAt { get; set; } = DateTime.Now; // תאריך עדכון
+        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow; // תאריך עדכון
         public string UpdatedBy { get; set; } = "";// עודכן על ידי
 
         // אובייקטים לקשרים בין הטבלאות
