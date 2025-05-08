@@ -1,5 +1,5 @@
 ﻿using BusinessMan.Core.DTO_s;
-using BusinessMan.Core.Models;
+using BusinessMan.Core.Extentions;
 using BusinessMan.Core.Repositories;
 using BusinessMan.Core.Services;
 using BusinessMan.Data.Repositories;
@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static OpenAI.ObjectModels.StaticValues.AudioStatics;
 
 namespace BusinessMan.Service
 {
@@ -38,13 +39,20 @@ namespace BusinessMan.Service
 
         public async Task<FileDto> AddAsync(FileDto fileUpload)
         {
-            // חילוץ הסכומים וגיבוי הקובץ
-            var readFile = new ReadFileContent(_configuration);
-            var invoiceToAdd = await readFile.FileAnalysis(fileUpload);
+            // ניתוח הקובץ
+            var invoiceToAdd = await readFileContent.FileAnalysis(fileUpload);
+
+            // טיפול נכון בתאריכים
+            invoiceToAdd.InvoiceDate = ExtentionsFunctions.ForceUtc(invoiceToAdd.InvoiceDate);
+            invoiceToAdd.CreatedAt = ExtentionsFunctions.ForceUtc(invoiceToAdd.CreatedAt);
+            invoiceToAdd.UpdatedAt = DateTime.UtcNow;
+
             Console.WriteLine("***********The result is: " + invoiceToAdd);
+
             await _repositoryManager.Files.AddAsync(fileUpload);
             await _repositoryManager.Invoice.AddAsync(invoiceToAdd);
             await _repositoryManager.SaveAsync();
+
             return fileUpload;
         }
 
