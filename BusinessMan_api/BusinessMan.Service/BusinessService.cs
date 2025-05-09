@@ -45,7 +45,7 @@ namespace BusinessMan.Service
 
         public async Task<Business?> UpdateAsync(int id, Business item)
         {
-            item.UpdatedAt = DateTime.Now;
+            item.UpdatedAt = DateTime.UtcNow;
             var updatedBusiness = await _repositoryManager.Business.UpdateAsync(id, item);
             await _repositoryManager.SaveAsync(); 
             return updatedBusiness;

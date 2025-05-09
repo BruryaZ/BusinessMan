@@ -2,7 +2,7 @@ import { useContext, useState } from "react"
 import * as Yup from 'yup'
 import axios from "axios"
 import { useNavigate } from "react-router-dom"
-import { UserRegisterModel } from "../models/UserRegisterModel"
+import { UserPostModel } from "../models/UserRegisterModel"
 import { validationSchemaUserRegister } from "../utils/validationSchema"
 import { globalContext } from "../context/GlobalContext"
 import { UserDto } from "../models/UserDto"
@@ -11,11 +11,11 @@ import { converFromUserDto } from "../utils/convertFromUserDto"
 const AdminRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => {
     const nav = useNavigate();
     const validationSchema = validationSchemaUserRegister;
-    const [myAdmin, setMyAdmin] = useState<UserRegisterModel>({
+    const [myAdmin, setMyAdmin] = useState<UserPostModel>({
         firstName: "יוסי", // ערך ברירת מחדל
         lastName: "כהן", // ערך ברירת מחדל
         email: "a@a", // ערך ברירת מחדל
-        password: "Password123", // ערך ברירת מחדל
+        password: "", // ערך ברירת מחדל
         phone: "050-1234567", // ערך ברירת מחדל
         role: 1, // ערך ברירת מחדל
         idNumber: "123456789", // ערך ברירת מחדל
@@ -24,7 +24,7 @@ const AdminRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) =>
     const globalContextDetails = useContext(globalContext);
     const url = import.meta.env.VITE_API_URL;
 
-    const handleSubmit = (adminRegister: UserRegisterModel) => async (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = (adminRegister: UserPostModel) => async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         validationSchema.isValid(adminRegister).then(async valid => {
@@ -32,7 +32,6 @@ const AdminRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) =>
             if (valid) {
                 try {
                     console.log("adminRegister ", adminRegister);
-                    
                     const { data } = await axios.post<UserDto>(`${url}/Auth/admin-register`, adminRegister);
                     console.log("data ", data);
                     if (data.role == 2)
@@ -46,6 +45,7 @@ const AdminRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) =>
                     
                 } catch (e) {
                     console.log(e);
+                    setErrors(['Error in registration']);
                 }
             } else {
                 setErrors(['Validation error']);
@@ -60,12 +60,12 @@ const AdminRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) =>
     }
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
-        const { name, value } = event.target;
-        setMyAdmin(prevUser => ({
+        const { name, value, type } = event.target;
+        setMyAdmin((prevUser) => ({
             ...prevUser,
-            [name]: name === 'role' ? Number(value) : value,
+            [name]: type === 'number' ? Number(value) : value,
         }));
-    }
+    }    
 
     return (
         <form onSubmit={handleSubmit(myAdmin)}>

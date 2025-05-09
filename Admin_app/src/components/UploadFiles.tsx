@@ -31,11 +31,11 @@ const FileUpload = () => {
             const response = await axios.post(`${url}/FileUpload/upload`, formData, {
                 headers: { "Content-Type": "multipart/form-data" }
             });
-            setMessage(response.data);
+            setMessage(response.data.message);
             setError(null);
         } catch (err: any) {
             const msg = err.response?.data || "אירעה שגיאה בהעלאת הקובץ";
-            setError(msg);
+            setError(msg.message || msg);
             setMessage(null);
         }
     };

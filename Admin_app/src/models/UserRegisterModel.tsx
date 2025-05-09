@@ -1,4 +1,4 @@
-export interface UserRegisterModel {
+export interface UserPostModel {
     firstName: string; // שם פרטי
     lastName: string; // שם משפחה
     email: string; // אימייל

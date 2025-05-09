@@ -16,16 +16,16 @@ namespace BusinessMan.Service
     {
         private readonly IConfiguration _configuration = configuration;
         // Generate JWT token for user login
-   
+
         public UserLoginResponse GenerateJwtToken(int userId, int? businessId, string userName, int role)
         {
             var claims = new[]
             {
-            new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
-            new Claim("business_id", businessId.ToString()),
-            new Claim(ClaimTypes.Name, userName),
-            new Claim(ClaimTypes.Role, role.ToString()),
-        };
+        new Claim("user_id", userId.ToString()),
+        new Claim("business_id", businessId?.ToString() ?? ""),
+        new Claim("user_name", userName),
+        new Claim("role", role.ToString())
+    };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);

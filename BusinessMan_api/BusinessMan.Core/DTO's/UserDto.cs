@@ -16,6 +16,7 @@ namespace BusinessMan.Core.DTO_s
         public int Role { get; set; } // תפקיד (admin/user/bookkeeper)
         public string IdNumber { get; set; } // תעודת זהות
         public string Status { get; set; } // מצב המשתמש (active/inactive)
+        public string Password { get; set; }
         public DateTime LastLogin { get; set; } = DateTime.UtcNow; // תאריך כניסה אחרונה
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;// תאריך יצירה
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;// תאריך עדכון

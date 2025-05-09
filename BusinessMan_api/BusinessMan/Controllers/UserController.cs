@@ -13,11 +13,11 @@ namespace BusinessMan.API.Controllers
     [ApiController]
     public class UserController : Controller
     {
-        private readonly IService<User> _allUsers;
+        private readonly IUserService _allUsers;
         private readonly IMapper _mapper;
-        public UserController(IService<User> Users, IMapper mapper)
+        public UserController(IUserService userService, IMapper mapper)
         {
-            _allUsers = Users;
+            _allUsers = userService;
             _mapper = mapper;
         }
 
