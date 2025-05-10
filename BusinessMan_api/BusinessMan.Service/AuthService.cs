@@ -17,14 +17,15 @@ namespace BusinessMan.Service
         private readonly IConfiguration _configuration = configuration;
         // Generate JWT token for user login
 
-        public UserLoginResponse GenerateJwtToken(int userId, int? businessId, string userName, int role)
+        public UserLoginResponse GenerateJwtToken(int userId, int? businessId, string userName, int role, string email)
         {
             var claims = new[]
             {
         new Claim("user_id", userId.ToString()),
         new Claim("business_id", businessId?.ToString() ?? ""),
         new Claim("user_name", userName),
-        new Claim("role", role.ToString())
+        new Claim("role", role.ToString()),
+        new Claim("email", email)
     };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
@@ -42,7 +43,10 @@ namespace BusinessMan.Service
             {
                 Token = new JwtSecurityTokenHandler().WriteToken(token),
                 UserName = userName,
-                BusinessId = businessId
+                BusinessId = businessId,
+                UserId = userId,
+                Role = role,
+                Email = email
             };
         }
     }

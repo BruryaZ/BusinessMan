@@ -77,7 +77,10 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuerSigningKey = true,
         ValidIssuer = builder.Configuration["JWT:Issuer"],
         ValidAudience = builder.Configuration["JWT:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"]))
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"])),
+
+        NameClaimType = "user_id",
+        RoleClaimType = "role"
     };
 });
 
@@ -95,6 +98,8 @@ builder.Services.AddSwaggerGen(options =>
         Description = "Bearer Authentication with JWT Token",
         Type = SecuritySchemeType.Http
     });
+
+    // דרישת האבטחה לכל הבקשות
     options.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
@@ -102,14 +107,15 @@ builder.Services.AddSwaggerGen(options =>
             {
                 Reference = new OpenApiReference
                 {
-                    Id = "Bearer",
-                    Type = ReferenceType.SecurityScheme
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
                 }
             },
-            new List<string>()
+            new string[] {}
         }
     });
 });
+
 
 // AWS הוספת שירותי 
 builder.Services.AddAWSService<IAmazonS3>();

@@ -19,7 +19,7 @@ namespace BusinessMan.API.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    [AllowAnonymous] // מאפשר גישה ללא הזדהות לכל הפעולות ב-controller // TODO להסיר
+    //[AllowAnonymous] // מאפשר גישה ללא הזדהות לכל הפעולות ב-controller // TODO להסיר
     public class AuthController : Controller
     {
         private readonly DataContext _context;
@@ -52,7 +52,7 @@ namespace BusinessMan.API.Controllers
                     return Unauthorized(new { Message = "סיסמה שגויה" });
                 }
 
-                var token = _authService.GenerateJwtToken(existingUser.Id, existingUser.BusinessId, existingUser.FirstName, existingUser.Role);
+                var token = _authService.GenerateJwtToken(existingUser.Id, existingUser.BusinessId, existingUser.FirstName, existingUser.Role, existingUser.Email);
                 return Ok(new { Token = token });
 
             }
@@ -181,8 +181,8 @@ namespace BusinessMan.API.Controllers
             }
 
             // יצירת טוקן
-            var token = _authService.GenerateJwtToken(existingUser.Id, existingUser.BusinessId, existingUser.FirstName, existingUser.Role);
-            return Ok(new { Token = token, User = existingUser });
+            var token = _authService.GenerateJwtToken(existingUser.Id, existingUser.BusinessId, existingUser.FirstName, existingUser.Role, existingUser.Email);
+            return Ok(token);//User = existingUser נכון להחזיר או לא?
         }
 
         [HttpDelete("api/remove-admin-by-dev")]// מחיקת מנהל על ידי המתכנת

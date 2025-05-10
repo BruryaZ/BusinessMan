@@ -9,6 +9,6 @@ namespace BusinessMan.Core.Services
 {
     public interface IAuthService
     {
-        UserLoginResponse GenerateJwtToken(int userId, int? businessId, string userName, int role);
+        UserLoginResponse GenerateJwtToken(int userId, int? businessId, string userName, int role, string email);
     }
 }
