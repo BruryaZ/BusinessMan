@@ -21,7 +21,6 @@ using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
 // הזרקת קובץ הנתונים 
 //builder.Services.AddDbContext<DataContext>(); 
 builder.Services.AddDbContext<DataContext>(options =>
@@ -69,6 +68,13 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer(options =>
 {
+    // Fix for CS8604: Ensure the configuration value is not null before using it.
+    var jwtKey = builder.Configuration["JWT:Key"];
+    if (string.IsNullOrEmpty(jwtKey))
+    {
+        throw new InvalidOperationException("JWT:Key is not configured in the application settings.");
+    }
+
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
@@ -77,10 +83,24 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuerSigningKey = true,
         ValidIssuer = builder.Configuration["JWT:Issuer"],
         ValidAudience = builder.Configuration["JWT:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"])),
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
 
         NameClaimType = "user_id",
         RoleClaimType = "role"
+    };
+
+    // מאפשר קריאת טוקן מתוך עוגייה
+    options.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            var token = context.Request.Cookies["jwt"];
+            if (!string.IsNullOrEmpty(token))
+            {
+                context.Token = token;
+            }
+            return Task.CompletedTask;
+        }
     };
 });
 
@@ -136,10 +156,13 @@ builder.Services.AddSingleton<IAmazonS3>(sp =>
 // שירותי CORS
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll",
-        builder => builder.AllowAnyOrigin()
-                          .AllowAnyMethod()
-                          .AllowAnyHeader());
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173")
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
 });
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -152,7 +175,7 @@ builder.Services.AddHttpContextAccessor();
 var app = builder.Build();
 
 // הוספת-CORS
-app.UseCors("AllowAll");
+app.UseCors("AllowFrontend");
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -165,11 +188,11 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 
-app.UseAuthorization();
-
 // My middlwares:
 //app.UseAdminOnly(); // TODO
 app.UseUserContext();
+
+app.UseAuthorization();
 
 app.MapControllers();
 

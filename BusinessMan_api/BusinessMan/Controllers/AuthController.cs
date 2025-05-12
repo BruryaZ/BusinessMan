@@ -42,22 +42,27 @@ namespace BusinessMan.API.Controllers
         [HttpPost("user-login")]// כניסת משתמש רגיל
         public async Task<IActionResult> Login([FromBody] UserLoginModel user)
         {
-            // בדיקה אם המשתמש קיים במסד הנתונים
             var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == user.Email);
 
-            if (existingUser != null)
+            if (existingUser == null)
+                return NotFound(new { Message = "המשתמש לא קיים" });
+
+            if (user.Password != existingUser.Password)
+                return Unauthorized(new { Message = "סיסמה שגויה" });
+
+            var token = _authService.GenerateJwtToken(existingUser.Id, existingUser.BusinessId, existingUser.FirstName, existingUser.Role, existingUser.Email);
+
+            Response.Cookies.Append("jwt", token, new CookieOptions
             {
-                if (user.Password != existingUser.Password)
-                {
-                    return Unauthorized(new { Message = "סיסמה שגויה" });
-                }
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTimeOffset.UtcNow.AddDays(1)
+            });
 
-                var token = _authService.GenerateJwtToken(existingUser.Id, existingUser.BusinessId, existingUser.FirstName, existingUser.Role, existingUser.Email);
-                return Ok(new { Token = token });
-
-            }
-            return NotFound(new { Message = "המשתמש לא קיים" });
+            return Ok(new { Message = "התחברות הצליחה" });
         }
+
 
         [HttpPost("user-register")]// רישום משתמש רגיל
         public async Task<ActionResult<UserDto>> RegisterAsync([FromBody] UserPostModel user)
@@ -150,40 +155,36 @@ namespace BusinessMan.API.Controllers
             return Ok(_mapper.Map<UserDto>(createUser));
         }
 
-        [HttpPost]
-        [Route("api/admin-login")]// כניסת מנהל
+        [HttpPost("admin-login")]// כניסת מנהל
         public async Task<ActionResult> AdminLogin([FromBody] UserLoginModel user)
         {
-            // בדוק אם האימייל קיים ברשימה
             var emailExists = await _context.EmailList.FirstOrDefaultAsync(e => e.EmailAddress == user.Email);
             if (emailExists == null)
-            {
-                return BadRequest("אתה לא מורשה להיכנס כמנהל אנא פנה למנהל המערכת להרשמה");
-            }
+                return BadRequest("אתה לא מורשה להיכנס כמנהל");
 
-            // בדוק אם המשתמש קיים
             var existingUser = await _userRepository.FirstOrDefaultAsync(u => u.Email == emailExists.EmailAddress);
-
             if (existingUser == null)
-            {
                 return BadRequest("User not found.");
-            }
 
             if (existingUser.Password != user.Password)
-            {
                 return Unauthorized("הסיסמא שגויה");
-            }
 
-            // בדיקה אם המשתמש הוא מנהל
-            if (existingUser.Role != 1) // 1 הוא תפקיד מנהל
-            {
-                return Forbid("You are not authorized to access this resource.");
-            }
+            if (existingUser.Role != 1)
+                return Forbid("אין הרשאה");
 
-            // יצירת טוקן
             var token = _authService.GenerateJwtToken(existingUser.Id, existingUser.BusinessId, existingUser.FirstName, existingUser.Role, existingUser.Email);
-            return Ok(token);//User = existingUser נכון להחזיר או לא?
+
+            Response.Cookies.Append("jwt", token, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTimeOffset.UtcNow.AddDays(1)
+            });
+
+            return Ok(new { Message = "התחברות כמנהל הצליחה" });
         }
+
 
         [HttpDelete("api/remove-admin-by-dev")]// מחיקת מנהל על ידי המתכנת
         public async Task<ActionResult> RemoveEmailFromList([FromQuery] string emailAddress)
@@ -228,9 +229,20 @@ namespace BusinessMan.API.Controllers
             return Ok(new
             {
                 user.FirstName,
-                BusinessName = user.Business.Name
+                BusinessName = user.Business?.Name
             });
         }
+
+        [Authorize]
+        [HttpGet]
+        public IActionResult Test()
+        {
+            var userId = User.FindFirst("user_id")?.Value;
+            var businessId = User.FindFirst("business_id")?.Value;
+
+            return Ok(new { userId, businessId, isAuth = User.Identity?.IsAuthenticated });
+        }
+
 
         // פונקציה לבדוק אם האימייל חוקי
         private bool IsValidEmail(string email)

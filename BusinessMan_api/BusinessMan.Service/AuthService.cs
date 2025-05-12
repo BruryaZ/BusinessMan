@@ -17,7 +17,7 @@ namespace BusinessMan.Service
         private readonly IConfiguration _configuration = configuration;
         // Generate JWT token for user login
 
-        public UserLoginResponse GenerateJwtToken(int userId, int? businessId, string userName, int role, string email)
+        public string GenerateJwtToken(int userId, int? businessId, string userName, int role, string email)
         {
             var claims = new[]
             {
@@ -39,15 +39,7 @@ namespace BusinessMan.Service
                 signingCredentials: creds
             );
 
-            return new UserLoginResponse
-            {
-                Token = new JwtSecurityTokenHandler().WriteToken(token),
-                UserName = userName,
-                BusinessId = businessId,
-                UserId = userId,
-                Role = role,
-                Email = email
-            };
+            return new JwtSecurityTokenHandler().WriteToken(token);
         }
     }
 }

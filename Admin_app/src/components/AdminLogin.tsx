@@ -24,19 +24,9 @@ const AdmineLogin = () => {
 
             if (valid) {
                 try {
-                    const { data } = await axios.post<AdminLoginResponse>(`${url}/Auth/api/admin-login`, adminRegister) // TODO 
-                    // הכנסת הטוקן לlocal storage
-                    if (typeof window !== 'undefined') {
-                        localStorage.setItem('token', data.token);
-                    }
-                    else{
-                        console.log('window is undefined');
-                    }
-                    // // הכנסת הנתונים לקונטקסט TODO:: זה מיותר יש לי את כל האובייקט בקונטקטס
-                    // authDetails.user_email = data.user.email
-                    // authDetails.user_id = data.user.id
-                    // authDetails.user_name = data.user.firstName + " " + data.user.lastName
-                    // authDetails.user_role = data.user.role
+                    const res = await axios.post<any>(`${url}/Auth/admin-login`, adminRegister) // TODO 
+                    console.log(res.data);
+                    
                     nav('/')
                 }
                 catch (e) {

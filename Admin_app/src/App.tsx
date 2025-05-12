@@ -12,8 +12,11 @@ import RegisterUser from './components/UserRegister';
 import BusinessAndAdmin from './components/BusinessAndAdmin';
 import GlobalContext from './context/GlobalContext';
 import { BusinessImpl } from './models/Business';
+import axios from 'axios';
 
 function App() {
+  axios.defaults.withCredentials = true;// הטוקן יישלח בכל קריאת אקסיוס
+
   return (
     <GlobalContext>
       {/* <AuthContext> */}
