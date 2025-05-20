@@ -2,7 +2,6 @@ import { useContext, useState } from "react"
 import { Admin } from "../models/Admin"
 import * as Yup from 'yup'
 import axios from "axios"
-// import { detailsContext } from "../context/AuthContext"
 import { AdminRegister } from "../models/AdminRegister"
 import { useNavigate } from "react-router-dom"
 import { validationSchemaAdminLogin } from "../utils/validationSchema"
@@ -12,8 +11,7 @@ const AdmineLogin = () => {
     const nav = useNavigate()
     const [admin, setAdmin] = useState<Admin>({ email: '', password: '' })
     const [errors, setErrors] = useState<string[]>([])
-    const url = import.meta.env.VITE_API_URL 
-    // const authDetails = useContext(detailsContext)
+    const url = import.meta.env.VITE_API_URL
     const validationSchema = validationSchemaAdminLogin
     const globalContextDetails = useContext(globalContext);
 
@@ -25,8 +23,8 @@ const AdmineLogin = () => {
 
             if (valid) {
                 try {
-                    const res = await axios.post<any>(`${url}/Auth/admin-login`, adminRegister, {withCredentials: true}) // TODO 
-                    globalContextDetails.setAdmin(res.data.user);
+                    const { data } = await axios.post<any>(`${url}/Auth/admin-login`, adminRegister, { withCredentials: true }) // TODO 
+                    globalContextDetails.setAdmin(data.user);
                     nav('/')
                 }
                 catch (e) {

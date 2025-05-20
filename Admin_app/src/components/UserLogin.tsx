@@ -1,7 +1,6 @@
 import { useContext, useState } from "react"
 import * as Yup from 'yup'
 import axios from "axios"
-import { AdminLoginResponse } from "../models/AdminLoginResponse"
 import { AdminRegister } from "../models/AdminRegister"
 import { useNavigate } from "react-router-dom"
 import { validationSchemaUserLogin } from "../utils/validationSchema"
@@ -15,8 +14,6 @@ const UserLogin = () => {
     const url = import.meta.env.VITE_API_URL
     const globalContextDetails = useContext(globalContext);
 
-    // const authDetails = useContext(detailsContext)
-
     const handleSubmit = (userLogin: AdminRegister) => async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         validationSchema.isValid(userLogin).then(async valid => {
@@ -27,18 +24,6 @@ const UserLogin = () => {
                 try {
                     const { data } = await axios.post<any>(`${url}/Auth/user-login`, userLogin) // TODO 
                     globalContextDetails.setUser(data.user);
-                    // הכנסת הטוקן לlocal storage
-                    if (typeof window !== 'undefined') {
-                        localStorage.setItem('token', data.token);
-                    }
-                    else {
-                        console.log('window is undefined');
-                    }
-                    // // הכנסת הנתונים לקונטקסט
-                    // authDetails.user_email = data.user.email
-                    // authDetails.user_id = data.user.id
-                    // authDetails.user_name = data.user.firstName + " " + data.user.lastName
-                    // authDetails.user_role = data.user.role
                     nav('/')
                 }
                 catch (e) {
