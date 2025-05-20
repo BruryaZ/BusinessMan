@@ -60,7 +60,18 @@ namespace BusinessMan.API.Controllers
                 Expires = DateTimeOffset.UtcNow.AddDays(1)
             });
 
-            return Ok(new { Message = "התחברות הצליחה" });
+            return Ok(new
+            {
+                Message = "ההתחברות הצליחה",
+                User = new
+                {
+                    existingUser.Id,
+                    existingUser.BusinessId,
+                    existingUser.FirstName,
+                    existingUser.Role,
+                    existingUser.Email
+                }
+            });
         }
 
 
@@ -182,7 +193,18 @@ namespace BusinessMan.API.Controllers
                 Expires = DateTimeOffset.UtcNow.AddDays(1)
             });
 
-            return Ok(new { Message = "התחברות כמנהל הצליחה" });
+            return Ok(new
+            {
+                Message = "התחברות כמנהל הצליחה",
+                User = new
+                {
+                    existingUser.Id,
+                    existingUser.BusinessId,
+                    existingUser.FirstName,
+                    existingUser.Role,
+                    existingUser.Email
+                }
+            });
         }
 
 

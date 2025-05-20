@@ -3,10 +3,10 @@ import { Admin } from "../models/Admin"
 import * as Yup from 'yup'
 import axios from "axios"
 // import { detailsContext } from "../context/AuthContext"
-import { AdminLoginResponse } from "../models/AdminLoginResponse"
 import { AdminRegister } from "../models/AdminRegister"
 import { useNavigate } from "react-router-dom"
 import { validationSchemaAdminLogin } from "../utils/validationSchema"
+import { globalContext } from "../context/GlobalContext"
 
 const AdmineLogin = () => {
     const nav = useNavigate()
@@ -15,6 +15,7 @@ const AdmineLogin = () => {
     const url = import.meta.env.VITE_API_URL 
     // const authDetails = useContext(detailsContext)
     const validationSchema = validationSchemaAdminLogin
+    const globalContextDetails = useContext(globalContext);
 
     const handleSubmit = (adminRegister: AdminRegister) => async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
@@ -24,9 +25,8 @@ const AdmineLogin = () => {
 
             if (valid) {
                 try {
-                    const res = await axios.post<any>(`${url}/Auth/admin-login`, adminRegister) // TODO 
-                    console.log(res.data);
-                    
+                    const res = await axios.post<any>(`${url}/Auth/admin-login`, adminRegister, {withCredentials: true}) // TODO 
+                    globalContextDetails.setAdmin(res.data.user);
                     nav('/')
                 }
                 catch (e) {
