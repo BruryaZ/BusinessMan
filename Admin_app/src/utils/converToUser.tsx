@@ -1,5 +1,5 @@
 import { User } from "../models/User";
-import { UserRegisterModel } from "../models/UserRegisterModel";
+import { UserRegisterModel } from "../models/UserPostModel";
 
 export const convertToUser = (userRegister: UserRegisterModel): User => {
     return {

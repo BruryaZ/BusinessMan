@@ -6,7 +6,6 @@ const Home = () => {
   return (
     <div>
       <h1>Home page</h1>
-      <h2>Hello {globalContextDetails.admin.firstName} {globalContextDetails.admin.lastName}</h2>
       <h2>Hello {globalContextDetails.user.firstName} {globalContextDetails.user.lastName}</h2>
     </div>
   )

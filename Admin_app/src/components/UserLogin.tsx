@@ -9,10 +9,10 @@ import { globalContext } from "../context/GlobalContext"
 const UserLogin = () => {
     const nav = useNavigate()
     const validationSchema = validationSchemaUserLogin
-    const [user, setUser] = useState<AdminRegister>({ email: "", password: "" })
+    const [userLogin, setUserLogin] = useState<AdminRegister>({ email: "", password: "" })
     const [errors, setErrors] = useState<string[]>([])
     const url = import.meta.env.VITE_API_URL
-    const globalContextDetails = useContext(globalContext);
+    const {setUser} = useContext(globalContext);
 
     const handleSubmit = (userLogin: AdminRegister) => async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
@@ -23,7 +23,7 @@ const UserLogin = () => {
             if (valid) {
                 try {
                     const { data } = await axios.post<any>(`${url}/Auth/user-login`, userLogin) // TODO 
-                    globalContextDetails.setUser(data.user);
+                    setUser(data.user);
                     nav('/')
                 }
                 catch (e) {
@@ -44,14 +44,14 @@ const UserLogin = () => {
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
         const { name, value } = event.target
-        setUser(prevUser => ({
+        setUserLogin(prevUser => ({
             ...prevUser,
             [name]: value
         }))
     }
 
     return (
-        <form onSubmit={handleSubmit(user)}>
+        <form onSubmit={handleSubmit(userLogin)}>
             <input type="email" name="email" placeholder="אימייל" onChange={handleChange} />
             <input type="password" name="password" placeholder="סיסמא" onChange={handleChange} />
             <button type="submit">התחבר</button>

@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { Business } from '../models/Business';
 import BusinessTable from './BusinessTable';
 import axios from 'axios';
+import { globalContext } from '../context/GlobalContext';
 
 //TODO: לשנות שנתוני העסק יגיעו מהשרת
 // const business: Business = {
@@ -27,8 +28,10 @@ import axios from 'axios';
 function ViewData() {
     const url = import.meta.env.VITE_API_URL
     const [errors, setErrors] = useState<string[]>([])
+    // const [businessId, setBusinessId] = useState<number | null>(0)
+    const globalContextDetails = useContext(globalContext);
     const [business, setBusiness] = useState<Business>({
-        id: 2,// TODO: לשנות 
+        id: 0, 
         businessId: 0,
         name: "",
         address: "",
@@ -46,15 +49,12 @@ function ViewData() {
         updatedBy: "",
     })
 
-    const handleSubmit = (businessId: number) => async (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = () => async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         setErrors([]);
 
-        try {
-            console.log(`${url}/api/Business/${businessId}`);
-            console.log(business);
-            
-            const res = await axios.get<Business>(`${url}/api/Business/${businessId}`);
+        try {                
+            const res = await axios.get<Business>(`${url}/api/Business/${globalContextDetails.user.businessId}`, { withCredentials: true });
             if (res.status !== 200) {
                 setErrors(['Error fetching business data']);
                 return;
@@ -74,8 +74,7 @@ function ViewData() {
 
 
     return (
-        // לדאוג להכניס את מספר העסק בכניסת המנהל TODO::
-        <form onSubmit={handleSubmit(business.id)}>
+        <form onSubmit={handleSubmit()}>
             <div>
                 <BusinessTable business={business} />
             </div>

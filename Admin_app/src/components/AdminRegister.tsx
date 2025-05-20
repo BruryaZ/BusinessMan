@@ -2,7 +2,7 @@ import { useContext, useState } from "react"
 import * as Yup from 'yup'
 import axios from "axios"
 import { useNavigate } from "react-router-dom"
-import { UserPostModel } from "../models/UserRegisterModel"
+import { UserPostModel } from "../models/UserPostModel"
 import { validationSchemaUserRegister } from "../utils/validationSchema"
 import { globalContext } from "../context/GlobalContext"
 import { UserDto } from "../models/UserDto"
@@ -34,11 +34,10 @@ const AdminRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) =>
                     console.log("adminRegister ", adminRegister);
                     const { data } = await axios.post<UserDto>(`${url}/Auth/admin-register`, adminRegister);
                     console.log("data ", data);
-                    if (data.role == 2)
-                        globalContextDetails.setUser(converFromUserDto(data));
-                    else if (data.role == 1)
+                    globalContextDetails.setUser(converFromUserDto(data));
+                    if (data.role == 1)
                     {
-                        globalContextDetails.setAdmin(converFromUserDto(data));
+                        globalContextDetails.setIsAdmin(true);
                     }
                     if (onSubmitSuccess)
                         onSubmitSuccess();

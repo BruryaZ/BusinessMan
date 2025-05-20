@@ -6,12 +6,10 @@ import { defaultBusiness, defaultUser } from "../models/DefaultObjects"
 type GlobalContextType = {
     business_global: Business,
     setBusinessGlobal: (business: Business) => void
-    admin: User,
-    setAdmin: (admin: User) => void
     user: User,
     setUser: (user: User) => void
-    num: number
-    setNum: (num: number) => void
+    isAdmin: boolean
+    setIsAdmin: (isAdmin: boolean) => void
 }
 
 export const globalContext = createContext<GlobalContextType>({
@@ -19,19 +17,16 @@ export const globalContext = createContext<GlobalContextType>({
     setUser: (_: User) => { },
     business_global: defaultBusiness,
     setBusinessGlobal: (_: Business) => { },
-    admin: defaultUser,
-    setAdmin: (_: User) => { },
-    num: 0,
-    setNum: (_: number) => { }
+    isAdmin: false,
+    setIsAdmin: (_: boolean) => { }
 })
 
 const GlobalContext = ({children}:{children:ReactElement}) => {
     const [business_global, setBusinessGlobal] = useState<Business>(defaultBusiness)
-    const [admin, setAdmin] = useState<User>(defaultUser)
     const [user, setUser] = useState<User>(defaultUser)
-    const [num, setNum] = useState<number>(0)
+    const [isAdmin, setIsAdmin] = useState<boolean>(false)
 
-    return <globalContext.Provider value={{ business_global, setBusinessGlobal, admin, setAdmin, user, setUser, num, setNum }}>
+    return <globalContext.Provider value={{ business_global, setBusinessGlobal, user, setUser, isAdmin, setIsAdmin }}>
         {children}
     </globalContext.Provider>
 }

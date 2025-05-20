@@ -16,7 +16,7 @@ const BusinessAndAdmin = () => {
 
     useEffect(() => {
         if (businessDone && adminDone) {  // OK
-            updateObjects() 
+            updateObjects()
             // שניהם הסתיימו => אפשר להמשיך לשלב הבא או לנווט
             console.log("הטפסים נוספו בהצלחה");
         }
@@ -25,34 +25,34 @@ const BusinessAndAdmin = () => {
     // עדכון קשרים בין עסק למשתמש - מנהל
     const updateObjects = async () => {
         const updateAdmin = {
-            ...globalContextDetails.admin,
+            ...globalContextDetails.user,
             businessId: globalContextDetails.business_global.id,
             business: globalContextDetails.business_global,
             role: 1,
-            updateBy: globalContextDetails.admin.firstName + " " + globalContextDetails.admin.lastName,
+            updateBy: globalContextDetails.user.firstName + " " + globalContextDetails.user.lastName,
         }
         const updateBusiness = {
             ...globalContextDetails.business_global,
-            users: [globalContextDetails.admin],
-            updateBy: globalContextDetails.admin.firstName + " " + globalContextDetails.admin.lastName,
+            users: [globalContextDetails.user],
+            updateBy: globalContextDetails.user.firstName + " " + globalContextDetails.user.lastName,
         }
-        globalContextDetails.setAdmin(updateAdmin)
+        globalContextDetails.setUser(updateAdmin)
         globalContextDetails.setBusinessGlobal(updateBusiness)
 
         try {
             console.log("updateAdmin ", updateAdmin);
             console.log("updateBusiness ", updateBusiness);
-            
-            const { data } = await axios.put<UserDto>(`${url}/api/User/${globalContextDetails.admin.id}`,  updateAdmin )
+
+            await axios.put<UserDto>(`${url}/api/User/${globalContextDetails.user.id}`, updateAdmin)
         }
         catch (e) {
             console.log(e);
         }
 
         try {
-            const { data } = await axios.put<BusinessResponsePutModel>(`${url}/api/Business/${globalContextDetails.business_global.id}`, updateBusiness )
+            await axios.put<BusinessResponsePutModel>(`${url}/api/Business/${globalContextDetails.business_global.id}`, updateBusiness)
             globalContextDetails.setBusinessGlobal(updateBusiness)
-            globalContextDetails.setAdmin(updateAdmin)
+            globalContextDetails.setUser(updateAdmin)
         }
         catch (e) {
             console.log(e);

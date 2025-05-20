@@ -13,51 +13,101 @@ import BusinessAndAdmin from './components/BusinessAndAdmin';
 import GlobalContext from './context/GlobalContext';
 import { BusinessImpl } from './models/Business';
 import axios from 'axios';
+import RegisterBusinessData from './components/RegisterBusinessData';
+import AdminRoute from './components/AdminRoute';
+import IncomAndExpennses from './components/Incom&Expennses';
 
 function App() {
   axios.defaults.withCredentials = true;// הטוקן יישלח בכל קריאת אקסיוס
 
   return (
     <GlobalContext>
-      {/* <AuthContext> */}
-        <Router>
-          <nav dir="rtl">
-            <Link to="/register-user">רישום משתמש</Link>
-            <span>   |   </span>
-            <Link to="/user-login">כניסת משתמש</Link>
-            <span>   |   </span>
-            <Link to="/admin-login">כניסת מנהל</Link>
-            <span>   |   </span>
-            <Link to="/upload-file">העלאת קבצים</Link>
-            <span>   |   </span>
-            <Link to="/view-data">צפייה בנתונים</Link>
-            <span>   |   </span>
-            <Link to="/">בית</Link>
-            <span>   |   </span>
-            <Link to='/user-management'>ניהול משתמשים</Link>
-            <span>   |   </span>
-            <Link to="/production-reports">דו"ח ייצור</Link>
-            <span>   |   </span>
-            <Link to="/business-table">טבלת עסקים</Link>
-            <span>   |   </span>
-            <Link to='/new-business-registation'>רישום עסק חדש</Link>
-          </nav>
+      <Router>
+        <nav dir="rtl">
+          <Link to="/register-user">רישום משתמש</Link>
+          <span>   |   </span>
+          <Link to="/user-login">כניסת משתמש</Link>
+          <span>   |   </span>
+          <Link to="/admin-login">כניסת מנהל</Link>
+          <span>   |   </span>
+          <Link to="/upload-file">העלאת קבצים</Link>
+          <span>   |   </span>
+          <Link to="/">בית</Link>
+          <span>   |   </span>
+          <Link to="/view-data">צפייה בנתונים</Link>
+          <span>   |   </span>
+          <Link to='/user-management'>ניהול משתמשים</Link>
+          <span>   |   </span>
+          <Link to="/production-reports">דו"ח ייצור</Link>
+          <span>   |   </span>
+          <Link to="/business-table">טבלת עסקים</Link>
+          <span>   |   </span>
+          <Link to="/incom&Expennses">ניהול הוצאות והכנסות</Link>
+          <span>   |   </span>
+          <Link to='/business-register'>רישום עסק חדש</Link>
+          <span>   |   </span>
+          <Link to='/register-admin&business'>רישום עסק ומנהל חדש</Link>
+        </nav>
 
-          <Routes>
-            <Route path="/register-user" element={<RegisterUser />} />
-            <Route path='/admin-login' element={<AdminLogin />} />
-            <Route path='/upload-file' element={<UploadFiles />} />
-            <Route path='/view-data' element={<DataViweing />} />
-            <Route path='/business-table' element={<BusinessTable business={new BusinessImpl(0, 0, '', '', '', '', 2, 0, 0, 0, 0, 0, 0)} />} />
-            <Route path='/production-reports' element={<ProductionReports />} />
-            <Route path='/user-management' element={<UserManagemet />} />
-            <Route path='/' element={<Home />} />
-            <Route path='/user-login' element={<AdminLogin />} />
-            <Route path='/new-business-registation' element={<BusinessAndAdmin />} />
-          </Routes>
-        </Router>
-      {/* </AuthContext> */}
-    </GlobalContext>
+        <Routes>
+          <Route path='/' element={<Home />} />
+          <Route path="/register-user" element={<RegisterUser />} />
+          <Route path='/admin-login' element={<AdminLogin />} />
+          <Route path='/upload-file' element={<UploadFiles />} />
+          <Route path='/register-admin&business' element={<BusinessAndAdmin />} />
+
+          <Route
+            path='/production-reports'
+            element={
+              <AdminRoute>
+                <ProductionReports />
+              </AdminRoute>
+            }
+          />
+          <Route
+            path='/business-table'
+            element={
+              <AdminRoute>
+                <BusinessTable business={new BusinessImpl(0, 0, '', '', '', '', 2, 0, 0, 0, 0, 0, 0)} />
+              </AdminRoute>
+            }
+          />
+          <Route
+            path='/view-data'
+            element={
+              <AdminRoute>
+                <DataViweing />
+              </AdminRoute>
+            }
+          />
+          <Route
+            path='/user-management'
+            element={
+              <AdminRoute>
+                <UserManagemet />
+              </AdminRoute>
+            }
+          />
+          <Route
+            path='/business-register'
+            element={
+              <AdminRoute>
+                <RegisterBusinessData />
+              </AdminRoute>
+            }
+          />
+            <Route
+            path='/incom&Expennses'
+            element={
+              <AdminRoute>
+                <IncomAndExpennses />
+              </AdminRoute>
+            }
+          />
+        </Routes>
+
+      </Router >
+    </GlobalContext >
   );
 }
 

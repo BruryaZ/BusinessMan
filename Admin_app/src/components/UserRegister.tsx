@@ -2,18 +2,18 @@ import { useContext, useState } from "react"
 import * as Yup from 'yup'
 import axios from "axios"
 import { useNavigate } from "react-router-dom"
-import { UserRegisterModel } from "../models/UserRegisterModel"
 import { validationSchemaUserRegister } from "../utils/validationSchema"
 import { globalContext } from "../context/GlobalContext"
 import { convertToUser } from "../utils/converToUser"
+import { UserPostModel } from "../models/UserPostModel"
 
 const UserRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => {
     const nav = useNavigate()
     const validationSchema = validationSchemaUserRegister
     const [errors, setErrors] = useState<string[]>([])
-    const globalContextDetails = useContext(globalContext)
+    const {setUser} = useContext(globalContext)
     const url = import.meta.env.VITE_API_URL
-    const [myUser, setMyUser] = useState<UserRegisterModel>({
+    const [myUser, setMyUser] = useState<UserPostModel>({
         firstName: "",
         lastName: "",
         email: "",
@@ -31,7 +31,7 @@ const UserRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => 
         }))
     }
 
-    const handleSubmit = (userRegister: UserRegisterModel) => async (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = (userRegister: UserPostModel) => async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
 
         console.log(userRegister);
@@ -39,13 +39,10 @@ const UserRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => 
         validationSchema.isValid(userRegister).then(async valid => {
             setErrors([]);
             if (valid) {
-                try {                               // TODO: type 
-                    const { data } = await axios.post<UserRegisterModel>(`${url}/Auth/user-register`, userRegister) // TODO 
-                    // console.log(data);
-                    if (data.role == 2)
-                        globalContextDetails.setUser(convertToUser(data))
-                    else if (data.role == 1)
-                        globalContextDetails.setAdmin(convertToUser(data))
+                try {                               
+                    const { data } = await axios.post<UserPostModel>(`${url}/Auth/user-register`, userRegister)
+                    setUser(convertToUser(data))
+
                     if (onSubmitSuccess) 
                         onSubmitSuccess();
                     nav('/')
