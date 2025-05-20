@@ -95,7 +95,8 @@ namespace BusinessMan.API.Controllers
                     Size = fileUpload.Length,
                     UploadDate = DateTime.UtcNow,
                     FilePath = fileUrl,
-                    FileContent = fileUpload
+                    FileContent = fileUpload,
+                    UserId = int.Parse(User.FindFirst("user_id")?.Value ?? "0") // הנחתי שהמשתמש מחובר
                 };
 
                 var createdFile = await _fileService.AddAsync(fileDto);
@@ -140,6 +141,49 @@ namespace BusinessMan.API.Controllers
             // TODO: Save file to AWS S3.
 
             return NoContent();
+        }
+
+        // הורדת כל הקבצים של המשתמש לזיפ
+        [HttpGet("my-files-download-zip")]
+        public async Task<IActionResult> DownloadAllMyFilesAsZip()
+        {
+            var userIdClaim = User?.FindFirst("user_id")?.Value;
+            if (string.IsNullOrEmpty(userIdClaim))
+                return Unauthorized("המשתמש לא מזוהה.");
+
+            int userId = int.Parse(userIdClaim);
+
+            var allFiles = await _fileService.GetListAsync();
+            var myFiles = allFiles.Where(f => f.UserId == userId);
+
+            using var memoryStream = new MemoryStream();
+            using (var archive = new System.IO.Compression.ZipArchive(memoryStream, System.IO.Compression.ZipArchiveMode.Create, true))
+            {
+                foreach (var file in myFiles)
+                {
+                    var request = new Amazon.S3.Model.GetObjectRequest
+                    {
+                        BucketName = _bucketName,
+                        Key = ExtractKeyFromUrl(file.FilePath)
+                    };
+
+                    using var response = await _s3Client.GetObjectAsync(request);
+                    using var responseStream = response.ResponseStream;
+                    var entry = archive.CreateEntry(file.FileName, System.IO.Compression.CompressionLevel.Fastest);
+
+                    using var entryStream = entry.Open();
+                    await responseStream.CopyToAsync(entryStream);
+                }
+            }
+
+            memoryStream.Position = 0;
+            return File(memoryStream.ToArray(), "application/zip", "my-files.zip");
+        }
+        private string ExtractKeyFromUrl(string url)
+        {
+            // מניח שה־Key מתחיל אחרי amazonaws.com/
+            var uri = new Uri(url);
+            return uri.AbsolutePath.TrimStart('/');
         }
     }
 }

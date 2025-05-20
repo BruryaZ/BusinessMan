@@ -51,6 +51,7 @@ namespace BusinessMan.Service
             invoiceToAdd.InvoiceDate = ExtentionsFunctions.ForceUtc(invoiceToAdd.InvoiceDate);
             invoiceToAdd.CreatedAt = ExtentionsFunctions.ForceUtc(invoiceToAdd.CreatedAt);
             invoiceToAdd.UpdatedAt = DateTime.UtcNow;
+            invoiceToAdd.InvoicePath = fileUpload.FilePath;
 
             // הגדרת המידע של מי שיצר את החשבונית
             var user = _httpContextAccessor.HttpContext.Items["CurrentUser"] as User;

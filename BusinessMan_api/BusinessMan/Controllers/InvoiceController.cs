@@ -4,6 +4,7 @@ using BusinessMan.Core.Models;
 using BusinessMan.Core.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using OpenAI.Interfaces;
 
 namespace BusinessMan.API.Controllers
 {
@@ -72,6 +73,23 @@ namespace BusinessMan.API.Controllers
             }
             await _allInvoices.DeleteAsync(invoice);
             return NoContent();
+        }
+
+        // קבלת קבצים של משתמש מסוים
+        [HttpGet("my-files")]
+        public async Task<IActionResult> GetMyFiles()
+        {
+            var userIdClaim = User?.FindFirst("user_id")?.Value;
+            if (string.IsNullOrEmpty(userIdClaim))
+                return Unauthorized("המשתמש לא מזוהה.");
+
+            int userId = int.Parse(userIdClaim);
+
+            var allFiles = await _allInvoices.GetListAsync();
+            var myFiles = allFiles.Where(f => f.UserId == userId); 
+
+            var dto = _mapper.Map<IEnumerable<InvoiceDto>>(myFiles);
+            return Ok(dto);
         }
     }
 }

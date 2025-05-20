@@ -8,8 +8,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using System.ComponentModel.DataAnnotations.Schema;
 
-
-
 namespace BusinessMan.Core.DTO_s
 {
     public class FileDto
@@ -20,6 +18,7 @@ namespace BusinessMan.Core.DTO_s
         public string FileName { get; set; } // שם הקובץ
         public string FilePath { get; set; } // נתיב הקובץ במערכת
         public long Size { get; set; } // גודל הקובץ בבתים
+        public int UserId { get; set; }
         public DateTime UploadDate { get; set; } = DateTime.UtcNow;// תאריך העלאת הקובץ
     }
 }

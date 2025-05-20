@@ -18,6 +18,7 @@ namespace BusinessMan.Core.DTO_s
         public string CreatedBy { get; set; } // נוצר על ידי
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow; // תאריך עדכון
         public string UpdatedBy { get; set; } // עודכן על ידי
+        public string InvoicePath { get; set; }
 
         // אובייקטים לקשרים בין הטבלאות
         public int? UserId { get; set; } // מזהה המשתמש (קשר לטבלת Users)
