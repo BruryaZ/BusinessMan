@@ -10,6 +10,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@mui/material": "^7.1.0",
     "@types/yup": "^0.29.14",
     "axios": "^1.8.3",
     "pdfjs-dist": "^4.10.38",
@@ -17,6 +20,7 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.3.0",
+    "stylis-plugin-rtl": "^2.1.1",
     "yup": "^1.6.1"
   },
   "devDependencies": {

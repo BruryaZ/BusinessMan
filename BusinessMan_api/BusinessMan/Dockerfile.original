@@ -13,8 +13,8 @@ FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["BusinessMan/BusinessMan.API.csproj", "BusinessMan/"]
-COPY ["BusinessMan.Core/BusinessMan.Core.csproj", "BusinessMan.Core/"]
 COPY ["BusinessMan.Data/BusinessMan.Data.csproj", "BusinessMan.Data/"]
+COPY ["BusinessMan.Core/BusinessMan.Core.csproj", "BusinessMan.Core/"]
 COPY ["BusinessMan.Service/BusinessMan.Service.csproj", "BusinessMan.Service/"]
 RUN dotnet restore "./BusinessMan/BusinessMan.API.csproj"
 COPY . .
