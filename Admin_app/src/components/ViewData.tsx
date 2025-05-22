@@ -1,37 +1,15 @@
 import { useContext, useState } from 'react';
 import { Business } from '../models/Business';
-import BusinessTable from './BusinessTable';
 import axios from 'axios';
 import { globalContext } from '../context/GlobalContext';
-
-//TODO: לשנות שנתוני העסק יגיעו מהשרת
-// const business: Business = {
-//     id: 2,
-//     businessId: 101,
-//     name: "עסק א",
-//     address: "כתובת א",
-//     email: "businessA@example.com",
-//     businessType: "סוג א",
-//     income: 100000,
-//     expenses: 50000,
-//     cashFlow: 50000,
-//     totalAssets: 200000,
-//     totalLiabilities: 50000,
-//     netWorth: 150000,
-//     createdAt: new Date(),
-//     createdBy: "משתמש א",
-//     updatedAt: new Date(),
-//     updatedBy: "משתמש ב",
-// };
-
+import BusinessTable from './BusinessTable';
 
 function ViewData() {
     const url = import.meta.env.VITE_API_URL
     const [errors, setErrors] = useState<string[]>([])
-    // const [businessId, setBusinessId] = useState<number | null>(0)
     const globalContextDetails = useContext(globalContext);
     const [business, setBusiness] = useState<Business>({
-        id: 0, 
+        id: 0,
         businessId: 0,
         name: "",
         address: "",
@@ -53,7 +31,7 @@ function ViewData() {
         e.preventDefault()
         setErrors([]);
 
-        try {                
+        try {
             const res = await axios.get<Business>(`${url}/api/Business/${globalContextDetails.user.businessId}`, { withCredentials: true });
             if (res.status !== 200) {
                 setErrors(['Error fetching business data']);

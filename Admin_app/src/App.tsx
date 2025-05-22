@@ -4,14 +4,11 @@ import AdminLogin from './components/AdminLogin';
 import UploadFiles from './components/UploadFiles';
 import DataViweing from './components/ViewData';
 import Home from './components/Home';
-import BusinessTable from './components/BusinessTable';
 import ProductionReports from './components/ProductionReports';
 import UserManagemet from './components/UserManagemet';
-// import AuthContext from './context/AuthContext';
 import RegisterUser from './components/UserRegister';
 import BusinessAndAdmin from './components/BusinessAndAdmin';
 import GlobalContext from './context/GlobalContext';
-import { BusinessImpl } from './models/Business';
 import axios from 'axios';
 import RegisterBusinessData from './components/RegisterBusinessData';
 import AdminRoute from './components/AdminRoute';
@@ -40,8 +37,6 @@ function App() {
           <span>   |   </span>
           <Link to="/production-reports">דו"ח ייצור</Link>
           <span>   |   </span>
-          <Link to="/business-table">טבלת עסקים</Link>
-          <span>   |   </span>
           <Link to="/incom&Expennses">ניהול הוצאות והכנסות</Link>
           <span>   |   </span>
           <Link to='/business-register'>רישום עסק חדש</Link>
@@ -61,14 +56,6 @@ function App() {
             element={
               <AdminRoute>
                 <ProductionReports />
-              </AdminRoute>
-            }
-          />
-          <Route
-            path='/business-table'
-            element={
-              <AdminRoute>
-                <BusinessTable business={new BusinessImpl(0, 0, '', '', '', '', 2, 0, 0, 0, 0, 0, 0)} />
               </AdminRoute>
             }
           />

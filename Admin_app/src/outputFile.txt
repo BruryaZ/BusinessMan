@@ -1,0 +1,1514 @@
+//Brurya
+
+import './App.css';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import AdminLogin from './components/AdminLogin';
+import UploadFiles from './components/UploadFiles';
+import DataViweing from './components/ViewData';
+import Home from './components/Home';
+import ProductionReports from './components/ProductionReports';
+import UserManagemet from './components/UserManagemet';
+import RegisterUser from './components/UserRegister';
+import BusinessAndAdmin from './components/BusinessAndAdmin';
+import GlobalContext from './context/GlobalContext';
+import axios from 'axios';
+import RegisterBusinessData from './components/RegisterBusinessData';
+import AdminRoute from './components/AdminRoute';
+import IncomAndExpennses from './components/Incom&Expennses';
+
+function App() {
+  axios.defaults.withCredentials = true;// הטוקן יישלח בכל קריאת אקסיוס
+
+  return (
+    <GlobalContext>
+      <Router>
+        <nav dir="rtl">
+          <Link to="/register-user">רישום משתמש</Link>
+          <span>   |   </span>
+          <Link to="/user-login">כניסת משתמש</Link>
+          <span>   |   </span>
+          <Link to="/admin-login">כניסת מנהל</Link>
+          <span>   |   </span>
+          <Link to="/upload-file">העלאת קבצים</Link>
+          <span>   |   </span>
+          <Link to="/">בית</Link>
+          <span>   |   </span>
+          <Link to="/view-data">צפייה בנתונים</Link>
+          <span>   |   </span>
+          <Link to='/user-management'>ניהול משתמשים</Link>
+          <span>   |   </span>
+          <Link to="/production-reports">דו"ח ייצור</Link>
+          <span>   |   </span>
+          <Link to="/incom&Expennses">ניהול הוצאות והכנסות</Link>
+          <span>   |   </span>
+          <Link to='/business-register'>רישום עסק חדש</Link>
+          <span>   |   </span>
+          <Link to='/register-admin&business'>רישום עסק ומנהל חדש</Link>
+        </nav>
+
+        <Routes>
+          <Route path='/' element={<Home />} />
+          <Route path="/register-user" element={<RegisterUser />} />
+          <Route path='/admin-login' element={<AdminLogin />} />
+          <Route path='/upload-file' element={<UploadFiles />} />
+          <Route path='/register-admin&business' element={<BusinessAndAdmin />} />
+
+          <Route
+            path='/production-reports'
+            element={
+              <AdminRoute>
+                <ProductionReports />
+              </AdminRoute>
+            }
+          />
+          <Route
+            path='/view-data'
+            element={
+              <AdminRoute>
+                <DataViweing />
+              </AdminRoute>
+            }
+          />
+          <Route
+            path='/user-management'
+            element={
+              <AdminRoute>
+                <UserManagemet />
+              </AdminRoute>
+            }
+          />
+          <Route
+            path='/business-register'
+            element={
+              <AdminRoute>
+                <RegisterBusinessData />
+              </AdminRoute>
+            }
+          />
+            <Route
+            path='/incom&Expennses'
+            element={
+              <AdminRoute>
+                <IncomAndExpennses />
+              </AdminRoute>
+            }
+          />
+        </Routes>
+
+      </Router >
+    </GlobalContext >
+  );
+}
+
+export default App;
+import { useContext, useState } from "react"
+import { Admin } from "../models/Admin"
+import * as Yup from 'yup'
+import axios from "axios"
+import { AdminRegister } from "../models/AdminRegister"
+import { useNavigate } from "react-router-dom"
+import { validationSchemaAdminLogin } from "../utils/validationSchema"
+import { globalContext } from "../context/GlobalContext"
+
+const AdmineLogin = () => {
+    const nav = useNavigate()
+    const [admin, setAdmin] = useState<Admin>({ email: '', password: '' })
+    const [errors, setErrors] = useState<string[]>([])
+    const url = import.meta.env.VITE_API_URL
+    const validationSchema = validationSchemaAdminLogin
+    const globalContextDetails = useContext(globalContext);
+
+    const handleSubmit = (adminRegister: AdminRegister) => async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault()
+        validationSchema.isValid(admin).then(async valid => {
+
+            setErrors([]);
+
+            if (valid) {
+                try {
+                    const { data } = await axios.post<any>(`${url}/Auth/admin-login`, adminRegister, { withCredentials: true }) // TODO 
+                    globalContextDetails.setUser(data.user);
+                    globalContextDetails.setIsAdmin(true);
+                    // globalContextDetails.setBusinessGlobal(data.business);
+                    nav('/')
+                }
+                catch (e) {
+                    console.log(e);
+                }
+            }
+            else {
+                setErrors(['Validation error']);
+            }
+
+        }).catch((err) => {
+            console.log('Validation error:', err.errors);
+            if (err instanceof Yup.ValidationError) {
+                setErrors(err.errors);
+            }
+        });
+    }
+
+    const handleChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
+        const { name, value } = event.target
+        setAdmin(prevAdmin => ({
+            ...prevAdmin,
+            [name]: value
+        }))
+    }
+
+    return (
+        <form onSubmit={handleSubmit(admin)}>
+            <input type="email" name="email" placeholder="אימייל" onChange={handleChange} />
+            <input type="password" name="password" placeholder="סיסמא" onChange={handleChange} />
+            <button type="submit">התחבר</button>
+
+            {errors.length > 0 && (
+                <ul>
+                    {errors.map((error, index) => (
+                        <li key={index}>{error}</li>
+                    ))}
+                </ul>
+            )}
+        </form>
+    )
+
+}
+
+export default AdmineLogin
+import { useContext, useState } from "react"
+import * as Yup from 'yup'
+import axios from "axios"
+import { useNavigate } from "react-router-dom"
+import { UserPostModel } from "../models/UserPostModel"
+import { validationSchemaUserRegister } from "../utils/validationSchema"
+import { globalContext } from "../context/GlobalContext"
+import { UserDto } from "../models/UserDto"
+import { converFromUserDto } from "../utils/convertFromUserDto"
+
+const AdminRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => {
+    const nav = useNavigate();
+    const validationSchema = validationSchemaUserRegister;
+    const [myAdmin, setMyAdmin] = useState<UserPostModel>({
+        firstName: "יוסי", // ערך ברירת מחדל
+        lastName: "כהן", // ערך ברירת מחדל
+        email: "a@a", // ערך ברירת מחדל
+        password: "", // ערך ברירת מחדל
+        phone: "050-1234567", // ערך ברירת מחדל
+        role: 1, // ערך ברירת מחדל
+        idNumber: "123456789", // ערך ברירת מחדל
+    });
+    const [errors, setErrors] = useState<string[]>([]);
+    const globalContextDetails = useContext(globalContext);
+    const url = import.meta.env.VITE_API_URL;
+
+    const handleSubmit = (adminRegister: UserPostModel) => async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+
+        validationSchema.isValid(adminRegister).then(async valid => {
+            setErrors([]);
+            if (valid) {
+                try {
+                    console.log("adminRegister ", adminRegister);
+                    const { data } = await axios.post<UserDto>(`${url}/Auth/admin-register`, adminRegister);
+                    console.log("data ", data);
+                    globalContextDetails.setUser(converFromUserDto(data));
+                    if (data.role == 1)
+                    {
+                        globalContextDetails.setIsAdmin(true);
+                    }
+                    if (onSubmitSuccess)
+                        onSubmitSuccess();
+                    
+                } catch (e) {
+                    console.log(e);
+                    setErrors(['Error in registration']);
+                }
+            } else {
+                setErrors(['Validation error']);
+            }
+
+        }).catch((err) => {
+            console.log('Validation error:', err.errors);
+            if (err instanceof Yup.ValidationError) {
+                setErrors(err.errors);
+            }
+        });
+    }
+
+    const handleChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
+        const { name, value, type } = event.target;
+        setMyAdmin((prevUser) => ({
+            ...prevUser,
+            [name]: type === 'number' ? Number(value) : value,
+        }));
+    }    
+
+    return (
+        <form onSubmit={handleSubmit(myAdmin)}>
+            <input type="text" name="firstName" placeholder="שם פרטי" value={myAdmin.firstName} onChange={handleChange} />
+            <input type="text" name="lastName" placeholder="שם משפחה" value={myAdmin.lastName} onChange={handleChange} />
+            <input type="text" name="phone" placeholder="טלפון" value={myAdmin.phone} onChange={handleChange} />
+            <input type="text" name="idNumber" placeholder="מספר תעודת זהות" value={myAdmin.idNumber} onChange={handleChange} />
+            <input type="password" name="password" placeholder="סיסמא" value={myAdmin.password} onChange={handleChange} />
+            <input type="email" name="email" placeholder="אימייל" value={myAdmin.email} onChange={handleChange} />
+            <button type="submit">שמור</button>
+
+            {errors.length > 0 && (
+                <ul>
+                    {errors.map((error, index) => (
+                        <li key={index}>{error}</li>
+                    ))}
+                </ul>
+            )}
+        </form>
+    )
+}
+
+export default AdminRegister;
+
+// TODO להסיר ערכים
+import { JSX, useContext } from "react";
+import { globalContext } from "../context/GlobalContext";
+
+const AdminRoute = ({ children }: { children: JSX.Element }) => {
+    const { isAdmin } = useContext(globalContext);
+
+    if (isAdmin === false) {
+
+        return (
+            <div style={{ padding: '2rem', color: 'red', textAlign: 'center' }}>
+                <h2>אין לך הרשאה לצפות בדף זה</h2>
+            </div>
+        );
+    }
+
+    return children;
+};
+
+export default AdminRoute;
+import { useContext, useEffect, useState } from "react";
+import RegisterBusinessData from "./RegisterBusinessData";
+import { globalContext } from "../context/GlobalContext";
+import axios from "axios";
+import { BusinessResponsePutModel } from "../models/BusinessResponsePutModel";
+import AdminRegister from "./AdminRegister";
+import { UserDto } from "../models/UserDto";
+
+const BusinessAndAdmin = () => {
+    const [isBusiness, setIsBusiness] = useState(false);
+    const [isAdmin, setIsAdmin] = useState(false);
+    const [businessDone, setBusinessDone] = useState(false);
+    const [adminDone, setAdminDone] = useState(false);
+    const globalContextDetails = useContext(globalContext)
+    const url = import.meta.env.VITE_API_URL
+
+    useEffect(() => {
+        if (businessDone && adminDone) {  // OK
+            updateObjects()
+            // שניהם הסתיימו => אפשר להמשיך לשלב הבא או לנווט
+            console.log("הטפסים נוספו בהצלחה");
+        }
+    }, [businessDone, adminDone]);
+
+    // עדכון קשרים בין עסק למשתמש - מנהל
+    const updateObjects = async () => {
+        const updateAdmin = {
+            ...globalContextDetails.user,
+            businessId: globalContextDetails.business_global.id,
+            business: globalContextDetails.business_global,
+            role: 1,
+            updateBy: globalContextDetails.user.firstName + " " + globalContextDetails.user.lastName,
+        }
+        const updateBusiness = {
+            ...globalContextDetails.business_global,
+            users: [globalContextDetails.user],
+            updateBy: globalContextDetails.user.firstName + " " + globalContextDetails.user.lastName,
+        }
+        globalContextDetails.setUser(updateAdmin)
+        globalContextDetails.setBusinessGlobal(updateBusiness)
+
+        try {
+            console.log("updateAdmin ", updateAdmin);
+            console.log("updateBusiness ", updateBusiness);
+
+            await axios.put<UserDto>(`${url}/api/User/${globalContextDetails.user.id}`, updateAdmin)
+        }
+        catch (e) {
+            console.log(e);
+        }
+
+        try {
+            await axios.put<BusinessResponsePutModel>(`${url}/api/Business/${globalContextDetails.business_global.id}`, updateBusiness)
+            globalContextDetails.setBusinessGlobal(updateBusiness)
+            globalContextDetails.setUser(updateAdmin)
+        }
+        catch (e) {
+            console.log(e);
+        }
+    }
+
+    return (
+        <div>
+            <button onClick={() => { setIsAdmin(!isAdmin) }}>רישום פרטי מנהל</button>
+            {isAdmin && <AdminRegister onSubmitSuccess={() => setAdminDone(true)} />}
+            <button onClick={() => { setIsBusiness(!isBusiness) }}>רישום פרטי עסק</button>
+            {isBusiness && <RegisterBusinessData onSubmitSuccess={() => setBusinessDone(true)} />}
+        </div>
+    )
+}
+
+export default BusinessAndAdmin
+import React from 'react';
+import { Business } from '../models/Business';
+
+interface BusinessTableProps {
+    business: Business;
+}
+
+const BusinessTable: React.FC<BusinessTableProps> = ({ business }) => {
+    return (
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>שם עסק</th>
+                    <th>כתובת</th>
+                    <th>אימייל</th>
+                    <th>סוג עסק</th>
+                    <th>הכנסות</th>
+                    <th>הוצאות</th>
+                    <th>תזרים מזומנים</th>
+                    <th>שווי נקי</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{business.id}</td>
+                    <td>{business.name}</td>
+                    <td>{business.address}</td>
+                    <td>{business.email}</td>
+                    <td>{business.businessType}</td>
+                    <td>{business.income}</td>
+                    <td>{business.expenses}</td>
+                    <td>{business.cashFlow}</td>
+                    <td>{business.netWorth}</td>
+                </tr>
+            </tbody>
+        </table>
+    );
+};
+
+export default BusinessTable;
+import { useContext } from "react";
+import { globalContext } from "../context/GlobalContext";
+
+const Home = () => {
+  const globalContextDetails = useContext(globalContext);
+  return (
+    <div>
+      <h1>Home page</h1>
+      <h2>Hello {globalContextDetails.user.firstName} {globalContextDetails.user.lastName}</h2>
+    </div>
+  )
+}
+
+export default Home
+import axios from "axios";
+import { ChangeEvent, useContext, useState } from "react";
+import { InvoiceDto } from "../models/InvoiceDto";
+import { globalContext } from "../context/GlobalContext";
+
+const IncomAndExpennses = () => {
+    const [income, setIncome] = useState(0);
+    const [expenditure, setExpenditure] = useState(0);
+    const globalContextDetails = useContext(globalContext);
+
+    const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
+        const value = event.target.value;
+        const name = event.target.name;
+
+        if (name === "income") {
+            setIncome(Number(value));
+        } else if (name === "expenditure") {
+            setExpenditure(Number(value));
+        }
+    }
+
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        const invoiceToSend: InvoiceDto = {
+            id: globalContextDetails.user.id,
+            amountDebit: expenditure,
+            amountCredit: income,
+            invoiceDate: new Date(),
+            status: 1,
+            notes: "",
+            createdAt: new Date(),
+            createdBy: globalContextDetails.user.firstName + " " + globalContextDetails.user.lastName,
+            updatedAt: new Date(),
+            updatedBy: globalContextDetails.user.firstName + " " + globalContextDetails.user.lastName,
+            invoicePath: "",
+            userId: globalContextDetails.user.id,
+            businessId: globalContextDetails.user.businessId ?? 0
+        };
+    
+        try {
+            await axios.post("https://localhost:7031/api/Invoice", invoiceToSend);
+        } catch (error) {
+            console.error("Error saving invoice:", error);
+        }
+    };    
+
+    return <form onSubmit={handleSubmit}>
+        <h1>נהל את ההכנסות וההוצאות שלך</h1>
+        <input type="number" name="expenditure" placeholder="הכנס את ההוצאה שלך" onChange={handleChange} />
+        <input type="number" name="income" placeholder="הכנס את ההכנסה שלך" onChange={handleChange} />
+
+        <button type="submit">שלח</button>
+    </form>
+}
+
+export default IncomAndExpennses;
+const ProductionReports = () => {
+  return (
+    <div>
+      <h1>Production Reports</h1>
+    </div>
+  )
+}
+
+export default ProductionReports
+import axios from "axios";
+import { useState, useContext } from "react";
+import { globalContext } from "../context/GlobalContext";
+import { BusinessPostModel } from "../models/BusinessPostModel";
+import { convertToBusiness } from "../utils/convertToBusiness";
+import { validationSchemaBusinessRegister } from "../utils/validationSchema";
+import * as Yup from "yup";
+
+const RegisterBusinessData = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => {
+  const url = import.meta.env.VITE_API_URL;
+  const [errors, setErrors] = useState<string[]>([]);
+  const validationSchema = validationSchemaBusinessRegister;
+  const globalContextDetails = useContext(globalContext);
+  const [businessData, setBusinessData] = useState({
+    id: 0,
+    businessId: 1, // ערך ברירת מחדל
+    name: 'עסק לדוגמה', // ערך ברירת מחדל
+    address: 'כתובת לדוגמה', // ערך ברירת מחדל
+    email: 'example@business.com', // ערך ברירת מחדל
+    businessType: 'סוג עסק לדוגמה', // ערך ברירת מחדל
+    income: 10000, // ערך ברירת מחדל
+    expenses: 5000, // ערך ברירת מחדל
+    cashFlow: 5000, // ערך ברירת מחדל
+    totalAssets: 20000, // ערך ברירת מחדל
+    totalLiabilities: 10000, // ערך ברירת מחדל
+    netWorth: 10000,
+    revenueGrowthRate: undefined,
+    profitMargin: undefined,
+    currentRatio: undefined,
+    quickRatio: undefined,
+    createdAt: undefined,
+    createdBy: '',
+    updatedAt: undefined,
+    updatedBy: '',
+    users: [],
+    invoices: []
+  });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setBusinessData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = (businessDetails: BusinessPostModel) => async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    validationSchema.isValid(businessDetails).then(async valid => {
+      setErrors([]);
+      if (valid) {
+        try {
+          const { data } = await axios.post<BusinessPostModel>(`${url}/api/Business`, businessDetails);
+          console.log("The data", data);
+          globalContextDetails.setBusinessGlobal(convertToBusiness(data));
+          console.log("globalContextDetails.business_global", globalContextDetails.business_global);
+          console.log("convertToBusiness(data)", convertToBusiness(data));
+          
+          if (onSubmitSuccess) onSubmitSuccess();
+        } catch (e) {
+          console.log(e);
+        }
+      } else {
+        setErrors(['Validation error']);
+      }
+    }).catch((err) => {
+      console.log('Validation error:', err.errors);
+      if (err instanceof Yup.ValidationError) {
+        setErrors(err.errors);
+      }
+    });
+    setErrors([]);
+  };
+
+  return (
+    <form onSubmit={handleSubmit(businessData)}>
+      <input
+        type="number"
+        name="businessId"
+        placeholder="מזהה ייחודי לעסק"
+        value={businessData.businessId} // ערך ברירת מחדל
+        onChange={handleChange}
+      />
+      <input
+        type="text"
+        name="name"
+        placeholder="שם העסק"
+        value={businessData.name} // ערך ברירת מחדל
+        onChange={handleChange}
+      />
+      <input
+        type="text"
+        name="address"
+        placeholder="כתובת העסק"
+        value={businessData.address} // ערך ברירת מחדל
+        onChange={handleChange}
+      />
+      <input
+        type="email"
+        name="email"
+        placeholder="אימייל של העסק"
+        value={businessData.email} // ערך ברירת מחדל
+        onChange={handleChange}
+      />
+      <input
+        type="text"
+        name="businessType"
+        placeholder="סוג העסק"
+        value={businessData.businessType} // ערך ברירת מחדל
+        onChange={handleChange}
+      />
+      <input
+        type="number"
+        name="income"
+        placeholder="הכנסות העסק"
+        value={businessData.income} // ערך ברירת מחדל
+        onChange={handleChange}
+      />
+      <input
+        type="number"
+        name="expenses"
+        placeholder="הוצאות העסק"
+        value={businessData.expenses} // ערך ברירת מחדל
+        onChange={handleChange}
+      />
+      <input
+        type="number"
+        name="cashFlow"
+        placeholder="תזרים מזומנים"
+        value={businessData.cashFlow} // ערך ברירת מחדל
+        onChange={handleChange}
+      />
+      <input
+        type="number"
+        name="totalAssets"
+        placeholder="סך הנכסים"
+        value={businessData.totalAssets} // ערך ברירת מחדל
+        onChange={handleChange}
+      />
+      <input
+        type="number"
+        name="totalLiabilities"
+        placeholder="סך ההתחייבויות"
+        value={businessData.totalLiabilities} // ערך ברירת מחדל
+        onChange={handleChange}
+      />
+
+      <button type="submit">שמור</button>
+      
+      {errors.length > 0 && (
+        <ul>
+          {errors.map((error, index) => (
+            <li key={index}>{error}</li>
+          ))}
+        </ul>
+      )}
+    </form>
+  );
+}
+
+export default RegisterBusinessData;
+//TODO להסיר ערכים
+import { useState } from "react";
+import axios from "axios";
+
+const FileUpload = () => {
+    const [file, setFile] = useState<File | null>(null);
+    const [message, setMessage] = useState<string | null>(null);
+    const [error, setError] = useState<string | null>(null);
+
+    const url = import.meta.env.VITE_API_URL
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files.length > 0) {
+            setFile(e.target.files[0]);
+            setMessage(null);
+            setError(null);
+        }
+    };
+
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+
+        if (!file) {
+            setError("יש לבחור קובץ לפני השליחה");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("fileUpload", file);
+
+        try {
+            const response = await axios.post(`${url}/FileUpload/upload`, formData, {
+                headers: { "Content-Type": "multipart/form-data" }
+            });
+            setMessage(response.data.message);
+            setError(null);
+        } catch (err: any) {
+            const msg = err.response?.data || "אירעה שגיאה בהעלאת הקובץ";
+            setError(msg.message || msg);
+            setMessage(null);
+        }
+    };
+
+    return (
+        <form onSubmit={handleSubmit}>
+            <input type="file" onChange={handleFileChange} accept=".jpg,.png,.pdf,.docx,.txt" />
+            <button type="submit">העלה קובץ</button>
+
+            {message && <p style={{ color: "green" }}>{message}</p>}
+            {error && <p style={{ color: "red" }}>{error}</p>}
+        </form>
+    );
+};
+
+export default FileUpload;
+import { useContext, useState } from "react"
+import * as Yup from 'yup'
+import axios from "axios"
+import { AdminRegister } from "../models/AdminRegister"
+import { useNavigate } from "react-router-dom"
+import { validationSchemaUserLogin } from "../utils/validationSchema"
+import { globalContext } from "../context/GlobalContext"
+
+const UserLogin = () => {
+    const nav = useNavigate()
+    const validationSchema = validationSchemaUserLogin
+    const [userLogin, setUserLogin] = useState<AdminRegister>({ email: "", password: "" })
+    const [errors, setErrors] = useState<string[]>([])
+    const url = import.meta.env.VITE_API_URL
+    const {setUser} = useContext(globalContext);
+
+    const handleSubmit = (userLogin: AdminRegister) => async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault()
+        validationSchema.isValid(userLogin).then(async valid => {
+
+            setErrors([]);
+
+            if (valid) {
+                try {
+                    const { data } = await axios.post<any>(`${url}/Auth/user-login`, userLogin) // TODO 
+                    setUser(data.user);
+                    nav('/')
+                }
+                catch (e) {
+                    console.log(e);
+                }
+            }
+            else {
+                setErrors(['Validation error']);
+            }
+
+        }).catch((err) => {
+            console.log('Validation error:', err.errors);
+            if (err instanceof Yup.ValidationError) {
+                setErrors(err.errors);
+            }
+        });
+    }
+
+    const handleChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
+        const { name, value } = event.target
+        setUserLogin(prevUser => ({
+            ...prevUser,
+            [name]: value
+        }))
+    }
+
+    return (
+        <form onSubmit={handleSubmit(userLogin)}>
+            <input type="email" name="email" placeholder="אימייל" onChange={handleChange} />
+            <input type="password" name="password" placeholder="סיסמא" onChange={handleChange} />
+            <button type="submit">התחבר</button>
+
+            {errors.length > 0 && (
+                <ul>
+                    {errors.map((error, index) => (
+                        <li key={index}>{error}</li>
+                    ))}
+                </ul>
+            )}
+        </form>
+    )
+
+}
+
+export default UserLogin
+const UserManagemet = () => {
+  return (
+    <div>
+      <h1>User Managemet</h1>
+      לא יודעת אם זה נחוץ
+    </div>
+  )
+}
+
+export default UserManagemet
+import { useContext, useState } from "react"
+import * as Yup from 'yup'
+import axios from "axios"
+import { useNavigate } from "react-router-dom"
+import { validationSchemaUserRegister } from "../utils/validationSchema"
+import { globalContext } from "../context/GlobalContext"
+import { convertToUser } from "../utils/converToUser"
+import { UserPostModel } from "../models/UserPostModel"
+
+const UserRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => {
+    const nav = useNavigate()
+    const validationSchema = validationSchemaUserRegister
+    const [errors, setErrors] = useState<string[]>([])
+    const {setUser} = useContext(globalContext)
+    const url = import.meta.env.VITE_API_URL
+    const [myUser, setMyUser] = useState<UserPostModel>({
+        firstName: "",
+        lastName: "",
+        email: "",
+        password: "",
+        phone: "",
+        role: 0,
+        idNumber: "",
+    })
+    
+    const handleChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
+        const { name, value } = event.target
+        setMyUser(prevUser => ({
+            ...prevUser,
+            [name]: name === 'role' ? Number(value) : value
+        }))
+    }
+
+    const handleSubmit = (userRegister: UserPostModel) => async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault()
+
+        console.log(userRegister);
+
+        validationSchema.isValid(userRegister).then(async valid => {
+            setErrors([]);
+            if (valid) {
+                try {                               
+                    const { data } = await axios.post<UserPostModel>(`${url}/Auth/user-register`, userRegister)
+                    setUser(convertToUser(data))
+
+                    if (onSubmitSuccess) 
+                        onSubmitSuccess();
+                    nav('/')
+                }
+                catch (e) {
+                    console.log(e);
+                }
+            }
+            else {
+                setErrors(['Validation error']);
+            }
+
+        }).catch((err) => {
+            console.log('Validation error:', err.errors);
+            if (err instanceof Yup.ValidationError) {
+                setErrors(err.errors);
+            }
+        });
+    }
+
+    return (
+        <form onSubmit={handleSubmit(myUser)}>
+            <input type="text" name="firstName" placeholder="שם פרטי" onChange={handleChange} />
+            <input type="text" name="lastName" placeholder="שם משפחה" onChange={handleChange} />
+            <input type="text" name="phone" placeholder="טלפון" onChange={handleChange} />
+            <input type="text" name="idNumber" placeholder="מספר תעודת זהות" onChange={handleChange} />
+            <input type="password" name="password" placeholder="סיסמא" onChange={handleChange} />
+            {/* <input type="password" name="confirmPassword" placeholder="אשר סיסמא" onChange={handleChange} /> */}
+            <input type="text" name="role" placeholder="תפקיד" onChange={handleChange} />
+            <input type="email" name="email" placeholder="אימייל" onChange={handleChange} />
+            <button type="submit">שמור</button>
+
+            {errors.length > 0 && (
+                <ul>
+                    {errors.map((error, index) => (
+                        <li key={index}>{error}</li>
+                    ))}
+                </ul>
+            )}
+        </form>
+    )
+}
+
+export default UserRegister
+import { useContext, useState } from 'react';
+import { Business } from '../models/Business';
+import axios from 'axios';
+import { globalContext } from '../context/GlobalContext';
+import BusinessTable from './BusinessTable';
+
+//TODO: לשנות שנתוני העסק יגיעו מהשרת
+// const business: Business = {
+//     id: 2,
+//     businessId: 101,
+//     name: "עסק א",
+//     address: "כתובת א",
+//     email: "businessA@example.com",
+//     businessType: "סוג א",
+//     income: 100000,
+//     expenses: 50000,
+//     cashFlow: 50000,
+//     totalAssets: 200000,
+//     totalLiabilities: 50000,
+//     netWorth: 150000,
+//     createdAt: new Date(),
+//     createdBy: "משתמש א",
+//     updatedAt: new Date(),
+//     updatedBy: "משתמש ב",
+// };
+
+
+function ViewData() {
+    const url = import.meta.env.VITE_API_URL
+    const [errors, setErrors] = useState<string[]>([])
+    // const [businessId, setBusinessId] = useState<number | null>(0)
+    const globalContextDetails = useContext(globalContext);
+    const [business, setBusiness] = useState<Business>({
+        id: 0, 
+        businessId: 0,
+        name: "",
+        address: "",
+        email: "",
+        businessType: "",
+        income: 0,
+        expenses: 0,
+        cashFlow: 0,
+        totalAssets: 0,
+        totalLiabilities: 0,
+        netWorth: 0,
+        createdAt: new Date(),
+        createdBy: "",
+        updatedAt: new Date(),
+        updatedBy: "",
+    })
+
+    const handleSubmit = () => async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault()
+        setErrors([]);
+
+        try {                
+            const res = await axios.get<Business>(`${url}/api/Business/${globalContextDetails.user.businessId}`, { withCredentials: true });
+            if (res.status !== 200) {
+                setErrors(['Error fetching business data']);
+                return;
+            }
+
+            if (!res) {
+                setErrors(['No data found']);
+                return;
+            }
+
+            setBusiness(res.data);
+        } catch (error) {
+            console.error('Error fetching business data:', error);
+            setErrors(['Error fetching business data']);
+        }
+    }
+
+
+    return (
+        <form onSubmit={handleSubmit()}>
+            <div>
+                <BusinessTable business={business} />
+            </div>
+
+            <button type="submit">צפה בנתונים</button>
+            {errors.length > 0 && (
+                <ul>
+                    {errors.map((error, index) => (
+                        <li key={index}>{error}</li>
+                    ))}
+                </ul>
+            )}
+        </form>
+    )
+}
+
+export default ViewData
+// import { createContext, ReactElement, useState } from "react"
+
+// type AuthContextType = {
+//     user_id: number,
+//     setMyuserId: (id: number) => void
+//     business_id: number,
+//     setMyBusinessId: (id: number) => void
+//     user_email: string,
+//     setMyuserEmail: (email: string) => void
+//     business_name: string,
+//     setMyBusinessName: (name: string) => void
+//     user_name: string,
+//     setMyuserName: (name: string) => void
+//     user_role: number,
+//     setMyuserRole: (role: number) => void
+// }
+
+// export const detailsContext = createContext<AuthContextType>({
+//     user_id: 0,
+//     setMyuserId: (_: number) => { },
+//     business_id: 0,
+//     setMyBusinessId: (_: number) => { },
+//     user_email: '',
+//     setMyuserEmail: (_: string) => { },
+//     business_name: '',
+//     setMyBusinessName: (_: string) => { },
+//     user_name: '',
+//     setMyuserName: (_: string) => { },
+//     user_role: 0,
+//     setMyuserRole: (_: number) => { },
+// })
+
+// const AuthContext = ({children}:{children:ReactElement}) => {
+//     const [user_id, setMyuserId] = useState<number>(0)
+//     const [business_id, setMyBusinessId] = useState<number>(0)
+//     const [user_email, setMyuserEmail] = useState<string>('')
+//     const [business_name, setMyBusinessName] = useState<string>('')
+//     const [user_name, setMyuserName] = useState<string>('')
+//     const [user_role, setMyuserRole] = useState<number>(0)
+    
+//     return <detailsContext.Provider value={{ user_id, setMyuserId, business_id, setMyBusinessId, user_email, setMyuserEmail, business_name, setMyBusinessName, user_name, setMyuserName, user_role, setMyuserRole }}>
+//         {children}
+//     </detailsContext.Provider>
+// }
+
+// export default AuthContext
+import { createContext, ReactElement, useState } from "react"
+import { User } from "../models/User"
+import { defaultUser } from "../models/DefaultObjects"
+
+type GlobalContextType = {
+    // business_global: Business,
+    // setBusinessGlobal: (business: Business) => void
+    user: User,
+    setUser: (user: User) => void
+    isAdmin: boolean
+    setIsAdmin: (isAdmin: boolean) => void
+}
+
+export const globalContext = createContext<GlobalContextType>({
+    user: defaultUser,
+    setUser: (_: User) => { },
+    // business_global: defaultBusiness,
+    // setBusinessGlobal: (_: Business) => { },
+    isAdmin: false,
+    setIsAdmin: (_: boolean) => { }
+})
+
+const GlobalContext = ({ children }: { children: ReactElement }) => {
+    // const [business_global, setBusinessGlobal] = useState<Business>(defaultBusiness)
+    const [user, setUser] = useState<User>(defaultUser)
+    const [isAdmin, setIsAdmin] = useState<boolean>(false)
+
+    return <globalContext.Provider value={{ user, setUser, isAdmin, setIsAdmin }}>
+        {children}
+    </globalContext.Provider>
+}
+
+export default GlobalContext
+import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
+import './index.css'
+import App from './App.tsx'
+
+createRoot(document.getElementById('root')!).render(
+  <StrictMode>
+    <App />
+  </StrictMode>,
+)
+export interface Admin{
+    email: string;
+    password: string;
+}
+import { User } from "./User";
+
+export interface AdminLoginResponse {
+    token: string;
+    user: User;
+  }
+export interface AdminRegister {
+    email: string,
+    password: string
+}
+import { Invoice } from "./Invoices";
+import { User } from "./User";
+
+export interface Business {
+    id: number; // מזהה ייחודי
+    businessId: number; // מזהה ייחודי לעסק
+    name: string; // שם העסק
+    address: string; // כתובת העסק
+    email: string; // אימייל של העסק
+    businessType: string; // סוג העסק
+    income: number; // הכנסות העסק
+    expenses: number; // הוצאות העסק
+    cashFlow: number; // תזרים מזומנים של העסק
+    totalAssets: number; // סך הנכסים של העסק
+    totalLiabilities: number; // סך ההתחייבויות של העסק
+    netWorth: number; // שווי נקי
+    revenueGrowthRate?: number; // שיעור צמיחת ההכנסות
+    profitMargin?: number; // שיעור הרווח
+    currentRatio?: number; // יחס נוכחי
+    quickRatio?: number; // יחס מהיר
+    createdAt?: Date; // תאריך יצירה
+    createdBy?: string; // נוצר על ידי
+    updatedAt?: Date; // תאריך עדכון
+    updatedBy?: string; // עודכן על ידי
+    users?: User[]; // רשימת משתמשים
+    invoices?: Invoice[]; // רשימת חשבוניות
+}
+
+export class BusinessImpl implements Business {
+    id: number;
+    businessId: number;
+    name: string;
+    address: string;
+    email: string;
+    businessType: string;
+    income: number;
+    expenses: number;
+    cashFlow: number;
+    totalAssets: number;
+    totalLiabilities: number;
+    netWorth: number;
+    revenueGrowthRate?: number;
+    profitMargin?: number;
+    currentRatio?: number;
+    quickRatio?: number;
+    createdAt?: Date;
+    createdBy?: string;
+    updatedAt?: Date;
+    updatedBy?: string;
+    users?: User[];
+    invoices?: Invoice[];
+
+    constructor(
+        id: number,
+        businessId: number,
+        name: string,
+        address: string,
+        email: string,
+        businessType: string,
+        income: number,
+        expenses: number,
+        cashFlow: number,
+        totalAssets: number,
+        totalLiabilities: number,
+        netWorth: number,
+        revenueGrowthRate?: number,
+        profitMargin?: number,
+        currentRatio?: number,
+        quickRatio?: number,
+        createdAt?: Date,
+        createdBy?: string,
+        updatedAt?: Date,
+        updatedBy?: string,
+        users?: User[],
+        invoices?: Invoice[]
+    ) {
+        this.id = id;
+        this.businessId = businessId;
+        this.name = name;
+        this.address = address;
+        this.email = email;
+        this.businessType = businessType;
+        this.income = income;
+        this.expenses = expenses;
+        this.cashFlow = cashFlow;
+        this.totalAssets = totalAssets;
+        this.totalLiabilities = totalLiabilities;
+        this.netWorth = netWorth;
+        this.revenueGrowthRate = revenueGrowthRate;
+        this.profitMargin = profitMargin;
+        this.currentRatio = currentRatio;
+        this.quickRatio = quickRatio;
+        this.createdAt = createdAt;
+        this.createdBy = createdBy;
+        this.updatedAt = updatedAt;
+        this.updatedBy = updatedBy;
+        this.users = users;
+        this.invoices = invoices;
+    }
+}
+export interface BusinessPostModel {
+    id: number,
+    businessId: number; // מזהה ייחודי לעסק
+    name: string; // שם העסק
+    address: string; // כתובת העסק
+    email: string; // אימייל של העסק
+    businessType: string; // סוג העסק
+    income: number; // הכנסות העסק
+    expenses: number; // הוצאות העסק
+    cashFlow: number; // תזרים מזומנים של העסק
+    totalAssets: number; // סך הנכסים של העסק
+    totalLiabilities: number; // סך ההתחייבויות של העסק
+}
+
+// export class BusinessImpl implements RegisterModel {
+//     id: number;
+//     businessId: number;
+//     name: string;
+//     address: string;
+//     email: string;
+//     businessType: string;
+//     income: number;
+//     expenses: number;
+//     cashFlow: number;
+//     totalAssets: number;
+//     totalLiabilities: number;
+//     netWorth: number;
+//     revenueGrowthRate?: number;
+//     profitMargin?: number;
+//     currentRatio?: number;
+//     quickRatio?: number;
+//     createdAt?: Date;
+//     createdBy?: string;
+//     updatedAt?: Date;
+//     updatedBy?: string;
+//     users?: User[];
+//     invoices?: Invoice[];
+
+//     constructor(
+//         id: number,
+//         businessId: number,
+//         name: string,
+//         address: string,
+//         email: string,
+//         businessType: string,
+//         income: number,
+//         expenses: number,
+//         cashFlow: number,
+//         totalAssets: number,
+//         totalLiabilities: number,
+//         netWorth: number,
+//         revenueGrowthRate?: number,
+//         profitMargin?: number,
+//         currentRatio?: number,
+//         quickRatio?: number,
+//         createdAt?: Date,
+//         createdBy?: string,
+//         updatedAt?: Date,
+//         updatedBy?: string,
+//         users?: User[],
+//         invoices?: Invoice[]
+//     ) {
+//         this.id = id;
+//         this.businessId = businessId;
+//         this.name = name;
+//         this.address = address;
+//         this.email = email;
+//         this.businessType = businessType;
+//         this.income = income;
+//         this.expenses = expenses;
+//         this.cashFlow = cashFlow;
+//         this.totalAssets = totalAssets;
+//         this.totalLiabilities = totalLiabilities;
+//         this.netWorth = netWorth;
+//         this.revenueGrowthRate = revenueGrowthRate;
+//         this.profitMargin = profitMargin;
+//         this.currentRatio = currentRatio;
+//         this.quickRatio = quickRatio;
+//         this.createdAt = createdAt;
+//         this.createdBy = createdBy;
+//         this.updatedAt = updatedAt;
+//         this.updatedBy = updatedBy;
+//         this.users = users;
+//         this.invoices = invoices;
+//     }
+// }
+export interface BusinessResponsePutModel {
+    id: number; // מזהה ייחודי
+    businessId: number; // מזהה ייחודי לעסק
+    name: string; // שם העסק
+    address: string; // כתובת העסק
+    email: string; // אימייל של העסק
+    businessType: string; // סוג העסק
+    income: number; // הכנסות העסק
+    expenses: number; // הוצאות העסק
+    cashFlow: number; // תזרים מזומנים של העסק
+    totalAssets: number; // סך הנכסים של העסק
+    totalLiabilities: number; // סך ההתחייבויות של העסק
+    netWorth: number; // שווי נקי
+    revenueGrowthRate?: number; // שיעור צמיחת ההכנסות
+    profitMargin?: number; // שיעור הרווח
+    currentRatio?: number; // יחס נוכחי
+    quickRatio?: number; // יחס מהיר
+    createdAt?: Date; // תאריך יצירה
+    createdBy?: string; // נוצר על ידי
+    updatedAt?: Date; // תאריך עדכון
+    updatedBy?: string; // עודכן על ידי
+}
+import { Business } from "./Business";
+import { User } from "./User";
+
+export const defaultBusiness: Business = {
+  id: 0,
+  businessId: 0,
+  name: '',
+  address: '',
+  email: '',
+  businessType: '',
+  income: 0,
+  expenses: 0,
+  cashFlow: 0,
+  totalAssets: 0,
+  totalLiabilities: 0,
+  netWorth: 0,
+  revenueGrowthRate: 0,
+  profitMargin: 0,
+  currentRatio: 0,
+  quickRatio: 0,
+  createdAt: new Date(),
+  createdBy: '',
+  updatedAt: new Date(),
+  updatedBy: '',
+  users: [],
+  invoices: []
+};
+
+export const defaultUser: User = {
+    id: 0,
+    firstName: '',
+    lastName: '',
+    email: '',
+    password: '',
+    phone: '',
+    role: 0,
+    idNumber: '',
+    status: 'inactive',
+    lastLogin: new Date(),
+    createdAt: new Date(),
+    createdBy: '',
+    updatedAt: new Date(),
+    updatedBy: '',
+    businessId: null,
+    business: null,
+    invoices: [],
+  };
+export interface InvoiceDto {
+    id: number; // מזהה ייחודי
+    amountDebit: number; // סכום חובה
+    amountCredit: number; // סכום זכות
+    invoiceDate: Date; // תאריך החשבונית
+    status: number; // סטטוס החשבונית
+    notes: string; // הערות
+    createdAt: Date; // תאריך יצירה
+    createdBy: string; // נוצר על ידי
+    updatedAt: Date; // תאריך עדכון
+    updatedBy: string; // עודכן על ידי
+    invoicePath: string; // נתיב החשבונית
+
+    userId?: number; // מזהה המשתמש (קשר לטבלת Users)
+    businessId?: number; // מזהה ייחודי לעסק
+}
+import { Business } from "./Business";
+import { User } from "./User";
+
+export interface Invoice {
+    id: number; // מזהה ייחודי
+    amountDebit: number; // סכום חובה
+    amountCredit: number; // סכום זכות
+    invoiceDate: Date; // תאריך החשבונית
+    status: number; // סטטוס החשבונית
+    notes?: string; // הערות
+    createdAt?: Date; // תאריך יצירה
+    createdBy?: string; // נוצר על ידי
+    updatedAt?: Date; // תאריך עדכון
+    updatedBy?: string; // עודכן על ידי
+    business?: Business; // אובייקט עסק
+    user?: User; // אובייקט משתמש
+    userId?: number; // מזהה המשתמש (קשר לטבלת Users)
+    businessId?: number; // מזהה ייחודי לעסק
+}
+import { Business } from "./Business";
+import { Invoice } from "./Invoices";
+
+export interface User {
+    id: number; // מזהה ייחודי
+    firstName: string; // שם פרטי
+    lastName: string; // שם משפחה
+    email: string; // אימייל
+    password: string; // סיסמה (מוצפנת)
+    phone: string; // מספר פלאפון
+    role: number; // תפקיד עובד (admin / user)
+    idNumber: string; // תעודת זהות
+    status: string; // מצב המשתמש (active/inactive)
+    lastLogin: Date; // תאריך כניסה אחרונה
+    createdAt: Date; // תאריך יצירה
+    createdBy: string; // נוצר על ידי
+    updatedAt: Date; // תאריך עדכון
+    updatedBy: string; // עודכן על ידי
+    businessId: number | null; // מזהה ייחודי לעסק
+    business?: Business | null; // אובייקט עסק
+    invoices?: Invoice[]; // רשימת חשבוניות
+    // TODO: יכול להיות בעיות עם שדות של תאריך
+}
+export interface UserDto {
+    id:number,
+    firstName: string; // שם פרטי
+    lastName: string; // שם משפחה
+    email: string; // אימייל
+    phone: string; // מספר פלאפון
+    role: number; // תפקיד עובד (admin / user) // 1 = admin, 2 = user, 3 = bookkeeper
+    password: string; // סיסמא
+    idNumber: string; // תעודת זהות
+    status: string; // מצב המשתמש (active/inactive)
+    lastLogin: Date; // תאריך כניסה אחרונה
+    createdAt: Date; // תאריך יצירה
+    updateAt: Date; // תאריך עדכון
+    businessId: number | null; // מזהה ייחודי לעסק 
+}
+export interface UserPostModel {
+    firstName: string; // שם פרטי
+    lastName: string; // שם משפחה
+    email: string; // אימייל
+    password: string; // סיסמה (מוצפנת)
+    phone: string; // מספר פלאפון
+    role: number; // תפקיד עובד (admin / user) // 1 = admin, 2 = user, 3 = bookkeeper
+    idNumber: string; // תעודת זהות
+}
+
+import { User } from "../models/User";
+import { UserDto } from "../models/UserDto";
+
+export const converFromUserDto = (userRegister: UserDto): User => {
+    return {
+        id: userRegister.id, 
+        firstName: userRegister.firstName,
+        lastName: userRegister.lastName,
+        email: userRegister.email,
+        password: userRegister.password, // סיסמה לא מוצפנת, יש להוסיף הצפנה אם נדרש
+        phone: userRegister.phone,
+        role: userRegister.role,
+        idNumber: userRegister.idNumber,
+        status: "active", // מצב ברירת מחדל
+        createdBy: '', // תוכל להוסיף את המידע הזה אם יש לך
+        updatedBy: '', // תוכל להוסיף את המידע הזה אם יש לך
+        businessId: null, // או מזהה עסק אם יש לך
+        business: undefined, // או אובייקט עסק אם יש לך
+        invoices: [], // רשימת חשבוניות ריקה או מלאה
+        lastLogin: new Date(), // זמן התחברות אחרון, ערך ברירת מחדל
+        createdAt: new Date(), // תאריך יצירה
+        updatedAt: new Date() // תאריך עדכון
+    };
+};
+import { User } from "../models/User";
+import { UserRegisterModel } from "../models/UserPostModel";
+
+export const convertToUser = (userRegister: UserRegisterModel): User => {
+    return {
+        id: 0, 
+        firstName: userRegister.firstName,
+        lastName: userRegister.lastName,
+        email: userRegister.email,
+        password: userRegister.password, // יש לוודא שהסיסמה מוצפנת
+        phone: userRegister.phone,
+        role: userRegister.role,
+        idNumber: userRegister.idNumber,
+        status: "active", // מצב ברירת מחדל
+        createdBy: '', // תוכל להוסיף את המידע הזה אם יש לך
+        updatedBy: '', // תוכל להוסיף את המידע הזה אם יש לך
+        businessId: undefined, // או מזהה עסק אם יש לך
+        business: undefined, // או אובייקט עסק אם יש לך
+        invoices: [], // רשימת חשבוניות ריקה או מלאה
+        lastLogin: new Date(), // זמן התחברות אחרון, ערך ברירת מחדל
+        createdAt: new Date(), // תאריך יצירה
+        updatedAt: new Date() // תאריך עדכון
+    };
+};
+import { Business } from "../models/Business";
+import { BusinessPostModel } from "../models/BusinessPostModel";
+
+export const convertToBusiness = (businessPost: BusinessPostModel): Business => {
+    return {
+        id: businessPost.id, 
+        netWorth:  businessPost.expenses - businessPost.income, // חישוב שווי נקי
+        businessId: businessPost.businessId,
+        name: businessPost.name,
+        address: businessPost.address,
+        email: businessPost.email,
+        businessType: businessPost.businessType,
+        income: businessPost.income,
+        expenses: businessPost.expenses,
+        cashFlow: businessPost.cashFlow,
+        totalAssets: businessPost.totalAssets,
+        totalLiabilities: businessPost.totalLiabilities,
+        revenueGrowthRate: undefined, // או חישוב אם יש לך ערך
+        profitMargin: undefined, // או חישוב אם יש לך ערך
+        currentRatio: undefined, // או חישוב אם יש לך ערך
+        quickRatio: undefined, // או חישוב אם יש לך ערך
+        createdAt: new Date(), // תאריך יצירה נוכחי
+        createdBy: '', // תוכל להוסיף את המידע הזה אם יש לך
+        updatedAt: new Date(), // תאריך עדכון נוכחי
+        updatedBy: '', // תוכל להוסיף את המידע הזה אם יש לך
+        users: [], // רשימת משתמשים ריקה או מלאה
+        invoices: [] // רשימת חשבוניות ריקה או מלאה
+    };
+};
+
+import * as Yup from 'yup';
+
+export const validationSchemaBusinessRegister = Yup.object().shape({
+  businessId: Yup.number().required('מזהה ייחודי לעסק הוא שדה חובה'),
+  name: Yup.string().required('שם העסק הוא שדה חובה'),
+  address: Yup.string().required('כתובת העסק היא שדה חובה'),
+  email: Yup.string().email('אימייל לא תקין').required('אימייל של העסק הוא שדה חובה'),
+  businessType: Yup.string().required('סוג העסק הוא שדה חובה'),
+  income: Yup.number().required('הכנסות העסק הן שדה חובה').positive('הכנסות חייבות להיות חיוביות'),
+  expenses: Yup.number().required('הוצאות העסק הן שדה חובה').positive('הוצאות חייבות להיות חיוביות'),
+  cashFlow: Yup.number().required('תזרים מזומנים של העסק הוא שדה חובה').positive('תזרים חייב להיות חיובי'),
+  totalAssets: Yup.number().required('סך הנכסים של העסק הוא שדה חובה').positive('סך הנכסים חייב להיות חיובי'),
+  totalLiabilities: Yup.number().required('סך ההתחייבויות של העסק הוא שדה חובה').positive('סך ההתחייבויות חייב להיות חיובי'),
+  // netWorth: Yup.number().required('שווי נקי הוא שדה חובה').positive('שווי נקי חייב להיות חיובי'),
+  // revenueGrowthRate: Yup.number().nullable().positive('שיעור צמיחת ההכנסות חייב להיות חיובי'),
+  // profitMargin: Yup.number().nullable().positive('שיעור הרווח חייב להיות חיובי'),
+  // currentRatio: Yup.number().nullable().positive('יחס נוכחי חייב להיות חיובי'),
+  // quickRatio: Yup.number().nullable().positive('יחס מהיר חייב להיות חיובי'),
+});
+
+export const validationSchemaAdminLogin = Yup.object().shape({
+  email: Yup.string().email('אימייל לא חוקי').required('אימייל הוא שדה חובה'),
+  // password: Yup.string().required('סיסמא היא שדה חובה').min(3, 'סיסמא חייבת להיות לפחות 3 תווים') TODO:להחזיר את השדה הזה
+})
+
+export const validationSchemaUserLogin = Yup.object().shape({
+    email: Yup.string().email('אימייל לא חוקי').required('אימייל הוא שדה חובה'),
+    password: Yup.string().required('סיסמא היא שדה חובה').min(3, 'סיסמא חייבת להיות לפחות 3 תווים')
+})
+
+export const validationSchemaUserRegister = Yup.object().shape({
+  email: Yup.string().email('אימייל לא חוקי').required('אימייל הוא שדה חובה'),
+  // password: Yup.string().required('סיסמא היא שדה חובה').min(3, 'סיסמא חייבת להיות לפחות 3 תווים')//TODO :להחזיר את השדה הזה
+})
+/// <reference types="vite/client" />
