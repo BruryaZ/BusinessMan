@@ -26,6 +26,7 @@ const AdmineLogin = () => {
                     const { data } = await axios.post<any>(`${url}/Auth/admin-login`, adminRegister, { withCredentials: true }) // TODO 
                     globalContextDetails.setUser(data.user);
                     globalContextDetails.setIsAdmin(true);
+                    // globalContextDetails.setBusinessGlobal(data.business);
                     nav('/')
                 }
                 catch (e) {

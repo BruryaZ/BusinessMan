@@ -44,9 +44,10 @@ namespace BusinessMan.API.Controllers
 
         // POST api/<InvoiceController>
         [HttpPost]
-        public async Task<ActionResult<InvoiceDto>> PostAsync([FromBody] Invoice value)
+        public async Task<ActionResult<InvoiceDto>> PostAsync([FromBody] InvoiceDto value)
         {
-            var createdInvoice = await _allInvoices.AddAsync(value);
+            var invoice = _mapper.Map<Invoice>(value); 
+            var createdInvoice = await _allInvoices.AddAsync(invoice);
             return Ok(_mapper.Map<InvoiceDto>(createdInvoice)); // החזר את ה-DTO
         }
 

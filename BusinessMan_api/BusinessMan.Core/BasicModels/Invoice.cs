@@ -13,8 +13,8 @@ namespace BusinessMan.Core.Models
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; } // מזהה ייחודי
-        public string AmountDebit { get; set; } // סכום חובה
-        public string AmountCredit { get; set; } // סכום זכות
+        public int AmountDebit { get; set; } // סכום חובה
+        public int AmountCredit { get; set; } // סכום זכות
         public DateTime InvoiceDate { get; set; } = DateTime.UtcNow; // תאריך החשבונית
         public int Status { get; set; } // סטטוס החשבונית
         public string Notes { get; set; } // הערות

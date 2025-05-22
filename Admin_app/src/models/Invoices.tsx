@@ -3,8 +3,8 @@ import { User } from "./User";
 
 export interface Invoice {
     id: number; // מזהה ייחודי
-    amountDebit: string; // סכום חובה
-    amountCredit: string; // סכום זכות
+    amountDebit: number; // סכום חובה
+    amountCredit: number; // סכום זכות
     invoiceDate: Date; // תאריך החשבונית
     status: number; // סטטוס החשבונית
     notes?: string; // הערות
