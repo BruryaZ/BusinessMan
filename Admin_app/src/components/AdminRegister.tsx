@@ -1,7 +1,6 @@
 import { useContext, useState } from "react"
 import * as Yup from 'yup'
 import axios from "axios"
-import { useNavigate } from "react-router-dom"
 import { UserPostModel } from "../models/UserPostModel"
 import { validationSchemaUserRegister } from "../utils/validationSchema"
 import { globalContext } from "../context/GlobalContext"
@@ -9,7 +8,6 @@ import { UserDto } from "../models/UserDto"
 import { converFromUserDto } from "../utils/convertFromUserDto"
 
 const AdminRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => {
-    const nav = useNavigate();
     const validationSchema = validationSchemaUserRegister;
     const [myAdmin, setMyAdmin] = useState<UserPostModel>({
         firstName: "יוסי", // ערך ברירת מחדל

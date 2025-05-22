@@ -1,7 +1,7 @@
 import { User } from "../models/User";
-import { UserRegisterModel } from "../models/UserPostModel";
+import { UserPostModel } from "../models/UserPostModel";
 
-export const convertToUser = (userRegister: UserRegisterModel): User => {
+export const convertToUser = (userRegister: UserPostModel): User => {
     return {
         id: 0, 
         firstName: userRegister.firstName,
@@ -14,7 +14,7 @@ export const convertToUser = (userRegister: UserRegisterModel): User => {
         status: "active", // מצב ברירת מחדל
         createdBy: '', // תוכל להוסיף את המידע הזה אם יש לך
         updatedBy: '', // תוכל להוסיף את המידע הזה אם יש לך
-        businessId: undefined, // או מזהה עסק אם יש לך
+        businessId: 0, // או מזהה עסק אם יש לך
         business: undefined, // או אובייקט עסק אם יש לך
         invoices: [], // רשימת חשבוניות ריקה או מלאה
         lastLogin: new Date(), // זמן התחברות אחרון, ערך ברירת מחדל
