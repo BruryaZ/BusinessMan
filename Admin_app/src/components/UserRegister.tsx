@@ -20,51 +20,11 @@ import {
   Alert,
   Grid,
   InputAdornment,
-  ThemeProvider,
-  createTheme,
-  CssBaseline,
   Divider,
   Link,
+  Stack,
 } from "@mui/material"
-import { Person, Email, Phone, Badge, Lock, Work, HowToReg } from "@mui/icons-material"
-
-// Create a custom theme with RTL support and Hebrew font
-const theme = createTheme({
-  direction: "rtl",
-  typography: {
-    fontFamily: '"Assistant", "Rubik", "Heebo", sans-serif',
-  },
-  palette: {
-    primary: {
-      main: "#3f51b5",
-    },
-    secondary: {
-      main: "#f50057",
-    },
-    background: {
-      default: "#f5f5f5",
-    },
-  },
-  components: {
-    MuiTextField: {
-      styleOverrides: {
-        root: {
-          direction: "rtl",
-        },
-      },
-    },
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          borderRadius: 8,
-          padding: "10px 24px",
-          textTransform: "none",
-          fontSize: "1rem",
-        },
-      },
-    },
-  },
-})
+import { Person, Email, Phone, Badge, Lock, Work, HowToReg, ArrowBack } from "@mui/icons-material"
 
 const UserRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => {
   const nav = useNavigate()
@@ -123,199 +83,273 @@ const UserRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => 
   }
 
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Container maxWidth="md" sx={{ py: 4 }}>
-        <Paper
-          elevation={3}
-          sx={{
-            p: 4,
-            borderRadius: 3,
-            boxShadow: "0 8px 32px rgba(0, 0, 0, 0.1)",
-          }}
-        >
-          <Box sx={{ mb: 4, textAlign: "center" }}>
-            <HowToReg color="primary" sx={{ fontSize: 48, mb: 2 }} />
-            <Typography variant="h4" component="h1" gutterBottom fontWeight="bold">
-              הרשמת משתמש חדש
-            </Typography>
-            <Typography variant="body1" color="text.secondary">
-              נא למלא את כל הפרטים הנדרשים
-            </Typography>
-            <Divider sx={{ mt: 3 }} />
-          </Box>
-
+    <Container maxWidth="md" sx={{ py: 4, textAlign: "right" }}>
+      <Paper
+        elevation={0}
+        sx={{
+          p: { xs: 3, sm: 5 },
+          borderRadius: 3,
+          boxShadow: "0 10px 40px rgba(0, 0, 0, 0.08)",
+          background: "linear-gradient(145deg, #ffffff, #f8fafc)",
+          border: "1px solid rgba(0, 0, 0, 0.05)",
+        }}
+      >
+        <Box sx={{ mb: 4, textAlign: "center" }}>
           <Box
-            component="form"
-            onSubmit={handleSubmit(myUser)}
             sx={{
+              width: 80,
+              height: 80,
+              borderRadius: "50%",
+              bgcolor: "primary.light",
+              color: "primary.main",
               display: "flex",
-              flexDirection: "column",
-              gap: 3,
+              alignItems: "center",
+              justifyContent: "center",
+              mx: "auto",
+              mb: 2,
+              boxShadow: "0 4px 14px rgba(37, 99, 235, 0.2)",
             }}
           >
-            <Grid container spacing={2}>
-              <Grid item xs={12} md={6} {...({} as any)}>
-                <TextField
-                  fullWidth
-                  label="שם פרטי"
-                  name="firstName"
-                  value={myUser.firstName}
-                  onChange={handleChange}
-                  variant="outlined"
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <Person color="action" />
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12} md={6} {...({} as any)}>
-                <TextField
-                  fullWidth
-                  label="שם משפחה"
-                  name="lastName"
-                  value={myUser.lastName}
-                  onChange={handleChange}
-                  variant="outlined"
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <Person color="action" />
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12} md={6} {...({} as any)}>
-                <TextField
-                  fullWidth
-                  label="טלפון"
-                  name="phone"
-                  value={myUser.phone}
-                  onChange={handleChange}
-                  variant="outlined"
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <Phone color="action" />
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12} md={6} {...({} as any)}>
-                <TextField
-                  fullWidth
-                  label="מספר תעודת זהות"
-                  name="idNumber"
-                  value={myUser.idNumber}
-                  onChange={handleChange}
-                  variant="outlined"
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <Badge color="action" />
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12} {...({} as any)}>
-                <TextField
-                  fullWidth
-                  label="אימייל"
-                  name="email"
-                  type="email"
-                  value={myUser.email}
-                  onChange={handleChange}
-                  variant="outlined"
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <Email color="action" />
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12} md={6} {...({} as any)}>
-                <TextField
-                  fullWidth
-                  label="סיסמא"
-                  name="password"
-                  type="password"
-                  value={myUser.password}
-                  onChange={handleChange}
-                  variant="outlined"
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <Lock color="action" />
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12} md={6} {...({} as any)}>
-                <TextField
-                  fullWidth
-                  label="תפקיד"
-                  name="role"
-                  type="number"
-                  value={myUser.role}
-                  onChange={handleChange}
-                  variant="outlined"
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <Work color="action" />
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              </Grid>
-            </Grid>
+            <HowToReg sx={{ fontSize: 40 }} />
+          </Box>
+          <Typography variant="h4" component="h1" gutterBottom fontWeight="bold">
+            הרשמת משתמש חדש
+          </Typography>
+          <Typography variant="body1" color="text.secondary">
+            נא למלא את כל הפרטים הנדרשים
+          </Typography>
+          <Divider sx={{ mt: 3 }} />
+        </Box>
 
+        <Box
+          component="form"
+          onSubmit={handleSubmit(myUser)}
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 3,
+          }}
+        >
+          <Grid container spacing={2}>
+            <Grid item xs={12} md={6} {...({} as any)}>
+              <TextField
+                fullWidth
+                label="שם פרטי"
+                name="firstName"
+                value={myUser.firstName}
+                onChange={handleChange}
+                variant="outlined"
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start" sx={{ mr: 1.5 }}>
+                      <Person color="primary" />
+                    </InputAdornment>
+                  ),
+                }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    bgcolor: "white",
+                  },
+                }}
+              />
+            </Grid>
+            <Grid item xs={12} md={6} {...({} as any)}>
+              <TextField
+                fullWidth
+                label="שם משפחה"
+                name="lastName"
+                value={myUser.lastName}
+                onChange={handleChange}
+                variant="outlined"
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start" sx={{ mr: 1.5 }}>
+                      <Person color="primary" />
+                    </InputAdornment>
+                  ),
+                }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    bgcolor: "white",
+                  },
+                }}
+              />
+            </Grid>
+            <Grid item xs={12} md={6} {...({} as any)}>
+              <TextField
+                fullWidth
+                label="טלפון"
+                name="phone"
+                value={myUser.phone}
+                onChange={handleChange}
+                variant="outlined"
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start" sx={{ mr: 1.5 }}>
+                      <Phone color="primary" />
+                    </InputAdornment>
+                  ),
+                }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    bgcolor: "white",
+                  },
+                }}
+              />
+            </Grid>
+            <Grid item xs={12} md={6} {...({} as any)}>
+              <TextField
+                fullWidth
+                label="מספר תעודת זהות"
+                name="idNumber"
+                value={myUser.idNumber}
+                onChange={handleChange}
+                variant="outlined"
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start" sx={{ mr: 1.5 }}>
+                      <Badge color="primary" />
+                    </InputAdornment>
+                  ),
+                }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    bgcolor: "white",
+                  },
+                }}
+              />
+            </Grid>
+            <Grid item xs={12} {...({} as any)}>
+              <TextField
+                fullWidth
+                label="אימייל"
+                name="email"
+                type="email"
+                value={myUser.email}
+                onChange={handleChange}
+                variant="outlined"
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start" sx={{ mr: 1.5 }}>
+                      <Email color="primary" />
+                    </InputAdornment>
+                  ),
+                }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    bgcolor: "white",
+                  },
+                }}
+              />
+            </Grid>
+            <Grid item xs={12} md={6} {...({} as any)}>
+              <TextField
+                fullWidth
+                label="סיסמא"
+                name="password"
+                type="password"
+                value={myUser.password}
+                onChange={handleChange}
+                variant="outlined"
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start" sx={{ mr: 1.5 }}>
+                      <Lock color="primary" />
+                    </InputAdornment>
+                  ),
+                }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    bgcolor: "white",
+                  },
+                }}
+              />
+            </Grid>
+            <Grid item xs={12} md={6} {...({} as any)}>
+              <TextField
+                fullWidth
+                label="תפקיד"
+                name="role"
+                type="number"
+                value={myUser.role}
+                onChange={handleChange}
+                variant="outlined"
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start" sx={{ mr: 1.5 }}>
+                      <Work color="primary" />
+                    </InputAdornment>
+                  ),
+                }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    bgcolor: "white",
+                  },
+                }}
+              />
+            </Grid>
+          </Grid>
+
+          <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
             <Button
               type="submit"
               variant="contained"
               size="large"
+              startIcon={<HowToReg />}
               sx={{
-                mt: 2,
                 py: 1.5,
                 fontWeight: "bold",
                 fontSize: "1.1rem",
-                boxShadow: "0 4px 12px rgba(63, 81, 181, 0.4)",
+                boxShadow: "0 4px 14px rgba(37, 99, 235, 0.2)",
+                flexGrow: 1,
               }}
             >
               הירשם
             </Button>
 
-            <Box sx={{ mt: 1, textAlign: "center" }}>
-              <Typography variant="body2" color="text.secondary">
-                כבר יש לך חשבון?{" "}
-                <Link href="/user-login" underline="hover" fontWeight="bold">
-                  התחבר כאן
-                </Link>
-              </Typography>
-            </Box>
+            <Button
+              variant="outlined"
+              size="large"
+              startIcon={<ArrowBack />}
+              onClick={() => nav("/user-login")}
+              sx={{
+                py: 1.5,
+                fontWeight: "bold",
+                borderWidth: 2,
+                "&:hover": {
+                  borderWidth: 2,
+                },
+              }}
+            >
+              חזרה לכניסה
+            </Button>
+          </Stack>
 
-            {errors.length > 0 && (
-              <Box sx={{ width: "100%", mt: 2 }}>
-                {errors.map((error, index) => (
-                  <Alert key={index} severity="error" sx={{ mb: 1 }}>
-                    {error}
-                  </Alert>
-                ))}
-              </Box>
-            )}
+          <Box sx={{ mt: 3, textAlign: "center" }}>
+            <Typography variant="body2" color="text.secondary">
+              כבר יש לך חשבון?{" "}
+              <Link href="/user-login" underline="hover" fontWeight="bold">
+                התחבר כאן
+              </Link>
+            </Typography>
           </Box>
-        </Paper>
-      </Container>
-    </ThemeProvider>
+
+          {errors.length > 0 && (
+            <Box sx={{ width: "100%", mt: 2 }}>
+              {errors.map((error, index) => (
+                <Alert
+                  key={index}
+                  severity="error"
+                  sx={{ mb: 1, borderRadius: 2, boxShadow: "0 2px 10px rgba(239, 68, 68, 0.1)" }}
+                >
+                  {error}
+                </Alert>
+              ))}
+            </Box>
+          )}
+        </Box>
+      </Paper>
+    </Container>
   )
 }
 

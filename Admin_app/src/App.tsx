@@ -3,7 +3,6 @@
 import { useState } from "react"
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from "react-router-dom"
 import {
-  AppBar,
   Box,
   CssBaseline,
   Divider,
@@ -21,6 +20,8 @@ import {
   ThemeProvider,
   createTheme,
   useMediaQuery,
+  AppBar as MuiAppBar,
+  styled,
 } from "@mui/material"
 import {
   Menu as MenuIcon,
@@ -35,11 +36,14 @@ import {
   Business,
   BusinessCenter,
   Login,
+  ChevronLeft,
+  Dashboard,
 } from "@mui/icons-material"
 import { prefixer } from "stylis"
 import rtlPlugin from "stylis-plugin-rtl"
 import { CacheProvider } from "@emotion/react"
 import createCache from "@emotion/cache"
+import './App.css'
 
 // Components
 import GlobalContext from "./context/GlobalContext"
@@ -68,8 +72,29 @@ const theme = createTheme({
   direction: "rtl",
   typography: {
     fontFamily: '"Assistant", "Rubik", "Heebo", sans-serif',
+    h1: {
+      fontWeight: 800,
+      fontSize: "2.5rem",
+    },
+    h2: {
+      fontWeight: 700,
+      fontSize: "2rem",
+    },
+    h3: {
+      fontWeight: 700,
+      fontSize: "1.75rem",
+    },
     h4: {
       fontWeight: 700,
+      fontSize: "1.5rem",
+    },
+    h5: {
+      fontWeight: 600,
+      fontSize: "1.25rem",
+    },
+    h6: {
+      fontWeight: 600,
+      fontSize: "1rem",
     },
     button: {
       fontWeight: 600,
@@ -77,40 +102,158 @@ const theme = createTheme({
   },
   palette: {
     primary: {
-      main: "#3f51b5",
+      main: "#2563eb", // Modern blue
+      light: "#60a5fa",
+      dark: "#1e40af",
+      contrastText: "#ffffff",
     },
     secondary: {
-      main: "#f50057",
+      main: "#f97316", // Vibrant orange
+      light: "#fdba74",
+      dark: "#c2410c",
+      contrastText: "#ffffff",
     },
     background: {
-      default: "#f5f7ff",
+      default: "#f8fafc",
+      paper: "#ffffff",
     },
+    error: {
+      main: "#ef4444",
+    },
+    warning: {
+      main: "#f59e0b",
+    },
+    info: {
+      main: "#3b82f6",
+    },
+    success: {
+      main: "#10b981",
+    },
+    text: {
+      primary: "#0f172a",
+      secondary: "#64748b",
+    },
+  },
+  shape: {
+    borderRadius: 12,
   },
   components: {
     MuiButton: {
       styleOverrides: {
         root: {
-          borderRadius: 8,
+          borderRadius: 10,
           textTransform: "none",
+          fontWeight: 600,
+          boxShadow: "none",
+          padding: "10px 20px",
+          "&:hover": {
+            boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+          },
+        },
+        contained: {
+          boxShadow: "0 2px 6px rgba(0,0,0,0.08)",
         },
       },
     },
-    MuiAppBar: {
+    MuiPaper: {
       styleOverrides: {
         root: {
-          boxShadow: "0 4px 20px rgba(0, 0, 0, 0.08)",
+          borderRadius: 16,
+        },
+        elevation1: {
+          boxShadow: "0 2px 12px rgba(0,0,0,0.05)",
+        },
+        elevation2: {
+          boxShadow: "0 4px 16px rgba(0,0,0,0.08)",
+        },
+      },
+    },
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+          "& .MuiOutlinedInput-root": {
+            borderRadius: 10,
+          },
+        },
+      },
+    },
+    MuiCard: {
+      styleOverrides: {
+        root: {
+          borderRadius: 16,
+          boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
+          overflow: "hidden",
+          transition: "transform 0.2s, box-shadow 0.2s",
+          "&:hover": {
+            boxShadow: "0 12px 32px rgba(0,0,0,0.12)",
+            transform: "translateY(-4px)",
+          },
+        },
+      },
+    },
+    MuiChip: {
+      styleOverrides: {
+        root: {
+          borderRadius: 8,
+          fontWeight: 500,
+        },
+      },
+    },
+    MuiTableCell: {
+      styleOverrides: {
+        root: {
+          padding: "16px",
+        },
+        head: {
+          fontWeight: 600,
+          backgroundColor: "rgba(0, 0, 0, 0.02)",
+        },
+      },
+    },
+    MuiAlert: {
+      styleOverrides: {
+        root: {
+          borderRadius: 12,
+        },
+      },
+    },
+    MuiListItemButton: {
+      styleOverrides: {
+        root: {
+          borderRadius: 8,
+          margin: "4px 8px",
+          "&.Mui-selected": {
+            backgroundColor: "rgba(37, 99, 235, 0.1)",
+            color: "#2563eb",
+            "&:hover": {
+              backgroundColor: "rgba(37, 99, 235, 0.15)",
+            },
+            "& .MuiListItemIcon-root": {
+              color: "#2563eb",
+            },
+          },
+          "&:hover": {
+            backgroundColor: "rgba(0, 0, 0, 0.04)",
+          },
         },
       },
     },
     MuiDrawer: {
       styleOverrides: {
         paper: {
-          width: 280,
-          backgroundColor: "#f8faff",
+          backgroundColor: "#ffffff",
+          borderRight: "none",
+          boxShadow: "0 0 20px rgba(0, 0, 0, 0.05)",
         },
       },
     },
-    // Fix for RTL input fields and icons
+    MuiAppBar: {
+      styleOverrides: {
+        root: {
+          boxShadow: "0 2px 10px rgba(0, 0, 0, 0.05)",
+        },
+      },
+    },
     MuiInputBase: {
       styleOverrides: {
         root: {
@@ -121,7 +264,6 @@ const theme = createTheme({
         },
       },
     },
-    // Fix for Grid items in RTL
     MuiGrid: {
       styleOverrides: {
         root: {
@@ -149,9 +291,28 @@ const navItems = [
   { text: "רישום עסק ומנהל חדש", path: "/register-admin&business", icon: <BusinessCenter /> },
 ]
 
+const AppBar = styled(MuiAppBar, {
+  shouldForwardProp: (prop) => prop !== "open",
+})<{ open?: boolean }>(({ theme, open }) => ({
+  zIndex: theme.zIndex.drawer + 1,
+  transition: theme.transitions.create(["width", "margin"], {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.leavingScreen,
+  }),
+  ...(open && {
+    marginLeft: drawerWidth,
+    width: `calc(100% - ${drawerWidth}px)`,
+    transition: theme.transitions.create(["width", "margin"], {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+  }),
+}))
+
 // Responsive drawer component
 function ResponsiveDrawer() {
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [open, setOpen] = useState(true)
   const location = useLocation()
   const isMobile = useMediaQuery(theme.breakpoints.down("md"))
 
@@ -159,15 +320,31 @@ function ResponsiveDrawer() {
     setMobileOpen(!mobileOpen)
   }
 
+  const handleDrawerOpen = () => {
+    setOpen(true)
+  }
+
+  const handleDrawerClose = () => {
+    setOpen(false)
+  }
+
   const drawer = (
-    <Box sx={{ textAlign: "right" }}>
-      <Box sx={{ p: 2, bgcolor: "primary.main", color: "white" }}>
-        <Typography variant="h6" component="div" fontWeight="bold">
-          מערכת ניהול עסקים
-        </Typography>
+    <Box sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
+      <Box sx={{ p: 2, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+          <Box component="img" src="/logo.svg" alt="BusinessMan Logo" sx={{ height: 40, width: 40, mr: 1.5 }} />
+          <Typography variant="h5" component="div" fontWeight="bold" color="primary">
+            BusinessMan
+          </Typography>
+        </Box>
+        {!isMobile && (
+          <IconButton onClick={handleDrawerClose}>
+            <ChevronLeft />
+          </IconButton>
+        )}
       </Box>
-      <Divider />
-      <List>
+      <Divider sx={{ mb: 2 }} />
+      <List component="nav" sx={{ flexGrow: 1, px: 1 }}>
         {navItems.map((item) => (
           <ListItem key={item.text} disablePadding>
             <ListItemButton
@@ -175,64 +352,71 @@ function ResponsiveDrawer() {
               to={item.path}
               selected={location.pathname === item.path}
               onClick={() => isMobile && setMobileOpen(false)}
-              sx={{
-                "&.Mui-selected": {
-                  bgcolor: "primary.light",
-                  color: "primary.main",
-                  "&:hover": {
-                    bgcolor: "primary.light",
-                  },
-                  "& .MuiListItemIcon-root": {
-                    color: "primary.main",
-                  },
-                },
-                borderRadius: 1,
-                mx: 1,
-                my: 0.5,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "flex-start",
-              }}
             >
-              <ListItemIcon sx={{ minWidth: 40, marginLeft: 1, marginRight: 0 }}>{item.icon}</ListItemIcon>
-              <ListItemText primary={item.text} />
+              <ListItemText primary={item.text} /> <ListItemIcon sx={{padding:1.2, minWidth: 36, color: location.pathname === item.path ? "primary.main" : "inherit" }}>
+                {item.icon}
+              </ListItemIcon>
             </ListItemButton>
           </ListItem>
         ))}
       </List>
+      <Box sx={{ p: 2, textAlign: "center" }}>
+        <Typography variant="caption" color="text.secondary">
+          © 2025 BusinessMan
+        </Typography>
+      </Box>
     </Box>
   )
 
   return (
-    <Box sx={{ display: "flex" }}>
-      <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+    <Box sx={{ display: "flex", minHeight: "100vh" }}>
+      <AppBar
+        position="fixed"
+        color="inherit"
+        sx={{
+          ...(open && !isMobile && {
+            marginLeft: drawerWidth,
+            width: `calc(100% - ${drawerWidth}px)`,
+            transition: theme.transitions.create(["width", "margin"], {
+              easing: theme.transitions.easing.sharp,
+              duration: theme.transitions.duration.enteringScreen,
+            }),
+          }),
+        }}
+      >
         <Toolbar>
           <IconButton
             color="inherit"
             aria-label="open drawer"
             edge="start"
-            onClick={handleDrawerToggle}
-            sx={{ ml: 2, mr: 0, display: { md: "none" } }}
+            onClick={isMobile ? handleDrawerToggle : handleDrawerOpen}
+            sx={{ mr: 2, ...(open && !isMobile && { display: "none" }) }}
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            מערכת ניהול עסקים
-          </Typography>
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <Dashboard sx={{ display: { xs: "none", sm: "block" }, mr: 1, color: "primary.main" }} />
+            <Typography variant="h6" component="div" sx={{ flexGrow: 1, fontWeight: "bold" }}>
+              מערכת ניהול עסקים
+            </Typography>
+          </Box>
+          <Box sx={{ flexGrow: 1 }} />
           <Box sx={{ display: { xs: "none", md: "flex" }, gap: 1 }}>
-            {navItems.slice(0, 5).map((item) => (
+            {navItems.slice(0, 4).map((item) => (
               <Button
                 key={item.text}
                 component={Link}
                 to={item.path}
-                color="inherit"
+                color={location.pathname === item.path ? "primary" : "inherit"}
+                variant={location.pathname === item.path ? "contained" : "text"}
                 startIcon={item.icon}
                 sx={{
                   mx: 0.5,
                   py: 1,
-                  bgcolor: location.pathname === item.path ? "rgba(255, 255, 255, 0.15)" : "transparent",
-                  "&:hover": {
-                    bgcolor: "rgba(255, 255, 255, 0.25)",
+                  fontWeight: location.pathname === item.path ? 600 : 500,
+                  "& .MuiButton-startIcon": {
+                    marginLeft: 1.5,
+                    marginRight: -0.5,
                   },
                 }}
               >
@@ -243,7 +427,7 @@ function ResponsiveDrawer() {
         </Toolbar>
       </AppBar>
 
-      <Box component="nav">
+      <Box component="nav" sx={{ width: { md: drawerWidth }, flexShrink: { md: 0 } }}>
         <Drawer
           variant="temporary"
           open={mobileOpen}
@@ -262,9 +446,18 @@ function ResponsiveDrawer() {
           variant="permanent"
           sx={{
             display: { xs: "none", md: "block" },
-            "& .MuiDrawer-paper": { boxSizing: "border-box", width: drawerWidth, borderRight: "1px solid #e0e0e0" },
+            "& .MuiDrawer-paper": {
+              boxSizing: "border-box",
+              borderRight: "1px solid rgba(0, 0, 0, 0.05)",
+              overflowX: "hidden",
+              transition: theme.transitions.create("width", {
+                easing: theme.transitions.easing.sharp,
+                duration: theme.transitions.duration.enteringScreen,
+              }),
+              width: open ? drawerWidth : theme.spacing(9), // הגדרת width רק פעם אחת
+            },
           }}
-          open
+          open={open}
         >
           {drawer}
         </Drawer>
@@ -275,73 +468,67 @@ function ResponsiveDrawer() {
         sx={{
           flexGrow: 1,
           p: 3,
-          width: { xs: "100%", md: `calc(100% - ${drawerWidth}px)` },
+          width: { xs: "100%", md: `calc(100% - ${open ? drawerWidth : theme.spacing(9)}px)` },
           minHeight: "100vh",
           bgcolor: "background.default",
           mt: { xs: 7, sm: 8 },
+          transition: theme.transitions.create("width", {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.enteringScreen,
+          }),
         }}
       >
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            minHeight: "80vh", // או 100vh אם רוצים שזה יתפוס את כל הגובה
-            pt: 2,
-          }}
-        >
-          <Container maxWidth="xl" sx={{ pt: 2 }}>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/register-user" element={<UserRegister />} />
-              <Route path="/user-login" element={<UserLogin />} />
-              <Route path="/admin-login" element={<AdminLogin />} />
-              <Route path="/upload-file" element={<UploadFiles />} />
-              <Route path="/register-admin&business" element={<BusinessAndAdmin />} />
+        <Container maxWidth="xl" sx={{ pt: 2 }}>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/register-user" element={<UserRegister />} />
+            <Route path="/user-login" element={<UserLogin />} />
+            <Route path="/admin-login" element={<AdminLogin />} />
+            <Route path="/upload-file" element={<UploadFiles />} />
+            <Route path="/register-admin&business" element={<BusinessAndAdmin />} />
 
-              <Route
-                path="/production-reports"
-                element={
-                  <AdminRoute>
-                    <ProductionReports />
-                  </AdminRoute>
-                }
-              />
-              <Route
-                path="/view-data"
-                element={
-                  <AdminRoute>
-                    <DataViweing />
-                  </AdminRoute>
-                }
-              />
-              <Route
-                path="/user-management"
-                element={
-                  <AdminRoute>
-                    <UserManagemet />
-                  </AdminRoute>
-                }
-              />
-              <Route
-                path="/business-register"
-                element={
-                  <AdminRoute>
-                    <RegisterBusinessData />
-                  </AdminRoute>
-                }
-              />
-              <Route
-                path="/incom&Expennses"
-                element={
-                  <AdminRoute>
-                    <IncomAndExpennses />
-                  </AdminRoute>
-                }
-              />
-            </Routes>
-          </Container>
-        </Box>
+            <Route
+              path="/production-reports"
+              element={
+                <AdminRoute>
+                  <ProductionReports />
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="/view-data"
+              element={
+                <AdminRoute>
+                  <DataViweing />
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="/user-management"
+              element={
+                <AdminRoute>
+                  <UserManagemet />
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="/business-register"
+              element={
+                <AdminRoute>
+                  <RegisterBusinessData />
+                </AdminRoute>
+              }
+            />
+            <Route
+              path="/incom&Expennses"
+              element={
+                <AdminRoute>
+                  <IncomAndExpennses />
+                </AdminRoute>
+              }
+            />
+          </Routes>
+        </Container>
       </Box>
     </Box>
   )

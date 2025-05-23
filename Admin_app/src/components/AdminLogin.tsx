@@ -1,5 +1,7 @@
 "use client"
 
+import type React from "react"
+
 import { useContext, useState } from "react"
 import type { Admin } from "../models/Admin"
 import * as Yup from "yup"
@@ -8,7 +10,6 @@ import type { AdminRegister } from "../models/AdminRegister"
 import { useNavigate } from "react-router-dom"
 import { validationSchemaAdminLogin } from "../utils/validationSchema"
 import { globalContext } from "../context/GlobalContext"
-// MUI imports
 import {
   Box,
   TextField,
@@ -18,57 +19,12 @@ import {
   Container,
   Alert,
   InputAdornment,
-  ThemeProvider,
-  createTheme,
-  CssBaseline,
   Avatar,
+  Link,
+  Stack,
 } from "@mui/material"
-import { Email, Lock, AdminPanelSettings } from "@mui/icons-material"
+import { Email, Lock, AdminPanelSettings, Login as LoginIcon } from "@mui/icons-material"
 import CenteredLayout from "./CenteredLayout"
-
-// Create a custom theme with RTL support and Hebrew font
-const theme = createTheme({
-  direction: "rtl",
-  typography: {
-    fontFamily: '"Assistant", "Rubik", "Heebo", sans-serif',
-    h4: {
-      fontWeight: 700,
-    },
-    button: {
-      fontWeight: 600,
-    },
-  },
-  palette: {
-    primary: {
-      main: "#3f51b5",
-    },
-    secondary: {
-      main: "#f50057",
-    },
-    background: {
-      default: "#f5f5f5",
-    },
-  },
-  components: {
-    MuiTextField: {
-      styleOverrides: {
-        root: {
-          direction: "rtl",
-        },
-      },
-    },
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          borderRadius: 8,
-          padding: "10px 24px",
-          textTransform: "none",
-          fontSize: "1rem",
-        },
-      },
-    },
-  },
-})
 
 const AdmineLogin = () => {
   const nav = useNavigate()
@@ -90,7 +46,7 @@ const AdmineLogin = () => {
             const { data } = await axios.post<any>(`${url}/Auth/admin-login`, adminRegister, { withCredentials: true }) // TODO
             globalContextDetails.setUser(data.user)
             globalContextDetails.setIsAdmin(true)
-            globalContextDetails.setBusinessGlobal(data.business);
+            globalContextDetails.setBusinessGlobal(data.business)
             nav("/")
           } catch (e) {
             console.log(e)
@@ -118,106 +74,143 @@ const AdmineLogin = () => {
 
   return (
     <CenteredLayout>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <Container
-          maxWidth="sm"
-          sx={{ height: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}
+      <Container maxWidth="sm" sx={{ py: 4 }}>
+        <Paper
+          elevation={0}
+          sx={{
+            p: { xs: 3, sm: 5 },
+            width: "100%",
+            borderRadius: 3,
+            boxShadow: "0 10px 40px rgba(0, 0, 0, 0.08)",
+            background: "linear-gradient(145deg, #ffffff, #f8fafc)",
+            border: "1px solid rgba(0, 0, 0, 0.05)",
+          }}
         >
-          <Paper
-            elevation={3}
+          <Box
+            component="form"
+            onSubmit={handleSubmit(admin)}
             sx={{
-              p: 4,
-              width: "100%",
-              borderRadius: 3,
-              boxShadow: "0 8px 32px rgba(0, 0, 0, 0.1)",
+              display: "flex",
+              flexDirection: "column",
+              gap: 3,
+              alignItems: "center",
             }}
           >
-            <Box
-              component="form"
-              onSubmit={handleSubmit(admin)}
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                gap: 3,
-                alignItems: "center",
-              }}
-            >
-              <Avatar sx={{ bgcolor: "primary.main", width: 56, height: 56, mb: 1 }}>
-                <AdminPanelSettings fontSize="large" />
+            <Box sx={{ textAlign: "center", mb: 2 }}>
+              <Avatar
+                sx={{
+                  bgcolor: "primary.main",
+                  width: 70,
+                  height: 70,
+                  mb: 2,
+                  mx: "auto",
+                  boxShadow: "0 4px 14px rgba(37, 99, 235, 0.2)",
+                }}
+              >
+                <AdminPanelSettings sx={{ fontSize: 40 }} />
               </Avatar>
 
-              <Typography variant="h4" component="h1" align="center" gutterBottom>
+              <Typography variant="h4" component="h1" gutterBottom fontWeight="bold">
                 כניסת מנהל
               </Typography>
 
-              <Typography variant="body1" color="text.secondary" align="center" sx={{ mb: 2 }}>
+              <Typography variant="body1" color="text.secondary" sx={{ mb: 1 }}>
                 ברוכים הבאים למערכת הניהול
               </Typography>
-
-              <TextField
-                fullWidth
-                label="אימייל"
-                name="email"
-                type="email"
-                variant="outlined"
-                onChange={handleChange}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <Email color="action" />
-                    </InputAdornment>
-                  ),
-                }}
-                placeholder="הזן את האימייל שלך"
-              />
-
-              <TextField
-                fullWidth
-                label="סיסמא"
-                name="password"
-                type="password"
-                variant="outlined"
-                onChange={handleChange}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <Lock color="action" />
-                    </InputAdornment>
-                  ),
-                }}
-                placeholder="הזן את הסיסמה שלך"
-              />
-
-              <Button
-                type="submit"
-                variant="contained"
-                fullWidth
-                size="large"
-                sx={{
-                  mt: 2,
-                  py: 1.5,
-                  fontWeight: "bold",
-                  fontSize: "1.1rem",
-                  boxShadow: "0 4px 12px rgba(63, 81, 181, 0.4)",
-                }}
-              >
-                התחבר
-              </Button>
-
-              {errors.length > 0 && (
-                <Box sx={{ width: "100%", mt: 2 }}>
-                  {errors.map((error, index) => (
-                    <Alert key={index} severity="error" sx={{ mb: 1 }}>
-                      {error}
-                    </Alert>
-                  ))}
-                </Box>
-              )}
             </Box>
-          </Paper>
-        </Container>
-      </ThemeProvider>
+
+            <TextField
+              fullWidth
+              label="אימייל"
+              name="email"
+              type="email"
+              variant="outlined"
+              onChange={handleChange}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start" sx={{ mr: 1.5 }}>
+                    <Email color="primary" />
+                  </InputAdornment>
+                ),
+              }}
+              placeholder="הזן את האימייל שלך"
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  bgcolor: "white",
+                  "&:hover .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "primary.main",
+                  },
+                },
+              }}
+            />
+
+            <TextField
+              fullWidth
+              label="סיסמא"
+              name="password"
+              type="password"
+              variant="outlined"
+              onChange={handleChange}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start" sx={{ mr: 1.5 }}>
+                    <Lock color="primary" />
+                  </InputAdornment>
+                ),
+              }}
+              placeholder="הזן את הסיסמה שלך"
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  bgcolor: "white",
+                  "&:hover .MuiOutlinedInput-notchedOutline": {
+                    borderColor: "primary.main",
+                  },
+                },
+              }}
+            />
+
+            <Button
+              type="submit"
+              variant="contained"
+              fullWidth
+              size="large"
+              startIcon={<LoginIcon />}
+              sx={{
+                mt: 2,
+                py: 1.5,
+                fontWeight: "bold",
+                fontSize: "1.1rem",
+                boxShadow: "0 4px 14px rgba(37, 99, 235, 0.2)",
+              }}
+            >
+              התחבר
+            </Button>
+
+            <Stack direction="row" spacing={1} sx={{ mt: 2 }}>
+              <Typography variant="body2" color="text.secondary">
+                אין לך חשבון?
+              </Typography>
+              <Link href="/register-admin&business" underline="hover" fontWeight="medium">
+                הירשם כמנהל
+              </Link>
+            </Stack>
+
+            {errors.length > 0 && (
+              <Box sx={{ width: "100%", mt: 2 }}>
+                {errors.map((error, index) => (
+                  <Alert
+                    key={index}
+                    severity="error"
+                    sx={{ mb: 1, borderRadius: 2, boxShadow: "0 2px 10px rgba(239, 68, 68, 0.1)" }}
+                  >
+                    {error}
+                  </Alert>
+                ))}
+              </Box>
+            )}
+          </Box>
+        </Paper>
+      </Container>
     </CenteredLayout>
   )
 }

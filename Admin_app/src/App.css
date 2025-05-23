@@ -10,6 +10,8 @@ body {
   justify-content: center;
   align-items: center;
   width: 100%;
+  /* height: 100vh; */
+  /* overflow: hidden; */
 }
 
 a {
@@ -55,4 +57,20 @@ a {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #3f51b5;
+}
+
+html:lang(he),
+body:lang(he) {
+  direction: rtl;
+  text-align: right;
+}
+
+.ltr,
+.lang_dir:lang(en) {
+  direction: ltr !important;
+}
+
+.rtl,
+.lang_dir:lang(he) {
+  direction: rtl !important;
 }
