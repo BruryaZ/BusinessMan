@@ -15,27 +15,9 @@ namespace BusinessMan.Data
     public class DataContext : DbContext
     {
         public DataContext(DbContextOptions<DataContext> options) : base(options) { }
-        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        //{
-        //    // User Id=postgres.jzhpcydzzjymiujlfaxt;Password=[YOUR-PASSWORD];Server=aws-0-eu-central-1.pooler.supabase.com;Port=6543;Database=postgres
-        //    // render : optionsBuilder.UseNpgsql("Host=dpg-cvc7k5an91rc73cbo3dg-a;Database=businessman;Username=businessman_user;Password=hzVdhB3mXwqV6vZlOsWulAjFNlo0gYHa");
-        //    // supabase : optionsBuilder.UseNpgsql("Host=db.jzhpcydzzjymiujlfaxt.supabase.co;Database=postgres;Username=postgres;Password=b214958522");
-        //    optionsBuilder.UseNpgsql("User Id=postgres.jzhpcydzzjymiujlfaxt;Password=b214958522;Server=aws-0-eu-central-1.pooler.supabase.com;Port=6543;Database=postgres");
-        //    optionsBuilder.LogTo(message => Debug.WriteLine(message));
-        //}
-
-        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        //{
-
-        //    optionsBuilder.UseSqlServer(@"Server=(localdb)\MSSQLLocalDB;Database=businessman_db");
-        //}
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            //    if (!optionsBuilder.IsConfigured)
-            //    {
-            //        optionsBuilder.UseNpgsql("User Id=postgres.fxmuilefdjrimtcujyfu;Password=b214958522;Server=aws-0-eu-central-1.pooler.supabase.com;Port=6543;Database=postgres");
-            //    }
         }
 
         public DbSet<User> Users { get; set; }
@@ -44,16 +26,6 @@ namespace BusinessMan.Data
         public DbSet<Example> Examples { get; set; }
         public DbSet<FileDto> Files { get; set; }
         public DbSet<Email> EmailList { get; set; }
-
-        //protected override void OnModelCreating(ModelBuilder modelBuilder)
-        //{
-        //    // הגדרת שמות הטבלאות באות קטנה
-        //    modelBuilder.Entity<User>().ToTable("users");
-        //    modelBuilder.Entity<Invoice>().ToTable("invoices");
-        //    modelBuilder.Entity<Business>().ToTable("businesses");
-        //    modelBuilder.Entity<Example>().ToTable("examples");
-        //    modelBuilder.Entity<FileDto>().ToTable("uploaded_files");
-        //}
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // 🗃️ טבלאות
@@ -105,6 +77,13 @@ namespace BusinessMan.Data
                     .Property(prop)
                     .HasColumnType("decimal(18,2)");
             }
+            modelBuilder.Entity<Invoice>()
+    .Property(i => i.AmountDebit)
+    .HasColumnType("numeric(18,2)");
+
+            modelBuilder.Entity<Invoice>()
+                .Property(i => i.AmountCredit)
+                .HasColumnType("numeric(18,2)");
         }
 
         //        modelBuilder.Entity<User>().ToTable("users");

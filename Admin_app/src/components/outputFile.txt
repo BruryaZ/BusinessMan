@@ -1,3 +1,4 @@
+//Brurya
 "use client"
 
 import { useState } from "react"
@@ -43,6 +44,7 @@ import { prefixer } from "stylis"
 import rtlPlugin from "stylis-plugin-rtl"
 import { CacheProvider } from "@emotion/react"
 import createCache from "@emotion/cache"
+import './App.css'
 
 // Components
 import GlobalContext from "./context/GlobalContext"
@@ -352,10 +354,9 @@ function ResponsiveDrawer() {
               selected={location.pathname === item.path}
               onClick={() => isMobile && setMobileOpen(false)}
             >
-              <ListItemIcon sx={{ minWidth: 40, color: location.pathname === item.path ? "primary.main" : "inherit" }}>
+              <ListItemText primary={item.text} /> <ListItemIcon sx={{padding:1.2, minWidth: 36, color: location.pathname === item.path ? "primary.main" : "inherit" }}>
                 {item.icon}
               </ListItemIcon>
-              <ListItemText primary={item.text} />
             </ListItemButton>
           </ListItem>
         ))}
@@ -370,7 +371,20 @@ function ResponsiveDrawer() {
 
   return (
     <Box sx={{ display: "flex", minHeight: "100vh" }}>
-      <AppBar position="fixed" color="inherit" open={open && !isMobile}>
+      <AppBar
+        position="fixed"
+        color="inherit"
+        sx={{
+          ...(open && !isMobile && {
+            marginLeft: drawerWidth,
+            width: `calc(100% - ${drawerWidth}px)`,
+            transition: theme.transitions.create(["width", "margin"], {
+              easing: theme.transitions.easing.sharp,
+              duration: theme.transitions.duration.enteringScreen,
+            }),
+          }),
+        }}
+      >
         <Toolbar>
           <IconButton
             color="inherit"
@@ -401,6 +415,10 @@ function ResponsiveDrawer() {
                   mx: 0.5,
                   py: 1,
                   fontWeight: location.pathname === item.path ? 600 : 500,
+                  "& .MuiButton-startIcon": {
+                    marginLeft: 1.5,
+                    marginRight: -0.5,
+                  },
                 }}
               >
                 {item.text}
@@ -536,8 +554,6 @@ function App() {
 
 export default App
 
-//Brurya
-
 "use client"
 
 import type React from "react"
@@ -668,7 +684,7 @@ const AdmineLogin = () => {
               onChange={handleChange}
               InputProps={{
                 startAdornment: (
-                  <InputAdornment position="start">
+                  <InputAdornment position="start" sx={{ mr: 1.5 }}>
                     <Email color="primary" />
                   </InputAdornment>
                 ),
@@ -693,7 +709,7 @@ const AdmineLogin = () => {
               onChange={handleChange}
               InputProps={{
                 startAdornment: (
-                  <InputAdornment position="start">
+                  <InputAdornment position="start" sx={{ mr: 1.5 }}>
                     <Lock color="primary" />
                   </InputAdornment>
                 ),
@@ -1920,7 +1936,7 @@ const Home = () => {
   ]
 
   return (
-    <Box sx={{ py: 4 }}>
+    <Box sx={{ py: 4, textAlign: "right" }}>
       {/* Hero Section */}
       <Paper
         elevation={0}
@@ -1997,10 +2013,10 @@ const Home = () => {
                 </Button>
               </Stack>
             </Grid>
-            <Grid item xs={12} md={5} {...({} as any)} sx={{ display: { xs: "none", md: "block" } }}>
+            <Grid item xs={12} md={5} sx={{ display: { xs: "none", md: "block" } }} {...({} as any)}>
               <Box
                 component="img"
-                src="/placeholder.svg?height=300&width=300"
+                src="/placeholder.svg?height=300&width=400"
                 alt="Business Dashboard"
                 sx={{
                   width: "100%",
@@ -2016,7 +2032,7 @@ const Home = () => {
       </Paper>
 
       {/* Stats Section */}
-      <Container maxWidth="lg" sx={{ mb: 6 }}>
+      <Container maxWidth="lg" sx={{ mb: 6, display: "flex", flexDirection: "column", alignItems: "center" }}>
         <Grid container spacing={3}>
           <Grid item xs={12} sm={6} md={3} {...({} as any)}>
             <Paper
@@ -2241,7 +2257,7 @@ const Home = () => {
       </Container>
 
       {/* Quick Actions */}
-      <Container maxWidth="lg" sx={{ mb: 6 }}>
+      <Container maxWidth="lg" sx={{ mb: 6, display: "flex", flexDirection: "column", alignItems: "center" }}>
         <Typography variant="h5" component="h2" fontWeight="bold" gutterBottom sx={{ mb: 3 }}>
           פעולות מהירות
         </Typography>
@@ -2271,9 +2287,9 @@ const Home = () => {
       </Container>
 
       {/* Main Menu Cards */}
-      <Container maxWidth="lg">
+      <Container maxWidth="lg" sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
         <Box sx={{ mb: 4 }}>
-          <Typography variant="h5" component="h2" fontWeight="bold" gutterBottom>
+          <Typography textAlign={"right"} variant="h5" component="h2" fontWeight="bold" gutterBottom>
             ניהול העסק שלך
           </Typography>
           <Typography variant="body1" color="text.secondary">
@@ -2281,7 +2297,7 @@ const Home = () => {
           </Typography>
         </Box>
 
-        <Grid container spacing={3}>
+        <Grid container spacing={3} sx={{ direction: "rtl" }} >
           {menuItems.map((item, index) => (
             <Grid item xs={12} sm={6} md={3} key={index} {...({} as any)}>
               <Card
@@ -2347,10 +2363,10 @@ const Home = () => {
           <Grid container spacing={3} alignItems="center">
             <Grid item xs={12} md={8} {...({} as any)}>
               <Typography variant="h6" fontWeight="bold" gutterBottom color="primary.dark">
-                "מערכת BusinessMan שינתה את הדרך שבה אני מנהל את העסק שלי. הכל נגיש, פשוט ויעיל."
+                ".שינתה את הדרך שבה אני מנהל את העסק שלי. הכל נגיש ויעיל BusinessMan מערכת"
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                יוסי כהן, בעלים של "טכנולוגיות מתקדמות בע״מ"
+                יוסי כהן, בעלים של "טכנולוגיות מתקדמות" בע״מ
               </Typography>
             </Grid>
             <Grid item xs={12} md={4} sx={{ textAlign: "center" }} {...({} as any)}>
@@ -2373,7 +2389,7 @@ const Home = () => {
       {/* Footer */}
       <Box sx={{ mt: 8, py: 4 }}>
         <Divider sx={{ mb: 4 }} />
-        <Container>
+        <Container sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
           <Grid container spacing={2} justifyContent="space-between" alignItems="center">
             <Grid item {...({} as any)}>
               <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -2490,7 +2506,7 @@ const IncomAndExpennses = () => {
   ]
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
+    <Container maxWidth="lg" sx={{ py: 4, textAlign: "right" }}>
       <Paper
         elevation={0}
         sx={{
@@ -2558,6 +2574,7 @@ const IncomAndExpennses = () => {
                         color: `${item.color}.main`,
                         p: 1,
                         borderRadius: "50%",
+                        mr: 2,
                       }}
                     >
                       {item.icon}
@@ -2651,7 +2668,7 @@ const IncomAndExpennses = () => {
                 />
               </Box>
             </Grid>
-            <Grid item xs={12} md={6} {...({} as any)}>
+            <Grid item xs={12} md={6} {...({} as any)}> 
               <Box
                 sx={{
                   p: 3,
@@ -3815,7 +3832,7 @@ const UserLogin = () => {
   }
 
   return (
-    <Container maxWidth="sm" sx={{ py: 6 }}>
+    <Container maxWidth="sm" sx={{ py: 6, display: "flex", justifyContent: "center" }}>
       <Paper
         elevation={0}
         sx={{
@@ -3869,7 +3886,7 @@ const UserLogin = () => {
             onChange={handleChange}
             InputProps={{
               startAdornment: (
-                <InputAdornment position="start">
+                <InputAdornment position="start" sx={{ mr: 1.5 }}>
                   <Email color="primary" />
                 </InputAdornment>
               ),
@@ -3894,7 +3911,7 @@ const UserLogin = () => {
             onChange={handleChange}
             InputProps={{
               startAdornment: (
-                <InputAdornment position="start">
+                <InputAdornment position="start" sx={{ mr: 1.5 }}>
                   <Lock color="primary" />
                 </InputAdornment>
               ),
@@ -4241,7 +4258,7 @@ const UserRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => 
   }
 
   return (
-    <Container maxWidth="md" sx={{ py: 4 }}>
+    <Container maxWidth="md" sx={{ py: 4, textAlign: "right" }}>
       <Paper
         elevation={0}
         sx={{
@@ -4299,7 +4316,7 @@ const UserRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => 
                 variant="outlined"
                 InputProps={{
                   startAdornment: (
-                    <InputAdornment position="start">
+                    <InputAdornment position="start" sx={{ mr: 1.5 }}>
                       <Person color="primary" />
                     </InputAdornment>
                   ),
@@ -4311,7 +4328,7 @@ const UserRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => 
                 }}
               />
             </Grid>
-            <Grid item xs={12} md={6}{...({} as any)}>
+            <Grid item xs={12} md={6} {...({} as any)}>
               <TextField
                 fullWidth
                 label="שם משפחה"
@@ -4321,7 +4338,7 @@ const UserRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => 
                 variant="outlined"
                 InputProps={{
                   startAdornment: (
-                    <InputAdornment position="start">
+                    <InputAdornment position="start" sx={{ mr: 1.5 }}>
                       <Person color="primary" />
                     </InputAdornment>
                   ),
@@ -4343,7 +4360,7 @@ const UserRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => 
                 variant="outlined"
                 InputProps={{
                   startAdornment: (
-                    <InputAdornment position="start">
+                    <InputAdornment position="start" sx={{ mr: 1.5 }}>
                       <Phone color="primary" />
                     </InputAdornment>
                   ),
@@ -4365,7 +4382,7 @@ const UserRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => 
                 variant="outlined"
                 InputProps={{
                   startAdornment: (
-                    <InputAdornment position="start">
+                    <InputAdornment position="start" sx={{ mr: 1.5 }}>
                       <Badge color="primary" />
                     </InputAdornment>
                   ),
@@ -4388,7 +4405,7 @@ const UserRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => 
                 variant="outlined"
                 InputProps={{
                   startAdornment: (
-                    <InputAdornment position="start">
+                    <InputAdornment position="start" sx={{ mr: 1.5 }}>
                       <Email color="primary" />
                     </InputAdornment>
                   ),
@@ -4400,7 +4417,7 @@ const UserRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => 
                 }}
               />
             </Grid>
-            <Grid item xs={12} md={6}{...({} as any)}>
+            <Grid item xs={12} md={6} {...({} as any)}>
               <TextField
                 fullWidth
                 label="סיסמא"
@@ -4411,7 +4428,7 @@ const UserRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => 
                 variant="outlined"
                 InputProps={{
                   startAdornment: (
-                    <InputAdornment position="start">
+                    <InputAdornment position="start" sx={{ mr: 1.5 }}>
                       <Lock color="primary" />
                     </InputAdornment>
                   ),
@@ -4423,7 +4440,7 @@ const UserRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => 
                 }}
               />
             </Grid>
-            <Grid item xs={12} md={6}{...({} as any)}>
+            <Grid item xs={12} md={6} {...({} as any)}>
               <TextField
                 fullWidth
                 label="תפקיד"
@@ -4434,7 +4451,7 @@ const UserRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => 
                 variant="outlined"
                 InputProps={{
                   startAdornment: (
-                    <InputAdornment position="start">
+                    <InputAdornment position="start" sx={{ mr: 1.5 }}>
                       <Work color="primary" />
                     </InputAdornment>
                   ),

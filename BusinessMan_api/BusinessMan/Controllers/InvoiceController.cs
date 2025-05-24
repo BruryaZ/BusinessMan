@@ -2,6 +2,7 @@
 using BusinessMan.Core.DTO_s;
 using BusinessMan.Core.Models;
 using BusinessMan.Core.Services;
+using BusinessMan.Service;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OpenAI.Interfaces;
@@ -12,10 +13,10 @@ namespace BusinessMan.API.Controllers
     [ApiController]
     public class InvoiceController : Controller
     {
-        private readonly IService<Invoice> _allInvoices;
+        private readonly IInvoiceService _allInvoices;
         private readonly IMapper _mapper;
 
-        public InvoiceController(IService<Invoice> invoices, IMapper mapper )
+        public InvoiceController(IInvoiceService invoices, IMapper mapper )
         {
             _allInvoices = invoices;
             _mapper = mapper;
@@ -78,19 +79,15 @@ namespace BusinessMan.API.Controllers
 
         // קבלת קבצים של משתמש מסוים
         [HttpGet("my-files")]
-        public async Task<IActionResult> GetMyFiles()
+        public async Task<ActionResult<IEnumerable<InvoiceDto>>> GetMyFiles()
         {
             var userIdClaim = User?.FindFirst("user_id")?.Value;
             if (string.IsNullOrEmpty(userIdClaim))
                 return Unauthorized("המשתמש לא מזוהה.");
 
             int userId = int.Parse(userIdClaim);
-
-            var allFiles = await _allInvoices.GetListAsync();
-            var myFiles = allFiles.Where(f => f.UserId == userId); 
-
-            var dto = _mapper.Map<IEnumerable<InvoiceDto>>(myFiles);
-            return Ok(dto);
+            var myFiles = await _allInvoices.GetMyFiles(userId);
+            return Ok(myFiles);
         }
     }
 }

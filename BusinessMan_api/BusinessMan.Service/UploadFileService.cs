@@ -23,13 +23,15 @@ namespace BusinessMan.Service
         private readonly IRepositoryManager _repositoryManager;
         private readonly IConfiguration _configuration;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IInvoiceService _invoiceService;
 
-        public FileUploadService(IRepositoryManager repositoryManager, ReadFileContent readFileContent, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
+        public FileUploadService(IRepositoryManager repositoryManager, ReadFileContent readFileContent, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, IInvoiceService invoiceService)
         {
             _repositoryManager = repositoryManager;
             this.readFileContent = readFileContent;
             _configuration = configuration;
             _httpContextAccessor = httpContextAccessor;
+            _invoiceService = invoiceService;
         }
 
         public async Task<FileDto?> GetByIdAsync(int id)
@@ -67,7 +69,7 @@ namespace BusinessMan.Service
             Console.WriteLine("***********The result is: " + invoiceToAdd);
 
             await _repositoryManager.Files.AddAsync(fileUpload);
-            await _repositoryManager.Invoice.AddAsync(invoiceToAdd);
+            await _invoiceService.AddAsync(invoiceToAdd);
             await _repositoryManager.SaveAsync();
 
             return fileUpload;

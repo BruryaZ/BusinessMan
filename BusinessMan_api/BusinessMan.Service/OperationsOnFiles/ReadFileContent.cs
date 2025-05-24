@@ -161,13 +161,11 @@ namespace BusinessMan.Service.OperationsOnFiles
                 ApiKey = apiKey
             });
 
-            // שימי כאן את הטקסט של החשבונית ששלפת מ-PDF
             string invoiceText = await ReadFileContent.Read(file);
 
             var result = await service.ChatCompletion.CreateCompletion(new ChatCompletionCreateRequest
             {
                 Model = Models.Gpt_4o_mini,
-                //Model = Models.Gpt_3_5_Turbo,
                 Messages = new List<ChatMessage>
     {
         ChatMessage.FromSystem("אתה עוזר לנתח חשבוניות ולהחזיר תוצאה כ־JSON לפי מבנה קבוע."),
@@ -178,8 +176,8 @@ namespace BusinessMan.Service.OperationsOnFiles
 
 החזר לי JSON מתאים למחלקה C# בשם Invoice. הנה מבנה המחלקה:
 {{
-  ""AmountDebit"": ""<סכום החובה>"",
-  ""AmountCredit"": ""<סכום הזכות>"",
+  ""AmountDebit"": <סכום החובה>,
+  ""AmountCredit"": <סכום הזכות>,
   ""InvoiceDate"": ""<תאריך החשבונית>"",
   ""Status"": 1,
   ""Notes"": ""נותח ע״י GPT"",
