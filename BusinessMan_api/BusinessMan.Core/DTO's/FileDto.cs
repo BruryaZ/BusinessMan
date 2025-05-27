@@ -20,5 +20,6 @@ namespace BusinessMan.Core.DTO_s
         public long Size { get; set; } // גודל הקובץ בבתים
         public int UserId { get; set; }
         public DateTime UploadDate { get; set; } = DateTime.UtcNow;// תאריך העלאת הקובץ
+        public int BusinessId { get; set; }
     }
 }

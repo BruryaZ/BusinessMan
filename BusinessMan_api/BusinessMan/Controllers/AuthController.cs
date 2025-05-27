@@ -55,7 +55,7 @@ namespace BusinessMan.API.Controllers
             Response.Cookies.Append("jwt", token, new CookieOptions
             {
                 HttpOnly = true,
-                Secure = true,
+                Secure = false,
                 SameSite = SameSiteMode.Strict,
                 Expires = DateTimeOffset.UtcNow.AddDays(1)
             });
@@ -73,7 +73,6 @@ namespace BusinessMan.API.Controllers
                 }
             });
         }
-
 
         [HttpPost("user-register")]// רישום משתמש רגיל
         public async Task<ActionResult<UserDto>> RegisterAsync([FromBody] UserPostModel user)

@@ -47,7 +47,7 @@ const IncomAndExpennses = () => {
     setError(null)
 
     const invoiceToSend: InvoiceDto = {
-      id: globalContextDetails.user.id,
+      id: 0,
       amountDebit: expenditure,
       amountCredit: income,
       invoiceDate: new Date(),

@@ -12,21 +12,24 @@ namespace BusinessMan.API.Middlwares
         {
             _next = next;
         }
-
         public async Task Invoke(HttpContext context, IUserService userService)
         {
-      
+            // קודם מנסה דרך Authorization Header
             var token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+
+            // אם לא נמצא, מנסה דרך Cookie
+            if (string.IsNullOrEmpty(token))
+            {
+                token = context.Request.Cookies["jwt"];
+            }
+
             Console.WriteLine($"Token: {token}");
 
             if (!string.IsNullOrEmpty(token))
             {
+                // אם המערכת של JwtBearer פועלת, Claims כבר קיימים כאן
                 var userIdClaim = context.User.FindFirst("user_id");
                 var businessIdClaim = context.User.FindFirst("business_id");
-
-                //Console.WriteLine($"UserIdClaim: {userIdClaim?.Value}");
-                //Console.WriteLine($"BusinessIdClaim: {businessIdClaim?.Value}");
-                //Console.WriteLine($"IsAuthenticated: {context.User.Identity?.IsAuthenticated}");
 
                 if (userIdClaim != null && int.TryParse(userIdClaim.Value, out int userId))
                 {
@@ -40,10 +43,14 @@ namespace BusinessMan.API.Middlwares
 
                     context.Items["CurrentUser"] = user;
                 }
+                else
+                {
+                    Console.WriteLine("Token found but claims are missing or invalid.");
+                }
             }
             else
             {
-                Console.WriteLine("No token found.");
+                Console.WriteLine("No token found in header or cookie.");
             }
 
             await _next(context);

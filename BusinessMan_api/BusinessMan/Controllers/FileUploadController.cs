@@ -21,14 +21,16 @@ namespace BusinessMan.API.Controllers
         private readonly IAmazonS3 _s3Client;
         private readonly string _bucketName;
         private readonly IConfiguration _configuration;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public FileUploadController(IService<FileDto> fileService, IMapper mapper, IAmazonS3 amazonS3, IConfiguration configuration)
+        public FileUploadController(IService<FileDto> fileService, IMapper mapper, IAmazonS3 amazonS3, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
         {
             _fileService = fileService;
             _mapper = mapper;
             _s3Client = amazonS3;
             _configuration = configuration;
             _bucketName = configuration["AWS:BucketName"] ?? throw new ArgumentNullException("AWS:BucketName");
+            _httpContextAccessor = httpContextAccessor;
         }
 
         // GET: api/<FileUploadController>
@@ -89,14 +91,17 @@ namespace BusinessMan.API.Controllers
 
                 string fileUrl = $"https://{_bucketName}.s3.{_s3Client.Config.RegionEndpoint.SystemName}.amazonaws.com/{key}";
 
+                var user = _httpContextAccessor.HttpContext.Items["CurrentUser"] as User;
+
                 var fileDto = new FileDto
                 {
                     FileName = $"{fileName}{fileExtension}",
                     Size = fileUpload.Length,
                     UploadDate = DateTime.UtcNow,
                     FilePath = fileUrl,
+                    BusinessId = user.BusinessId ?? 0,
                     FileContent = fileUpload,
-                    UserId = int.Parse(User.FindFirst("user_id")?.Value ?? "0") // הנחתי שהמשתמש מחובר
+                    UserId = user.Id,
                 };
 
                 var createdFile = await _fileService.AddAsync(fileDto);
