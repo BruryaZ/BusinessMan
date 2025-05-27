@@ -535,7 +535,7 @@ function ResponsiveDrawer() {
 }
 
 function App() {
-  // axios.defaults.withCredentials = true // הטוקן יישלח בכל קריאת אקסיוס
+  axios.defaults.withCredentials = true // הטוקן יישלח בכל קריאת אקסיוס
 
   return (
     <CacheProvider value={cacheRtl}>
