@@ -101,10 +101,11 @@ const BusinessAndAdmin = () => {
       console.log("updateAdmin ", updateAdmin)
       console.log("updateBusiness ", updateBusiness)
 
-      await axios.put<UserDto>(`${url}/api/User/${globalContextDetails.user.id}`, updateAdmin)
+      await axios.put<UserDto>(`${url}/api/User/${globalContextDetails.user.id}`, updateAdmin, { withCredentials: true })
       await axios.put<BusinessResponsePutModel>(
         `${url}/api/Business/${globalContextDetails.business_global.id}`,
         updateBusiness,
+        { withCredentials: true }
       )
 
       globalContextDetails.setBusinessGlobal(updateBusiness)

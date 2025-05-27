@@ -63,7 +63,7 @@ const IncomAndExpennses = () => {
     }
 
     try {
-      await axios.post("https://localhost:7031/api/Invoice", invoiceToSend)
+      await axios.post("https://localhost:7031/api/Invoice", invoiceToSend, { withCredentials: true })
       setSuccess(true)
       setIncome(0)
       setExpenditure(0)

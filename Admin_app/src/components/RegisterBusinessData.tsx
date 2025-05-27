@@ -121,7 +121,7 @@ const RegisterBusinessData = ({ onSubmitSuccess }: { onSubmitSuccess?: () => voi
         setErrors([])
         if (valid) {
           try {
-            const { data } = await axios.post<BusinessPostModel>(`${url}/api/Business`, businessDetails)
+            const { data } = await axios.post<BusinessPostModel>(`${url}/api/Business`, businessDetails, { withCredentials: true })
             console.log("The data", data)
             globalContextDetails.setBusinessGlobal(convertToBusiness(data))
             console.log("globalContextDetails.business_global", globalContextDetails.business_global)

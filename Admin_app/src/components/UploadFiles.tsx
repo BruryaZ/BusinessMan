@@ -101,6 +101,7 @@ const UploadFiles = () => {
 
       const response = await axios.post(`${url}/FileUpload/upload`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
+        withCredentials: true,
       })
 
       clearInterval(progressInterval)

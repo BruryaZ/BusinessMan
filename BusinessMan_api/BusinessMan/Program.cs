@@ -190,11 +190,11 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 
+app.UseAuthorization();
+
 // My middlwares:
 //app.UseAdminOnly(); // TODO
 app.UseUserContext();
-
-app.UseAuthorization();
 
 app.MapControllers();
 

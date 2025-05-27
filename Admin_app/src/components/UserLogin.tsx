@@ -42,7 +42,7 @@ const UserLogin = () => {
 
         if (valid) {
           try {
-            const { data } = await axios.post<any>(`${url}/Auth/user-login`, userLogin) // TODO
+            const { data } = await axios.post<any>(`${url}/Auth/user-login`, userLogin, { withCredentials: true }) // TODO
             setUser(data.user)
             nav("/")
           } catch (e) {

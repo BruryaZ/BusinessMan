@@ -61,7 +61,7 @@ const UserRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => 
         setErrors([])
         if (valid) {
           try {
-            const { data } = await axios.post<UserPostModel>(`${url}/Auth/user-register`, userRegister)
+            const { data } = await axios.post<UserPostModel>(`${url}/Auth/user-register`, userRegister, { withCredentials: true })
             setUser(convertToUser(data))
 
             if (onSubmitSuccess) onSubmitSuccess()

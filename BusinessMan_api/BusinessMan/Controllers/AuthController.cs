@@ -56,7 +56,7 @@ namespace BusinessMan.API.Controllers
             {
                 HttpOnly = true,
                 Secure = false,
-                SameSite = SameSiteMode.Strict,
+                SameSite = SameSiteMode.None,
                 Expires = DateTimeOffset.UtcNow.AddDays(1)
             });
 
@@ -188,8 +188,8 @@ namespace BusinessMan.API.Controllers
             {
                 HttpOnly = true,
                 Secure = true,
-                SameSite = SameSiteMode.Strict,
-                Expires = DateTimeOffset.UtcNow.AddDays(1)
+                SameSite = SameSiteMode.None,
+                Expires = DateTimeOffset.UtcNow.AddDays(7)
             });
 
             return Ok(new
