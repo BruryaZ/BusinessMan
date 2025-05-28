@@ -62,7 +62,7 @@ const BusinessAndAdmin = () => {
   const [isBusiness, setIsBusiness] = useState(false)
   const [isAdmin, setIsAdmin] = useState(false)
   const [businessDone, setBusinessDone] = useState(false)
-  const [adminDone, setAdminDone] = useState(false)
+  const [adminDone] = useState(false)
   const [activeStep, setActiveStep] = useState(0)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
@@ -116,11 +116,6 @@ const BusinessAndAdmin = () => {
       console.log(e)
       setError("אירעה שגיאה בעדכון הנתונים. אנא נסה שנית.")
     }
-  }
-
-  const handleAdminSuccess = () => {
-    setAdminDone(true)
-    setActiveStep((prevStep) => Math.max(prevStep, 1))
   }
 
   const handleBusinessSuccess = () => {
