@@ -1,6 +1,6 @@
 "use client"
 import axios from "axios"
-import { useContext, useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import type { InvoiceDto } from "../models/InvoiceDto"
 import { globalContext } from "../context/GlobalContext"
 import {
@@ -16,6 +16,7 @@ import {
   ConfigProvider,
   Divider,
   Avatar,
+  Spin,
 } from "antd"
 import {
   DollarOutlined,
@@ -36,7 +37,60 @@ const IncomAndExpennses = () => {
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [summaryLoading, setSummaryLoading] = useState(true)
+  const [financialSummary, setFinancialSummary] = useState<any[]>([])
+
   const globalContextDetails = useContext(globalContext)
+
+  const fetchSummaryData = async () => {
+    const businessId = globalContextDetails.user.businessId
+    const now = new Date()
+    const year = now.getFullYear()
+    const month = now.getMonth() + 1
+
+    try {
+      const response = await axios.get(`https://localhost:7031/api/Reports/monthly?businessId=${businessId}&year=${year}&month=${month}`, {
+        withCredentials: true,
+      })
+
+      const data = response.data
+
+      const summary = [
+        {
+          title: "הכנסות החודש",
+          amount: data.currentMonthIncome,
+          change: data.incomeChangePercent,
+          icon: <WarningOutlined />,
+          color: "#52c41a",
+        },
+        {
+          title: "הוצאות החודש",
+          amount: data.currentMonthExpenses,
+          change: data.expensesChangePercent,
+          icon: <DingdingOutlined />,
+          color: "#ff4d4f",
+        },
+        {
+          title: "רווח נקי",
+          amount: data.currentMonthNetProfit,
+          change: data.netProfitChangePercent,
+          icon: <BarChartOutlined />,
+          color: "#1890ff",
+        },
+      ]
+
+      setFinancialSummary(summary)
+    } catch (err) {
+      console.error("Failed to fetch financial summary", err)
+      setError("שגיאה בטעינת סיכום פיננסי.")
+    } finally {
+      setSummaryLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchSummaryData()
+  }, [])
 
   const handleSubmit = async () => {
     setLoading(true)
@@ -64,6 +118,7 @@ const IncomAndExpennses = () => {
       setSuccess(true)
       setIncome(0)
       setExpenditure(0)
+      fetchSummaryData() // טען מחדש את הסיכום אחרי שמירת תנועה
     } catch (error) {
       console.error("Error saving invoice:", error)
       setError("אירעה שגיאה בשמירת הנתונים. אנא נסה שנית.")
@@ -79,34 +134,9 @@ const IncomAndExpennses = () => {
     setError(null)
   }
 
-  // Sample data for the financial summary
-  const financialSummary = [
-    {
-      title: "הכנסות החודש",
-      amount: 15750,
-      change: 12,
-      icon: <WarningOutlined />,
-      color: "#52c41a",
-    },
-    {
-      title: "הוצאות החודש",
-      amount: 8320,
-      change: -5,
-      icon: <DingdingOutlined />,
-      color: "#ff4d4f",
-    },
-    {
-      title: "רווח נקי",
-      amount: 7430,
-      change: 18,
-      icon: <BarChartOutlined />,
-      color: "#1890ff",
-    },
-  ]
-
   return (
     <ConfigProvider direction="rtl">
-      <div style={{ padding: "0 0 40px 0" , marginTop: "80vh"}}>
+      <div style={{ padding: "0 0 40px 0", marginTop: "80vh" }}>
         <Card className="form-section" style={{ marginBottom: 32 }}>
           <div style={{ textAlign: "center", marginBottom: 32 }}>
             <Avatar
@@ -132,52 +162,46 @@ const IncomAndExpennses = () => {
           </div>
 
           {/* Financial Summary */}
-          <Row gutter={[24, 24]} style={{ marginBottom: 40 }}>
-            {financialSummary.map((item, index) => (
-              <Col xs={24} md={8} key={index}>
-                <Card className="financial-summary-card">
-                  <div
-                    style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}
-                  >
-                    <Title level={5} style={{ margin: 0, color: "#2d3748" }}>
-                      {item.title}
-                    </Title>
-                    <Avatar
-                      size={48}
-                      style={{
-                        background: `${item.color}20`,
-                        color: item.color,
-                      }}
-                    >
-                      {item.icon}
-                    </Avatar>
-                  </div>
-                  <Statistic
-                    value={item.amount}
-                    prefix="₪"
-                    valueStyle={{
-                      color: item.color,
-                      fontSize: "1.8rem",
-                      fontWeight: "bold",
-                    }}
-                  />
-                  <div style={{ display: "flex", alignItems: "center", marginTop: 8 }}>
-                    <Text
-                      style={{
-                        color: item.change > 0 ? "#52c41a" : "#ff4d4f",
-                        fontWeight: 600,
-                        marginLeft: 8,
-                      }}
-                    >
-                      {item.change > 0 ? "+" : ""}
-                      {item.change}%
-                    </Text>
-                    <Text type="secondary">מהחודש הקודם</Text>
-                  </div>
-                </Card>
-              </Col>
-            ))}
-          </Row>
+          {summaryLoading ? (
+            <div style={{ textAlign: "center", marginBottom: 40 }}>
+              <Spin size="large" />
+            </div>
+          ) : (
+            <Row gutter={[24, 24]} style={{ marginBottom: 40 }}>
+              {financialSummary.map((item, index) => (
+                <Col xs={24} md={8} key={index}>
+                  <Card className="financial-summary-card">
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+                      <Title level={5} style={{ margin: 0, color: "#2d3748" }}>
+                        {item.title}
+                      </Title>
+                      <Avatar size={48} style={{ background: `${item.color}20`, color: item.color }}>
+                        {item.icon}
+                      </Avatar>
+                    </div>
+                    <Statistic
+                      value={item.amount}
+                      prefix="₪"
+                      valueStyle={{ color: item.color, fontSize: "1.8rem", fontWeight: "bold" }}
+                    />
+                    <div style={{ display: "flex", alignItems: "center", marginTop: 8 }}>
+                      <Text
+                        style={{
+                          color: item.change > 0 ? "#52c41a" : "#ff4d4f",
+                          fontWeight: 600,
+                          marginLeft: 8,
+                        }}
+                      >
+                        {item.change > 0 ? "+" : ""}
+                        {item.change}%
+                      </Text>
+                      <Text type="secondary">מהחודש הקודם</Text>
+                    </div>
+                  </Card>
+                </Col>
+              ))}
+            </Row>
+          )}
 
           <Form layout="vertical" onFinish={handleSubmit}>
             <Title level={4} style={{ marginBottom: 24 }}>
@@ -188,13 +212,7 @@ const IncomAndExpennses = () => {
               <Col xs={24} md={12}>
                 <Card className="income-card" style={{ height: "100%" }}>
                   <div style={{ display: "flex", alignItems: "center", marginBottom: 20 }}>
-                    <Avatar
-                      style={{
-                        background: "#52c41a",
-                        color: "white",
-                        marginLeft: 12,
-                      }}
-                    >
+                    <Avatar style={{ background: "#52c41a", color: "white", marginLeft: 12 }}>
                       <DollarOutlined />
                     </Avatar>
                     <Title level={5} style={{ margin: 0, color: "#389e0d" }}>
@@ -219,13 +237,7 @@ const IncomAndExpennses = () => {
               <Col xs={24} md={12}>
                 <Card className="expense-card" style={{ height: "100%" }}>
                   <div style={{ display: "flex", alignItems: "center", marginBottom: 20 }}>
-                    <Avatar
-                      style={{
-                        background: "#ff4d4f",
-                        color: "white",
-                        marginLeft: 12,
-                      }}
-                    >
+                    <Avatar style={{ background: "#ff4d4f", color: "white", marginLeft: 12 }}>
                       <MinusCircleOutlined />
                     </Avatar>
                     <Title level={5} style={{ margin: 0, color: "#cf1322" }}>
@@ -257,11 +269,7 @@ const IncomAndExpennses = () => {
                   loading={loading}
                   icon={<SendOutlined />}
                   block
-                  style={{
-                    height: 48,
-                    fontWeight: 600,
-                    fontSize: 16,
-                  }}
+                  style={{ height: 48, fontWeight: 600, fontSize: 16 }}
                 >
                   שמור נתונים
                 </Button>
@@ -274,11 +282,7 @@ const IncomAndExpennses = () => {
                   onClick={handleReset}
                   icon={<ClearOutlined />}
                   block
-                  style={{
-                    height: 48,
-                    fontWeight: 600,
-                    borderWidth: 2,
-                  }}
+                  style={{ height: 48, fontWeight: 600, borderWidth: 2 }}
                 >
                   נקה טופס
                 </Button>
@@ -291,11 +295,7 @@ const IncomAndExpennses = () => {
                 description="התנועה הפיננסית נוספה למערכת בהצלחה."
                 type="success"
                 showIcon
-                style={{
-                  marginTop: 24,
-                  borderRadius: 8,
-                  border: "1px solid #b7eb8f",
-                }}
+                style={{ marginTop: 24, borderRadius: 8, border: "1px solid #b7eb8f" }}
               />
             )}
 
@@ -305,11 +305,7 @@ const IncomAndExpennses = () => {
                 description={error}
                 type="error"
                 showIcon
-                style={{
-                  marginTop: 24,
-                  borderRadius: 8,
-                  border: "1px solid #ffccc7",
-                }}
+                style={{ marginTop: 24, borderRadius: 8, border: "1px solid #ffccc7" }}
               />
             )}
           </Form>

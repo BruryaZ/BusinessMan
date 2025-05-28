@@ -73,5 +73,53 @@ namespace BusinessMan.Service
             var myInvoices = allInvoices.Where(i => i.UserId == userId);
             return _mapper.Map<IEnumerable<InvoiceDto>>(myInvoices);
         }
+        public async Task<MonthlyReportDto> GetMonthlyReportAsync(int businessId, int year, int month)
+        {
+            var currentMonthStart = new DateTime(year, month, 1);
+            var previousMonthStart = currentMonthStart.AddMonths(-1);
+            var currentMonthEnd = currentMonthStart.AddMonths(1);
+            var previousMonthEnd = previousMonthStart.AddMonths(1);
+
+            var allInvoices = await _repositoryManager.Invoice.GetAllAsync();
+
+            var currentMonthInvoices = allInvoices
+                .Where(i => i.BusinessId == businessId &&
+                            i.InvoiceDate >= currentMonthStart &&
+                            i.InvoiceDate < currentMonthEnd);
+
+            var previousMonthInvoices = allInvoices
+                .Where(i => i.BusinessId == businessId &&
+                            i.InvoiceDate >= previousMonthStart &&
+                            i.InvoiceDate < previousMonthEnd);
+
+            var currentMonthIncome = currentMonthInvoices.Sum(i => i.AmountCredit);
+            var currentMonthExpenses = currentMonthInvoices.Sum(i => i.AmountDebit);
+            var currentNetProfit = currentMonthIncome - currentMonthExpenses;
+
+            var previousMonthIncome = previousMonthInvoices.Sum(i => i.AmountCredit);
+            var previousMonthExpenses = previousMonthInvoices.Sum(i => i.AmountDebit);
+            var previousNetProfit = previousMonthIncome - previousMonthExpenses;
+
+            decimal CalcPercentChange(decimal current, decimal previous)
+            {
+                if (previous == 0) return current == 0 ? 0 : 100;
+                return ((current - previous) / previous) * 100;
+            }
+
+            return new MonthlyReportDto
+            {
+                CurrentMonthIncome = currentMonthIncome,
+                PreviousMonthIncome = previousMonthIncome,
+                IncomeChangePercent = CalcPercentChange(currentMonthIncome, previousMonthIncome),
+
+                CurrentMonthExpenses = currentMonthExpenses,
+                PreviousMonthExpenses = previousMonthExpenses,
+                ExpensesChangePercent = CalcPercentChange(currentMonthExpenses, previousMonthExpenses),
+
+                CurrentMonthNetProfit = currentNetProfit,
+                PreviousMonthNetProfit = previousNetProfit,
+                NetProfitChangePercent = CalcPercentChange(currentNetProfit, previousNetProfit)
+            };
+        }
     }
 }
