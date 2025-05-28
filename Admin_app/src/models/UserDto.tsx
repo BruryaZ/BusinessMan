@@ -1,5 +1,5 @@
 export interface UserDto {
-    id:number,
+    id: number,
     firstName: string; // שם פרטי
     lastName: string; // שם משפחה
     email: string; // אימייל

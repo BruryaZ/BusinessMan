@@ -132,6 +132,8 @@ const BusinessAndAdmin = () => {
 
   return (
     <ThemeProvider theme={theme}>
+      <div style={{ marginTop: "65vh" }}></div>
+
       <CssBaseline />
       <Container maxWidth="md" sx={{ py: 4 }}>
         <Paper
@@ -184,7 +186,7 @@ const BusinessAndAdmin = () => {
                     {isAdmin ? "סגור טופס רישום מנהל" : "רישום פרטי מנהל"}
                   </Button>
 
-                  {isAdmin && <AdminRegister onSubmitSuccess={handleAdminSuccess} />}
+                  {isAdmin && <AdminRegister />}
                 </Box>
 
                 <Box>

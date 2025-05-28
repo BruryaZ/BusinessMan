@@ -1,7 +1,7 @@
 "use client"
-import { useContext, useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import axios from "axios"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 import { validationSchemaUserRegister } from "../utils/validationSchema"
 import { globalContext } from "../context/GlobalContext"
 import { convertToUser } from "../utils/converToUser"
@@ -26,29 +26,49 @@ import {
   PhoneOutlined,
   IdcardOutlined,
   LockOutlined,
-  TeamOutlined,
-  UserAddOutlined,
+  EditOutlined,
   ArrowLeftOutlined,
 } from "@ant-design/icons"
+import { UserDto } from "../models/UserDto"
 
-const { Title, Text, Link } = Typography
+const { Title, Text } = Typography
 
-const UserRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => {
+const EditUserPage = () => {
+  const { id } = useParams()
   const nav = useNavigate()
   const validationSchema = validationSchemaUserRegister
   const [errors, setErrors] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
   const { setUser } = useContext(globalContext)
   const url = import.meta.env.VITE_API_URL
-  const [myUser, setMyUser] = useState<UserPostModel>({
+  const [myUser, setMyUser] = useState<UserDto>({
+    id: 0,
     firstName: "",
     lastName: "",
     email: "",
-    password: "",
     phone: "",
-    role: 0,
     idNumber: "",
+    password: "",
+    role: 0,
+    status: "", // Default value for status
+    lastLogin: new Date(), // Default value for lastLogin
+    createdAt: new Date(), // Default value for createdAt
+    updateAt: new Date(), // Default value for updateAt
+    businessId: 0, // Default value for businessId
   })
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const { data } = await axios.get<UserDto>(`${url}/api/User/${id}`, { withCredentials: true })
+        setMyUser(data)
+      } catch (e) {
+        setErrors(["שגיאה בטעינת נתוני המשתמש"])
+      }
+    }
+
+    if (id) fetchUser()
+  }, [id, url])
 
   const handleChange = (field: string, value: any) => {
     setMyUser((prev) => ({ ...prev, [field]: value }))
@@ -60,18 +80,18 @@ const UserRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => 
       const valid = await validationSchema.isValid(myUser)
       setErrors([])
 
-      if (valid) {
-        const { data } = await axios.post<UserPostModel>(`${url}/Auth/user-register`, myUser, { withCredentials: true })
+      if (valid && id) {
+        console.log(myUser);
+        
+        const { data } = await axios.put<UserPostModel>(`${url}/api/User/${id}`, myUser, { withCredentials: true })
         setUser(convertToUser(data))
-
-        if (onSubmitSuccess) onSubmitSuccess()
-        nav("/")
+        nav("/user-management")
       } else {
         setErrors(["נא למלא את כל השדות הנדרשים"])
       }
     } catch (e) {
       console.log(e)
-      setErrors(["שגיאה ברישום המשתמש"])
+      setErrors(["שגיאה בעדכון המשתמש"])
     } finally {
       setLoading(false)
     }
@@ -79,7 +99,7 @@ const UserRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => 
 
   return (
     <ConfigProvider direction="rtl">
-      <div style={{ padding: "40px 20px", maxWidth: 800, margin: "0 auto" , marginTop: "70vh"}}>
+      <div style={{ padding: "40px 20px", maxWidth: 800, margin: "0 auto", marginTop: "70vh" }}>
         <Card className="form-section">
           <div style={{ textAlign: "center", marginBottom: 32 }}>
             <Avatar
@@ -90,15 +110,15 @@ const UserRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => 
                 boxShadow: "0 4px 14px rgba(102, 126, 234, 0.3)",
               }}
             >
-              <UserAddOutlined style={{ fontSize: 40 }} />
+              <EditOutlined style={{ fontSize: 40 }} />
             </Avatar>
 
-            <Title level={2} style={{ marginBottom: 8, color: "#2d3748", textAlign:"center" }}>
-              הרשמת משתמש חדש
+            <Title level={2} style={{ marginBottom: 8, color: "#2d3748", textAlign: "center" }}>
+              עריכת משתמש
             </Title>
 
             <Text type="secondary" style={{ fontSize: 16 }}>
-              נא למלא את כל הפרטים הנדרשים
+              עדכן את פרטי המשתמש
             </Text>
 
             <Divider />
@@ -109,7 +129,7 @@ const UserRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => 
               <Col xs={24} md={12}>
                 <Form.Item label="שם פרטי" required>
                   <Input
-                    prefix={<UserOutlined style={{ color: "#667eea" }} />}
+                    prefix={<UserOutlined />}
                     placeholder="הזן שם פרטי"
                     size="large"
                     value={myUser.firstName}
@@ -120,7 +140,7 @@ const UserRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => 
               <Col xs={24} md={12}>
                 <Form.Item label="שם משפחה" required>
                   <Input
-                    prefix={<UserOutlined style={{ color: "#667eea" }} />}
+                    prefix={<UserOutlined />}
                     placeholder="הזן שם משפחה"
                     size="large"
                     value={myUser.lastName}
@@ -131,7 +151,7 @@ const UserRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => 
               <Col xs={24} md={12}>
                 <Form.Item label="טלפון" required>
                   <Input
-                    prefix={<PhoneOutlined style={{ color: "#667eea" }} />}
+                    prefix={<PhoneOutlined />}
                     placeholder="הזן מספר טלפון"
                     size="large"
                     value={myUser.phone}
@@ -142,7 +162,7 @@ const UserRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => 
               <Col xs={24} md={12}>
                 <Form.Item label="מספר תעודת זהות" required>
                   <Input
-                    prefix={<IdcardOutlined style={{ color: "#667eea" }} />}
+                    prefix={<IdcardOutlined />}
                     placeholder="הזן מספר תעודת זהות"
                     size="large"
                     value={myUser.idNumber}
@@ -153,7 +173,7 @@ const UserRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => 
               <Col xs={24}>
                 <Form.Item label="אימייל" required>
                   <Input
-                    prefix={<MailOutlined style={{ color: "#667eea" }} />}
+                    prefix={<MailOutlined />}
                     placeholder="הזן כתובת אימייל"
                     size="large"
                     type="email"
@@ -163,9 +183,9 @@ const UserRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => 
                 </Form.Item>
               </Col>
               <Col xs={24} md={12}>
-                <Form.Item label="סיסמא" required>
+                <Form.Item label="סיסמא (חדשה)" required>
                   <Input.Password
-                    prefix={<LockOutlined style={{ color: "#667eea" }} />}
+                    prefix={<LockOutlined />}
                     placeholder="הזן סיסמא"
                     size="large"
                     value={myUser.password}
@@ -176,7 +196,6 @@ const UserRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => 
               <Col xs={24} md={12}>
                 <Form.Item label="תפקיד" required>
                   <InputNumber
-                    prefix={<TeamOutlined style={{ color: "#667eea" }} />}
                     placeholder="הזן קוד תפקיד"
                     size="large"
                     style={{ width: "100%" }}
@@ -194,15 +213,11 @@ const UserRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => 
                   htmlType="submit"
                   size="large"
                   loading={loading}
-                  icon={<UserAddOutlined />}
+                  icon={<EditOutlined />}
                   block
-                  style={{
-                    height: 48,
-                    fontWeight: 600,
-                    fontSize: 16,
-                  }}
+                  style={{ height: 48, fontWeight: 600, fontSize: 16 }}
                 >
-                  הירשם
+                  עדכן משתמש
                 </Button>
               </Col>
               <Col xs={24} sm={12}>
@@ -210,27 +225,14 @@ const UserRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => 
                   type="default"
                   size="large"
                   icon={<ArrowLeftOutlined />}
-                  onClick={() => nav("/user-login")}
+                  onClick={() => nav(-1)}
                   block
-                  style={{
-                    height: 48,
-                    fontWeight: 600,
-                    borderWidth: 2,
-                  }}
+                  style={{ height: 48, fontWeight: 600, borderWidth: 2 }}
                 >
-                  חזרה לכניסה
+                  חזרה
                 </Button>
               </Col>
             </Row>
-
-            <div style={{ textAlign: "center", marginTop: 24 }}>
-              <Text type="secondary">
-                כבר יש לך חשבון?{" "}
-                <Link href="/user-login" style={{ fontWeight: 600 }}>
-                  התחבר כאן
-                </Link>
-              </Text>
-            </div>
 
             {errors.length > 0 && (
               <div style={{ marginTop: 16 }}>
@@ -252,4 +254,4 @@ const UserRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => 
   )
 }
 
-export default UserRegister
+export default EditUserPage

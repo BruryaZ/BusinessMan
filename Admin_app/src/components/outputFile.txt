@@ -1,54 +1,30 @@
-//Brurya
 "use client"
 
 import { useState } from "react"
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from "react-router-dom"
+import { Layout, Menu, Button, Typography, Avatar, Space, Drawer, ConfigProvider, theme as antTheme } from "antd"
 import {
-  Box,
-  CssBaseline,
-  Divider,
-  Drawer,
-  IconButton,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  Toolbar,
-  Typography,
-  Button,
-  Container,
-  ThemeProvider,
-  createTheme,
-  useMediaQuery,
-  AppBar as MuiAppBar,
-  styled,
-} from "@mui/material"
-import {
-  Menu as MenuIcon,
-  Home as HomeIcon,
-  Person,
-  AdminPanelSettings,
-  Upload,
-  Visibility,
-  Group,
-  Assessment,
-  AttachMoney,
-  Business,
-  BusinessCenter,
-  Login,
-  ChevronLeft,
-  Dashboard,
-} from "@mui/icons-material"
-import { prefixer } from "stylis"
-import rtlPlugin from "stylis-plugin-rtl"
-import { CacheProvider } from "@emotion/react"
-import createCache from "@emotion/cache"
-import './App.css'
+  MenuOutlined,
+  HomeOutlined,
+  UserAddOutlined,
+  LoginOutlined,
+  CrownOutlined,
+  UploadOutlined,
+  EyeOutlined,
+  TeamOutlined,
+  BarChartOutlined,
+  DollarOutlined,
+  ShopOutlined,
+  BankOutlined,
+  DashboardOutlined,
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
+} from "@ant-design/icons"
+import { useMediaQuery } from "react-responsive"
+import "./App.css"
 
 // Components
 import GlobalContext from "./context/GlobalContext"
-import axios from "axios"
 import UserLogin from "./components/UserLogin"
 import AdminLogin from "./components/AdminLogin"
 import AdminRoute from "./components/AdminRoute"
@@ -62,1017 +38,1145 @@ import Home from "./components/Home"
 import UploadFiles from "./components/UploadFiles"
 import DataViweing from "./components/DataViweing"
 
-// Create RTL cache
-const cacheRtl = createCache({
-  key: "muirtl",
-  stylisPlugins: [prefixer, rtlPlugin],
-})
-
-// Create a custom theme with RTL support and Hebrew font
-const theme = createTheme({
-  direction: "rtl",
-  typography: {
-    fontFamily: '"Assistant", "Rubik", "Heebo", sans-serif',
-    h1: {
-      fontWeight: 800,
-      fontSize: "2.5rem",
-    },
-    h2: {
-      fontWeight: 700,
-      fontSize: "2rem",
-    },
-    h3: {
-      fontWeight: 700,
-      fontSize: "1.75rem",
-    },
-    h4: {
-      fontWeight: 700,
-      fontSize: "1.5rem",
-    },
-    h5: {
-      fontWeight: 600,
-      fontSize: "1.25rem",
-    },
-    h6: {
-      fontWeight: 600,
-      fontSize: "1rem",
-    },
-    button: {
-      fontWeight: 600,
-    },
-  },
-  palette: {
-    primary: {
-      main: "#2563eb", // Modern blue
-      light: "#60a5fa",
-      dark: "#1e40af",
-      contrastText: "#ffffff",
-    },
-    secondary: {
-      main: "#f97316", // Vibrant orange
-      light: "#fdba74",
-      dark: "#c2410c",
-      contrastText: "#ffffff",
-    },
-    background: {
-      default: "#f8fafc",
-      paper: "#ffffff",
-    },
-    error: {
-      main: "#ef4444",
-    },
-    warning: {
-      main: "#f59e0b",
-    },
-    info: {
-      main: "#3b82f6",
-    },
-    success: {
-      main: "#10b981",
-    },
-    text: {
-      primary: "#0f172a",
-      secondary: "#64748b",
-    },
-  },
-  shape: {
-    borderRadius: 12,
-  },
-  components: {
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          borderRadius: 10,
-          textTransform: "none",
-          fontWeight: 600,
-          boxShadow: "none",
-          padding: "10px 20px",
-          "&:hover": {
-            boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
-          },
-        },
-        contained: {
-          boxShadow: "0 2px 6px rgba(0,0,0,0.08)",
-        },
-      },
-    },
-    MuiPaper: {
-      styleOverrides: {
-        root: {
-          borderRadius: 16,
-        },
-        elevation1: {
-          boxShadow: "0 2px 12px rgba(0,0,0,0.05)",
-        },
-        elevation2: {
-          boxShadow: "0 4px 16px rgba(0,0,0,0.08)",
-        },
-      },
-    },
-    MuiTextField: {
-      styleOverrides: {
-        root: {
-          "& .MuiOutlinedInput-root": {
-            borderRadius: 10,
-          },
-        },
-      },
-    },
-    MuiCard: {
-      styleOverrides: {
-        root: {
-          borderRadius: 16,
-          boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
-          overflow: "hidden",
-          transition: "transform 0.2s, box-shadow 0.2s",
-          "&:hover": {
-            boxShadow: "0 12px 32px rgba(0,0,0,0.12)",
-            transform: "translateY(-4px)",
-          },
-        },
-      },
-    },
-    MuiChip: {
-      styleOverrides: {
-        root: {
-          borderRadius: 8,
-          fontWeight: 500,
-        },
-      },
-    },
-    MuiTableCell: {
-      styleOverrides: {
-        root: {
-          padding: "16px",
-        },
-        head: {
-          fontWeight: 600,
-          backgroundColor: "rgba(0, 0, 0, 0.02)",
-        },
-      },
-    },
-    MuiAlert: {
-      styleOverrides: {
-        root: {
-          borderRadius: 12,
-        },
-      },
-    },
-    MuiListItemButton: {
-      styleOverrides: {
-        root: {
-          borderRadius: 8,
-          margin: "4px 8px",
-          "&.Mui-selected": {
-            backgroundColor: "rgba(37, 99, 235, 0.1)",
-            color: "#2563eb",
-            "&:hover": {
-              backgroundColor: "rgba(37, 99, 235, 0.15)",
-            },
-            "& .MuiListItemIcon-root": {
-              color: "#2563eb",
-            },
-          },
-          "&:hover": {
-            backgroundColor: "rgba(0, 0, 0, 0.04)",
-          },
-        },
-      },
-    },
-    MuiDrawer: {
-      styleOverrides: {
-        paper: {
-          backgroundColor: "#ffffff",
-          borderRight: "none",
-          boxShadow: "0 0 20px rgba(0, 0, 0, 0.05)",
-        },
-      },
-    },
-    MuiAppBar: {
-      styleOverrides: {
-        root: {
-          boxShadow: "0 2px 10px rgba(0, 0, 0, 0.05)",
-        },
-      },
-    },
-    MuiInputBase: {
-      styleOverrides: {
-        root: {
-          "& .MuiInputAdornment-root": {
-            marginLeft: 8,
-            marginRight: 0,
-          },
-        },
-      },
-    },
-    MuiGrid: {
-      styleOverrides: {
-        root: {
-          textAlign: "right",
-        },
-      },
-    },
-  },
-})
-
-const drawerWidth = 280
+const { Header, Sider, Content } = Layout
+const { Title } = Typography
 
 // Navigation items with icons
 const navItems = [
-  { text: "בית", path: "/", icon: <HomeIcon /> },
-  { text: "רישום משתמש", path: "/register-user", icon: <Person /> },
-  { text: "כניסת משתמש", path: "/user-login", icon: <Login /> },
-  { text: "כניסת מנהל", path: "/admin-login", icon: <AdminPanelSettings /> },
-  { text: "העלאת קבצים", path: "/upload-file", icon: <Upload /> },
-  { text: "צפייה בנתונים", path: "/view-data", icon: <Visibility /> },
-  { text: "ניהול משתמשים", path: "/user-management", icon: <Group /> },
-  { text: 'דו"ח ייצור', path: "/production-reports", icon: <Assessment /> },
-  { text: "ניהול הוצאות והכנסות", path: "/incom&Expennses", icon: <AttachMoney /> },
-  { text: "רישום עסק חדש", path: "/business-register", icon: <Business /> },
-  { text: "רישום עסק ומנהל חדש", path: "/register-admin&business", icon: <BusinessCenter /> },
+  { key: "/", label: "בית", icon: <HomeOutlined />, path: "/" },
+  { key: "/register-user", label: "רישום משתמש", icon: <UserAddOutlined />, path: "/register-user" },
+  { key: "/user-login", label: "כניסת משתמש", icon: <LoginOutlined />, path: "/user-login" },
+  { key: "/admin-login", label: "כניסת מנהל", icon: <CrownOutlined />, path: "/admin-login" },
+  { key: "/upload-file", label: "העלאת קבצים", icon: <UploadOutlined />, path: "/upload-file" },
+  { key: "/view-data", label: "צפייה בנתונים", icon: <EyeOutlined />, path: "/view-data" },
+  { key: "/user-management", label: "ניהול משתמשים", icon: <TeamOutlined />, path: "/user-management" },
+  { key: "/production-reports", label: 'דו"ח ייצור', icon: <BarChartOutlined />, path: "/production-reports" },
+  { key: "/incom&Expennses", label: "ניהול הוצאות והכנסות", icon: <DollarOutlined />, path: "/incom&Expennses" },
+  { key: "/business-register", label: "רישום עסק חדש", icon: <ShopOutlined />, path: "/business-register" },
+  {
+    key: "/register-admin&business",
+    label: "רישום עסק ומנהל חדש",
+    icon: <BankOutlined />,
+    path: "/register-admin&business",
+  },
 ]
-
-const AppBar = styled(MuiAppBar, {
-  shouldForwardProp: (prop) => prop !== "open",
-})<{ open?: boolean }>(({ theme, open }) => ({
-  zIndex: theme.zIndex.drawer + 1,
-  transition: theme.transitions.create(["width", "margin"], {
-    easing: theme.transitions.easing.sharp,
-    duration: theme.transitions.duration.leavingScreen,
-  }),
-  ...(open && {
-    marginLeft: drawerWidth,
-    width: `calc(100% - ${drawerWidth}px)`,
-    transition: theme.transitions.create(["width", "margin"], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-  }),
-}))
 
 // Responsive drawer component
 function ResponsiveDrawer() {
+  const [collapsed, setCollapsed] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
-  const [open, setOpen] = useState(true)
   const location = useLocation()
-  const isMobile = useMediaQuery(theme.breakpoints.down("md"))
+  const isMobile = useMediaQuery({ maxWidth: 768 })
+  const isSmallScreen = useMediaQuery({ maxWidth: 1024 });
+
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen)
   }
 
-  const handleDrawerOpen = () => {
-    setOpen(true)
+  const handleCollapse = () => {
+    setCollapsed(!collapsed)
   }
 
-  const handleDrawerClose = () => {
-    setOpen(false)
-  }
+  const menuItems = navItems.map((item) => ({
+    key: item.key,
+    icon: item.icon,
+    label: <Link to={item.path}>{item.label}</Link>,
+  }))
 
-  const drawer = (
-    <Box sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
-      <Box sx={{ p: 2, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <Box sx={{ display: "flex", alignItems: "center" }}>
-          <Box component="img" src="/logo.svg" alt="BusinessMan Logo" sx={{ height: 40, width: 40, mr: 1.5 }} />
-          <Typography variant="h5" component="div" fontWeight="bold" color="primary">
+  const siderContent = (
+    <div style={{ height: "100%", display: "flex", flexDirection: "column", direction: "rtl", width: "100%" }}>
+      <div
+        style={{
+          padding: "24px 16px",
+          borderBottom: "1px solid #f0f0f0",
+          textAlign: "center",
+          direction: "rtl",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexDirection: "column"
+        }}
+      >
+        <Avatar
+          size={collapsed ? 32 : 48}
+          style={{
+            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+            marginBottom: collapsed ? 0 : 8,
+          }}
+        >
+          <DashboardOutlined />
+        </Avatar>
+        {!collapsed && (
+          <Title level={4} style={{ margin: "8px 0 0 0", color: "#667eea" }}>
             BusinessMan
-          </Typography>
-        </Box>
-        {!isMobile && (
-          <IconButton onClick={handleDrawerClose}>
-            <ChevronLeft />
-          </IconButton>
+          </Title>
         )}
-      </Box>
-      <Divider sx={{ mb: 2 }} />
-      <List component="nav" sx={{ flexGrow: 1, px: 1 }}>
-        {navItems.map((item) => (
-          <ListItem key={item.text} disablePadding>
-            <ListItemButton
-              component={Link}
-              to={item.path}
-              selected={location.pathname === item.path}
-              onClick={() => isMobile && setMobileOpen(false)}
-            >
-              <ListItemText primary={item.text} /> <ListItemIcon sx={{padding:1.2, minWidth: 36, color: location.pathname === item.path ? "primary.main" : "inherit" }}>
-                {item.icon}
-              </ListItemIcon>
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
-      <Box sx={{ p: 2, textAlign: "center" }}>
-        <Typography variant="caption" color="text.secondary">
+      </div>
+
+      <Menu
+        mode="inline"
+        selectedKeys={[location.pathname]}
+        style={{
+          border: "none",
+          flex: 1,
+          padding: "8px",
+          direction: "rtl",
+        }}
+        items={menuItems}
+        onClick={() => isMobile && setMobileOpen(false)}
+      />
+
+      <div
+        style={{
+          padding: "16px",
+          borderTop: "1px solid #f0f0f0",
+          textAlign: "center",
+          direction: "rtl",
+        }}
+      >
+        <Typography.Text type="secondary" style={{ fontSize: "12px" }}>
           © 2025 BusinessMan
-        </Typography>
-      </Box>
-    </Box>
+        </Typography.Text>
+      </div>
+    </div>
   )
 
   return (
-    <Box sx={{ display: "flex", minHeight: "100vh" }}>
-      <AppBar
-        position="fixed"
-        color="inherit"
-        sx={{
-          ...(open && !isMobile && {
-            marginLeft: drawerWidth,
-            width: `calc(100% - ${drawerWidth}px)`,
-            transition: theme.transitions.create(["width", "margin"], {
-              easing: theme.transitions.easing.sharp,
-              duration: theme.transitions.duration.enteringScreen,
-            }),
-          }),
-        }}
-      >
-        <Toolbar>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            edge="start"
-            onClick={isMobile ? handleDrawerToggle : handleDrawerOpen}
-            sx={{ mr: 2, ...(open && !isMobile && { display: "none" }) }}
+    <ConfigProvider
+      direction="rtl"
+      theme={{
+        algorithm: antTheme.defaultAlgorithm,
+        token: {
+          colorPrimary: "#667eea",
+          borderRadius: 10,
+          fontFamily: '"Assistant", "Rubik", "Heebo", sans-serif',
+        },
+      }}
+    >
+      <Layout style={{ minHeight: "100vh", width: "100%", direction: "rtl" }}>
+        {/* Desktop Sider */}
+        {!isMobile && (
+          <Sider
+            trigger={null}
+            collapsible
+            collapsed={collapsed}
+            width={280}
+            collapsedWidth={80}
+            style={{
+              background: "#fff",
+              position: "fixed",
+              height: "100vh",
+              right: 0,
+              top: 0,
+              zIndex: 1001,
+              boxShadow: "-2px 0 8px rgba(0, 0, 0, 0.05)",
+            }}
           >
-            <MenuIcon />
-          </IconButton>
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            <Dashboard sx={{ display: { xs: "none", sm: "block" }, mr: 1, color: "primary.main" }} />
-            <Typography variant="h6" component="div" sx={{ flexGrow: 1, fontWeight: "bold" }}>
-              מערכת ניהול עסקים
-            </Typography>
-          </Box>
-          <Box sx={{ flexGrow: 1 }} />
-          <Box sx={{ display: { xs: "none", md: "flex" }, gap: 1 }}>
-            {navItems.slice(0, 4).map((item) => (
+            {siderContent}
+          </Sider>
+        )}
+
+        {/* Mobile Drawer */}
+        {isMobile && (
+          <Drawer
+            title={
+              <Space style={{ direction: "rtl" }}>
+                <Avatar style={{ background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)" }}>
+                  <DashboardOutlined />
+                </Avatar>
+                <span>BusinessMan</span>
+              </Space>
+            }
+            placement="right"
+            onClose={handleDrawerToggle}
+            open={mobileOpen}
+            width={280}
+            style={{ padding: 0, direction: "rtl" }}
+          >
+            <Menu
+              mode="inline"
+              selectedKeys={[location.pathname]}
+              style={{ border: "none", direction: "rtl" }}
+              items={menuItems}
+              onClick={handleDrawerToggle}
+            />
+          </Drawer>
+        )}
+
+        <Layout
+          className={`main-layout ${collapsed ? "collapsed" : ""}`}
+          style={{
+            marginRight: isMobile ? 0 : collapsed ? 80 : 280,
+            width: isMobile ? "100%" : collapsed ? "calc(100% - 80px)" : "calc(100% - 280px)",
+            minHeight: "100vh",
+            direction: "rtl",
+          }}
+        >
+          <Header
+            style={{
+              background: "#fff",
+              padding: "0 24px",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              position: "sticky",
+              top: 0,
+              zIndex: 100,
+              width: "100%",
+              direction: "rtl",
+            }}
+          >
+            <Space style={{ direction: "rtl" }}>
               <Button
-                key={item.text}
-                component={Link}
-                to={item.path}
-                color={location.pathname === item.path ? "primary" : "inherit"}
-                variant={location.pathname === item.path ? "contained" : "text"}
-                startIcon={item.icon}
-                sx={{
-                  mx: 0.5,
-                  py: 1,
-                  fontWeight: location.pathname === item.path ? 600 : 500,
-                  "& .MuiButton-startIcon": {
-                    marginLeft: 1.5,
-                    marginRight: -0.5,
-                  },
-                }}
-              >
-                {item.text}
-              </Button>
-            ))}
-          </Box>
-        </Toolbar>
-      </AppBar>
+                type="text"
+                icon={isMobile ? <MenuOutlined /> : collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+                onClick={isMobile ? handleDrawerToggle : handleCollapse}
+                style={{ fontSize: "16px" }}
+              />
+              <Space style={{ direction: "rtl" }}>
+                <DashboardOutlined style={{ color: "#667eea", fontSize: "20px" }} />
+                <Title level={4} style={{ margin: 0, color: "#2d3748" }}>
+                  מערכת ניהול עסקים
+                </Title>
+              </Space>
+            </Space>
 
-      <Box component="nav" sx={{ width: { md: drawerWidth }, flexShrink: { md: 0 } }}>
-        <Drawer
-          variant="temporary"
-          open={mobileOpen}
-          onClose={handleDrawerToggle}
-          ModalProps={{
-            keepMounted: true, // Better open performance on mobile
-          }}
-          sx={{
-            display: { xs: "block", md: "none" },
-            "& .MuiDrawer-paper": { boxSizing: "border-box", width: drawerWidth },
-          }}
-        >
-          {drawer}
-        </Drawer>
-        <Drawer
-          variant="permanent"
-          sx={{
-            display: { xs: "none", md: "block" },
-            "& .MuiDrawer-paper": {
-              boxSizing: "border-box",
-              borderRight: "1px solid rgba(0, 0, 0, 0.05)",
-              overflowX: "hidden",
-              transition: theme.transitions.create("width", {
-                easing: theme.transitions.easing.sharp,
-                duration: theme.transitions.duration.enteringScreen,
-              }),
-              width: open ? drawerWidth : theme.spacing(9), // הגדרת width רק פעם אחת
-            },
-          }}
-          open={open}
-        >
-          {drawer}
-        </Drawer>
-      </Box>
+            {!isSmallScreen && (
+              <Space style={{ direction: "rtl" }}>
+                {navItems.slice(0, 4).map((item) => (
+                  <Button
+                    key={item.key}
+                    type={location.pathname === item.path ? "primary" : "text"}
+                    icon={item.icon}
+                    style={{
+                      borderRadius: "8px",
+                      fontWeight: location.pathname === item.path ? 600 : 400,
+                    }}
+                  >
+                    <Link to={item.path}>{item.label}</Link>
+                  </Button>
+                ))}
+              </Space>
+            )}
 
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          p: 3,
-          width: { xs: "100%", md: `calc(100% - ${open ? drawerWidth : theme.spacing(9)}px)` },
-          minHeight: "100vh",
-          bgcolor: "background.default",
-          mt: { xs: 7, sm: 8 },
-          transition: theme.transitions.create("width", {
-            easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.enteringScreen,
-          }),
-        }}
-      >
-        <Container maxWidth="xl" sx={{ pt: 2 }}>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/register-user" element={<UserRegister />} />
-            <Route path="/user-login" element={<UserLogin />} />
-            <Route path="/admin-login" element={<AdminLogin />} />
-            <Route path="/upload-file" element={<UploadFiles />} />
-            <Route path="/register-admin&business" element={<BusinessAndAdmin />} />
+          </Header>
 
-            <Route
-              path="/production-reports"
-              element={
-                <AdminRoute>
-                  <ProductionReports />
-                </AdminRoute>
-              }
-            />
-            <Route
-              path="/view-data"
-              element={
-                <AdminRoute>
-                  <DataViweing />
-                </AdminRoute>
-              }
-            />
-            <Route
-              path="/user-management"
-              element={
-                <AdminRoute>
-                  <UserManagemet />
-                </AdminRoute>
-              }
-            />
-            <Route
-              path="/business-register"
-              element={
-                <AdminRoute>
-                  <RegisterBusinessData />
-                </AdminRoute>
-              }
-            />
-            <Route
-              path="/incom&Expennses"
-              element={
-                <AdminRoute>
-                  <IncomAndExpennses />
-                </AdminRoute>
-              }
-            />
-          </Routes>
-        </Container>
-      </Box>
-    </Box>
+          <Content
+            style={{
+              padding: "24px",
+              background: "transparent",
+              minHeight: "calc(100vh - 64px)",
+              width: "100%",
+              overflow: "auto",
+              direction: "rtl",
+            }}
+          >
+            <div className="content-wrapper">
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/register-user" element={<UserRegister />} />
+                <Route path="/user-login" element={<UserLogin />} />
+                <Route path="/admin-login" element={<AdminLogin />} />
+                <Route path="/upload-file" element={<UploadFiles />} />
+                <Route path="/register-admin&business" element={<BusinessAndAdmin />} />
+
+                <Route
+                  path="/production-reports"
+                  element={
+                    <AdminRoute>
+                      <ProductionReports />
+                    </AdminRoute>
+                  }
+                />
+                <Route
+                  path="/view-data"
+                  element={
+                    <AdminRoute>
+                      <DataViweing />
+                    </AdminRoute>
+                  }
+                />
+                <Route
+                  path="/user-management"
+                  element={
+                    <AdminRoute>
+                      <UserManagemet />
+                    </AdminRoute>
+                  }
+                />
+                <Route
+                  path="/business-register"
+                  element={
+                    <AdminRoute>
+                      <RegisterBusinessData />
+                    </AdminRoute>
+                  }
+                />
+                <Route
+                  path="/incom&Expennses"
+                  element={
+                    <AdminRoute>
+                      <IncomAndExpennses />
+                    </AdminRoute>
+                  }
+                />
+              </Routes>
+            </div>
+          </Content>
+        </Layout>
+      </Layout>
+    </ConfigProvider>
   )
 }
 
 function App() {
-  axios.defaults.withCredentials = true // הטוקן יישלח בכל קריאת אקסיוס
-
   return (
-    <CacheProvider value={cacheRtl}>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <GlobalContext>
-          <Router>
-            <ResponsiveDrawer />
-          </Router>
-        </GlobalContext>
-      </ThemeProvider>
-    </CacheProvider>
+    <div style={{ width: "100%", minHeight: "100vh", direction: "rtl" }}>
+      <GlobalContext>
+        <Router>
+          <ResponsiveDrawer />
+        </Router>
+      </GlobalContext>
+    </div>
   )
 }
 
 export default App
+App.css:
+/* Import Hebrew fonts */
+@import url("https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;500;600;700&family=Heebo:wght@300;400;500;600;700&family=Rubik:wght@300;400;500;600;700&display=swap");
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  direction: rtl;
+  font-family: "Assistant", "Rubik", "Heebo", sans-serif;
+  background: linear-gradient(135deg, #f5f7ff 0%, #ffffff 100%);
+  overflow-x: hidden;
+}
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+}
+
+html:lang(he),
+body:lang(he) {
+  direction: rtl;
+  text-align: right;
+}
+
+.ltr {
+  direction: ltr !important;
+}
+
+.rtl {
+  direction: rtl !important;
+}
+
+/* Ant Design Layout Fixes for RTL */
+.ant-layout {
+  min-height: 100vh !important;
+  width: 100% !important;
+  direction: rtl !important;
+}
+
+/* Fixed header height */
+.header-fixed {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  z-index: 1000 !important;
+  background: #fff !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+  height: 64px !important;
+  line-height: 64px !important;
+  padding: 0 24px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  direction: rtl !important;
+}
+
+.ant-layout-content {
+  width: 100% !important;
+  padding: 24px !important;
+  margin: 0 !important;
+  min-height: calc(100vh - 64px) !important;
+  background: transparent !important;
+  margin-top: 64px !important; /* Space for fixed header */
+  padding-top: 40px !important; /* Additional padding to ensure content starts below header */
+}
+
+/* RTL Sider positioning */
+.ant-layout-sider {
+  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.05) !important;
+  position: fixed !important;
+  height: 100vh !important;
+  right: 0 !important;
+  top: 0 !important;
+  z-index: 1001 !important;
+  background: #fff !important;
+}
+
+/* Content area adjustments for RTL */
+.main-layout {
+  margin-right: 280px !important;
+  width: calc(100% - 280px) !important;
+  transition: all 0.2s !important;
+  min-height: 100vh !important;
+}
+
+.main-layout.collapsed {
+  margin-right: 80px !important;
+  width: calc(100% - 80px) !important;
+}
+
+/* Header adjustments for sider */
+.header-fixed.with-sider {
+  right: 280px !important;
+  width: calc(100% - 280px) !important;
+}
+
+.header-fixed.with-sider.collapsed {
+  right: 80px !important;
+  width: calc(100% - 80px) !important;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .main-layout,
+  .main-layout.collapsed {
+    margin-right: 0 !important;
+    width: 100% !important;
+  }
+
+  .header-fixed,
+  .header-fixed.with-sider,
+  .header-fixed.with-sider.collapsed {
+    right: 0 !important;
+    width: 100% !important;
+    padding: 0 16px !important;
+  }
+
+  .ant-layout-sider {
+    transform: translateX(100%) !important;
+  }
+
+  .ant-layout-content {
+    padding: 16px !important;
+    margin-top: 64px !important;
+    padding-top: 32px !important; /* Additional padding for mobile */
+  }
+
+  /* Hide desktop nav buttons on mobile */
+  .desktop-nav {
+    display: none !important;
+  }
+}
+
+/* Show desktop nav only on desktop */
+@media (min-width: 769px) {
+  .mobile-nav {
+    display: none !important;
+  }
+}
+
+/* Drawer RTL fix */
+.ant-drawer-content-wrapper {
+  right: 0 !important;
+  left: auto !important;
+}
+
+.ant-drawer-body {
+  padding: 0 !important;
+  direction: rtl !important;
+}
+
+/* Menu RTL fixes */
+.ant-menu {
+  direction: rtl !important;
+}
+
+.ant-menu-item {
+  border-radius: 8px !important;
+  margin: 4px 8px !important;
+  text-align: right !important;
+}
+
+.ant-menu-item-selected {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  color: white !important;
+}
+
+.ant-menu-item-selected .anticon {
+  color: white !important;
+}
+
+.ant-menu-item .ant-menu-title-content {
+  margin-right: 12px !important;
+  margin-left: 0 !important;
+}
+
+/* Card and component fixes */
+.ant-card {
+  border-radius: 16px !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08) !important;
+  transition: all 0.3s ease !important;
+  width: 100% !important;
+  direction: rtl !important;
+}
+
+.ant-card:hover {
+  transform: translateY(-4px) !important;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12) !important;
+}
+
+.ant-card-body {
+  direction: rtl !important;
+  text-align: right !important;
+}
+
+/* Button fixes */
+.ant-btn {
+  border-radius: 10px !important;
+  font-weight: 600 !important;
+  height: auto !important;
+  padding: 10px 20px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  direction: rtl !important;
+}
+
+.ant-btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  border: none !important;
+  box-shadow: 0 4px 14px rgba(102, 126, 234, 0.4) !important;
+}
+
+.ant-btn-primary:hover {
+  background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6) !important;
+}
+
+/* Responsive navigation buttons */
+.nav-buttons {
+  display: flex !important;
+  gap: 8px !important;
+  flex-wrap: wrap !important;
+  direction: rtl !important;
+}
+
+@media (max-width: 1200px) {
+  .nav-buttons .ant-btn {
+    padding: 8px 12px !important;
+    font-size: 12px !important;
+  }
+}
+
+@media (max-width: 992px) {
+  .nav-buttons .ant-btn span {
+    display: none !important;
+  }
+
+  .nav-buttons .ant-btn {
+    padding: 8px !important;
+    min-width: 40px !important;
+  }
+}
+
+/* Input and form fixes */
+.ant-input {
+  border-radius: 10px !important;
+  padding: 12px 16px !important;
+  border: 2px solid #e1e5e9 !important;
+  transition: all 0.3s ease !important;
+  direction: rtl !important;
+  text-align: right !important;
+}
+
+.ant-input:focus {
+  border-color: #667eea !important;
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2) !important;
+}
+
+.ant-form-item-label > label {
+  font-weight: 600 !important;
+  color: #2d3748 !important;
+  text-align: right !important;
+}
+
+.ant-form-item {
+  direction: rtl !important;
+}
+
+.ant-input-number {
+  width: 100% !important;
+  direction: rtl !important;
+}
+
+.ant-input-number-input {
+  text-align: right !important;
+}
+
+/* Container and layout utilities */
+.page-container {
+  width: 100% !important;
+  max-width: 100% !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  direction: rtl !important;
+}
+
+.content-wrapper {
+  width: 100% !important;
+  max-width: 1200px !important;
+  margin: 0 auto !important;
+  padding: 0 24px !important;
+  direction: rtl !important;
+}
+
+/* Ensure content starts below fixed header */
+.content-container {
+  width: 100% !important;
+  max-width: 1200px !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+  direction: rtl !important;
+  position: relative !important;
+  z-index: 1 !important; /* Ensure content is below header */
+}
+
+.content-container {
+  width: 100% !important;
+  max-width: 1200px !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+  direction: rtl !important;
+}
+
+@media (max-width: 768px) {
+  .content-wrapper {
+    padding: 0 16px !important;
+  }
+}
+
+/* Component specific styles */
+.hero-section {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 60px 24px;
+  border-radius: 20px;
+  margin-bottom: 40px;
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  direction: rtl;
+}
+
+@media (max-width: 768px) {
+  .hero-section {
+    padding: 40px 20px;
+    margin: 0 0 40px 0;
+    border-radius: 16px;
+  }
+}
+
+.stats-card {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  direction: rtl;
+  text-align: right;
+}
+
+.stats-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+.feature-card {
+  background: white;
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  height: 100%;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  width: 100%;
+  direction: rtl;
+  text-align: right;
+}
+
+@media (max-width: 768px) {
+  .feature-card {
+    padding: 24px;
+  }
+}
+
+.feature-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12);
+}
+
+.icon-wrapper {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-size: 24px;
+}
+
+.testimonial-section {
+  background: rgba(102, 126, 234, 0.03);
+  border: 1px solid rgba(102, 126, 234, 0.1);
+  border-radius: 16px;
+  padding: 32px;
+  margin-top: 40px;
+  width: 100%;
+  direction: rtl;
+  text-align: right;
+}
+
+@media (max-width: 768px) {
+  .testimonial-section {
+    padding: 24px;
+  }
+}
+
+.financial-summary-card {
+  border-radius: 16px;
+  padding: 24px;
+  height: 100%;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  width: 100%;
+  direction: rtl;
+  text-align: right;
+}
+
+.financial-summary-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+}
+
+.income-card {
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.expense-card {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.centered-layout {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+  width: 100%;
+  direction: rtl;
+}
+
+.login-form {
+  background: linear-gradient(145deg, #ffffff, #f8fafc);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+  width: 100%;
+  max-width: 500px;
+  direction: rtl;
+  text-align: right;
+}
+
+@media (max-width: 768px) {
+  .login-form {
+    padding: 24px;
+    margin: 0;
+    border-radius: 16px;
+  }
+}
+
+.form-section {
+  background: white;
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  width: 100%;
+  direction: rtl;
+  text-align: right;
+}
+
+@media (max-width: 768px) {
+  .form-section {
+    padding: 20px;
+    margin: 0;
+  }
+}
+
+/* Grid fixes for RTL */
+.ant-row {
+  width: 100% !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  direction: rtl !important;
+}
+
+.ant-col {
+  padding-left: 12px !important;
+  padding-right: 12px !important;
+  direction: rtl !important;
+}
+
+@media (max-width: 768px) {
+  .ant-col {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+}
+
+/* Table responsive */
+.ant-table-wrapper {
+  width: 100% !important;
+  overflow-x: auto !important;
+  direction: rtl !important;
+}
+
+.ant-table {
+  min-width: 800px !important;
+  direction: rtl !important;
+}
+
+.ant-table-thead > tr > th {
+  text-align: right !important;
+}
+
+.ant-table-tbody > tr > td {
+  text-align: right !important;
+}
+
+@media (max-width: 768px) {
+  .ant-table {
+    min-width: 600px !important;
+  }
+}
+
+/* Typography RTL */
+.ant-typography {
+  direction: rtl !important;
+  text-align: right !important;
+}
+
+/* Space component RTL */
+.ant-space {
+  direction: rtl !important;
+}
+
+/* Upload component RTL */
+.ant-upload-drag {
+  direction: rtl !important;
+  text-align: center !important;
+}
+
+/* Progress RTL */
+.ant-progress {
+  direction: rtl !important;
+}
+
+/* Alert RTL */
+.ant-alert {
+  direction: rtl !important;
+  text-align: right !important;
+}
+
+/* Statistic RTL */
+.ant-statistic {
+  direction: rtl !important;
+  text-align: right !important;
+}
+
+.ant-statistic-content {
+  direction: rtl !important;
+  text-align: right !important;
+}
+
+/* Add safe area for content */
+.page-content {
+  min-height: calc(100vh - 128px) !important; /* Account for header + padding */
+  padding-top: 20px !important;
+}
+//Brurya
 
 "use client"
-
-import type React from "react"
-
 import { useContext, useState } from "react"
 import type { Admin } from "../models/Admin"
-import * as Yup from "yup"
 import axios from "axios"
-import type { AdminRegister } from "../models/AdminRegister"
 import { useNavigate } from "react-router-dom"
 import { validationSchemaAdminLogin } from "../utils/validationSchema"
 import { globalContext } from "../context/GlobalContext"
-import {
-  Box,
-  TextField,
-  Button,
-  Typography,
-  Paper,
-  Container,
-  Alert,
-  InputAdornment,
-  Avatar,
-  Link,
-  Stack,
-} from "@mui/material"
-import { Email, Lock, AdminPanelSettings, Login as LoginIcon } from "@mui/icons-material"
+import { Form, Input, Button, Typography, Card, Alert, Space, Avatar, Divider, ConfigProvider } from "antd"
+import { MailOutlined, LockOutlined, CrownOutlined, LoginOutlined } from "@ant-design/icons"
 import CenteredLayout from "./CenteredLayout"
 
-const AdmineLogin = () => {
+const { Title, Text, Link } = Typography
+
+const AdminLogin = () => {
   const nav = useNavigate()
   const [admin, setAdmin] = useState<Admin>({ email: "", password: "" })
   const [errors, setErrors] = useState<string[]>([])
+  const [loading, setLoading] = useState(false)
   const url = import.meta.env.VITE_API_URL
   const validationSchema = validationSchemaAdminLogin
   const globalContextDetails = useContext(globalContext)
 
-  const handleSubmit = (adminRegister: AdminRegister) => async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    validationSchema
-      .isValid(admin)
-      .then(async (valid) => {
-        setErrors([])
+  const handleSubmit = async () => {
+    setLoading(true)
+    try {
+      const valid = await validationSchema.isValid(admin)
+      setErrors([])
 
-        if (valid) {
-          try {
-            const { data } = await axios.post<any>(`${url}/Auth/admin-login`, adminRegister, { withCredentials: true }) // TODO
-            globalContextDetails.setUser(data.user)
-            globalContextDetails.setIsAdmin(true)
-            globalContextDetails.setBusinessGlobal(data.business)
-            nav("/")
-          } catch (e) {
-            console.log(e)
-            setErrors(["שם משתמש או סיסמה שגויים"])
-          }
-        } else {
-          setErrors(["נא למלא את כל השדות הנדרשים"])
-        }
-      })
-      .catch((err) => {
-        console.log("Validation error:", err.errors)
-        if (err instanceof Yup.ValidationError) {
-          setErrors(err.errors)
-        }
-      })
+      if (valid) {
+        const { data } = await axios.post<any>(`${url}/Auth/admin-login`, admin, { withCredentials: true })
+        globalContextDetails.setUser(data.user)
+        globalContextDetails.setIsAdmin(true)
+        globalContextDetails.setBusinessGlobal(data.business)
+        nav("/")
+      } else {
+        setErrors(["נא למלא את כל השדות הנדרשים"])
+      }
+    } catch (e) {
+      console.log(e)
+      setErrors(["שם משתמש או סיסמה שגויים"])
+    } finally {
+      setLoading(false)
+    }
   }
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
-    const { name, value } = event.target
-    setAdmin((prevAdmin) => ({
-      ...prevAdmin,
-      [name]: value,
-    }))
+  const handleChange = (field: string, value: string) => {
+    setAdmin((prev) => ({ ...prev, [field]: value }))
   }
 
   return (
-    <CenteredLayout>
-      <Container maxWidth="sm" sx={{ py: 4 }}>
-        <Paper
-          elevation={0}
-          sx={{
-            p: { xs: 3, sm: 5 },
-            width: "100%",
-            borderRadius: 3,
-            boxShadow: "0 10px 40px rgba(0, 0, 0, 0.08)",
-            background: "linear-gradient(145deg, #ffffff, #f8fafc)",
-            border: "1px solid rgba(0, 0, 0, 0.05)",
-          }}
-        >
-          <Box
-            component="form"
-            onSubmit={handleSubmit(admin)}
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              gap: 3,
-              alignItems: "center",
-            }}
-          >
-            <Box sx={{ textAlign: "center", mb: 2 }}>
-              <Avatar
-                sx={{
-                  bgcolor: "primary.main",
-                  width: 70,
-                  height: 70,
-                  mb: 2,
-                  mx: "auto",
-                  boxShadow: "0 4px 14px rgba(37, 99, 235, 0.2)",
-                }}
-              >
-                <AdminPanelSettings sx={{ fontSize: 40 }} />
-              </Avatar>
-
-              <Typography variant="h4" component="h1" gutterBottom fontWeight="bold">
-                כניסת מנהל
-              </Typography>
-
-              <Typography variant="body1" color="text.secondary" sx={{ mb: 1 }}>
-                ברוכים הבאים למערכת הניהול
-              </Typography>
-            </Box>
-
-            <TextField
-              fullWidth
-              label="אימייל"
-              name="email"
-              type="email"
-              variant="outlined"
-              onChange={handleChange}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start" sx={{ mr: 1.5 }}>
-                    <Email color="primary" />
-                  </InputAdornment>
-                ),
+    <ConfigProvider direction="rtl" >
+      <CenteredLayout>
+        <Card className="login-form" style={{ maxWidth: 500, width: "100%" }}>
+          <div style={{ textAlign: "center", marginBottom: 32 }}>
+            <Avatar
+              size={80}
+              style={{
+                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                marginBottom: 16,
+                boxShadow: "0 4px 14px rgba(102, 126, 234, 0.3)",
               }}
-              placeholder="הזן את האימייל שלך"
-              sx={{
-                "& .MuiOutlinedInput-root": {
-                  bgcolor: "white",
-                  "&:hover .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "primary.main",
-                  },
-                },
-              }}
-            />
+            >
+              <CrownOutlined style={{ fontSize: 40 }} />
+            </Avatar>
 
-            <TextField
-              fullWidth
-              label="סיסמא"
-              name="password"
-              type="password"
-              variant="outlined"
-              onChange={handleChange}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start" sx={{ mr: 1.5 }}>
-                    <Lock color="primary" />
-                  </InputAdornment>
-                ),
-              }}
-              placeholder="הזן את הסיסמה שלך"
-              sx={{
-                "& .MuiOutlinedInput-root": {
-                  bgcolor: "white",
-                  "&:hover .MuiOutlinedInput-notchedOutline": {
-                    borderColor: "primary.main",
-                  },
-                },
-              }}
-            />
+            <Title level={2} style={{ marginBottom: 8, color: "#2d3748" }}>
+              כניסת מנהל
+            </Title>
+
+            <Text type="secondary" style={{ fontSize: 16 }}>
+              ברוכים הבאים למערכת הניהול
+            </Text>
+          </div>
+
+          <Form layout="vertical" onFinish={handleSubmit}>
+            <Form.Item label="אימייל" required style={{ marginBottom: 20 }}>
+              <Input
+                prefix={<MailOutlined style={{ color: "#667eea" }} />}
+                placeholder="הזן את האימייל שלך"
+                size="large"
+                value={admin.email}
+                onChange={(e) => handleChange("email", e.target.value)}
+                style={{ borderRadius: 10 }}
+              />
+            </Form.Item>
+
+            <Form.Item label="סיסמא" required style={{ marginBottom: 24 }}>
+              <Input.Password
+                prefix={<LockOutlined style={{ color: "#667eea" }} />}
+                placeholder="הזן את הסיסמה שלך"
+                size="large"
+                value={admin.password}
+                onChange={(e) => handleChange("password", e.target.value)}
+                style={{ borderRadius: 10 }}
+              />
+            </Form.Item>
 
             <Button
-              type="submit"
-              variant="contained"
-              fullWidth
+              type="primary"
+              htmlType="submit"
               size="large"
-              startIcon={<LoginIcon />}
-              sx={{
-                mt: 2,
-                py: 1.5,
-                fontWeight: "bold",
-                fontSize: "1.1rem",
-                boxShadow: "0 4px 14px rgba(37, 99, 235, 0.2)",
+              loading={loading}
+              icon={<LoginOutlined />}
+              block
+              style={{
+                height: 48,
+                borderRadius: 10,
+                fontWeight: 600,
+                fontSize: 16,
+                marginBottom: 16,
               }}
             >
               התחבר
             </Button>
 
-            <Stack direction="row" spacing={1} sx={{ mt: 2 }}>
-              <Typography variant="body2" color="text.secondary">
-                אין לך חשבון?
-              </Typography>
-              <Link href="/register-admin&business" underline="hover" fontWeight="medium">
-                הירשם כמנהל
-              </Link>
-            </Stack>
+            <Divider>
+              <Text type="secondary">או</Text>
+            </Divider>
+
+            <div style={{ textAlign: "center" }}>
+              <Space>
+                <Text type="secondary">אין לך חשבון?</Text>
+                <Link href="/register-admin&business" style={{ fontWeight: 600 }}>
+                  הירשם כמנהל
+                </Link>
+              </Space>
+            </div>
 
             {errors.length > 0 && (
-              <Box sx={{ width: "100%", mt: 2 }}>
+              <div style={{ marginTop: 16 }}>
                 {errors.map((error, index) => (
                   <Alert
                     key={index}
-                    severity="error"
-                    sx={{ mb: 1, borderRadius: 2, boxShadow: "0 2px 10px rgba(239, 68, 68, 0.1)" }}
-                  >
-                    {error}
-                  </Alert>
+                    message={error}
+                    type="error"
+                    showIcon
+                    style={{ marginBottom: 8, borderRadius: 8 }}
+                  />
                 ))}
-              </Box>
+              </div>
             )}
-          </Box>
-        </Paper>
-      </Container>
-    </CenteredLayout>
+          </Form>
+        </Card>
+      </CenteredLayout>
+    </ConfigProvider>
   )
 }
 
-export default AdmineLogin
+export default AdminLogin
 "use client"
 
-import type React from "react"
-
-import { useContext, useState } from "react"
-import * as Yup from "yup"
-import axios from "axios"
-import type { UserPostModel } from "../models/UserPostModel"
-import { validationSchemaUserRegister } from "../utils/validationSchema"
+import { useContext } from "react"
 import { globalContext } from "../context/GlobalContext"
-import type { UserDto } from "../models/UserDto"
-import { converFromUserDto } from "../utils/convertFromUserDto"
-// MUI imports
-import {
-    Box,
-    TextField,
-    Button,
-    Typography,
-    Paper,
-    Container,
-    Alert,
-    Grid,
-    ThemeProvider,
-    createTheme,
-    CssBaseline,
-    InputAdornment,
-    Divider,
-} from "@mui/material"
-import { Person, Email, Phone, Badge, Lock, AdminPanelSettings } from "@mui/icons-material"
+import { Typography, Button, Card, Space, ConfigProvider } from "antd"
+import { StopOutlined } from "@ant-design/icons"
+import { useNavigate } from "react-router-dom"
+import CenteredLayout from "./CenteredLayout"
 
-// Create a custom theme with RTL support and Hebrew font
-const theme = createTheme({
-    direction: "rtl",
-    typography: {
-        fontFamily: '"Assistant", "Rubik", "Heebo", sans-serif',
-        h4: {
-            fontWeight: 700,
-        },
-        button: {
-            fontWeight: 600,
-        },
-    },
-    palette: {
-        primary: {
-            main: "#3f51b5",
-        },
-        secondary: {
-            main: "#f50057",
-        },
-        background: {
-            default: "#f5f5f5",
-        },
-    },
-    components: {
-        MuiTextField: {
-            styleOverrides: {
-                root: {
-                    direction: "rtl",
-                },
-            },
-        },
-        MuiButton: {
-            styleOverrides: {
-                root: {
-                    borderRadius: 8,
-                    padding: "10px 24px",
-                    textTransform: "none",
-                    fontSize: "1rem",
-                },
-            },
-        },
-    },
-})
+const { Title, Text } = Typography
 
-const AdminRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => {
-    const validationSchema = validationSchemaUserRegister
-    const [myAdmin, setMyAdmin] = useState<UserPostModel>({
-        firstName: "יוסי", // ערך ברירת מחדל
-        lastName: "כהן", // ערך ברירת מחדל
-        email: "a@a", // ערך ברירת מחדל
-        password: "", // ערך ברירת מחדל
-        phone: "050-1234567", // ערך ברירת מחדל
-        role: 1, // ערך ברירת מחדל
-        idNumber: "123456789", // ערך ברירת מחדל
-    })
-    const [errors, setErrors] = useState<string[]>([])
-    const globalContextDetails = useContext(globalContext)
-    const url = import.meta.env.VITE_API_URL
+const AdminRoute = () => {
+  const { isAdmin } = useContext(globalContext)
+  const navigate = useNavigate()
 
-    const handleSubmit = (adminRegister: UserPostModel) => async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault()
-
-        validationSchema
-            .isValid(adminRegister)
-            .then(async (valid) => {
-                setErrors([])
-                if (valid) {
-                    try {
-                        console.log("adminRegister ", adminRegister)
-                        const { data } = await axios.post<UserDto>(`${url}/Auth/admin-register`, adminRegister)
-                        console.log("data ", data)
-                        globalContextDetails.setUser(converFromUserDto(data))
-                        if (data.role == 1) {
-                            globalContextDetails.setIsAdmin(true)
-                        }
-                        if (onSubmitSuccess) onSubmitSuccess()
-                    } catch (e) {
-                        console.log(e)
-                        setErrors(["שגיאה ברישום"])
-                    }
-                } else {
-                    setErrors(["נא למלא את כל השדות הנדרשים"])
-                }
-            })
-            .catch((err) => {
-                console.log("Validation error:", err.errors)
-                if (err instanceof Yup.ValidationError) {
-                    setErrors(err.errors)
-                }
-            })
-    }
-
-    const handleChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
-        const { name, value, type } = event.target
-        setMyAdmin((prevUser) => ({
-            ...prevUser,
-            [name]: type === "number" ? Number(value) : value,
-        }))
-    }
-
+  if (isAdmin === false) {
     return (
-        <ThemeProvider theme={theme}>
-            <CssBaseline />
-            <Container maxWidth="md" sx={{ py: 4 }}>
-                <Paper
-                    elevation={3}
-                    sx={{
-                        p: 4,
-                        borderRadius: 3,
-                        boxShadow: "0 8px 32px rgba(0, 0, 0, 0.1)",
-                    }}
-                >
-                    <Box sx={{ mb: 4, textAlign: "center" }}>
-                        <AdminPanelSettings color="primary" sx={{ fontSize: 48, mb: 2 }} />
-                        <Typography variant="h4" component="h1" gutterBottom>
-                            רישום מנהל חדש
-                        </Typography>
-                        <Typography variant="body1" color="text.secondary">
-                            נא למלא את כל הפרטים הנדרשים
-                        </Typography>
-                        <Divider sx={{ mt: 3 }} />
-                    </Box>
+      <ConfigProvider direction="rtl">
+        <CenteredLayout>
+          <Card
+            style={{
+              textAlign: "center",
+              padding: 40,
+              borderRadius: 16,
+              boxShadow: "0 8px 32px rgba(0, 0, 0, 0.1)",
+            }}
+          >
+            <Space direction="vertical" size="large" style={{ width: "100%" }}>
+              <StopOutlined
+                style={{
+                  fontSize: 80,
+                  color: "#ff4d4f",
+                  marginBottom: 16,
+                }}
+              />
 
-                    <Box
-                        component="form"
-                        onSubmit={handleSubmit(myAdmin)}
-                        sx={{
-                            display: "flex",
-                            flexDirection: "column",
-                            gap: 3,
-                        }}
-                    >
-                        <Grid container spacing={2}>
-                            <Grid item xs={12} md={6} {...({} as any)}>
-                                <TextField
-                                    fullWidth
-                                    label="שם פרטי"
-                                    name="firstName"
-                                    value={myAdmin.firstName}
-                                    onChange={handleChange}
-                                    variant="outlined"
-                                    InputProps={{
-                                        startAdornment: (
-                                            <InputAdornment position="start">
-                                                <Person color="action" />
-                                            </InputAdornment>
-                                        ),
-                                    }}
-                                />
-                            </Grid>
-                            <Grid item xs={12} md={6} {...({} as any)}>
-                                <TextField
-                                    fullWidth
-                                    label="שם משפחה"
-                                    name="lastName"
-                                    value={myAdmin.lastName}
-                                    onChange={handleChange}
-                                    variant="outlined"
-                                    InputProps={{
-                                        startAdornment: (
-                                            <InputAdornment position="start">
-                                                <Person color="action" />
-                                            </InputAdornment>
-                                        ),
-                                    }}
-                                />
-                            </Grid>
-                            <Grid item xs={12} md={6} {...({} as any)}>
-                                <TextField
-                                    fullWidth
-                                    label="טלפון"
-                                    name="phone"
-                                    value={myAdmin.phone}
-                                    onChange={handleChange}
-                                    variant="outlined"
-                                    InputProps={{
-                                        startAdornment: (
-                                            <InputAdornment position="start">
-                                                <Phone color="action" />
-                                            </InputAdornment>
-                                        ),
-                                    }}
-                                />
-                            </Grid>
-                            <Grid item xs={12} md={6} {...({} as any)}>
-                                <TextField
-                                    fullWidth
-                                    label="מספר תעודת זהות"
-                                    name="idNumber"
-                                    value={myAdmin.idNumber}
-                                    onChange={handleChange}
-                                    variant="outlined"
-                                    InputProps={{
-                                        startAdornment: (
-                                            <InputAdornment position="start">
-                                                <Badge color="action" />
-                                            </InputAdornment>
-                                        ),
-                                    }}
-                                />
-                            </Grid>
-                            <Grid item xs={12} {...({} as any)}>
-                                <TextField
-                                    fullWidth
-                                    label="אימייל"
-                                    name="email"
-                                    type="email"
-                                    value={myAdmin.email}
-                                    onChange={handleChange}
-                                    variant="outlined"
-                                    InputProps={{
-                                        startAdornment: (
-                                            <InputAdornment position="start">
-                                                <Email color="action" />
-                                            </InputAdornment>
-                                        ),
-                                    }}
-                                />
-                            </Grid>
-                            <Grid item xs={12} {...({} as any)}>
-                                <TextField
-                                    fullWidth
-                                    label="סיסמא"
-                                    name="password"
-                                    type="password"
-                                    value={myAdmin.password}
-                                    onChange={handleChange}
-                                    variant="outlined"
-                                    InputProps={{
-                                        startAdornment: (
-                                            <InputAdornment position="start">
-                                                <Lock color="action" />
-                                            </InputAdornment>
-                                        ),
-                                    }}
-                                />
-                            </Grid>
-                        </Grid>
+              <Title level={2} style={{ color: "#ff4d4f", margin: 0 }}>
+                גישה נדחתה
+              </Title>
 
-                        <Button
-                            type="submit"
-                            variant="contained"
-                            size="large"
-                            sx={{
-                                mt: 2,
-                                py: 1.5,
-                                fontWeight: "bold",
-                                fontSize: "1.1rem",
-                                boxShadow: "0 4px 12px rgba(63, 81, 181, 0.4)",
-                            }}
-                        >
-                            שמור פרטים
-                        </Button>
+              <Text type="secondary" style={{ fontSize: 16 }}>
+                אין לך הרשאה לצפות בדף זה. רק מנהלים יכולים לגשת לתוכן זה.
+              </Text>
 
-                        {errors.length > 0 && (
-                            <Box sx={{ width: "100%", mt: 2 }}>
-                                {errors.map((error, index) => (
-                                    <Alert key={index} severity="error" sx={{ mb: 1 }}>
-                                        {error}
-                                    </Alert>
-                                ))}
-                            </Box>
-                        )}
-                    </Box>
-                </Paper>
-            </Container>
-        </ThemeProvider>
+              <Button
+                type="primary"
+                size="large"
+                onClick={() => navigate("/")}
+                style={{
+                  height: 48,
+                  padding: "0 32px",
+                  fontWeight: 600,
+                  marginTop: 16,
+                }}
+              >
+                חזרה לדף הבית
+              </Button>
+            </Space>
+          </Card>
+        </CenteredLayout>
+      </ConfigProvider>
     )
+
+  }
+  return <></>
 }
 
-export default AdminRegister
+export default AdminRoute
 "use client"
 
 import { type JSX, useContext } from "react"
@@ -1253,10 +1357,11 @@ const BusinessAndAdmin = () => {
       console.log("updateAdmin ", updateAdmin)
       console.log("updateBusiness ", updateBusiness)
 
-      await axios.put<UserDto>(`${url}/api/User/${globalContextDetails.user.id}`, updateAdmin)
+      await axios.put<UserDto>(`${url}/api/User/${globalContextDetails.user.id}`, updateAdmin, { withCredentials: true })
       await axios.put<BusinessResponsePutModel>(
         `${url}/api/Business/${globalContextDetails.business_global.id}`,
         updateBusiness,
+        { withCredentials: true }
       )
 
       globalContextDetails.setBusinessGlobal(updateBusiness)
@@ -1335,7 +1440,7 @@ const BusinessAndAdmin = () => {
                     {isAdmin ? "סגור טופס רישום מנהל" : "רישום פרטי מנהל"}
                   </Button>
 
-                  {isAdmin && <AdminRegister onSubmitSuccess={handleAdminSuccess} />}
+                  {isAdmin && <AdminRegister />}
                 </Box>
 
                 <Box>
@@ -1374,178 +1479,128 @@ const BusinessAndAdmin = () => {
 export default BusinessAndAdmin
 import type React from "react"
 import type { Business } from "../models/Business"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Typography,
-  Box,
-  ThemeProvider,
-  createTheme,
-} from "@mui/material"
+import { Table, Typography, Card, ConfigProvider, Tag } from "antd"
+import type { ColumnsType } from "antd/es/table"
+
+const { Title } = Typography
 
 interface BusinessTableProps {
   business: Business
 }
 
-// Create a custom theme with RTL support and Hebrew font
-const theme = createTheme({
-  direction: "rtl",
-  typography: {
-    fontFamily: '"Assistant", "Rubik", "Heebo", sans-serif',
-  },
-  palette: {
-    primary: {
-      main: "#3f51b5",
-    },
-    background: {
-      default: "#f5f5f5",
-    },
-  },
-})
-
 const BusinessTable: React.FC<BusinessTableProps> = ({ business }) => {
-  return (
-    <ThemeProvider theme={theme}>
-      <Box sx={{ width: "100%", overflow: "hidden" }}>
-        <Typography variant="h6" component="h2" gutterBottom fontWeight="bold" sx={{ mb: 2 }}>
-          פרטי העסק
-        </Typography>
+  const dataSource = [business]
 
-        <TableContainer component={Paper} sx={{ boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)", borderRadius: 2 }}>
-          <Table sx={{ minWidth: 650 }} aria-label="business data table">
-            <TableHead sx={{ bgcolor: "primary.main" }}>
-              <TableRow>
-                <TableCell align="right" sx={{ color: "white", fontWeight: "bold" }}>
-                  מזהה
-                </TableCell>
-                <TableCell align="right" sx={{ color: "white", fontWeight: "bold" }}>
-                  שם עסק
-                </TableCell>
-                <TableCell align="right" sx={{ color: "white", fontWeight: "bold" }}>
-                  כתובת
-                </TableCell>
-                <TableCell align="right" sx={{ color: "white", fontWeight: "bold" }}>
-                  אימייל
-                </TableCell>
-                <TableCell align="right" sx={{ color: "white", fontWeight: "bold" }}>
-                  סוג עסק
-                </TableCell>
-                <TableCell align="right" sx={{ color: "white", fontWeight: "bold" }}>
-                  הכנסות
-                </TableCell>
-                <TableCell align="right" sx={{ color: "white", fontWeight: "bold" }}>
-                  הוצאות
-                </TableCell>
-                <TableCell align="right" sx={{ color: "white", fontWeight: "bold" }}>
-                  תזרים מזומנים
-                </TableCell>
-                <TableCell align="right" sx={{ color: "white", fontWeight: "bold" }}>
-                  שווי נקי
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              <TableRow sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
-                <TableCell align="right">{business.id}</TableCell>
-                <TableCell align="right">{business.name}</TableCell>
-                <TableCell align="right">{business.address}</TableCell>
-                <TableCell align="right">{business.email}</TableCell>
-                <TableCell align="right">{business.businessType}</TableCell>
-                <TableCell align="right">₪{business.income?.toLocaleString()}</TableCell>
-                <TableCell align="right">₪{business.expenses?.toLocaleString()}</TableCell>
-                <TableCell align="right">₪{business.cashFlow?.toLocaleString()}</TableCell>
-                <TableCell align="right">₪{business.netWorth?.toLocaleString()}</TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Box>
-    </ThemeProvider>
+  const columns: ColumnsType<Business> = [
+    {
+      title: "מזהה",
+      dataIndex: "id",
+      key: "id",
+      align: "right",
+    },
+    {
+      title: "שם עסק",
+      dataIndex: "name",
+      key: "name",
+      align: "right",
+      render: (text) => <strong>{text}</strong>,
+    },
+    {
+      title: "כתובת",
+      dataIndex: "address",
+      key: "address",
+      align: "right",
+    },
+    {
+      title: "אימייל",
+      dataIndex: "email",
+      key: "email",
+      align: "right",
+    },
+    {
+      title: "סוג עסק",
+      dataIndex: "businessType",
+      key: "businessType",
+      align: "right",
+      render: (text) => <Tag color="blue">{text}</Tag>,
+    },
+    {
+      title: "הכנסות",
+      dataIndex: "income",
+      key: "income",
+      align: "right",
+      render: (value) => <span style={{ color: "#52c41a", fontWeight: "bold" }}>₪{value?.toLocaleString()}</span>,
+    },
+    {
+      title: "הוצאות",
+      dataIndex: "expenses",
+      key: "expenses",
+      align: "right",
+      render: (value) => <span style={{ color: "#ff4d4f", fontWeight: "bold" }}>₪{value?.toLocaleString()}</span>,
+    },
+    {
+      title: "תזרים מזומנים",
+      dataIndex: "cashFlow",
+      key: "cashFlow",
+      align: "right",
+      render: (value) => <span style={{ color: "#1890ff", fontWeight: "bold" }}>₪{value?.toLocaleString()}</span>,
+    },
+    {
+      title: "שווי נקי",
+      dataIndex: "netWorth",
+      key: "netWorth",
+      align: "right",
+      render: (value) => <span style={{ color: "#722ed1", fontWeight: "bold" }}>₪{value?.toLocaleString()}</span>,
+    },
+  ]
+
+  return (
+    <ConfigProvider direction="rtl">
+      <div style={{ width: "100%" }}>
+        <Title level={4} style={{ marginBottom: 16, textAlign: "right" }}>
+          פרטי העסק
+        </Title>
+
+        <Card style={{ borderRadius: 12, overflow: "hidden" }}>
+          <Table
+            dataSource={dataSource}
+            columns={columns}
+            pagination={false}
+            rowKey="id"
+            scroll={{ x: 800 }}
+            style={{ direction: "rtl" }}
+          />
+        </Card>
+      </div>
+    </ConfigProvider>
   )
 }
 
 export default BusinessTable
-import { Box } from "@mui/material";
-import React from "react";
+import { ConfigProvider } from "antd"
+import type React from "react"
 
 const CenteredLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <Box
-      sx={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        minHeight: "100vh", // חשוב! כדי שיתפוס את כל הגובה
-        width: "100%",
-        px: 2,
-      }}
-    >
-      <Box sx={{ width: "100%", maxWidth: 600 }}>{children}</Box>
-    </Box>
-  );
-};
+    <ConfigProvider direction="rtl">
+      <div className="centered-layout">
+        <div style={{ width: "100%", maxWidth: 600 }}>{children}</div>
+      </div>
+    </ConfigProvider>
+  )
+}
 
-export default CenteredLayout;
-
+export default CenteredLayout
 "use client"
-
-import type React from "react"
-
-import { useContext, useState } from "react"
-import type { Business } from "../models/Business"
 import axios from "axios"
+import { useState, useContext } from "react"
 import { globalContext } from "../context/GlobalContext"
+import type { Business } from "../models/Business"
 import BusinessTable from "./BusinessTable"
-import {
-  Box,
-  Button,
-  Typography,
-  Paper,
-  Container,
-  Alert,
-  CircularProgress,
-  ThemeProvider,
-  createTheme,
-  CssBaseline,
-  Divider,
-} from "@mui/material"
-import { Visibility, Business as BusinessIcon } from "@mui/icons-material"
+import { Button, Typography, Card, Alert, Spin, ConfigProvider, Space, Avatar, Divider } from "antd"
+import { EyeOutlined, ShopOutlined } from "@ant-design/icons"
 
-// Create a custom theme with RTL support and Hebrew font
-const theme = createTheme({
-  direction: "rtl",
-  typography: {
-    fontFamily: '"Assistant", "Rubik", "Heebo", sans-serif',
-  },
-  palette: {
-    primary: {
-      main: "#3f51b5",
-    },
-    secondary: {
-      main: "#f50057",
-    },
-    background: {
-      default: "#f5f5f5",
-    },
-  },
-  components: {
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          borderRadius: 8,
-          padding: "10px 24px",
-          textTransform: "none",
-          fontSize: "1rem",
-        },
-      },
-    },
-  },
-})
+const { Title, Text } = Typography
 
 function DataViweing() {
   const url = import.meta.env.VITE_API_URL
@@ -1572,8 +1627,7 @@ function DataViweing() {
     updatedBy: "",
   })
 
-  const handleSubmit = () => async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+  const handleSubmit = async () => {
     setErrors([])
     setLoading(true)
 
@@ -1581,13 +1635,14 @@ function DataViweing() {
       const res = await axios.get<Business>(`${url}/api/Business/${globalContextDetails.user.businessId}`, {
         withCredentials: true,
       })
+
       if (res.status !== 200) {
         setErrors(["שגיאה בטעינת נתוני העסק"])
         setLoading(false)
         return
       }
 
-      if (!res) {
+      if (!res.data) {
         setErrors(["לא נמצאו נתונים"])
         setLoading(false)
         return
@@ -1604,299 +1659,105 @@ function DataViweing() {
   }
 
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Container maxWidth="lg" sx={{ py: 4 }}>
-        <Paper
-          elevation={3}
-          sx={{
-            p: 4,
-            borderRadius: 3,
-            boxShadow: "0 8px 32px rgba(0, 0, 0, 0.1)",
-          }}
-        >
-          <Box sx={{ textAlign: "center", mb: 4 }}>
-            <BusinessIcon color="primary" sx={{ fontSize: 48, mb: 2 }} />
-            <Typography variant="h4" component="h1" gutterBottom fontWeight="bold">
-              צפייה בנתוני העסק
-            </Typography>
-            <Typography variant="body1" color="text.secondary">
-              לחץ על הכפתור כדי לטעון את נתוני העסק העדכניים
-            </Typography>
-            <Divider sx={{ mt: 3 }} />
-          </Box>
-
-          <Box
-            component="form"
-            onSubmit={handleSubmit()}
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              gap: 3,
-              alignItems: "center",
-            }}
-          >
-            <Button
-              type="submit"
-              variant="contained"
-              startIcon={<Visibility />}
-              disabled={loading}
-              sx={{
-                py: 1.5,
-                px: 4,
-                fontWeight: "bold",
-                fontSize: "1.1rem",
-                boxShadow: "0 4px 12px rgba(63, 81, 181, 0.4)",
+    <ConfigProvider direction="rtl">
+      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "40px 20px" }}>
+        <Card className="form-section">
+          <div style={{ textAlign: "center", marginBottom: 32 }}>
+            <Avatar
+              size={80}
+              style={{
+                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                marginBottom: 16,
+                boxShadow: "0 4px 14px rgba(102, 126, 234, 0.3)",
               }}
             >
-              {loading ? "טוען נתונים..." : "צפה בנתונים"}
-            </Button>
+              <ShopOutlined style={{ fontSize: 40 }} />
+            </Avatar>
 
-            {loading && <CircularProgress sx={{ mt: 4 }} />}
+            <Title level={2} style={{ marginBottom: 8, color: "#2d3748" }}>
+              צפייה בנתוני העסק
+            </Title>
 
-            {dataLoaded && !loading && (
-              <Box sx={{ width: "100%", mt: 4 }}>
-                <BusinessTable business={business} />
-              </Box>
+            <Text type="secondary" style={{ fontSize: 16 }}>
+              לחץ על הכפתור כדי לטעון את נתוני העסק העדכניים
+            </Text>
+
+            <Divider />
+          </div>
+
+          <Space direction="vertical" style={{ width: "100%" }} size="large">
+            <div style={{ textAlign: "center" }}>
+              <Button
+                type="primary"
+                size="large"
+                disabled={loading}
+                loading={loading}
+                icon={<EyeOutlined />}
+                onClick={handleSubmit}
+                style={{
+                  height: 48,
+                  padding: "0 32px",
+                  fontWeight: 600,
+                  fontSize: 16,
+                }}
+              >
+                {loading ? "טוען נתונים..." : "צפה בנתונים"}
+              </Button>
+            </div>
+
+            {loading && (
+              <div style={{ textAlign: "center", padding: "40px 0" }}>
+                <Spin size="large" />
+                <div style={{ marginTop: 16 }}>
+                  <Text type="secondary">טוען נתוני העסק...</Text>
+                </div>
+              </div>
             )}
+
+            {dataLoaded && !loading && <BusinessTable business={business} />}
 
             {errors.length > 0 && (
-              <Box sx={{ width: "100%", mt: 2 }}>
+              <div>
                 {errors.map((error, index) => (
-                  <Alert key={index} severity="error" sx={{ mb: 1 }}>
-                    {error}
-                  </Alert>
+                  <Alert
+                    key={index}
+                    message="שגיאה"
+                    description={error}
+                    type="error"
+                    showIcon
+                    style={{ marginBottom: 8, borderRadius: 8 }}
+                  />
                 ))}
-              </Box>
+              </div>
             )}
-          </Box>
-        </Paper>
-      </Container>
-    </ThemeProvider>
+          </Space>
+        </Card>
+      </div>
+    </ConfigProvider>
   )
 }
 
 export default DataViweing
-// import type React from "react"
-// import { createTheme, ThemeProvider } from "@mui/material/styles"
-// import CssBaseline from "@mui/material/CssBaseline"
-// import rtlPlugin from "stylis-plugin-rtl"
-// import { prefixer } from "stylis"
-// import { CacheProvider } from "@emotion/react"
-// import createCache from "@emotion/cache"
-
-// // Create rtl cache
-// const cacheRtl = createCache({
-//   key: "muirtl",
-//   stylisPlugins: [prefixer, rtlPlugin],
-// })
-
-// // Define font family
-// const heeboFontFamily = '"Heebo", "Roboto", "Helvetica", "Arial", sans-serif'
-
-// // Create a theme instance with modern styling
-// const theme = createTheme({
-//   direction: "rtl",
-//   typography: {
-//     fontFamily: heeboFontFamily,
-//     h1: {
-//       fontWeight: 700,
-//     },
-//     h2: {
-//       fontWeight: 700,
-//     },
-//     h3: {
-//       fontWeight: 600,
-//     },
-//     h4: {
-//       fontWeight: 600,
-//     },
-//     h5: {
-//       fontWeight: 500,
-//     },
-//     h6: {
-//       fontWeight: 500,
-//     },
-//     button: {
-//       fontWeight: 500,
-//       textTransform: "none",
-//     },
-//   },
-//   palette: {
-//     primary: {
-//       main: "#5569ff", // Modern blue with a hint of purple
-//       light: "#8c9eff",
-//       dark: "#303f9f",
-//     },
-//     secondary: {
-//       main: "#ff4081", // Vibrant pink
-//       light: "#ff79b0",
-//       dark: "#c60055",
-//     },
-//     background: {
-//       default: "#f8f9fa",
-//       paper: "#ffffff",
-//     },
-//     error: {
-//       main: "#f44336",
-//     },
-//     warning: {
-//       main: "#ff9800",
-//     },
-//     info: {
-//       main: "#03a9f4",
-//     },
-//     success: {
-//       main: "#4caf50",
-//     },
-//   },
-//   shape: {
-//     borderRadius: 12,
-//   },
-//   components: {
-//     MuiButton: {
-//       styleOverrides: {
-//         root: {
-//           borderRadius: 12,
-//           textTransform: "none",
-//           fontWeight: 600,
-//           padding: "10px 20px",
-//           boxShadow: "none",
-//           "&:hover": {
-//             boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
-//           },
-//         },
-//         contained: {
-//           boxShadow: "0 2px 6px rgba(0,0,0,0.08)",
-//         },
-//       },
-//     },
-//     MuiCard: {
-//       styleOverrides: {
-//         root: {
-//           borderRadius: 16,
-//           boxShadow: "0 8px 24px rgba(0,0,0,0.08)",
-//           overflow: "hidden",
-//           transition: "transform 0.2s, box-shadow 0.2s",
-//           "&:hover": {
-//             boxShadow: "0 12px 32px rgba(0,0,0,0.12)",
-//           },
-//         },
-//       },
-//     },
-//     MuiPaper: {
-//       styleOverrides: {
-//         root: {
-//           borderRadius: 16,
-//         },
-//         elevation1: {
-//           boxShadow: "0 2px 12px rgba(0,0,0,0.05)",
-//         },
-//         elevation2: {
-//           boxShadow: "0 4px 16px rgba(0,0,0,0.08)",
-//         },
-//       },
-//     },
-//     MuiTextField: {
-//       styleOverrides: {
-//         root: {
-//           "& .MuiOutlinedInput-root": {
-//             borderRadius: 12,
-//           },
-//         },
-//       },
-//     },
-//     MuiChip: {
-//       styleOverrides: {
-//         root: {
-//           borderRadius: 8,
-//           fontWeight: 500,
-//         },
-//       },
-//     },
-//     MuiAvatar: {
-//       styleOverrides: {
-//         root: {
-//           fontWeight: 600,
-//         },
-//       },
-//     },
-//     MuiTableCell: {
-//       styleOverrides: {
-//         root: {
-//           padding: "16px",
-//         },
-//         head: {
-//           fontWeight: 600,
-//           backgroundColor: "rgba(0, 0, 0, 0.02)",
-//         },
-//       },
-//     },
-//     MuiTab: {
-//       styleOverrides: {
-//         root: {
-//           textTransform: "none",
-//           fontWeight: 500,
-//           minWidth: 100,
-//         },
-//       },
-//     },
-//     MuiAlert: {
-//       styleOverrides: {
-//         root: {
-//           borderRadius: 12,
-//         },
-//       },
-//     },
-//     MuiListItemButton: {
-//       styleOverrides: {
-//         root: {
-//           borderRadius: 8,
-//         },
-//       },
-//     },
-//   },
-// })
-
-// export function ThemeRegistry({ children }: { children: React.ReactNode }) {
-//   return (
-//     <CacheProvider value={cacheRtl}>
-//       <ThemeProvider theme={theme}>
-//         <CssBaseline />
-//         {children}
-//       </ThemeProvider>
-//     </CacheProvider>
-//   )
-// }
 "use client"
 
 import { useContext } from "react"
 import { globalContext } from "../context/GlobalContext"
+import { Typography, Row, Col, Card, Button, Space, Avatar, Statistic, ConfigProvider } from "antd"
 import {
-  Box,
-  Typography,
-  Container,
-  Grid,
-  Card,
-  CardContent,
-  Button,
-  Avatar,
-  Paper,
-  Stack,
-  Divider,
-} from "@mui/material"
-import {
-  Dashboard,
-  Business,
-  AttachMoney,
-  BarChart,
-  ArrowForward,
-  TrendingUp,
-  Group,
-  Visibility,
-  Upload,
-} from "@mui/icons-material"
+  DashboardOutlined,
+  ShopOutlined,
+  DollarOutlined,
+  BarChartOutlined,
+  ArrowRightOutlined,
+  TeamOutlined,
+  EyeOutlined,
+  UploadOutlined,
+  RiseOutlined,
+  FallOutlined,
+} from "@ant-design/icons"
 import { useNavigate } from "react-router-dom"
+
+const { Title, Text, Paragraph } = Typography
 
 const Home = () => {
   const globalContextDetails = useContext(globalContext)
@@ -1905,574 +1766,386 @@ const Home = () => {
   const menuItems = [
     {
       title: "לוח בקרה",
-      icon: <Dashboard fontSize="large" color="primary" />,
+      icon: <DashboardOutlined style={{ fontSize: 32, color: "#667eea" }} />,
       description: "צפה בנתונים עדכניים של העסק שלך",
       path: "/view-data",
+      color: "#667eea",
     },
     {
       title: "פרטי העסק",
-      icon: <Business fontSize="large" color="primary" />,
+      icon: <ShopOutlined style={{ fontSize: 32, color: "#52c41a" }} />,
       description: "נהל את פרטי העסק שלך",
       path: "/business-register",
+      color: "#52c41a",
     },
     {
       title: "הכנסות והוצאות",
-      icon: <AttachMoney fontSize="large" color="primary" />,
+      icon: <DollarOutlined style={{ fontSize: 32, color: "#fa8c16" }} />,
       description: "נהל את התקציב והתזרים של העסק",
       path: "/incom&Expennses",
+      color: "#fa8c16",
     },
     {
       title: "דוחות",
-      icon: <BarChart fontSize="large" color="primary" />,
+      icon: <BarChartOutlined style={{ fontSize: 32, color: "#722ed1" }} />,
       description: "צפה בדוחות ביצועים ותחזיות",
       path: "/production-reports",
+      color: "#722ed1",
     },
   ]
 
   const quickActions = [
-    { title: "צפייה בנתונים", icon: <Visibility />, path: "/view-data" },
-    { title: "העלאת קבצים", icon: <Upload />, path: "/upload-file" },
-    { title: "ניהול משתמשים", icon: <Group />, path: "/user-management" },
+    { title: "צפייה בנתונים", icon: <EyeOutlined />, path: "/view-data" },
+    { title: "העלאת קבצים", icon: <UploadOutlined />, path: "/upload-file" },
+    { title: "ניהול משתמשים", icon: <TeamOutlined />, path: "/user-management" },
+  ]
+
+  const statsData = [
+    {
+      title: "הכנסות החודש",
+      value: 10500,
+      prefix: "₪",
+      trend: 12.5,
+      color: "#52c41a",
+      icon: <DollarOutlined />,
+    },
+    {
+      title: "משתמשים פעילים",
+      value: 24,
+      trend: 3,
+      color: "#1890ff",
+      icon: <TeamOutlined />,
+    },
+    {
+      title: "יעילות תפעולית",
+      value: 92,
+      suffix: "%",
+      trend: 5.2,
+      color: "#722ed1",
+      icon: <RiseOutlined />,
+    },
+    {
+      title: "פרויקטים פעילים",
+      value: 18,
+      trend: 2,
+      color: "#fa8c16",
+      icon: <BarChartOutlined />,
+    },
   ]
 
   return (
-    <Box sx={{ py: 4, textAlign: "right" }}>
-      {/* Hero Section */}
-      <Paper
-        elevation={0}
-        sx={{
-          p: { xs: 3, md: 5 },
-          mb: 5,
-          borderRadius: 4,
-          background: "linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)",
-          color: "white",
-          boxShadow: "0 10px 40px rgba(37, 99, 235, 0.2)",
-          overflow: "hidden",
-          position: "relative",
-        }}
-      >
-        <Box
-          sx={{
-            position: "absolute",
-            top: 0,
-            right: 0,
-            width: "100%",
-            height: "100%",
-            opacity: 0.1,
-            backgroundImage: "url('/placeholder.svg?height=500&width=500')",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            zIndex: 0,
-          }}
-        />
-        <Container maxWidth="lg" sx={{ position: "relative", zIndex: 1 }}>
-          <Grid container spacing={4} alignItems="center">
-            <Grid item xs={12} md={7} {...({} as any)}>
-              <Typography variant="h3" component="h1" fontWeight="bold" gutterBottom>
+    <ConfigProvider direction="rtl">
+      <div style={{ padding: "1250px 0 40px 0" }}>
+        {/* Hero Section */}
+        <div className="hero-section" style={{ position: "relative", zIndex: 1 }}>
+          <Row gutter={[32, 32]} align="middle">
+            <Col xs={24} lg={14}>
+              <Title level={1} style={{ color: "white", marginBottom: 16, fontSize: "2.5rem" }}>
                 שלום, {globalContextDetails.user?.firstName || "אורח"} {globalContextDetails.user?.lastName || ""}
-              </Typography>
-              <Typography variant="h5" sx={{ mb: 3, opacity: 0.9 }}>
+              </Title>
+              <Title level={3} style={{ color: "rgba(255,255,255,0.9)", marginBottom: 24, fontWeight: 400 }}>
                 ברוכים הבאים למערכת BusinessMan - הדרך החכמה לנהל את העסק שלך
-              </Typography>
-              <Typography variant="body1" sx={{ mb: 4, opacity: 0.8 }}>
+              </Title>
+              <Paragraph style={{ color: "rgba(255,255,255,0.8)", fontSize: 16, marginBottom: 32 }}>
                 נהל את העסק שלך בקלות ויעילות עם כלים מתקדמים לניהול הכנסות, הוצאות, משתמשים ודוחות.
-              </Typography>
-              <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
+              </Paragraph>
+              <Space size="large" wrap>
                 <Button
-                  variant="contained"
+                  type="primary"
                   size="large"
-                  color="secondary"
                   onClick={() => navigate("/view-data")}
-                  sx={{
-                    px: 4,
-                    py: 1.5,
-                    fontWeight: "bold",
-                    boxShadow: "0 4px 14px rgba(249, 115, 22, 0.4)",
+                  style={{
+                    height: 48,
+                    padding: "0 32px",
+                    background: "#fa8c16",
+                    borderColor: "#fa8c16",
+                    fontWeight: 600,
+                    fontSize: 16,
                   }}
                 >
                   צפה בנתוני העסק
                 </Button>
                 <Button
-                  variant="outlined"
                   size="large"
                   onClick={() => navigate("/business-register")}
-                  sx={{
-                    px: 4,
-                    py: 1.5,
-                    fontWeight: "bold",
-                    bgcolor: "rgba(255, 255, 255, 0.1)",
-                    borderColor: "rgba(255, 255, 255, 0.3)",
+                  style={{
+                    height: 48,
+                    padding: "0 32px",
+                    background: "rgba(255,255,255,0.1)",
+                    borderColor: "rgba(255,255,255,0.3)",
                     color: "white",
-                    "&:hover": {
-                      bgcolor: "rgba(255, 255, 255, 0.2)",
-                      borderColor: "rgba(255, 255, 255, 0.5)",
-                    },
+                    fontWeight: 600,
+                    fontSize: 16,
                   }}
                 >
                   עדכן פרטי עסק
                 </Button>
-              </Stack>
-            </Grid>
-            <Grid item xs={12} md={5} sx={{ display: { xs: "none", md: "block" } }} {...({} as any)}>
-              <Box
-                component="img"
-                src="/placeholder.svg?height=300&width=400"
-                alt="Business Dashboard"
-                sx={{
+              </Space>
+            </Col>
+            <Col xs={0} lg={10} style={{ textAlign: "center" }}>
+              <div
+                style={{
                   width: "100%",
                   maxWidth: 400,
-                  borderRadius: 4,
-                  boxShadow: "0 20px 40px rgba(0, 0, 0, 0.2)",
-                  transform: "perspective(1000px) rotateY(-10deg) rotateX(5deg)",
-                }}
-              />
-            </Grid>
-          </Grid>
-        </Container>
-      </Paper>
-
-      {/* Stats Section */}
-      <Container maxWidth="lg" sx={{ mb: 6, display: "flex", flexDirection: "column", alignItems: "center" }}>
-        <Grid container spacing={3}>
-          <Grid item xs={12} sm={6} md={3} {...({} as any)}>
-            <Paper
-              sx={{
-                p: 3,
-                borderRadius: 3,
-                boxShadow: "0 4px 20px rgba(0, 0, 0, 0.05)",
-                height: "100%",
-                display: "flex",
-                flexDirection: "column",
-                position: "relative",
-                overflow: "hidden",
-              }}
-            >
-              <Box
-                sx={{
-                  position: "absolute",
-                  top: 0,
-                  right: 0,
-                  width: 80,
-                  height: 80,
-                  borderRadius: "0 0 0 100%",
-                  bgcolor: "primary.light",
-                  opacity: 0.1,
-                }}
-              />
-              <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                <Avatar
-                  sx={{
-                    bgcolor: "primary.light",
-                    color: "primary.main",
-                    width: 48,
-                    height: 48,
-                  }}
-                >
-                  <AttachMoney />
-                </Avatar>
-              </Box>
-              <Typography variant="h5" fontWeight="bold" gutterBottom>
-                ₪10,500
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                הכנסות החודש
-              </Typography>
-              <Box sx={{ display: "flex", alignItems: "center", mt: "auto", pt: 2 }}>
-                <TrendingUp sx={{ color: "success.main", fontSize: 18, mr: 0.5 }} />
-                <Typography variant="caption" color="success.main" fontWeight="bold">
-                  +12.5%
-                </Typography>
-                <Typography variant="caption" color="text.secondary" sx={{ ml: 1 }}>
-                  מהחודש הקודם
-                </Typography>
-              </Box>
-            </Paper>
-          </Grid>
-
-          <Grid item xs={12} sm={6} md={3} {...({} as any)}>
-            <Paper
-              sx={{
-                p: 3,
-                borderRadius: 3,
-                boxShadow: "0 4px 20px rgba(0, 0, 0, 0.05)",
-                height: "100%",
-                display: "flex",
-                flexDirection: "column",
-                position: "relative",
-                overflow: "hidden",
-              }}
-            >
-              <Box
-                sx={{
-                  position: "absolute",
-                  top: 0,
-                  right: 0,
-                  width: 80,
-                  height: 80,
-                  borderRadius: "0 0 0 100%",
-                  bgcolor: "secondary.light",
-                  opacity: 0.1,
-                }}
-              />
-              <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                <Avatar
-                  sx={{
-                    bgcolor: "secondary.light",
-                    color: "secondary.main",
-                    width: 48,
-                    height: 48,
-                  }}
-                >
-                  <Group />
-                </Avatar>
-              </Box>
-              <Typography variant="h5" fontWeight="bold" gutterBottom>
-                24
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                משתמשים פעילים
-              </Typography>
-              <Box sx={{ display: "flex", alignItems: "center", mt: "auto", pt: 2 }}>
-                <TrendingUp sx={{ color: "success.main", fontSize: 18, mr: 0.5 }} />
-                <Typography variant="caption" color="success.main" fontWeight="bold">
-                  +3
-                </Typography>
-                <Typography variant="caption" color="text.secondary" sx={{ ml: 1 }}>
-                  משתמשים חדשים
-                </Typography>
-              </Box>
-            </Paper>
-          </Grid>
-
-          <Grid item xs={12} sm={6} md={3} {...({} as any)}>
-            <Paper
-              sx={{
-                p: 3,
-                borderRadius: 3,
-                boxShadow: "0 4px 20px rgba(0, 0, 0, 0.05)",
-                height: "100%",
-                display: "flex",
-                flexDirection: "column",
-                position: "relative",
-                overflow: "hidden",
-              }}
-            >
-              <Box
-                sx={{
-                  position: "absolute",
-                  top: 0,
-                  right: 0,
-                  width: 80,
-                  height: 80,
-                  borderRadius: "0 0 0 100%",
-                  bgcolor: "success.light",
-                  opacity: 0.1,
-                }}
-              />
-              <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                <Avatar
-                  sx={{
-                    bgcolor: "success.light",
-                    color: "success.main",
-                    width: 48,
-                    height: 48,
-                  }}
-                >
-                  <Business />
-                </Avatar>
-              </Box>
-              <Typography variant="h5" fontWeight="bold" gutterBottom>
-                92%
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                יעילות תפעולית
-              </Typography>
-              <Box sx={{ display: "flex", alignItems: "center", mt: "auto", pt: 2 }}>
-                <TrendingUp sx={{ color: "success.main", fontSize: 18, mr: 0.5 }} />
-                <Typography variant="caption" color="success.main" fontWeight="bold">
-                  +5.2%
-                </Typography>
-                <Typography variant="caption" color="text.secondary" sx={{ ml: 1 }}>
-                  שיפור
-                </Typography>
-              </Box>
-            </Paper>
-          </Grid>
-
-          <Grid item xs={12} sm={6} md={3} {...({} as any)}>
-            <Paper
-              sx={{
-                p: 3,
-                borderRadius: 3,
-                boxShadow: "0 4px 20px rgba(0, 0, 0, 0.05)",
-                height: "100%",
-                display: "flex",
-                flexDirection: "column",
-                position: "relative",
-                overflow: "hidden",
-              }}
-            >
-              <Box
-                sx={{
-                  position: "absolute",
-                  top: 0,
-                  right: 0,
-                  width: 80,
-                  height: 80,
-                  borderRadius: "0 0 0 100%",
-                  bgcolor: "info.light",
-                  opacity: 0.1,
-                }}
-              />
-              <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                <Avatar
-                  sx={{
-                    bgcolor: "info.light",
-                    color: "info.main",
-                    width: 48,
-                    height: 48,
-                  }}
-                >
-                  <BarChart />
-                </Avatar>
-              </Box>
-              <Typography variant="h5" fontWeight="bold" gutterBottom>
-                18
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                פרויקטים פעילים
-              </Typography>
-              <Box sx={{ display: "flex", alignItems: "center", mt: "auto", pt: 2 }}>
-                <TrendingUp sx={{ color: "success.main", fontSize: 18, mr: 0.5 }} />
-                <Typography variant="caption" color="success.main" fontWeight="bold">
-                  +2
-                </Typography>
-                <Typography variant="caption" color="text.secondary" sx={{ ml: 1 }}>
-                  פרויקטים חדשים
-                </Typography>
-              </Box>
-            </Paper>
-          </Grid>
-        </Grid>
-      </Container>
-
-      {/* Quick Actions */}
-      <Container maxWidth="lg" sx={{ mb: 6, display: "flex", flexDirection: "column", alignItems: "center" }}>
-        <Typography variant="h5" component="h2" fontWeight="bold" gutterBottom sx={{ mb: 3 }}>
-          פעולות מהירות
-        </Typography>
-        <Grid container spacing={2}>
-          {quickActions.map((action, index) => (
-            <Grid item xs={12} sm={4} key={index} {...({} as any)}>
-              <Button
-                variant="outlined"
-                fullWidth
-                startIcon={action.icon}
-                onClick={() => navigate(action.path)}
-                sx={{
-                  p: 2,
-                  justifyContent: "flex-start",
-                  borderColor: "rgba(0, 0, 0, 0.1)",
-                  "&:hover": {
-                    borderColor: "primary.main",
-                    bgcolor: "rgba(37, 99, 235, 0.05)",
-                  },
-                }}
-              >
-                {action.title}
-              </Button>
-            </Grid>
-          ))}
-        </Grid>
-      </Container>
-
-      {/* Main Menu Cards */}
-      <Container maxWidth="lg" sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-        <Box sx={{ mb: 4 }}>
-          <Typography textAlign={"right"} variant="h5" component="h2" fontWeight="bold" gutterBottom>
-            ניהול העסק שלך
-          </Typography>
-          <Typography variant="body1" color="text.secondary">
-            כל הכלים שאתה צריך לניהול יעיל ומוצלח של העסק שלך במקום אחד
-          </Typography>
-        </Box>
-
-        <Grid container spacing={3} sx={{ direction: "rtl" }} >
-          {menuItems.map((item, index) => (
-            <Grid item xs={12} sm={6} md={3} key={index} {...({} as any)}>
-              <Card
-                sx={{
-                  height: "100%",
+                  height: 300,
+                  background: "rgba(255,255,255,0.1)",
+                  borderRadius: 20,
                   display: "flex",
-                  flexDirection: "column",
-                  transition: "all 0.3s ease",
-                  "&:hover": {
-                    transform: "translateY(-8px)",
-                    boxShadow: "0 16px 40px rgba(0, 0, 0, 0.12)",
-                  },
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backdropFilter: "blur(10px)",
+                  border: "1px solid rgba(255,255,255,0.2)",
                 }}
               >
-                <CardContent sx={{ p: 3, flexGrow: 1, display: "flex", flexDirection: "column" }}>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      mb: 2,
-                      p: 1.5,
-                      borderRadius: 2,
-                      bgcolor: "primary.light",
-                      color: "primary.main",
-                      width: 64,
-                      height: 64,
+                <DashboardOutlined style={{ fontSize: 120, color: "rgba(255,255,255,0.8)" }} />
+              </div>
+            </Col>
+          </Row>
+        </div>
+
+        {/* Stats Section */}
+        <Row gutter={[24, 24]} style={{ marginBottom: 48 }}>
+          {statsData.map((stat, index) => (
+            <Col xs={24} sm={12} lg={6} key={index}>
+              <Card className="stats-card">
+                <div style={{ display: "flex", alignItems: "center", marginBottom: 16 }}>
+                  <Avatar
+                    size={48}
+                    style={{
+                      background: `${stat.color}20`,
+                      color: stat.color,
+                      marginLeft: 12,
                     }}
                   >
+                    {stat.icon}
+                  </Avatar>
+                </div>
+                <Statistic
+                  title={stat.title}
+                  value={stat.value}
+                  prefix={stat.prefix}
+                  suffix={stat.suffix}
+                  valueStyle={{
+                    color: stat.color,
+                    fontSize: "2rem",
+                    fontWeight: "bold",
+                  }}
+                />
+                <div style={{ display: "flex", alignItems: "center", marginTop: 12 }}>
+                  {stat.trend > 0 ? (
+                    <RiseOutlined style={{ color: "#52c41a", marginLeft: 4 }} />
+                  ) : (
+                    <FallOutlined style={{ color: "#ff4d4f", marginLeft: 4 }} />
+                  )}
+                  <Text
+                    style={{
+                      color: stat.trend > 0 ? "#52c41a" : "#ff4d4f",
+                      fontWeight: 600,
+                      marginLeft: 8,
+                    }}
+                  >
+                    {stat.trend > 0 ? "+" : ""}
+                    {stat.trend}%
+                  </Text>
+                  <Text type="secondary">מהחודש הקודם</Text>
+                </div>
+              </Card>
+            </Col>
+          ))}
+        </Row>
+
+        {/* Quick Actions */}
+        <div style={{ marginBottom: 48 }}>
+          <Title level={3} style={{ textAlign: "center", marginBottom: 24 }}>
+            פעולות מהירות
+          </Title>
+          <Row gutter={[16, 16]}>
+            {quickActions.map((action, index) => (
+              <Col xs={24} sm={8} key={index}>
+                <Button
+                  type="default"
+                  size="large"
+                  icon={action.icon}
+                  onClick={() => navigate(action.path)}
+                  block
+                  style={{
+                    height: 56,
+                    borderRadius: 12,
+                    borderWidth: 2,
+                    fontWeight: 600,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  {action.title}
+                </Button>
+              </Col>
+            ))}
+          </Row>
+        </div>
+
+        {/* Main Menu Cards */}
+        <div style={{ marginBottom: 48 }}>
+          <div style={{ textAlign: "center", marginBottom: 32 }}>
+            <Title level={3} style={{ marginBottom: 8 }}>
+              ניהול העסק שלך
+            </Title>
+            <Text type="secondary" style={{ fontSize: 16 }}>
+              כל הכלים שאתה צריך לניהול יעיל ומוצלח של העסק שלך במקום אחד
+            </Text>
+          </div>
+
+          <Row gutter={[24, 24]}>
+            {menuItems.map((item, index) => (
+              <Col xs={24} sm={12} lg={6} key={index}>
+                <Card className="feature-card" hoverable style={{ height: "100%" }} bodyStyle={{ padding: 32 }}>
+                  <div className="icon-wrapper" style={{ background: `${item.color}20`, color: item.color }}>
                     {item.icon}
-                  </Box>
-                  <Typography variant="h6" component="h3" fontWeight="bold" gutterBottom>
+                  </div>
+                  <Title level={4} style={{ marginBottom: 12, color: "#2d3748" }}>
                     {item.title}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                  </Title>
+                  <Paragraph type="secondary" style={{ marginBottom: 24, minHeight: 48 }}>
                     {item.description}
-                  </Typography>
+                  </Paragraph>
                   <Button
-                    variant="text"
-                    color="primary"
-                    endIcon={<ArrowForward />}
+                    type="text"
+                    icon={<ArrowRightOutlined />}
                     onClick={() => navigate(item.path)}
-                    sx={{ mt: "auto", alignSelf: "flex-start" }}
+                    style={{
+                      padding: 0,
+                      height: "auto",
+                      color: item.color,
+                      fontWeight: 600,
+                    }}
                   >
                     כניסה
                   </Button>
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
+                </Card>
+              </Col>
+            ))}
+          </Row>
+        </div>
 
         {/* Testimonial */}
-        <Paper
-          sx={{
-            mt: 6,
-            p: 4,
-            borderRadius: 3,
-            bgcolor: "rgba(37, 99, 235, 0.03)",
-            border: "1px solid rgba(37, 99, 235, 0.1)",
-          }}
-        >
-          <Grid container spacing={3} alignItems="center">
-            <Grid item xs={12} md={8} {...({} as any)}>
-              <Typography variant="h6" fontWeight="bold" gutterBottom color="primary.dark">
-                ".שינתה את הדרך שבה אני מנהל את העסק שלי. הכל נגיש ויעיל BusinessMan מערכת"
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                יוסי כהן, בעלים של "טכנולוגיות מתקדמות" בע״מ
-              </Typography>
-            </Grid>
-            <Grid item xs={12} md={4} sx={{ textAlign: "center" }} {...({} as any)}>
+        <Card className="testimonial-section">
+          <Row gutter={[32, 32]} align="middle">
+            <Col xs={24} lg={16}>
+              <Title level={4} style={{ color: "#667eea", marginBottom: 16 }}>
+                "מערכת BusinessMan שינתה את הדרך שבה אני מנהל את העסק שלי. הכל נגיש ויעיל."
+              </Title>
+              <Text type="secondary">יוסי כהן, בעלים של "טכנולוגיות מתקדמות" בע״מ</Text>
+            </Col>
+            <Col xs={24} lg={8} style={{ textAlign: "center" }}>
               <Button
-                variant="contained"
+                type="primary"
                 size="large"
                 onClick={() => navigate("/register-user")}
-                sx={{ px: 4, py: 1.5, fontWeight: "bold" }}
+                style={{
+                  height: 48,
+                  padding: "0 32px",
+                  fontWeight: 600,
+                  marginBottom: 8,
+                }}
               >
                 הצטרף עכשיו
               </Button>
-              <Typography variant="caption" display="block" sx={{ mt: 1 }} color="text.secondary">
-                הצטרפו למאות עסקים שכבר משתמשים במערכת
-              </Typography>
-            </Grid>
-          </Grid>
-        </Paper>
-      </Container>
+              <div>
+                <Text type="secondary" style={{ fontSize: 12 }}>
+                  הצטרפו למאות עסקים שכבר משתמשים במערכת
+                </Text>
+              </div>
+            </Col>
+          </Row>
+        </Card>
 
-      {/* Footer */}
-      <Box sx={{ mt: 8, py: 4 }}>
-        <Divider sx={{ mb: 4 }} />
-        <Container sx={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-          <Grid container spacing={2} justifyContent="space-between" alignItems="center">
-            <Grid item {...({} as any)}>
-              <Box sx={{ display: "flex", alignItems: "center" }}>
-                <Box component="img" src="/logo.svg" alt="BusinessMan Logo" sx={{ height: 32, width: 32, mr: 1 }} />
-                <Typography variant="h6" component="div" fontWeight="bold" color="primary">
-                  BusinessMan
-                </Typography>
-              </Box>
-              <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: "block" }}>
-                © 2025 BusinessMan. כל הזכויות שמורות.
-              </Typography>
-            </Grid>
-            <Grid item {...({} as any)}>
-              <Stack direction="row" spacing={2}>
-                <Button variant="text" size="small">
+        {/* Footer */}
+        <div style={{ marginTop: 64, paddingTop: 32, borderTop: "1px solid #f0f0f0" }}>
+          <Row justify="space-between" align="middle">
+            <Col>
+              <Space>
+                <Avatar style={{ background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)" }}>
+                  <DashboardOutlined />
+                </Avatar>
+                <div>
+                  <Title level={4} style={{ margin: 0, color: "#667eea" }}>
+                    BusinessMan
+                  </Title>
+                  <Text type="secondary" style={{ fontSize: 12 }}>
+                    © 2025 BusinessMan. כל הזכויות שמורות.
+                  </Text>
+                </div>
+              </Space>
+            </Col>
+            <Col>
+              <Space>
+                <Button type="text" size="small">
                   תנאי שימוש
                 </Button>
-                <Button variant="text" size="small">
+                <Button type="text" size="small">
                   פרטיות
                 </Button>
-                <Button variant="text" size="small">
+                <Button type="text" size="small">
                   צור קשר
                 </Button>
-              </Stack>
-            </Grid>
-          </Grid>
-        </Container>
-      </Box>
-    </Box>
+              </Space>
+            </Col>
+          </Row>
+        </div>
+      </div>
+    </ConfigProvider>
   )
 }
 
 export default Home
 "use client"
-
-import type React from "react"
-
 import axios from "axios"
-import { type ChangeEvent, useContext, useState } from "react"
+import { useContext, useState } from "react"
 import type { InvoiceDto } from "../models/InvoiceDto"
 import { globalContext } from "../context/GlobalContext"
 import {
-  Box,
-  TextField,
+  Form,
+  InputNumber,
   Button,
   Typography,
-  Paper,
-  Container,
-  Grid,
-  InputAdornment,
-  Alert,
-  Divider,
   Card,
-  CardContent,
-  Stack,
-} from "@mui/material"
-import { AttachMoney, MoneyOff, Send, Receipt, TrendingUp, TrendingDown, BarChart } from "@mui/icons-material"
+  Row,
+  Col,
+  Alert,
+  Statistic,
+  ConfigProvider,
+  Divider,
+  Avatar,
+} from "antd"
+import {
+  DollarOutlined,
+  MinusCircleOutlined,
+  SendOutlined,
+  FileTextOutlined,
+  WarningOutlined,
+  DingdingOutlined,
+  BarChartOutlined,
+  ClearOutlined,
+} from "@ant-design/icons"
+
+const { Title, Text } = Typography
 
 const IncomAndExpennses = () => {
   const [income, setIncome] = useState(0)
   const [expenditure, setExpenditure] = useState(0)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
   const globalContextDetails = useContext(globalContext)
 
-  const handleChange = (event: ChangeEvent<HTMLInputElement>): void => {
-    const value = event.target.value
-    const name = event.target.name
-
-    if (name === "income") {
-      setIncome(Number(value))
-    } else if (name === "expenditure") {
-      setExpenditure(Number(value))
-    }
-  }
-
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
+  const handleSubmit = async () => {
+    setLoading(true)
     setSuccess(false)
     setError(null)
 
     const invoiceToSend: InvoiceDto = {
-      id: globalContextDetails.user.id,
+      id: 0,
       amountDebit: expenditure,
       amountCredit: income,
       invoiceDate: new Date(),
@@ -2488,317 +2161,262 @@ const IncomAndExpennses = () => {
     }
 
     try {
-      await axios.post("https://localhost:7031/api/Invoice", invoiceToSend)
+      await axios.post("https://localhost:7031/api/Invoice", invoiceToSend, { withCredentials: true })
       setSuccess(true)
       setIncome(0)
       setExpenditure(0)
     } catch (error) {
       console.error("Error saving invoice:", error)
       setError("אירעה שגיאה בשמירת הנתונים. אנא נסה שנית.")
+    } finally {
+      setLoading(false)
     }
+  }
+
+  const handleReset = () => {
+    setIncome(0)
+    setExpenditure(0)
+    setSuccess(false)
+    setError(null)
   }
 
   // Sample data for the financial summary
   const financialSummary = [
-    { title: "הכנסות החודש", amount: "₪15,750", change: "+12%", icon: <TrendingUp />, color: "success" },
-    { title: "הוצאות החודש", amount: "₪8,320", change: "-5%", icon: <TrendingDown />, color: "error" },
-    { title: "רווח נקי", amount: "₪7,430", change: "+18%", icon: <BarChart />, color: "primary" },
+    {
+      title: "הכנסות החודש",
+      amount: 15750,
+      change: 12,
+      icon: <WarningOutlined />,
+      color: "#52c41a",
+    },
+    {
+      title: "הוצאות החודש",
+      amount: 8320,
+      change: -5,
+      icon: <DingdingOutlined />,
+      color: "#ff4d4f",
+    },
+    {
+      title: "רווח נקי",
+      amount: 7430,
+      change: 18,
+      icon: <BarChartOutlined />,
+      color: "#1890ff",
+    },
   ]
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4, textAlign: "right" }}>
-      <Paper
-        elevation={0}
-        sx={{
-          p: { xs: 3, md: 5 },
-          borderRadius: 3,
-          boxShadow: "0 10px 40px rgba(0, 0, 0, 0.08)",
-          background: "linear-gradient(145deg, #ffffff, #f8fafc)",
-          border: "1px solid rgba(0, 0, 0, 0.05)",
-          mb: 4,
-        }}
-      >
-        <Box sx={{ textAlign: "center", mb: 4 }}>
-          <Box
-            sx={{
-              width: 80,
-              height: 80,
-              borderRadius: "50%",
-              bgcolor: "primary.light",
-              color: "primary.main",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              mx: "auto",
-              mb: 2,
-              boxShadow: "0 4px 14px rgba(37, 99, 235, 0.2)",
-            }}
-          >
-            <Receipt sx={{ fontSize: 40 }} />
-          </Box>
-          <Typography variant="h4" component="h1" gutterBottom fontWeight="bold">
-            ניהול הכנסות והוצאות
-          </Typography>
-          <Typography variant="body1" color="text.secondary">
-            הזן את ההכנסות וההוצאות של העסק שלך לניהול פיננסי יעיל
-          </Typography>
-          <Divider sx={{ mt: 3 }} />
-        </Box>
+    <ConfigProvider direction="rtl">
+      <div style={{ padding: "0 0 40px 0" }}>
+        <Card className="form-section" style={{ marginBottom: 32 }}>
+          <div style={{ textAlign: "center", marginBottom: 32 }}>
+            <Avatar
+              size={80}
+              style={{
+                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                marginBottom: 16,
+                boxShadow: "0 4px 14px rgba(102, 126, 234, 0.3)",
+              }}
+            >
+              <FileTextOutlined style={{ fontSize: 40 }} />
+            </Avatar>
 
-        {/* Financial Summary */}
-        <Grid container spacing={3} sx={{ mb: 5 }}>
-          {financialSummary.map((item, index) => (
-            <Grid item xs={12} md={4} key={index} {...({} as any)}>
-              <Card
-                elevation={0}
-                sx={{
-                  borderRadius: 3,
-                  boxShadow: "0 4px 20px rgba(0, 0, 0, 0.05)",
-                  height: "100%",
-                  border: "1px solid rgba(0, 0, 0, 0.05)",
-                  transition: "transform 0.2s",
-                  "&:hover": {
-                    transform: "translateY(-5px)",
-                    boxShadow: "0 8px 30px rgba(0, 0, 0, 0.1)",
-                  },
-                }}
-              >
-                <CardContent sx={{ p: 3 }}>
-                  <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
-                    <Typography variant="h6" fontWeight="bold" color="text.primary">
+            <Title level={2} style={{ marginBottom: 8, color: "#2d3748" }}>
+              ניהול הכנסות והוצאות
+            </Title>
+
+            <Text type="secondary" style={{ fontSize: 16 }}>
+              הזן את ההכנסות וההוצאות של העסק שלך לניהול פיננסי יעיל
+            </Text>
+
+            <Divider />
+          </div>
+
+          {/* Financial Summary */}
+          <Row gutter={[24, 24]} style={{ marginBottom: 40 }}>
+            {financialSummary.map((item, index) => (
+              <Col xs={24} md={8} key={index}>
+                <Card className="financial-summary-card">
+                  <div
+                    style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}
+                  >
+                    <Title level={5} style={{ margin: 0, color: "#2d3748" }}>
                       {item.title}
-                    </Typography>
-                    <Box
-                      sx={{
-                        bgcolor: `${item.color}.light`,
-                        color: `${item.color}.main`,
-                        p: 1,
-                        borderRadius: "50%",
-                        mr: 2,
+                    </Title>
+                    <Avatar
+                      size={48}
+                      style={{
+                        background: `${item.color}20`,
+                        color: item.color,
                       }}
                     >
                       {item.icon}
-                    </Box>
-                  </Box>
-                  <Typography variant="h4" fontWeight="bold" color={`${item.color}.main`} gutterBottom>
-                    {item.amount}
-                  </Typography>
-                  <Box sx={{ display: "flex", alignItems: "center" }}>
-                    <Typography
-                      variant="body2"
-                      fontWeight="bold"
-                      color={item.change.startsWith("+") ? "success.main" : "error.main"}
+                    </Avatar>
+                  </div>
+                  <Statistic
+                    value={item.amount}
+                    prefix="₪"
+                    valueStyle={{
+                      color: item.color,
+                      fontSize: "1.8rem",
+                      fontWeight: "bold",
+                    }}
+                  />
+                  <div style={{ display: "flex", alignItems: "center", marginTop: 8 }}>
+                    <Text
+                      style={{
+                        color: item.change > 0 ? "#52c41a" : "#ff4d4f",
+                        fontWeight: 600,
+                        marginLeft: 8,
+                      }}
                     >
-                      {item.change}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
-                      מהחודש הקודם
-                    </Typography>
-                  </Box>
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
+                      {item.change > 0 ? "+" : ""}
+                      {item.change}%
+                    </Text>
+                    <Text type="secondary">מהחודש הקודם</Text>
+                  </div>
+                </Card>
+              </Col>
+            ))}
+          </Row>
 
-        <Box
-          component="form"
-          onSubmit={handleSubmit}
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            gap: 3,
-          }}
-        >
-          <Typography variant="h5" fontWeight="bold" gutterBottom>
-            הוספת תנועה חדשה
-          </Typography>
+          <Form layout="vertical" onFinish={handleSubmit}>
+            <Title level={4} style={{ marginBottom: 24 }}>
+              הוספת תנועה חדשה
+            </Title>
 
-          <Grid container spacing={3}>
-            <Grid item xs={12} md={6} {...({} as any)}>
-              <Box
-                sx={{
-                  p: 3,
-                  borderRadius: 3,
-                  bgcolor: "rgba(16, 185, 129, 0.1)",
-                  border: "1px solid rgba(16, 185, 129, 0.2)",
-                  height: "100%",
+            <Row gutter={[24, 24]}>
+              <Col xs={24} md={12}>
+                <Card className="income-card" style={{ height: "100%" }}>
+                  <div style={{ display: "flex", alignItems: "center", marginBottom: 20 }}>
+                    <Avatar
+                      style={{
+                        background: "#52c41a",
+                        color: "white",
+                        marginLeft: 12,
+                      }}
+                    >
+                      <DollarOutlined />
+                    </Avatar>
+                    <Title level={5} style={{ margin: 0, color: "#389e0d" }}>
+                      הכנסות
+                    </Title>
+                  </div>
+                  <Form.Item label="סכום ההכנסה" required>
+                    <InputNumber
+                      size="large"
+                      style={{ width: "100%" }}
+                      placeholder="הזן סכום הכנסה"
+                      value={income || undefined}
+                      onChange={(value) => setIncome(value || 0)}
+                      prefix="₪"
+                      formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                      parser={(value) => parseFloat(value!.replace(/\$\s?|(,*)/g, "")) || 0}
+                    />
+                  </Form.Item>
+                </Card>
+              </Col>
+
+              <Col xs={24} md={12}>
+                <Card className="expense-card" style={{ height: "100%" }}>
+                  <div style={{ display: "flex", alignItems: "center", marginBottom: 20 }}>
+                    <Avatar
+                      style={{
+                        background: "#ff4d4f",
+                        color: "white",
+                        marginLeft: 12,
+                      }}
+                    >
+                      <MinusCircleOutlined />
+                    </Avatar>
+                    <Title level={5} style={{ margin: 0, color: "#cf1322" }}>
+                      הוצאות
+                    </Title>
+                  </div>
+                  <Form.Item label="סכום ההוצאה" required>
+                    <InputNumber
+                      size="large"
+                      style={{ width: "100%" }}
+                      placeholder="הזן סכום הוצאה"
+                      value={expenditure || undefined}
+                      onChange={(value) => setExpenditure(value || 0)}
+                      prefix="₪"
+                      formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                      parser={(value) => parseFloat(value!.replace(/\$\s?|(,*)/g, "")) || 0}
+                    />
+                  </Form.Item>
+                </Card>
+              </Col>
+            </Row>
+
+            <Row gutter={[16, 16]} style={{ marginTop: 32 }}>
+              <Col xs={24} sm={12}>
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  size="large"
+                  loading={loading}
+                  icon={<SendOutlined />}
+                  block
+                  style={{
+                    height: 48,
+                    fontWeight: 600,
+                    fontSize: 16,
+                  }}
+                >
+                  שמור נתונים
+                </Button>
+              </Col>
+
+              <Col xs={24} sm={12}>
+                <Button
+                  type="default"
+                  size="large"
+                  onClick={handleReset}
+                  icon={<ClearOutlined />}
+                  block
+                  style={{
+                    height: 48,
+                    fontWeight: 600,
+                    borderWidth: 2,
+                  }}
+                >
+                  נקה טופס
+                </Button>
+              </Col>
+            </Row>
+
+            {success && (
+              <Alert
+                message="הנתונים נשמרו בהצלחה!"
+                description="התנועה הפיננסית נוספה למערכת בהצלחה."
+                type="success"
+                showIcon
+                style={{
+                  marginTop: 24,
+                  borderRadius: 8,
+                  border: "1px solid #b7eb8f",
                 }}
-              >
-                <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
-                  <Box
-                    sx={{
-                      bgcolor: "success.main",
-                      color: "white",
-                      p: 1,
-                      borderRadius: "50%",
-                      mr: 2,
-                    }}
-                  >
-                    <AttachMoney />
-                  </Box>
-                  <Typography variant="h6" fontWeight="bold" color="success.dark">
-                    הכנסות
-                  </Typography>
-                </Box>
-                <TextField
-                  fullWidth
-                  label="סכום ההכנסה"
-                  name="income"
-                  type="number"
-                  value={income || ""}
-                  onChange={handleChange}
-                  variant="outlined"
-                  InputProps={{
-                    startAdornment: <InputAdornment position="start">₪</InputAdornment>,
-                  }}
-                  sx={{
-                    bgcolor: "white",
-                    borderRadius: 2,
-                    "& .MuiOutlinedInput-root": {
-                      "& fieldset": {
-                        borderColor: "success.main",
-                        borderWidth: 2,
-                      },
-                      "&:hover fieldset": {
-                        borderColor: "success.dark",
-                      },
-                    },
-                  }}
-                />
-              </Box>
-            </Grid>
-            <Grid item xs={12} md={6} {...({} as any)}> 
-              <Box
-                sx={{
-                  p: 3,
-                  borderRadius: 3,
-                  bgcolor: "rgba(239, 68, 68, 0.1)",
-                  border: "1px solid rgba(239, 68, 68, 0.2)",
-                  height: "100%",
+              />
+            )}
+
+            {error && (
+              <Alert
+                message="שגיאה!"
+                description={error}
+                type="error"
+                showIcon
+                style={{
+                  marginTop: 24,
+                  borderRadius: 8,
+                  border: "1px solid #ffccc7",
                 }}
-              >
-                <Box sx={{ display: "flex", alignItems: "center", mb: 3 }}>
-                  <Box
-                    sx={{
-                      bgcolor: "error.main",
-                      color: "white",
-                      p: 1,
-                      borderRadius: "50%",
-                      mr: 2,
-                    }}
-                  >
-                    <MoneyOff />
-                  </Box>
-                  <Typography variant="h6" fontWeight="bold" color="error.dark">
-                    הוצאות
-                  </Typography>
-                </Box>
-                <TextField
-                  fullWidth
-                  label="סכום ההוצאה"
-                  name="expenditure"
-                  type="number"
-                  value={expenditure || ""}
-                  onChange={handleChange}
-                  variant="outlined"
-                  InputProps={{
-                    startAdornment: <InputAdornment position="start">₪</InputAdornment>,
-                  }}
-                  sx={{
-                    bgcolor: "white",
-                    borderRadius: 2,
-                    "& .MuiOutlinedInput-root": {
-                      "& fieldset": {
-                        borderColor: "error.main",
-                        borderWidth: 2,
-                      },
-                      "&:hover fieldset": {
-                        borderColor: "error.dark",
-                      },
-                    },
-                  }}
-                />
-              </Box>
-            </Grid>
-          </Grid>
-
-          <Stack direction={{ xs: "column", sm: "row" }} spacing={2} sx={{ mt: 2 }}>
-            <Button
-              type="submit"
-              variant="contained"
-              size="large"
-              startIcon={<Send />}
-              sx={{
-                py: 1.5,
-                fontWeight: "bold",
-                fontSize: "1.1rem",
-                boxShadow: "0 4px 14px rgba(37, 99, 235, 0.2)",
-                flexGrow: { sm: 1 },
-              }}
-            >
-              שמור נתונים
-            </Button>
-
-            <Button
-              type="reset"
-              variant="outlined"
-              size="large"
-              onClick={() => {
-                setIncome(0)
-                setExpenditure(0)
-                setSuccess(false)
-                setError(null)
-              }}
-              sx={{
-                py: 1.5,
-                fontWeight: "bold",
-                borderWidth: 2,
-                "&:hover": {
-                  borderWidth: 2,
-                },
-              }}
-            >
-              נקה טופס
-            </Button>
-          </Stack>
-
-          {success && (
-            <Alert
-              severity="success"
-              sx={{
-                mt: 3,
-                borderRadius: 2,
-                boxShadow: "0 4px 14px rgba(16, 185, 129, 0.2)",
-                border: "1px solid rgba(16, 185, 129, 0.1)",
-              }}
-            >
-              <Typography variant="subtitle2" fontWeight="bold">
-                הנתונים נשמרו בהצלחה!
-              </Typography>
-              <Typography variant="body2">התנועה הפיננסית נוספה למערכת בהצלחה.</Typography>
-            </Alert>
-          )}
-
-          {error && (
-            <Alert
-              severity="error"
-              sx={{
-                mt: 3,
-                borderRadius: 2,
-                boxShadow: "0 4px 14px rgba(239, 68, 68, 0.2)",
-                border: "1px solid rgba(239, 68, 68, 0.1)",
-              }}
-            >
-              <Typography variant="subtitle2" fontWeight="bold">
-                שגיאה!
-              </Typography>
-              <Typography variant="body2">{error}</Typography>
-            </Alert>
-          )}
-        </Box>
-      </Paper>
-    </Container>
+              />
+            )}
+          </Form>
+        </Card>
+      </div>
+    </ConfigProvider>
   )
 }
 
@@ -3220,7 +2838,7 @@ const RegisterBusinessData = ({ onSubmitSuccess }: { onSubmitSuccess?: () => voi
         setErrors([])
         if (valid) {
           try {
-            const { data } = await axios.post<BusinessPostModel>(`${url}/api/Business`, businessDetails)
+            const { data } = await axios.post<BusinessPostModel>(`${url}/api/Business`, businessDetails, { withCredentials: true })
             console.log("The data", data)
             globalContextDetails.setBusinessGlobal(convertToBusiness(data))
             console.log("globalContextDetails.business_global", globalContextDetails.business_global)
@@ -3520,62 +3138,14 @@ const RegisterBusinessData = ({ onSubmitSuccess }: { onSubmitSuccess?: () => voi
 
 export default RegisterBusinessData
 "use client"
-
-import type React from "react"
-
 import { useState } from "react"
 import axios from "axios"
-import {
-  Box,
-  Button,
-  Typography,
-  Paper,
-  Container,
-  Alert,
-  LinearProgress,
-  ThemeProvider,
-  createTheme,
-  CssBaseline,
-  Divider,
-} from "@mui/material"
-import { CloudUpload, CheckCircle, Error as ErrorIcon } from "@mui/icons-material"
+import { Upload, Button, Typography, Card, Alert, Progress, ConfigProvider, Space, Avatar, Divider } from "antd"
+import { CloudUploadOutlined, CheckCircleOutlined, ExclamationCircleOutlined, InboxOutlined } from "@ant-design/icons"
+import type { UploadProps } from "antd"
 
-// Create a custom theme with RTL support and Hebrew font
-const theme = createTheme({
-  direction: "rtl",
-  typography: {
-    fontFamily: '"Assistant", "Rubik", "Heebo", sans-serif',
-  },
-  palette: {
-    primary: {
-      main: "#3f51b5",
-    },
-    secondary: {
-      main: "#f50057",
-    },
-    success: {
-      main: "#4caf50",
-    },
-    error: {
-      main: "#f44336",
-    },
-    background: {
-      default: "#f5f5f5",
-    },
-  },
-  components: {
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          borderRadius: 8,
-          padding: "10px 24px",
-          textTransform: "none",
-          fontSize: "1rem",
-        },
-      },
-    },
-  },
-})
+const { Title, Text } = Typography
+const { Dragger } = Upload
 
 const UploadFiles = () => {
   const [file, setFile] = useState<File | null>(null)
@@ -3586,17 +3156,24 @@ const UploadFiles = () => {
 
   const url = import.meta.env.VITE_API_URL
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      setFile(e.target.files[0])
+  const uploadProps: UploadProps = {
+    name: "fileUpload",
+    multiple: false,
+    accept: ".jpg,.png,.pdf,.docx,.txt",
+    beforeUpload: (file) => {
+      setFile(file)
       setMessage(null)
       setError(null)
-    }
+      return false // Prevent automatic upload
+    },
+    onRemove: () => {
+      setFile(null)
+      setMessage(null)
+      setError(null)
+    },
   }
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-
+  const handleSubmit = async () => {
     if (!file) {
       setError("יש לבחור קובץ לפני השליחה")
       return
@@ -3622,6 +3199,7 @@ const UploadFiles = () => {
 
       const response = await axios.post(`${url}/FileUpload/upload`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
+        withCredentials: true,
       })
 
       clearInterval(progressInterval)
@@ -3631,6 +3209,7 @@ const UploadFiles = () => {
         setMessage(response.data.message || "הקובץ הועלה בהצלחה")
         setError(null)
         setUploading(false)
+        setFile(null)
       }, 500)
     } catch (err: any) {
       setProgress(0)
@@ -3642,356 +3221,273 @@ const UploadFiles = () => {
   }
 
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Container maxWidth="md" sx={{ py: 4 }}>
-        <Paper
-          elevation={3}
-          sx={{
-            p: 4,
-            borderRadius: 3,
-            boxShadow: "0 8px 32px rgba(0, 0, 0, 0.1)",
-          }}
-        >
-          <Box sx={{ textAlign: "center", mb: 4 }}>
-            <CloudUpload color="primary" sx={{ fontSize: 48, mb: 2 }} />
-            <Typography variant="h4" component="h1" gutterBottom fontWeight="bold">
-              העלאת קבצים
-            </Typography>
-            <Typography variant="body1" color="text.secondary">
-              בחר קובץ להעלאה למערכת
-            </Typography>
-            <Divider sx={{ mt: 3 }} />
-          </Box>
+    <ConfigProvider direction="rtl">
+      <div style={{ maxWidth: 800, margin: "0 auto", padding: "40px 20px" }}>
+        <Card className="form-section">
+          <div style={{ textAlign: "center", marginBottom: 32 }}>
+            <Avatar
+              size={80}
+              style={{
+                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                marginBottom: 16,
+                boxShadow: "0 4px 14px rgba(102, 126, 234, 0.3)",
+              }}
+            >
+              <CloudUploadOutlined style={{ fontSize: 40 }} />
+            </Avatar>
 
-          <Box
-            component="form"
-            onSubmit={handleSubmit}
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              gap: 3,
-              alignItems: "center",
+            <Title level={2} style={{ marginBottom: 8, color: "#2d3748" }}>
+              העלאת קבצים
+            </Title>
+
+            <Text type="secondary" style={{ fontSize: 16 }}>
+              בחר קובץ להעלאה למערכת
+            </Text>
+
+            <Divider />
+          </div>
+
+          <Dragger
+            {...uploadProps}
+            style={{
+              background: "linear-gradient(145deg, #f8fafc, #ffffff)",
+              border: "2px dashed #667eea",
+              borderRadius: 16,
+              padding: "40px 20px",
+              marginBottom: 24,
             }}
           >
-            <Box
-              sx={{
-                border: "2px dashed",
-                borderColor: "primary.main",
-                borderRadius: 2,
-                p: 5,
-                width: "100%",
-                textAlign: "center",
-                bgcolor: "primary.50",
-                cursor: "pointer",
-                transition: "all 0.3s",
-                "&:hover": {
-                  bgcolor: "primary.100",
-                },
-              }}
-              onClick={() => document.getElementById("file-upload")?.click()}
-            >
-              <input
-                type="file"
-                id="file-upload"
-                onChange={handleFileChange}
-                accept=".jpg,.png,.pdf,.docx,.txt"
-                style={{ display: "none" }}
+            <p className="ant-upload-drag-icon">
+              <InboxOutlined style={{ fontSize: 64, color: "#667eea" }} />
+            </p>
+            <Title level={4} style={{ color: "#2d3748", marginBottom: 8 }}>
+              גרור קובץ לכאן או לחץ לבחירת קובץ
+            </Title>
+            <Text type="secondary" style={{ fontSize: 14 }}>
+              תומך בקבצים מסוג JPG, PNG, PDF, DOCX, TXT
+            </Text>
+          </Dragger>
+
+          {uploading && (
+            <div style={{ marginBottom: 24 }}>
+              <Text style={{ marginBottom: 8, display: "block" }}>מעלה... {progress}%</Text>
+              <Progress
+                percent={progress}
+                strokeColor={{
+                  "0%": "#667eea",
+                  "100%": "#764ba2",
+                }}
+                style={{ marginBottom: 16 }}
               />
-              <CloudUpload color="primary" sx={{ fontSize: 60, mb: 2 }} />
-              <Typography variant="h6" gutterBottom>
-                גרור קובץ לכאן או לחץ לבחירת קובץ
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                תומך בקבצים מסוג JPG, PNG, PDF, DOCX, TXT
-              </Typography>
+            </div>
+          )}
 
-              {file && (
-                <Box sx={{ mt: 2, p: 1, bgcolor: "background.paper", borderRadius: 1 }}>
-                  <Typography variant="body2" fontWeight="bold">
-                    {file.name} ({(file.size / 1024).toFixed(2)} KB)
-                  </Typography>
-                </Box>
-              )}
-            </Box>
-
-            {uploading && (
-              <Box sx={{ width: "100%", mt: 2 }}>
-                <Typography variant="body2" sx={{ mb: 1 }}>
-                  מעלה... {progress}%
-                </Typography>
-                <LinearProgress variant="determinate" value={progress} sx={{ height: 8, borderRadius: 4 }} />
-              </Box>
-            )}
-
+          <Space direction="vertical" style={{ width: "100%" }}>
             <Button
-              type="submit"
-              variant="contained"
+              type="primary"
+              size="large"
               disabled={!file || uploading}
-              startIcon={<CloudUpload />}
-              sx={{
-                mt: 2,
-                py: 1.5,
-                px: 4,
-                fontWeight: "bold",
-                fontSize: "1.1rem",
-                boxShadow: "0 4px 12px rgba(63, 81, 181, 0.4)",
+              loading={uploading}
+              icon={<CloudUploadOutlined />}
+              onClick={handleSubmit}
+              block
+              style={{
+                height: 48,
+                fontWeight: 600,
+                fontSize: 16,
               }}
             >
               {uploading ? "מעלה..." : "העלה קובץ"}
             </Button>
 
             {message && (
-              <Alert icon={<CheckCircle fontSize="inherit" />} severity="success" sx={{ width: "100%", mt: 2 }}>
-                {message}
-              </Alert>
+              <Alert
+                message="הצלחה!"
+                description={message}
+                type="success"
+                showIcon
+                icon={<CheckCircleOutlined />}
+                style={{ borderRadius: 8 }}
+              />
             )}
 
             {error && (
-              <Alert icon={<ErrorIcon fontSize="inherit" />} severity="error" sx={{ width: "100%", mt: 2 }}>
-                {error}
-              </Alert>
+              <Alert
+                message="שגיאה!"
+                description={error}
+                type="error"
+                showIcon
+                icon={<ExclamationCircleOutlined />}
+                style={{ borderRadius: 8 }}
+              />
             )}
-          </Box>
-        </Paper>
-      </Container>
-    </ThemeProvider>
+          </Space>
+        </Card>
+      </div>
+    </ConfigProvider>
   )
 }
 
 export default UploadFiles
 "use client"
-
-import type React from "react"
-
 import { useContext, useState } from "react"
-import * as Yup from "yup"
 import axios from "axios"
 import type { AdminRegister } from "../models/AdminRegister"
 import { useNavigate } from "react-router-dom"
 import { validationSchemaUserLogin } from "../utils/validationSchema"
 import { globalContext } from "../context/GlobalContext"
-import {
-  Box,
-  TextField,
-  Button,
-  Typography,
-  Paper,
-  Container,
-  Alert,
-  InputAdornment,
-  Avatar,
-  Link,
-  Stack,
-  Divider,
-} from "@mui/material"
-import { Email, Lock, Person, Login as LoginIcon } from "@mui/icons-material"
+import { Form, Input, Button, Typography, Card, Alert, Space, Avatar, Divider, ConfigProvider } from "antd"
+import { MailOutlined, LockOutlined, UserOutlined, LoginOutlined } from "@ant-design/icons"
+import CenteredLayout from "./CenteredLayout"
+
+const { Title, Text, Link } = Typography
 
 const UserLogin = () => {
   const nav = useNavigate()
   const validationSchema = validationSchemaUserLogin
   const [userLogin, setUserLogin] = useState<AdminRegister>({ email: "", password: "" })
   const [errors, setErrors] = useState<string[]>([])
+  const [loading, setLoading] = useState(false)
   const url = import.meta.env.VITE_API_URL
   const { setUser } = useContext(globalContext)
 
-  const handleSubmit = (userLogin: AdminRegister) => async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    validationSchema
-      .isValid(userLogin)
-      .then(async (valid) => {
-        setErrors([])
+  const handleSubmit = async () => {
+    setLoading(true)
+    try {
+      const valid = await validationSchema.isValid(userLogin)
+      setErrors([])
 
-        if (valid) {
-          try {
-            const { data } = await axios.post<any>(`${url}/Auth/user-login`, userLogin) // TODO
-            setUser(data.user)
-            nav("/")
-          } catch (e) {
-            console.log(e)
-            setErrors(["שם משתמש או סיסמה שגויים"])
-          }
-        } else {
-          setErrors(["נא למלא את כל השדות הנדרשים"])
-        }
-      })
-      .catch((err) => {
-        console.log("Validation error:", err.errors)
-        if (err instanceof Yup.ValidationError) {
-          setErrors(err.errors)
-        }
-      })
+      if (valid) {
+        const { data } = await axios.post<any>(`${url}/Auth/user-login`, userLogin, { withCredentials: true })
+        setUser(data.user)
+        nav("/")
+      } else {
+        setErrors(["נא למלא את כל השדות הנדרשים"])
+      }
+    } catch (e) {
+      console.log(e)
+      setErrors(["שם משתמש או סיסמה שגויים"])
+    } finally {
+      setLoading(false)
+    }
   }
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
-    const { name, value } = event.target
-    setUserLogin((prevUser) => ({
-      ...prevUser,
-      [name]: value,
-    }))
+  const handleChange = (field: string, value: string) => {
+    setUserLogin((prev) => ({ ...prev, [field]: value }))
   }
 
   return (
-    <Container maxWidth="sm" sx={{ py: 6, display: "flex", justifyContent: "center" }}>
-      <Paper
-        elevation={0}
-        sx={{
-          p: { xs: 3, sm: 5 },
-          width: "100%",
-          borderRadius: 3,
-          boxShadow: "0 10px 40px rgba(0, 0, 0, 0.08)",
-          background: "linear-gradient(145deg, #ffffff, #f8fafc)",
-          border: "1px solid rgba(0, 0, 0, 0.05)",
-        }}
-      >
-        <Box
-          component="form"
-          onSubmit={handleSubmit(userLogin)}
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            gap: 3,
-            alignItems: "center",
-          }}
-        >
-          <Box sx={{ textAlign: "center", mb: 2 }}>
+    <ConfigProvider direction="rtl">
+      <CenteredLayout>
+        <Card className="login-form" style={{ maxWidth: 500, width: "100%" }}>
+          <div style={{ textAlign: "center", marginBottom: 32 }}>
             <Avatar
-              sx={{
-                bgcolor: "primary.main",
-                width: 70,
-                height: 70,
-                mb: 2,
-                mx: "auto",
-                boxShadow: "0 4px 14px rgba(37, 99, 235, 0.2)",
+              size={80}
+              style={{
+                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                marginBottom: 16,
+                boxShadow: "0 4px 14px rgba(102, 126, 234, 0.3)",
               }}
             >
-              <Person sx={{ fontSize: 40 }} />
+              <UserOutlined style={{ fontSize: 40 }} />
             </Avatar>
 
-            <Typography variant="h4" component="h1" gutterBottom fontWeight="bold">
+            <Title level={2} style={{ marginBottom: 8, color: "#2d3748" }}>
               כניסת משתמש
-            </Typography>
+            </Title>
 
-            <Typography variant="body1" color="text.secondary" sx={{ mb: 1 }}>
+            <Text type="secondary" style={{ fontSize: 16 }}>
               ברוכים הבאים למערכת ניהול העסק
-            </Typography>
-          </Box>
+            </Text>
+          </div>
 
-          <TextField
-            fullWidth
-            label="אימייל"
-            name="email"
-            type="email"
-            variant="outlined"
-            onChange={handleChange}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start" sx={{ mr: 1.5 }}>
-                  <Email color="primary" />
-                </InputAdornment>
-              ),
-            }}
-            placeholder="הזן את האימייל שלך"
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                bgcolor: "white",
-                "&:hover .MuiOutlinedInput-notchedOutline": {
-                  borderColor: "primary.main",
-                },
-              },
-            }}
-          />
+          <Form layout="vertical" onFinish={handleSubmit}>
+            <Form.Item label="אימייל" required style={{ marginBottom: 20 }}>
+              <Input
+                prefix={<MailOutlined style={{ color: "#667eea" }} />}
+                placeholder="הזן את האימייל שלך"
+                size="large"
+                value={userLogin.email}
+                onChange={(e) => handleChange("email", e.target.value)}
+                style={{ borderRadius: 10 }}
+              />
+            </Form.Item>
 
-          <TextField
-            fullWidth
-            label="סיסמא"
-            name="password"
-            type="password"
-            variant="outlined"
-            onChange={handleChange}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start" sx={{ mr: 1.5 }}>
-                  <Lock color="primary" />
-                </InputAdornment>
-              ),
-            }}
-            placeholder="הזן את הסיסמה שלך"
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                bgcolor: "white",
-                "&:hover .MuiOutlinedInput-notchedOutline": {
-                  borderColor: "primary.main",
-                },
-              },
-            }}
-          />
+            <Form.Item label="סיסמא" required style={{ marginBottom: 24 }}>
+              <Input.Password
+                prefix={<LockOutlined style={{ color: "#667eea" }} />}
+                placeholder="הזן את הסיסמה שלך"
+                size="large"
+                value={userLogin.password}
+                onChange={(e) => handleChange("password", e.target.value)}
+                style={{ borderRadius: 10 }}
+              />
+            </Form.Item>
 
-          <Button
-            type="submit"
-            variant="contained"
-            fullWidth
-            size="large"
-            startIcon={<LoginIcon />}
-            sx={{
-              mt: 2,
-              py: 1.5,
-              fontWeight: "bold",
-              fontSize: "1.1rem",
-              boxShadow: "0 4px 14px rgba(37, 99, 235, 0.2)",
-            }}
-          >
-            התחבר
-          </Button>
+            <Button
+              type="primary"
+              htmlType="submit"
+              size="large"
+              loading={loading}
+              icon={<LoginOutlined />}
+              block
+              style={{
+                height: 48,
+                borderRadius: 10,
+                fontWeight: 600,
+                fontSize: 16,
+                marginBottom: 16,
+              }}
+            >
+              התחבר
+            </Button>
 
-          <Divider sx={{ width: "100%", my: 1 }}>
-            <Typography variant="caption" color="text.secondary">
-              או
-            </Typography>
-          </Divider>
+            <Divider>
+              <Text type="secondary">או</Text>
+            </Divider>
 
-          <Button
-            variant="outlined"
-            fullWidth
-            size="large"
-            onClick={() => nav("/register-user")}
-            sx={{
-              py: 1.5,
-              fontWeight: "bold",
-              borderWidth: 2,
-              "&:hover": {
+            <Button
+              type="default"
+              size="large"
+              block
+              onClick={() => nav("/register-user")}
+              style={{
+                height: 48,
+                borderRadius: 10,
+                fontWeight: 600,
+                marginBottom: 16,
                 borderWidth: 2,
-              },
-            }}
-          >
-            הירשם עכשיו
-          </Button>
+              }}
+            >
+              הירשם עכשיו
+            </Button>
 
-          <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
-            <Typography variant="body2" color="text.secondary">
-              מנהל?
-            </Typography>
-            <Link href="/admin-login" underline="hover" fontWeight="medium">
-              התחבר כמנהל
-            </Link>
-          </Stack>
+            <div style={{ textAlign: "center" }}>
+              <Space>
+                <Text type="secondary">מנהל?</Text>
+                <Link href="/admin-login" style={{ fontWeight: 600 }}>
+                  התחבר כמנהל
+                </Link>
+              </Space>
+            </div>
 
-          {errors.length > 0 && (
-            <Box sx={{ width: "100%", mt: 2 }}>
-              {errors.map((error, index) => (
-                <Alert
-                  key={index}
-                  severity="error"
-                  sx={{ mb: 1, borderRadius: 2, boxShadow: "0 2px 10px rgba(239, 68, 68, 0.1)" }}
-                >
-                  {error}
-                </Alert>
-              ))}
-            </Box>
-          )}
-        </Box>
-      </Paper>
-    </Container>
+            {errors.length > 0 && (
+              <div style={{ marginTop: 16 }}>
+                {errors.map((error, index) => (
+                  <Alert
+                    key={index}
+                    message={error}
+                    type="error"
+                    showIcon
+                    style={{ marginBottom: 8, borderRadius: 8 }}
+                  />
+                ))}
+              </div>
+            )}
+          </Form>
+        </Card>
+      </CenteredLayout>
+    </ConfigProvider>
   )
 }
 
@@ -4174,11 +3670,7 @@ const UserManagemet = () => {
 
 export default UserManagemet
 "use client"
-
-import type React from "react"
-
 import { useContext, useState } from "react"
-import * as Yup from "yup"
 import axios from "axios"
 import { useNavigate } from "react-router-dom"
 import { validationSchemaUserRegister } from "../utils/validationSchema"
@@ -4186,25 +3678,37 @@ import { globalContext } from "../context/GlobalContext"
 import { convertToUser } from "../utils/converToUser"
 import type { UserPostModel } from "../models/UserPostModel"
 import {
-  Box,
-  TextField,
+  Form,
+  Input,
   Button,
   Typography,
-  Paper,
-  Container,
+  Card,
   Alert,
-  Grid,
-  InputAdornment,
+  Row,
+  Col,
+  Avatar,
   Divider,
-  Link,
-  Stack,
-} from "@mui/material"
-import { Person, Email, Phone, Badge, Lock, Work, HowToReg, ArrowBack } from "@mui/icons-material"
+  ConfigProvider,
+  InputNumber,
+} from "antd"
+import {
+  UserOutlined,
+  MailOutlined,
+  PhoneOutlined,
+  IdcardOutlined,
+  LockOutlined,
+  TeamOutlined,
+  UserAddOutlined,
+  ArrowLeftOutlined,
+} from "@ant-design/icons"
+
+const { Title, Text, Link } = Typography
 
 const UserRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => {
   const nav = useNavigate()
   const validationSchema = validationSchemaUserRegister
   const [errors, setErrors] = useState<string[]>([])
+  const [loading, setLoading] = useState(false)
   const { setUser } = useContext(globalContext)
   const url = import.meta.env.VITE_API_URL
   const [myUser, setMyUser] = useState<UserPostModel>({
@@ -4217,314 +3721,205 @@ const UserRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => 
     idNumber: "",
   })
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
-    const { name, value } = event.target
-    setMyUser((prevUser) => ({
-      ...prevUser,
-      [name]: name === "role" ? Number(value) : value,
-    }))
+  const handleChange = (field: string, value: any) => {
+    setMyUser((prev) => ({ ...prev, [field]: value }))
   }
 
-  const handleSubmit = (userRegister: UserPostModel) => async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+  const handleSubmit = async () => {
+    setLoading(true)
+    try {
+      const valid = await validationSchema.isValid(myUser)
+      setErrors([])
 
-    console.log(userRegister)
+      if (valid) {
+        const { data } = await axios.post<UserPostModel>(`${url}/Auth/user-register`, myUser, { withCredentials: true })
+        setUser(convertToUser(data))
 
-    validationSchema
-      .isValid(userRegister)
-      .then(async (valid) => {
-        setErrors([])
-        if (valid) {
-          try {
-            const { data } = await axios.post<UserPostModel>(`${url}/Auth/user-register`, userRegister)
-            setUser(convertToUser(data))
-
-            if (onSubmitSuccess) onSubmitSuccess()
-            nav("/")
-          } catch (e) {
-            console.log(e)
-            setErrors(["שגיאה ברישום המשתמש"])
-          }
-        } else {
-          setErrors(["נא למלא את כל השדות הנדרשים"])
-        }
-      })
-      .catch((err) => {
-        console.log("Validation error:", err.errors)
-        if (err instanceof Yup.ValidationError) {
-          setErrors(err.errors)
-        }
-      })
+        if (onSubmitSuccess) onSubmitSuccess()
+        nav("/")
+      } else {
+        setErrors(["נא למלא את כל השדות הנדרשים"])
+      }
+    } catch (e) {
+      console.log(e)
+      setErrors(["שגיאה ברישום המשתמש"])
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
-    <Container maxWidth="md" sx={{ py: 4, textAlign: "right" }}>
-      <Paper
-        elevation={0}
-        sx={{
-          p: { xs: 3, sm: 5 },
-          borderRadius: 3,
-          boxShadow: "0 10px 40px rgba(0, 0, 0, 0.08)",
-          background: "linear-gradient(145deg, #ffffff, #f8fafc)",
-          border: "1px solid rgba(0, 0, 0, 0.05)",
-        }}
-      >
-        <Box sx={{ mb: 4, textAlign: "center" }}>
-          <Box
-            sx={{
-              width: 80,
-              height: 80,
-              borderRadius: "50%",
-              bgcolor: "primary.light",
-              color: "primary.main",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              mx: "auto",
-              mb: 2,
-              boxShadow: "0 4px 14px rgba(37, 99, 235, 0.2)",
-            }}
-          >
-            <HowToReg sx={{ fontSize: 40 }} />
-          </Box>
-          <Typography variant="h4" component="h1" gutterBottom fontWeight="bold">
-            הרשמת משתמש חדש
-          </Typography>
-          <Typography variant="body1" color="text.secondary">
-            נא למלא את כל הפרטים הנדרשים
-          </Typography>
-          <Divider sx={{ mt: 3 }} />
-        </Box>
-
-        <Box
-          component="form"
-          onSubmit={handleSubmit(myUser)}
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            gap: 3,
-          }}
-        >
-          <Grid container spacing={2}>
-            <Grid item xs={12} md={6} {...({} as any)}>
-              <TextField
-                fullWidth
-                label="שם פרטי"
-                name="firstName"
-                value={myUser.firstName}
-                onChange={handleChange}
-                variant="outlined"
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start" sx={{ mr: 1.5 }}>
-                      <Person color="primary" />
-                    </InputAdornment>
-                  ),
-                }}
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    bgcolor: "white",
-                  },
-                }}
-              />
-            </Grid>
-            <Grid item xs={12} md={6} {...({} as any)}>
-              <TextField
-                fullWidth
-                label="שם משפחה"
-                name="lastName"
-                value={myUser.lastName}
-                onChange={handleChange}
-                variant="outlined"
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start" sx={{ mr: 1.5 }}>
-                      <Person color="primary" />
-                    </InputAdornment>
-                  ),
-                }}
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    bgcolor: "white",
-                  },
-                }}
-              />
-            </Grid>
-            <Grid item xs={12} md={6} {...({} as any)}>
-              <TextField
-                fullWidth
-                label="טלפון"
-                name="phone"
-                value={myUser.phone}
-                onChange={handleChange}
-                variant="outlined"
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start" sx={{ mr: 1.5 }}>
-                      <Phone color="primary" />
-                    </InputAdornment>
-                  ),
-                }}
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    bgcolor: "white",
-                  },
-                }}
-              />
-            </Grid>
-            <Grid item xs={12} md={6} {...({} as any)}>
-              <TextField
-                fullWidth
-                label="מספר תעודת זהות"
-                name="idNumber"
-                value={myUser.idNumber}
-                onChange={handleChange}
-                variant="outlined"
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start" sx={{ mr: 1.5 }}>
-                      <Badge color="primary" />
-                    </InputAdornment>
-                  ),
-                }}
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    bgcolor: "white",
-                  },
-                }}
-              />
-            </Grid>
-            <Grid item xs={12} {...({} as any)}>
-              <TextField
-                fullWidth
-                label="אימייל"
-                name="email"
-                type="email"
-                value={myUser.email}
-                onChange={handleChange}
-                variant="outlined"
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start" sx={{ mr: 1.5 }}>
-                      <Email color="primary" />
-                    </InputAdornment>
-                  ),
-                }}
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    bgcolor: "white",
-                  },
-                }}
-              />
-            </Grid>
-            <Grid item xs={12} md={6} {...({} as any)}>
-              <TextField
-                fullWidth
-                label="סיסמא"
-                name="password"
-                type="password"
-                value={myUser.password}
-                onChange={handleChange}
-                variant="outlined"
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start" sx={{ mr: 1.5 }}>
-                      <Lock color="primary" />
-                    </InputAdornment>
-                  ),
-                }}
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    bgcolor: "white",
-                  },
-                }}
-              />
-            </Grid>
-            <Grid item xs={12} md={6} {...({} as any)}>
-              <TextField
-                fullWidth
-                label="תפקיד"
-                name="role"
-                type="number"
-                value={myUser.role}
-                onChange={handleChange}
-                variant="outlined"
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start" sx={{ mr: 1.5 }}>
-                      <Work color="primary" />
-                    </InputAdornment>
-                  ),
-                }}
-                sx={{
-                  "& .MuiOutlinedInput-root": {
-                    bgcolor: "white",
-                  },
-                }}
-              />
-            </Grid>
-          </Grid>
-
-          <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
-            <Button
-              type="submit"
-              variant="contained"
-              size="large"
-              startIcon={<HowToReg />}
-              sx={{
-                py: 1.5,
-                fontWeight: "bold",
-                fontSize: "1.1rem",
-                boxShadow: "0 4px 14px rgba(37, 99, 235, 0.2)",
-                flexGrow: 1,
+    <ConfigProvider direction="rtl">
+      <div style={{ padding: "40px 20px", maxWidth: 800, margin: "0 auto" }}>
+        <Card className="form-section">
+          <div style={{ textAlign: "center", marginBottom: 32 }}>
+            <Avatar
+              size={80}
+              style={{
+                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                marginBottom: 16,
+                boxShadow: "0 4px 14px rgba(102, 126, 234, 0.3)",
               }}
             >
-              הירשם
-            </Button>
+              <UserAddOutlined style={{ fontSize: 40 }} />
+            </Avatar>
 
-            <Button
-              variant="outlined"
-              size="large"
-              startIcon={<ArrowBack />}
-              onClick={() => nav("/user-login")}
-              sx={{
-                py: 1.5,
-                fontWeight: "bold",
-                borderWidth: 2,
-                "&:hover": {
-                  borderWidth: 2,
-                },
-              }}
-            >
-              חזרה לכניסה
-            </Button>
-          </Stack>
+            <Title level={2} style={{ marginBottom: 8, color: "#2d3748" }}>
+              הרשמת משתמש חדש
+            </Title>
 
-          <Box sx={{ mt: 3, textAlign: "center" }}>
-            <Typography variant="body2" color="text.secondary">
-              כבר יש לך חשבון?{" "}
-              <Link href="/user-login" underline="hover" fontWeight="bold">
-                התחבר כאן
-              </Link>
-            </Typography>
-          </Box>
+            <Text type="secondary" style={{ fontSize: 16 }}>
+              נא למלא את כל הפרטים הנדרשים
+            </Text>
 
-          {errors.length > 0 && (
-            <Box sx={{ width: "100%", mt: 2 }}>
-              {errors.map((error, index) => (
-                <Alert
-                  key={index}
-                  severity="error"
-                  sx={{ mb: 1, borderRadius: 2, boxShadow: "0 2px 10px rgba(239, 68, 68, 0.1)" }}
+            <Divider />
+          </div>
+
+          <Form layout="vertical" onFinish={handleSubmit}>
+            <Row gutter={[16, 0]}>
+              <Col xs={24} md={12}>
+                <Form.Item label="שם פרטי" required>
+                  <Input
+                    prefix={<UserOutlined style={{ color: "#667eea" }} />}
+                    placeholder="הזן שם פרטי"
+                    size="large"
+                    value={myUser.firstName}
+                    onChange={(e) => handleChange("firstName", e.target.value)}
+                  />
+                </Form.Item>
+              </Col>
+              <Col xs={24} md={12}>
+                <Form.Item label="שם משפחה" required>
+                  <Input
+                    prefix={<UserOutlined style={{ color: "#667eea" }} />}
+                    placeholder="הזן שם משפחה"
+                    size="large"
+                    value={myUser.lastName}
+                    onChange={(e) => handleChange("lastName", e.target.value)}
+                  />
+                </Form.Item>
+              </Col>
+              <Col xs={24} md={12}>
+                <Form.Item label="טלפון" required>
+                  <Input
+                    prefix={<PhoneOutlined style={{ color: "#667eea" }} />}
+                    placeholder="הזן מספר טלפון"
+                    size="large"
+                    value={myUser.phone}
+                    onChange={(e) => handleChange("phone", e.target.value)}
+                  />
+                </Form.Item>
+              </Col>
+              <Col xs={24} md={12}>
+                <Form.Item label="מספר תעודת זהות" required>
+                  <Input
+                    prefix={<IdcardOutlined style={{ color: "#667eea" }} />}
+                    placeholder="הזן מספר תעודת זהות"
+                    size="large"
+                    value={myUser.idNumber}
+                    onChange={(e) => handleChange("idNumber", e.target.value)}
+                  />
+                </Form.Item>
+              </Col>
+              <Col xs={24}>
+                <Form.Item label="אימייל" required>
+                  <Input
+                    prefix={<MailOutlined style={{ color: "#667eea" }} />}
+                    placeholder="הזן כתובת אימייל"
+                    size="large"
+                    type="email"
+                    value={myUser.email}
+                    onChange={(e) => handleChange("email", e.target.value)}
+                  />
+                </Form.Item>
+              </Col>
+              <Col xs={24} md={12}>
+                <Form.Item label="סיסמא" required>
+                  <Input.Password
+                    prefix={<LockOutlined style={{ color: "#667eea" }} />}
+                    placeholder="הזן סיסמא"
+                    size="large"
+                    value={myUser.password}
+                    onChange={(e) => handleChange("password", e.target.value)}
+                  />
+                </Form.Item>
+              </Col>
+              <Col xs={24} md={12}>
+                <Form.Item label="תפקיד" required>
+                  <InputNumber
+                    prefix={<TeamOutlined style={{ color: "#667eea" }} />}
+                    placeholder="הזן קוד תפקיד"
+                    size="large"
+                    style={{ width: "100%" }}
+                    value={myUser.role}
+                    onChange={(value) => handleChange("role", value || 0)}
+                  />
+                </Form.Item>
+              </Col>
+            </Row>
+
+            <Row gutter={[16, 16]} style={{ marginTop: 24 }}>
+              <Col xs={24} sm={12}>
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  size="large"
+                  loading={loading}
+                  icon={<UserAddOutlined />}
+                  block
+                  style={{
+                    height: 48,
+                    fontWeight: 600,
+                    fontSize: 16,
+                  }}
                 >
-                  {error}
-                </Alert>
-              ))}
-            </Box>
-          )}
-        </Box>
-      </Paper>
-    </Container>
+                  הירשם
+                </Button>
+              </Col>
+              <Col xs={24} sm={12}>
+                <Button
+                  type="default"
+                  size="large"
+                  icon={<ArrowLeftOutlined />}
+                  onClick={() => nav("/user-login")}
+                  block
+                  style={{
+                    height: 48,
+                    fontWeight: 600,
+                    borderWidth: 2,
+                  }}
+                >
+                  חזרה לכניסה
+                </Button>
+              </Col>
+            </Row>
+
+            <div style={{ textAlign: "center", marginTop: 24 }}>
+              <Text type="secondary">
+                כבר יש לך חשבון?{" "}
+                <Link href="/user-login" style={{ fontWeight: 600 }}>
+                  התחבר כאן
+                </Link>
+              </Text>
+            </div>
+
+            {errors.length > 0 && (
+              <div style={{ marginTop: 16 }}>
+                {errors.map((error, index) => (
+                  <Alert
+                    key={index}
+                    message={error}
+                    type="error"
+                    showIcon
+                    style={{ marginBottom: 8, borderRadius: 8 }}
+                  />
+                ))}
+              </div>
+            )}
+          </Form>
+        </Card>
+      </div>
+    </ConfigProvider>
   )
 }
 

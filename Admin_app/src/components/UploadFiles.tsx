@@ -1,60 +1,35 @@
 "use client"
-
-import type React from "react"
-
 import { useState } from "react"
 import axios from "axios"
 import {
-  Box,
+  Upload,
   Button,
   Typography,
-  Paper,
-  Container,
+  Card,
   Alert,
-  LinearProgress,
-  ThemeProvider,
-  createTheme,
-  CssBaseline,
+  Progress,
+  ConfigProvider,
+  Space,
+  Avatar,
   Divider,
-} from "@mui/material"
-import { CloudUpload, CheckCircle, Error as ErrorIcon } from "@mui/icons-material"
+  Row,
+  Col,
+} from "antd"
+import {
+  CloudUploadOutlined,
+  CheckCircleOutlined,
+  ExclamationCircleOutlined,
+  InboxOutlined,
+  FileOutlined,
+  DeleteOutlined,
+  EyeOutlined,
+  DownloadOutlined,
+  RocketOutlined,
+} from "@ant-design/icons"
+import type { UploadProps } from "antd"
 
-// Create a custom theme with RTL support and Hebrew font
-const theme = createTheme({
-  direction: "rtl",
-  typography: {
-    fontFamily: '"Assistant", "Rubik", "Heebo", sans-serif',
-  },
-  palette: {
-    primary: {
-      main: "#3f51b5",
-    },
-    secondary: {
-      main: "#f50057",
-    },
-    success: {
-      main: "#4caf50",
-    },
-    error: {
-      main: "#f44336",
-    },
-    background: {
-      default: "#f5f5f5",
-    },
-  },
-  components: {
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          borderRadius: 8,
-          padding: "10px 24px",
-          textTransform: "none",
-          fontSize: "1rem",
-        },
-      },
-    },
-  },
-})
+const { Title, Text } = Typography
+const { Dragger } = Upload
 
 const UploadFiles = () => {
   const [file, setFile] = useState<File | null>(null)
@@ -62,20 +37,35 @@ const UploadFiles = () => {
   const [error, setError] = useState<string | null>(null)
   const [uploading, setUploading] = useState(false)
   const [progress, setProgress] = useState(0)
+  const [uploadComplete, setUploadComplete] = useState(false)
+  const [dragActive, setDragActive] = useState(false)
 
   const url = import.meta.env.VITE_API_URL
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      setFile(e.target.files[0])
+  const uploadProps: UploadProps = {
+    name: "fileUpload",
+    multiple: false,
+    accept: ".jpg,.png,.pdf,.docx,.txt",
+    beforeUpload: (file) => {
+      setFile(file)
       setMessage(null)
       setError(null)
-    }
+      setUploadComplete(false)
+      return false // Prevent automatic upload
+    },
+    onRemove: () => {
+      setFile(null)
+      setMessage(null)
+      setError(null)
+      setUploadComplete(false)
+      setProgress(0)
+    },
+    // Removed onDragEnter as it is not a valid property of UploadProps
+    // onDragLeave: () => setDragActive(false),
+    onDrop: () => setDragActive(false),
   }
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-
+  const handleSubmit = async () => {
     if (!file) {
       setError("יש לבחור קובץ לפני השליחה")
       return
@@ -88,16 +78,16 @@ const UploadFiles = () => {
     formData.append("fileUpload", file)
 
     try {
-      // Simulate progress for better UX
+      // Simulate realistic progress
       const progressInterval = setInterval(() => {
         setProgress((prev) => {
           if (prev >= 90) {
             clearInterval(progressInterval)
             return 90
           }
-          return prev + 10
+          return prev + Math.random() * 15
         })
-      }, 300)
+      }, 200)
 
       const response = await axios.post(`${url}/FileUpload/upload`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
@@ -111,7 +101,8 @@ const UploadFiles = () => {
         setMessage(response.data.message || "הקובץ הועלה בהצלחה")
         setError(null)
         setUploading(false)
-      }, 500)
+        setUploadComplete(true)
+      }, 800)
     } catch (err: any) {
       setProgress(0)
       setUploading(false)
@@ -121,121 +112,307 @@ const UploadFiles = () => {
     }
   }
 
-  return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Container maxWidth="md" sx={{ py: 4 }}>
-        <Paper
-          elevation={3}
-          sx={{
-            p: 4,
-            borderRadius: 3,
-            boxShadow: "0 8px 32px rgba(0, 0, 0, 0.1)",
-          }}
-        >
-          <Box sx={{ textAlign: "center", mb: 4 }}>
-            <CloudUpload color="primary" sx={{ fontSize: 48, mb: 2 }} />
-            <Typography variant="h4" component="h1" gutterBottom fontWeight="bold">
-              העלאת קבצים
-            </Typography>
-            <Typography variant="body1" color="text.secondary">
-              בחר קובץ להעלאה למערכת
-            </Typography>
-            <Divider sx={{ mt: 3 }} />
-          </Box>
+  const formatFileSize = (bytes: number) => {
+    if (bytes === 0) return "0 Bytes"
+    const k = 1024
+    const sizes = ["Bytes", "KB", "MB", "GB"]
+    const i = Math.floor(Math.log(bytes) / Math.log(k))
+    return Number.parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i]
+  }
 
-          <Box
-            component="form"
-            onSubmit={handleSubmit}
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              gap: 3,
-              alignItems: "center",
-            }}
-          >
-            <Box
-              sx={{
-                border: "2px dashed",
-                borderColor: "primary.main",
-                borderRadius: 2,
-                p: 5,
-                width: "100%",
-                textAlign: "center",
-                bgcolor: "primary.50",
-                cursor: "pointer",
-                transition: "all 0.3s",
-                "&:hover": {
-                  bgcolor: "primary.100",
-                },
+  const getFileIcon = (fileName: string) => {
+    const extension = fileName.split(".").pop()?.toLowerCase()
+    switch (extension) {
+      case "pdf":
+        return <FileOutlined style={{ color: "#ff4d4f" }} />
+      case "jpg":
+      case "jpeg":
+      case "png":
+        return <FileOutlined style={{ color: "#52c41a" }} />
+      case "docx":
+      case "doc":
+        return <FileOutlined style={{ color: "#1890ff" }} />
+      default:
+        return <FileOutlined style={{ color: "#666" }} />
+    }
+  }
+
+  return (
+    <ConfigProvider direction="rtl">
+      <div className="upload-container" style={{ maxWidth: 900, margin: "0 auto", marginTop: "45vh" }}>
+        <Card className="form-section">
+          <div style={{ textAlign: "center", marginBottom: 32 }}>
+            <Avatar
+              size={80}
+              className="upload-avatar"
+              style={{
+                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                marginBottom: 16,
+                boxShadow: "0 4px 14px rgba(102, 126, 234, 0.3)",
               }}
-              onClick={() => document.getElementById("file-upload")?.click()}
             >
-              <input
-                type="file"
-                id="file-upload"
-                onChange={handleFileChange}
-                accept=".jpg,.png,.pdf,.docx,.txt"
-                style={{ display: "none" }}
-              />
-              <CloudUpload color="primary" sx={{ fontSize: 60, mb: 2 }} />
-              <Typography variant="h6" gutterBottom>
-                גרור קובץ לכאן או לחץ לבחירת קובץ
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                תומך בקבצים מסוג JPG, PNG, PDF, DOCX, TXT
-              </Typography>
+              <RocketOutlined style={{ fontSize: 40 }} />
+            </Avatar>
+
+            <Title level={2} style={{ marginBottom: 8, color: "#2d3748" , textAlign:"center"}}>
+              העלאת קבצים וניתוח נתונים לעסק עם AI
+            </Title>
+
+            <Text type="secondary" style={{ fontSize: 16 }}>
+              גרור קבצים או לחץ לבחירה - תמיכה מלאה בכל סוגי הקבצים
+            </Text>
+
+            <Divider />
+          </div>
+
+          <Row gutter={[24, 24]}>
+            <Col xs={24} lg={16}>
+              <Dragger
+                {...uploadProps}
+                className={`upload-dragger ${dragActive ? "drag-active" : ""}`}
+                style={{
+                  background: dragActive
+                    ? "linear-gradient(145deg, #f0f7ff, #e6f4ff)"
+                    : "linear-gradient(145deg, #f8fafc, #ffffff)",
+                  border: dragActive ? "3px dashed #1890ff" : "2px dashed #667eea",
+                  borderRadius: 20,
+                  padding: "60px 20px",
+                  marginBottom: 24,
+                  position: "relative",
+                  overflow: "hidden",
+                  transition: "all 0.3s ease",
+                }}
+              >
+                <div style={{ position: "relative", zIndex: 2, display:"flex", alignItems:"center", justifyContent:"center", flexDirection:"column" }}>
+                  <p className="ant-upload-drag-icon">
+                    <InboxOutlined
+                      style={{
+                        fontSize: 80,
+                        color: dragActive ? "#1890ff" : "#667eea",
+                        transition: "all 0.3s ease",
+                      }}
+                    />
+                  </p>
+                  <Title
+                    level={3}
+                    style={{
+                      color: "#2d3748",
+                      marginBottom: 12,
+                      transition: "all 0.3s ease",
+                    }}
+                  >
+                    {dragActive ? "שחרר כאן!" : "גרור קובץ לכאן או לחץ לבחירה"}
+                  </Title>
+                  <Text type="secondary" style={{ fontSize: 16, display: "block", marginBottom: 16 }}>
+                    תומך בקבצים מסוג JPG, PNG, PDF, DOCX, TXT
+                  </Text>
+                  <Text type="secondary" style={{ fontSize: 14 }}>
+                    גודל מקסימלי: 10MB
+                  </Text>
+                </div>
+              </Dragger>
 
               {file && (
-                <Box sx={{ mt: 2, p: 1, bgcolor: "background.paper", borderRadius: 1 }}>
-                  <Typography variant="body2" fontWeight="bold">
-                    {file.name} ({(file.size / 1024).toFixed(2)} KB)
-                  </Typography>
-                </Box>
+                <Card
+                  size="small"
+                  style={{
+                    marginBottom: 24,
+                    background: "linear-gradient(145deg, #f0f9ff, #ffffff)",
+                    border: "1px solid #e6f4ff",
+                    borderRadius: 12,
+                  }}
+                >
+                  <Row align="middle" gutter={[16, 16]}>
+                    <Col flex="auto">
+                      <Space>
+                        {getFileIcon(file.name)}
+                        <div>
+                          <Text strong>{file.name}</Text>
+                          <br />
+                          <Text type="secondary" style={{ fontSize: 12 }}>
+                            {formatFileSize(file.size)}
+                          </Text>
+                        </div>
+                      </Space>
+                    </Col>
+                    <Col>
+                      <Space>
+                        <Button type="text" icon={<EyeOutlined />} size="small" style={{ color: "#1890ff" }}>
+                          תצוגה מקדימה
+                        </Button>
+                        <Button
+                          type="text"
+                          icon={<DeleteOutlined />}
+                          size="small"
+                          danger
+                          onClick={() => {
+                            setFile(null)
+                            setMessage(null)
+                            setError(null)
+                            setUploadComplete(false)
+                          }}
+                        >
+                          הסר
+                        </Button>
+                      </Space>
+                    </Col>
+                  </Row>
+                </Card>
               )}
-            </Box>
 
-            {uploading && (
-              <Box sx={{ width: "100%", mt: 2 }}>
-                <Typography variant="body2" sx={{ mb: 1 }}>
-                  מעלה... {progress}%
-                </Typography>
-                <LinearProgress variant="determinate" value={progress} sx={{ height: 8, borderRadius: 4 }} />
-              </Box>
-            )}
+              {uploading && (
+                <Card
+                  size="small"
+                  style={{
+                    marginBottom: 24,
+                    background: "linear-gradient(145deg, #fff7e6, #ffffff)",
+                    border: "1px solid #ffd591",
+                  }}
+                >
+                  <Space direction="vertical" style={{ width: "100%" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <Text strong>מעלה קובץ...</Text>
+                      <Text style={{ color: "#fa8c16" }}>{Math.round(progress)}%</Text>
+                    </div>
+                    <Progress
+                      percent={progress}
+                      strokeColor={{
+                        "0%": "#667eea",
+                        "50%": "#764ba2",
+                        "100%": "#52c41a",
+                      }}
+                      strokeWidth={8}
+                      style={{ marginBottom: 8 }}
+                      showInfo={false}
+                    />
+                    <Text type="secondary" style={{ fontSize: 12 }}>
+                      {progress < 30 && "מתחיל העלאה..."}
+                      {progress >= 30 && progress < 60 && "מעלה נתונים..."}
+                      {progress >= 60 && progress < 90 && "מעבד קובץ..."}
+                      {progress >= 90 && "משלים העלאה..."}
+                    </Text>
+                  </Space>
+                </Card>
+              )}
+            </Col>
 
-            <Button
-              type="submit"
-              variant="contained"
-              disabled={!file || uploading}
-              startIcon={<CloudUpload />}
-              sx={{
-                mt: 2,
-                py: 1.5,
-                px: 4,
-                fontWeight: "bold",
-                fontSize: "1.1rem",
-                boxShadow: "0 4px 12px rgba(63, 81, 181, 0.4)",
+            <Col xs={24} lg={8}>
+              <Card title="פעולות מהירות" size="small" style={{ marginBottom: 24 }}>
+                <Space direction="vertical" style={{ width: "100%" }}>
+                  <Button
+                    type="primary"
+                    size="large"
+                    disabled={!file || uploading}
+                    loading={uploading}
+                    icon={uploadComplete ? <CheckCircleOutlined /> : <CloudUploadOutlined />}
+                    onClick={handleSubmit}
+                    block
+                    style={{
+                      height: 48,
+                      fontWeight: 600,
+                      fontSize: 16,
+                      background: uploadComplete ? "linear-gradient(135deg, #52c41a 0%, #389e0d 100%)" : undefined,
+                    }}
+                  >
+                    {uploading ? "מעלה..." : uploadComplete ? "הועלה בהצלחה!" : "העלה קובץ"}
+                  </Button>
+
+                  {uploadComplete && (
+                    <Button
+                      type="default"
+                      size="large"
+                      icon={<DownloadOutlined />}
+                      block
+                      style={{
+                        height: 40,
+                        fontWeight: 600,
+                        borderWidth: 2,
+                      }}
+                    >
+                      הורד קובץ
+                    </Button>
+                  )}
+                </Space>
+              </Card>
+
+              <Card title="מידע שימושי" size="small">
+                <Space direction="vertical" style={{ width: "100%" }}>
+                  <div>
+                    <Text strong style={{ color: "#52c41a" }}>
+                      ✓
+                    </Text>
+                    <Text style={{ marginRight: 8 }}>העלאה מאובטחת</Text>
+                  </div>
+                  <div>
+                    <Text strong style={{ color: "#52c41a" }}>
+                      ✓
+                    </Text>
+                    <Text style={{ marginRight: 8 }}>גיבוי אוטומטי</Text>
+                  </div>
+                  <div>
+                    <Text strong style={{ color: "#52c41a" }}>
+                      ✓
+                    </Text>
+                    <Text style={{ marginRight: 8 }}>סריקת וירוסים</Text>
+                  </div>
+                  <div>
+                    <Text strong style={{ color: "#52c41a" }}>
+                      ✓
+                    </Text>
+                    <Text style={{ marginRight: 8 }}>דחיסה אוטומטית</Text>
+                  </div>
+                </Space>
+              </Card>
+            </Col>
+          </Row>
+
+          {message && (
+            <Alert
+              message="הצלחה!"
+              description={
+                <Space direction="vertical">
+                  <Text>{message}</Text>
+                  <Text type="secondary">הקובץ נשמר בבטחה במערכת</Text>
+                </Space>
+              }
+              type="success"
+              showIcon
+              icon={<CheckCircleOutlined />}
+              style={{
+                borderRadius: 12,
+                border: "1px solid #b7eb8f",
+                background: "linear-gradient(145deg, #f6ffed, #ffffff)",
               }}
-            >
-              {uploading ? "מעלה..." : "העלה קובץ"}
-            </Button>
+              action={
+                <Button size="small" type="primary" ghost>
+                  צפה בקובץ
+                </Button>
+              }
+            />
+          )}
 
-            {message && (
-              <Alert icon={<CheckCircle fontSize="inherit" />} severity="success" sx={{ width: "100%", mt: 2 }}>
-                {message}
-              </Alert>
-            )}
-
-            {error && (
-              <Alert icon={<ErrorIcon fontSize="inherit" />} severity="error" sx={{ width: "100%", mt: 2 }}>
-                {error}
-              </Alert>
-            )}
-          </Box>
-        </Paper>
-      </Container>
-    </ThemeProvider>
+          {error && (
+            <Alert
+              message="שגיאה!"
+              description={error}
+              type="error"
+              showIcon
+              icon={<ExclamationCircleOutlined />}
+              style={{
+                borderRadius: 12,
+                border: "1px solid #ffccc7",
+                background: "linear-gradient(145deg, #fff2f0, #ffffff)",
+              }}
+              action={
+                <Button size="small" danger ghost>
+                  נסה שוב
+                </Button>
+              }
+            />
+          )}
+        </Card>
+      </div>
+    </ConfigProvider>
   )
 }
 

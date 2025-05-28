@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import {
   Box,
   Typography,
@@ -16,26 +15,31 @@ import {
   Tabs,
   Tab,
   Divider,
+  CircularProgress,
 } from "@mui/material"
-import { BarChart, PieChart, Timeline, Assessment, TrendingUp, TrendingDown, ShowChart } from "@mui/icons-material"
-import { useState } from "react"
+import {
+  BarChart,
+  PieChart,
+  Timeline,
+  Assessment,
+  TrendingUp,
+  TrendingDown,
+  QueryStats,
+} from "@mui/icons-material"
+import { useContext, useEffect, useState } from "react"
+import axios from "axios"
+import { globalContext } from "../context/GlobalContext"
+import { ProdactionReportData } from "../models/ProdactionReportData"
 
-// Create a custom theme with RTL support and Hebrew font
 const theme = createTheme({
   direction: "rtl",
   typography: {
     fontFamily: '"Assistant", "Rubik", "Heebo", sans-serif',
   },
   palette: {
-    primary: {
-      main: "#3f51b5",
-    },
-    secondary: {
-      main: "#f50057",
-    },
-    background: {
-      default: "#f5f5f5",
-    },
+    primary: { main: "#3f51b5" },
+    secondary: { main: "#f50057" },
+    background: { default: "#f5f5f5" },
   },
   components: {
     MuiCard: {
@@ -51,52 +55,50 @@ const theme = createTheme({
 
 const ProductionReports = () => {
   const [tabValue, setTabValue] = useState(0)
+  const [reportData, setReportData] = useState<ProdactionReportData | null>(null)
+  const [loading, setLoading] = useState(true)
+  const globalContextDetails = useContext(globalContext)
+  const url = import.meta.env.VITE_API_URL
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue)
   }
 
+  useEffect(() => {
+    const fetchReport = async () => {
+      try {
+        const { data } = await axios.get(
+          `${url}/api/Reports/business-report/${globalContextDetails.business_global.id}`,
+          { withCredentials: true }
+        )
+        setReportData(data)
+      } catch (error) {
+        console.error("שגיאה בטעינת דוח ייצור:", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchReport()
+  }, [])
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Box
-        sx={{
-          minHeight: "100vh",
-          background: "linear-gradient(to bottom, #f5f7ff, #ffffff)",
-          py: 4,
-        }}
-      >
+      <Box sx={{ minHeight: "100vh", background: "linear-gradient(to bottom, #f5f7ff, #ffffff)", py: 4 }}>
         <Container>
-          <Paper
-            elevation={3}
-            sx={{
-              p: 4,
-              borderRadius: 3,
-              boxShadow: "0 8px 32px rgba(0, 0, 0, 0.1)",
-            }}
-          >
+          <Paper elevation={3} sx={{ p: 4, borderRadius: 3 }}>
             <Box sx={{ textAlign: "center", mb: 4 }}>
               <Assessment color="primary" sx={{ fontSize: 48, mb: 2 }} />
-              <Typography variant="h4" component="h1" gutterBottom fontWeight="bold">
-                דוחות ייצור
+              <Typography variant="h4" fontWeight="bold">
+                דוח ייצור - {reportData?.businessName ?? "טוען..."}
               </Typography>
               <Typography variant="body1" color="text.secondary">
-                צפה בנתוני הייצור והביצועים של העסק שלך
+                צפה בביצועי הייצור של העסק שלך
               </Typography>
             </Box>
 
-            <Tabs
-              value={tabValue}
-              onChange={handleTabChange}
-              variant="fullWidth"
-              sx={{ mb: 4 }}
-              TabIndicatorProps={{
-                style: {
-                  height: 4,
-                  borderRadius: 4,
-                },
-              }}
-            >
+            <Tabs value={tabValue} onChange={handleTabChange} variant="fullWidth" sx={{ mb: 4 }}>
               <Tab icon={<BarChart />} label="סקירה כללית" />
               <Tab icon={<Timeline />} label="מגמות" />
               <Tab icon={<PieChart />} label="התפלגות" />
@@ -104,152 +106,80 @@ const ProductionReports = () => {
 
             <Divider sx={{ mb: 4 }} />
 
-            {tabValue === 0 && (
+            {loading ? (
+              <Box sx={{ display: "flex", justifyContent: "center", py: 10 }}>
+                <CircularProgress />
+              </Box>
+            ) : reportData && tabValue === 0 ? (
               <Grid container spacing={3}>
-                <Grid item xs={12} md={6} lg={3} {...({} as any)}>
-                  <Card>
-                    <CardContent sx={{ p: 3 }}>
-                      <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                        <Box
-                          sx={{
-                            bgcolor: "primary.light",
-                            borderRadius: "50%",
-                            p: 1,
-                            mr: 2,
-                            display: "flex",
-                          }}
-                        >
-                          <BarChart color="primary" />
+                {[
+                  {
+                    label: "סה״כ הכנסות",
+                    value: `₪${reportData.totalIncome.toLocaleString()}`,
+                    icon: <TrendingUp color="success" />,
+                    color: "success.light",
+                  },
+                  {
+                    label: "סה״כ הוצאות",
+                    value: `₪${reportData.totalExpenses.toLocaleString()}`,
+                    icon: <TrendingDown color="error" />,
+                    color: "error.light",
+                  },
+                  {
+                    label: "רווח נקי",
+                    value: `₪${reportData.netProfit.toLocaleString()}`,
+                    icon: <QueryStats color="primary" />,
+                    color: "primary.light",
+                  },
+                  {
+                    label: "תזרים מזומנים",
+                    value: `₪${reportData.cashFlow.toLocaleString()}`,
+                    icon: <BarChart color="secondary" />,
+                    color: "secondary.light",
+                  },
+                  {
+                    label: "מספר חשבוניות",
+                    value: `${reportData.invoiceCount}`,
+                    icon: <Assessment color="info" />,
+                    color: "info.light",
+                  },
+                  {
+                    label: "סה״כ חיובים",
+                    value: `₪${reportData.totalDebit.toLocaleString()}`,
+                    icon: <TrendingDown color="warning" />,
+                    color: "warning.light",
+                  },
+                  {
+                    label: "סה״כ זיכויים",
+                    value: `₪${reportData.totalCredit.toLocaleString()}`,
+                    icon: <TrendingUp color="info" />,
+                    color: "info.light",
+                  },
+                  {
+                    label: "תאריך הדוח",
+                    value: new Date(reportData.reportDate).toLocaleDateString("he-IL"),
+                    icon: <Timeline color="disabled" />,
+                    color: "grey.300",
+                  },
+                ].map((item, index) => (
+                  <Grid item xs={12} md={6} lg={3} key={index} {...({} as any)}>
+                    <Card>
+                      <CardContent sx={{ p: 3 }}>
+                        <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                          <Box sx={{ bgcolor: item.color, borderRadius: "50%", p: 1, mr: 2 }}>{item.icon}</Box>
+                          <Typography variant="h6" fontWeight="bold">
+                            {item.label}
+                          </Typography>
                         </Box>
-                        <Typography variant="h6" fontWeight="bold">
-                          סה"כ ייצור
+                        <Typography variant="h4" fontWeight="bold">
+                          {item.value}
                         </Typography>
-                      </Box>
-                      <Typography variant="h4" fontWeight="bold" color="primary.main">
-                        1,245
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        יחידות בחודש האחרון
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                </Grid>
-
-                <Grid item xs={12} md={6} lg={3} {...({} as any)}>
-                  <Card>
-                    <CardContent sx={{ p: 3 }}>
-                      <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                        <Box
-                          sx={{
-                            bgcolor: "success.light",
-                            borderRadius: "50%",
-                            p: 1,
-                            mr: 2,
-                            display: "flex",
-                          }}
-                        >
-                          <TrendingUp color="success" />
-                        </Box>
-                        <Typography variant="h6" fontWeight="bold">
-                          יעילות
-                        </Typography>
-                      </Box>
-                      <Typography variant="h4" fontWeight="bold" color="success.main">
-                        92%
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        שיפור של 3% מהחודש הקודם
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                </Grid>
-
-                <Grid item xs={12} md={6} lg={3} {...({} as any)}>
-                  <Card>
-                    <CardContent sx={{ p: 3 }}>
-                      <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                        <Box
-                          sx={{
-                            bgcolor: "error.light",
-                            borderRadius: "50%",
-                            p: 1,
-                            mr: 2,
-                            display: "flex",
-                          }}
-                        >
-                          <TrendingDown color="error" />
-                        </Box>
-                        <Typography variant="h6" fontWeight="bold">
-                          פחת
-                        </Typography>
-                      </Box>
-                      <Typography variant="h4" fontWeight="bold" color="error.main">
-                        2.4%
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        ירידה של 0.8% מהחודש הקודם
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                </Grid>
-
-                <Grid item xs={12} md={6} lg={3} {...({} as any)}>
-                  <Card>
-                    <CardContent sx={{ p: 3 }}>
-                      <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                        <Box
-                          sx={{
-                            bgcolor: "secondary.light",
-                            borderRadius: "50%",
-                            p: 1,
-                            mr: 2,
-                            display: "flex",
-                          }}
-                        >
-                          <ShowChart color="secondary" />
-                        </Box>
-                        <Typography variant="h6" fontWeight="bold">
-                          עלות ייצור
-                        </Typography>
-                      </Box>
-                      <Typography variant="h4" fontWeight="bold" color="secondary.main">
-                        ₪85
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        עלות ממוצעת ליחידה
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                </Grid>
-
-                <Grid item xs={12} {...({} as any)}>
-                  <Card sx={{ mt: 2 }}>
-                    <CardContent sx={{ p: 3 }}>
-                      <Typography variant="h6" fontWeight="bold" gutterBottom>
-                        נתוני ייצור חודשיים
-                      </Typography>
-                      <Box
-                        sx={{
-                          height: 300,
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          bgcolor: "grey.100",
-                          borderRadius: 2,
-                          p: 2,
-                        }}
-                      >
-                        <Typography variant="body1" color="text.secondary">
-                          כאן יוצג גרף נתוני הייצור החודשיים
-                        </Typography>
-                      </Box>
-                    </CardContent>
-                  </Card>
-                </Grid>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                ))}
               </Grid>
-            )}
-
-            {tabValue === 1 && (
+            ) : tabValue === 1 ? (
               <Box
                 sx={{
                   height: 400,
@@ -265,9 +195,7 @@ const ProductionReports = () => {
                   כאן יוצגו נתוני המגמות
                 </Typography>
               </Box>
-            )}
-
-            {tabValue === 2 && (
+            ) : tabValue === 2 ? (
               <Box
                 sx={{
                   height: 400,
@@ -283,6 +211,8 @@ const ProductionReports = () => {
                   כאן תוצג התפלגות הנתונים
                 </Typography>
               </Box>
+            ) : (
+              <Typography color="error">שגיאה בטעינת הנתונים</Typography>
             )}
           </Paper>
         </Container>

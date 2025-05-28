@@ -1,235 +1,163 @@
 "use client"
-
-import type React from "react"
-
 import { useContext, useState } from "react"
-import * as Yup from "yup"
 import axios from "axios"
 import type { AdminRegister } from "../models/AdminRegister"
 import { useNavigate } from "react-router-dom"
 import { validationSchemaUserLogin } from "../utils/validationSchema"
 import { globalContext } from "../context/GlobalContext"
-import {
-  Box,
-  TextField,
-  Button,
-  Typography,
-  Paper,
-  Container,
-  Alert,
-  InputAdornment,
-  Avatar,
-  Link,
-  Stack,
-  Divider,
-} from "@mui/material"
-import { Email, Lock, Person, Login as LoginIcon } from "@mui/icons-material"
+import { Form, Input, Button, Typography, Card, Alert, Space, Avatar, Divider, ConfigProvider } from "antd"
+import { MailOutlined, LockOutlined, UserOutlined, LoginOutlined } from "@ant-design/icons"
+import CenteredLayout from "./CenteredLayout"
+
+const { Title, Text, Link } = Typography
 
 const UserLogin = () => {
   const nav = useNavigate()
   const validationSchema = validationSchemaUserLogin
   const [userLogin, setUserLogin] = useState<AdminRegister>({ email: "", password: "" })
   const [errors, setErrors] = useState<string[]>([])
+  const [loading, setLoading] = useState(false)
   const url = import.meta.env.VITE_API_URL
   const { setUser } = useContext(globalContext)
 
-  const handleSubmit = (userLogin: AdminRegister) => async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    validationSchema
-      .isValid(userLogin)
-      .then(async (valid) => {
-        setErrors([])
+  const handleSubmit = async () => {
+    setLoading(true)
+    try {
+      const valid = await validationSchema.isValid(userLogin)
+      setErrors([])
 
-        if (valid) {
-          try {
-            const { data } = await axios.post<any>(`${url}/Auth/user-login`, userLogin, { withCredentials: true }) // TODO
-            setUser(data.user)
-            nav("/")
-          } catch (e) {
-            console.log(e)
-            setErrors(["שם משתמש או סיסמה שגויים"])
-          }
-        } else {
-          setErrors(["נא למלא את כל השדות הנדרשים"])
-        }
-      })
-      .catch((err) => {
-        console.log("Validation error:", err.errors)
-        if (err instanceof Yup.ValidationError) {
-          setErrors(err.errors)
-        }
-      })
+      if (valid) {
+        const { data } = await axios.post<any>(`${url}/Auth/user-login`, userLogin, { withCredentials: true })
+        setUser(data.user)
+        nav("/")
+      } else {
+        setErrors(["נא למלא את כל השדות הנדרשים"])
+      }
+    } catch (e) {
+      console.log(e)
+      setErrors(["שם משתמש או סיסמה שגויים"])
+    } finally {
+      setLoading(false)
+    }
   }
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
-    const { name, value } = event.target
-    setUserLogin((prevUser) => ({
-      ...prevUser,
-      [name]: value,
-    }))
+  const handleChange = (field: string, value: string) => {
+    setUserLogin((prev) => ({ ...prev, [field]: value }))
   }
 
   return (
-    <Container maxWidth="sm" sx={{ py: 6, display: "flex", justifyContent: "center" }}>
-      <Paper
-        elevation={0}
-        sx={{
-          p: { xs: 3, sm: 5 },
-          width: "100%",
-          borderRadius: 3,
-          boxShadow: "0 10px 40px rgba(0, 0, 0, 0.08)",
-          background: "linear-gradient(145deg, #ffffff, #f8fafc)",
-          border: "1px solid rgba(0, 0, 0, 0.05)",
-        }}
-      >
-        <Box
-          component="form"
-          onSubmit={handleSubmit(userLogin)}
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            gap: 3,
-            alignItems: "center",
-          }}
-        >
-          <Box sx={{ textAlign: "center", mb: 2 }}>
+    <ConfigProvider direction="rtl">
+      <div style={{marginTop: "50vh"}}></div>
+      <CenteredLayout >
+        <Card className="login-form" style={{ maxWidth: 500, width: "100%" }}>
+          <div style={{ textAlign: "center", marginBottom: 32 }}>
             <Avatar
-              sx={{
-                bgcolor: "primary.main",
-                width: 70,
-                height: 70,
-                mb: 2,
-                mx: "auto",
-                boxShadow: "0 4px 14px rgba(37, 99, 235, 0.2)",
+              size={80}
+              style={{
+                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                marginBottom: 16,
+                boxShadow: "0 4px 14px rgba(102, 126, 234, 0.3)",
               }}
             >
-              <Person sx={{ fontSize: 40 }} />
+              <UserOutlined style={{ fontSize: 40 }} />
             </Avatar>
 
-            <Typography variant="h4" component="h1" gutterBottom fontWeight="bold">
+            <Title level={2} style={{ marginBottom: 8, color: "#2d3748" , textAlign:"center"}}>
               כניסת משתמש
-            </Typography>
+            </Title>
 
-            <Typography variant="body1" color="text.secondary" sx={{ mb: 1 }}>
+            <Text type="secondary" style={{ fontSize: 16 }}>
               ברוכים הבאים למערכת ניהול העסק
-            </Typography>
-          </Box>
+            </Text>
+          </div>
 
-          <TextField
-            fullWidth
-            label="אימייל"
-            name="email"
-            type="email"
-            variant="outlined"
-            onChange={handleChange}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start" sx={{ mr: 1.5 }}>
-                  <Email color="primary" />
-                </InputAdornment>
-              ),
-            }}
-            placeholder="הזן את האימייל שלך"
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                bgcolor: "white",
-                "&:hover .MuiOutlinedInput-notchedOutline": {
-                  borderColor: "primary.main",
-                },
-              },
-            }}
-          />
+          <Form layout="vertical" onFinish={handleSubmit}>
+            <Form.Item label="אימייל" required style={{ marginBottom: 20 }}>
+              <Input
+                prefix={<MailOutlined style={{ color: "#667eea" }} />}
+                placeholder="הזן את האימייל שלך"
+                size="large"
+                value={userLogin.email}
+                onChange={(e) => handleChange("email", e.target.value)}
+                style={{ borderRadius: 10 }}
+              />
+            </Form.Item>
 
-          <TextField
-            fullWidth
-            label="סיסמא"
-            name="password"
-            type="password"
-            variant="outlined"
-            onChange={handleChange}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start" sx={{ mr: 1.5 }}>
-                  <Lock color="primary" />
-                </InputAdornment>
-              ),
-            }}
-            placeholder="הזן את הסיסמה שלך"
-            sx={{
-              "& .MuiOutlinedInput-root": {
-                bgcolor: "white",
-                "&:hover .MuiOutlinedInput-notchedOutline": {
-                  borderColor: "primary.main",
-                },
-              },
-            }}
-          />
+            <Form.Item label="סיסמא" required style={{ marginBottom: 24 }}>
+              <Input.Password
+                prefix={<LockOutlined style={{ color: "#667eea" }} />}
+                placeholder="הזן את הסיסמה שלך"
+                size="large"
+                value={userLogin.password}
+                onChange={(e) => handleChange("password", e.target.value)}
+                style={{ borderRadius: 10 }}
+              />
+            </Form.Item>
 
-          <Button
-            type="submit"
-            variant="contained"
-            fullWidth
-            size="large"
-            startIcon={<LoginIcon />}
-            sx={{
-              mt: 2,
-              py: 1.5,
-              fontWeight: "bold",
-              fontSize: "1.1rem",
-              boxShadow: "0 4px 14px rgba(37, 99, 235, 0.2)",
-            }}
-          >
-            התחבר
-          </Button>
+            <Button
+              type="primary"
+              htmlType="submit"
+              size="large"
+              loading={loading}
+              icon={<LoginOutlined />}
+              block
+              style={{
+                height: 48,
+                borderRadius: 10,
+                fontWeight: 600,
+                fontSize: 16,
+                marginBottom: 16,
+              }}
+            >
+              התחבר
+            </Button>
 
-          <Divider sx={{ width: "100%", my: 1 }}>
-            <Typography variant="caption" color="text.secondary">
-              או
-            </Typography>
-          </Divider>
+            <Divider>
+              <Text type="secondary">או</Text>
+            </Divider>
 
-          <Button
-            variant="outlined"
-            fullWidth
-            size="large"
-            onClick={() => nav("/register-user")}
-            sx={{
-              py: 1.5,
-              fontWeight: "bold",
-              borderWidth: 2,
-              "&:hover": {
+            <Button
+              type="default"
+              size="large"
+              block
+              onClick={() => nav("/register-user")}
+              style={{
+                height: 48,
+                borderRadius: 10,
+                fontWeight: 600,
+                marginBottom: 16,
                 borderWidth: 2,
-              },
-            }}
-          >
-            הירשם עכשיו
-          </Button>
+              }}
+            >
+              הירשם עכשיו
+            </Button>
 
-          <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
-            <Typography variant="body2" color="text.secondary">
-              מנהל?
-            </Typography>
-            <Link href="/admin-login" underline="hover" fontWeight="medium">
-              התחבר כמנהל
-            </Link>
-          </Stack>
+            <div style={{ textAlign: "center" }}>
+              <Space>
+                <Text type="secondary">מנהל?</Text>
+                <Link href="/admin-login" style={{ fontWeight: 600 }}>
+                  התחבר כמנהל
+                </Link>
+              </Space>
+            </div>
 
-          {errors.length > 0 && (
-            <Box sx={{ width: "100%", mt: 2 }}>
-              {errors.map((error, index) => (
-                <Alert
-                  key={index}
-                  severity="error"
-                  sx={{ mb: 1, borderRadius: 2, boxShadow: "0 2px 10px rgba(239, 68, 68, 0.1)" }}
-                >
-                  {error}
-                </Alert>
-              ))}
-            </Box>
-          )}
-        </Box>
-      </Paper>
-    </Container>
+            {errors.length > 0 && (
+              <div style={{ marginTop: 16 }}>
+                {errors.map((error, index) => (
+                  <Alert
+                    key={index}
+                    message={error}
+                    type="error"
+                    showIcon
+                    style={{ marginBottom: 8, borderRadius: 8 }}
+                  />
+                ))}
+              </div>
+            )}
+          </Form>
+        </Card>
+      </CenteredLayout>
+    </ConfigProvider>
   )
 }
 

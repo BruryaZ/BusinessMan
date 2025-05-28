@@ -147,6 +147,8 @@ const RegisterBusinessData = ({ onSubmitSuccess }: { onSubmitSuccess?: () => voi
 
   return (
     <ThemeProvider theme={theme}>
+            <div style={{marginTop: "50vh"}}></div>
+
       <CssBaseline />
       <Container maxWidth="md">
         <Paper

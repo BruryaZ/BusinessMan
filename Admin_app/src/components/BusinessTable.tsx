@@ -1,97 +1,99 @@
 import type React from "react"
 import type { Business } from "../models/Business"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Typography,
-  Box,
-  ThemeProvider,
-  createTheme,
-} from "@mui/material"
+import { Table, Typography, Card, ConfigProvider, Tag } from "antd"
+import type { ColumnsType } from "antd/es/table"
+
+const { Title } = Typography
 
 interface BusinessTableProps {
   business: Business
 }
 
-// Create a custom theme with RTL support and Hebrew font
-const theme = createTheme({
-  direction: "rtl",
-  typography: {
-    fontFamily: '"Assistant", "Rubik", "Heebo", sans-serif',
-  },
-  palette: {
-    primary: {
-      main: "#3f51b5",
-    },
-    background: {
-      default: "#f5f5f5",
-    },
-  },
-})
-
 const BusinessTable: React.FC<BusinessTableProps> = ({ business }) => {
-  return (
-    <ThemeProvider theme={theme}>
-      <Box sx={{ width: "100%", overflow: "hidden" }}>
-        <Typography variant="h6" component="h2" gutterBottom fontWeight="bold" sx={{ mb: 2 }}>
-          פרטי העסק
-        </Typography>
+  const dataSource = [business]
 
-        <TableContainer component={Paper} sx={{ boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)", borderRadius: 2 }}>
-          <Table sx={{ minWidth: 650 }} aria-label="business data table">
-            <TableHead sx={{ bgcolor: "primary.main" }}>
-              <TableRow>
-                <TableCell align="right" sx={{ color: "white", fontWeight: "bold" }}>
-                  מזהה
-                </TableCell>
-                <TableCell align="right" sx={{ color: "white", fontWeight: "bold" }}>
-                  שם עסק
-                </TableCell>
-                <TableCell align="right" sx={{ color: "white", fontWeight: "bold" }}>
-                  כתובת
-                </TableCell>
-                <TableCell align="right" sx={{ color: "white", fontWeight: "bold" }}>
-                  אימייל
-                </TableCell>
-                <TableCell align="right" sx={{ color: "white", fontWeight: "bold" }}>
-                  סוג עסק
-                </TableCell>
-                <TableCell align="right" sx={{ color: "white", fontWeight: "bold" }}>
-                  הכנסות
-                </TableCell>
-                <TableCell align="right" sx={{ color: "white", fontWeight: "bold" }}>
-                  הוצאות
-                </TableCell>
-                <TableCell align="right" sx={{ color: "white", fontWeight: "bold" }}>
-                  תזרים מזומנים
-                </TableCell>
-                <TableCell align="right" sx={{ color: "white", fontWeight: "bold" }}>
-                  שווי נקי
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              <TableRow sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
-                <TableCell align="right">{business.id}</TableCell>
-                <TableCell align="right">{business.name}</TableCell>
-                <TableCell align="right">{business.address}</TableCell>
-                <TableCell align="right">{business.email}</TableCell>
-                <TableCell align="right">{business.businessType}</TableCell>
-                <TableCell align="right">₪{business.income?.toLocaleString()}</TableCell>
-                <TableCell align="right">₪{business.expenses?.toLocaleString()}</TableCell>
-                <TableCell align="right">₪{business.cashFlow?.toLocaleString()}</TableCell>
-                <TableCell align="right">₪{business.netWorth?.toLocaleString()}</TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Box>
-    </ThemeProvider>
+  const columns: ColumnsType<Business> = [
+    {
+      title: "מזהה",
+      dataIndex: "id",
+      key: "id",
+      align: "right",
+    },
+    {
+      title: "שם עסק",
+      dataIndex: "name",
+      key: "name",
+      align: "right",
+      render: (text) => <strong>{text}</strong>,
+    },
+    {
+      title: "כתובת",
+      dataIndex: "address",
+      key: "address",
+      align: "right",
+    },
+    {
+      title: "אימייל",
+      dataIndex: "email",
+      key: "email",
+      align: "right",
+    },
+    {
+      title: "סוג עסק",
+      dataIndex: "businessType",
+      key: "businessType",
+      align: "right",
+      render: (text) => <Tag color="blue">{text}</Tag>,
+    },
+    {
+      title: "הכנסות",
+      dataIndex: "income",
+      key: "income",
+      align: "right",
+      render: (value) => <span style={{ color: "#52c41a", fontWeight: "bold" }}>₪{value?.toLocaleString()}</span>,
+    },
+    {
+      title: "הוצאות",
+      dataIndex: "expenses",
+      key: "expenses",
+      align: "right",
+      render: (value) => <span style={{ color: "#ff4d4f", fontWeight: "bold" }}>₪{value?.toLocaleString()}</span>,
+    },
+    {
+      title: "תזרים מזומנים",
+      dataIndex: "cashFlow",
+      key: "cashFlow",
+      align: "right",
+      render: (value) => <span style={{ color: "#1890ff", fontWeight: "bold" }}>₪{value?.toLocaleString()}</span>,
+    },
+    {
+      title: "שווי נקי",
+      dataIndex: "netWorth",
+      key: "netWorth",
+      align: "right",
+      render: (value) => <span style={{ color: "#722ed1", fontWeight: "bold" }}>₪{value?.toLocaleString()}</span>,
+    },
+  ]
+
+  return (
+    <ConfigProvider direction="rtl">
+      <div style={{ width: "100%" }}>
+        <Title level={4} style={{ marginBottom: 16, textAlign: "right" }}>
+          פרטי העסק
+        </Title>
+
+        <Card style={{ borderRadius: 12, overflow: "hidden" }}>
+          <Table
+            dataSource={dataSource}
+            columns={columns}
+            pagination={false}
+            rowKey="id"
+            scroll={{ x: 800 }}
+            style={{ direction: "rtl" }}
+          />
+        </Card>
+      </div>
+    </ConfigProvider>
   )
 }
 

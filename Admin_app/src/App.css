@@ -1,17 +1,30 @@
 /* Import Hebrew fonts */
 @import url("https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;500;600;700&family=Heebo:wght@300;400;500;600;700&family=Rubik:wght@300;400;500;600;700&display=swap");
 
+* {
+  box-sizing: border-box;
+}
+
+html,
 body {
   margin: 0;
   padding: 0;
+  width: 100%;
+  height: 100%;
   direction: rtl;
   font-family: "Assistant", "Rubik", "Heebo", sans-serif;
-  background-color: #f5f7ff;
-  justify-content: center;
-  align-items: center;
+  background: linear-gradient(135deg, #f5f7ff 0%, #ffffff 100%);
+  overflow-x: hidden;
+}
+
+::selection {
+  background-color: #8581d4;
+  color: white;
+}
+
+#root {
   width: 100%;
-  /* height: 100vh; */
-  /* overflow: hidden; */
+  min-height: 100vh;
 }
 
 a {
@@ -19,25 +32,191 @@ a {
   color: inherit;
 }
 
-/* Fix for RTL input fields */
-.MuiInputBase-root {
-  text-align: right;
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.MuiInputAdornment-root {
-  margin-left: 8px !important;
-  margin-right: 0 !important;
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
-/* Fix for RTL icons in buttons */
-.MuiButton-startIcon {
-  margin-left: 8px;
-  margin-right: -4px;
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
-/* Fix for RTL Grid items */
-.MuiGrid-item {
-  text-align: right;
+@keyframes bounceIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+
+  70% {
+    transform: scale(0.9);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.05);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes glow {
+
+  0%,
+  100% {
+    box-shadow: 0 0 5px rgba(102, 126, 234, 0.5);
+  }
+
+  50% {
+    box-shadow: 0 0 20px rgba(102, 126, 234, 0.8), 0 0 30px rgba(102, 126, 234, 0.6);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200px 0;
+  }
+
+  100% {
+    background-position: calc(200px + 100%) 0;
+  }
+}
+
+@keyframes rotateIn {
+  from {
+    opacity: 0;
+    transform: rotate(-200deg);
+  }
+
+  to {
+    opacity: 1;
+    transform: rotate(0deg);
+  }
+}
+
+/* Component Animations */
+.logo-section {
+  animation: slideInRight 0.8s ease-out;
+}
+
+.logo-avatar {
+  animation: bounceIn 1s ease-out 0.3s both;
+}
+
+.logo-title {
+  animation: fadeInUp 0.8s ease-out 0.5s both;
+}
+
+.sidebar-menu {
+  animation: slideInRight 0.8s ease-out 0.2s both;
+}
+
+.sidebar-menu .ant-menu-item {
+  animation: fadeInUp 0.6s ease-out both;
+  animation-delay: calc(var(--item-index, 0) * 0.1s);
+}
+
+.main-header {
+  animation: slideInLeft 0.8s ease-out;
+}
+
+.header-icon {
+  animation: rotateIn 1s ease-out 0.5s both;
+}
+
+.header-title {
+  animation: fadeInUp 0.8s ease-out 0.3s both;
+}
+
+.nav-btn {
+  animation: fadeInUp 0.6s ease-out both;
+  animation-delay: calc(var(--btn-index, 0) * 0.1s);
+  transition: all 0.3s ease;
+}
+
+.nav-btn:hover {
+  transform: translateY(-2px);
+  animation: pulse 0.6s ease-in-out infinite;
+}
+
+.menu-toggle-btn {
+  transition: all 0.3s ease;
+}
+
+.menu-toggle-btn:hover {
+  animation: pulse 0.6s ease-in-out;
+}
+
+.desktop-sider {
+  animation: slideInRight 1s ease-out;
+}
+
+.mobile-drawer .ant-drawer-content {
+  animation: slideInRight 0.5s ease-out;
+}
+
+.main-content {
+  animation: fadeInUp 0.8s ease-out 0.3s both;
+}
+
+.content-wrapper {
+  animation: fadeInUp 1s ease-out 0.5s both;
 }
 
 /* Custom scrollbar */
@@ -48,15 +227,17 @@ a {
 
 ::-webkit-scrollbar-track {
   background: #f1f1f1;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #c5cae9;
   border-radius: 4px;
 }
 
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 4px;
+  animation: glow 2s ease-in-out infinite alternate;
+}
+
 ::-webkit-scrollbar-thumb:hover {
-  background: #3f51b5;
+  background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
 }
 
 html:lang(he),
@@ -65,12 +246,734 @@ body:lang(he) {
   text-align: right;
 }
 
-.ltr,
-.lang_dir:lang(en) {
+.ltr {
   direction: ltr !important;
 }
 
-.rtl,
-.lang_dir:lang(he) {
+.rtl {
   direction: rtl !important;
+}
+
+/* Ant Design Layout Fixes for RTL */
+.ant-layout {
+  min-height: 100vh !important;
+  width: 100% !important;
+  direction: rtl !important;
+}
+
+.ant-layout-content {
+  width: 100% !important;
+  margin: 0 !important;
+  background: transparent !important;
+  direction: rtl !important;
+}
+
+/* RTL Sider positioning */
+.ant-layout-sider {
+  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.05) !important;
+  position: fixed !important;
+  height: 100vh !important;
+  right: 0 !important;
+  top: 0 !important;
+  z-index: 1001 !important;
+  background: #fff !important;
+}
+
+/* Content area adjustments for RTL */
+.main-layout {
+  margin-right: 280px !important;
+  width: calc(100% - 280px) !important;
+  transition: all 0.3s ease !important;
+  min-height: 100vh !important;
+}
+
+.main-layout.collapsed {
+  margin-right: 80px !important;
+  width: calc(100% - 80px) !important;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+
+  .main-layout,
+  .main-layout.collapsed {
+    margin-right: 0 !important;
+    width: 100% !important;
+  }
+
+  .ant-layout-sider {
+    transform: translateX(100%) !important;
+  }
+}
+
+/* Drawer RTL fix */
+.ant-drawer-content-wrapper {
+  right: 0 !important;
+  left: auto !important;
+}
+
+.ant-drawer-body {
+  padding: 0 !important;
+  direction: rtl !important;
+}
+
+/* Menu RTL fixes */
+.ant-menu {
+  direction: rtl !important;
+}
+
+.ant-menu-item {
+  border-radius: 8px !important;
+  margin: 4px 8px !important;
+  text-align: right !important;
+  transition: all 0.3s ease !important;
+}
+
+.ant-menu-item:hover {
+  transform: translateX(-5px) !important;
+  animation: glow 0.6s ease-in-out !important;
+}
+
+.ant-menu-item-selected {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  color: white !important;
+  animation: shimmer 2s ease-in-out infinite !important;
+  background-size: 200px 100% !important;
+  background-image: linear-gradient(90deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.2) 20%,
+      rgba(255, 255, 255, 0.5) 60%,
+      rgba(255, 255, 255, 0)) !important;
+}
+
+.ant-menu-item-selected .anticon {
+  color: white !important;
+}
+
+.ant-menu-item .ant-menu-title-content {
+  margin-right: 12px !important;
+  margin-left: 0 !important;
+}
+
+/* Card and component fixes */
+.ant-card {
+  border-radius: 16px !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08) !important;
+  transition: all 0.3s ease !important;
+  width: 100% !important;
+  direction: rtl !important;
+  animation: fadeInUp 0.8s ease-out both !important;
+}
+
+.ant-card:hover {
+  transform: translateY(-8px) !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.15) !important;
+  animation: float 3s ease-in-out infinite !important;
+}
+
+.ant-card-body {
+  direction: rtl !important;
+  text-align: right !important;
+}
+
+/* Button fixes */
+.ant-btn {
+  border-radius: 10px !important;
+  font-weight: 600 !important;
+  height: auto !important;
+  padding: 10px 20px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  direction: rtl !important;
+  transition: all 0.3s ease !important;
+}
+
+.ant-btn:hover {
+  transform: translateY(-2px) !important;
+  animation: pulse 0.6s ease-in-out !important;
+}
+
+.ant-btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  border: none !important;
+  box-shadow: 0 4px 14px rgba(102, 126, 234, 0.4) !important;
+}
+
+.ant-btn-primary:hover {
+  background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%) !important;
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6) !important;
+  animation: glow 0.6s ease-in-out !important;
+}
+
+/* Input and form fixes */
+.ant-input {
+  border-radius: 10px !important;
+  padding: 12px 16px !important;
+  border: 2px solid #e1e5e9 !important;
+  transition: all 0.3s ease !important;
+  direction: rtl !important;
+  text-align: right !important;
+}
+
+.ant-input:focus {
+  border-color: #667eea !important;
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2) !important;
+  animation: glow 0.6s ease-in-out !important;
+}
+
+.ant-form-item-label>label {
+  font-weight: 600 !important;
+  color: #2d3748 !important;
+  text-align: right !important;
+}
+
+.ant-form-item {
+  direction: rtl !important;
+  animation: fadeInUp 0.6s ease-out both !important;
+  animation-delay: calc(var(--form-item-index, 0) * 0.1s) !important;
+}
+
+.ant-input-number {
+  width: 100% !important;
+  direction: rtl !important;
+}
+
+.ant-input-number-input {
+  text-align: right !important;
+}
+
+/* Container and layout utilities */
+.page-container {
+  width: 100% !important;
+  max-width: 100% !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  direction: rtl !important;
+}
+
+.content-wrapper {
+  width: 100% !important;
+  max-width: 1200px !important;
+  margin: 0 auto !important;
+  padding: 40px 24px 24px 24px !important;
+  direction: rtl !important;
+  min-height: calc(100vh - 104px) !important;
+}
+
+@media (max-width: 768px) {
+  .content-wrapper {
+    padding: 32px 16px 16px 16px !important;
+  }
+}
+
+/* Component specific styles */
+.hero-section {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 60px 24px;
+  border-radius: 20px;
+  margin-bottom: 40px;
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  direction: rtl;
+  animation: fadeInUp 1s ease-out both;
+}
+
+.hero-section::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+@media (max-width: 768px) {
+  .hero-section {
+    padding: 40px 20px;
+    margin: 0 0 40px 0;
+    border-radius: 16px;
+  }
+}
+
+.stats-card {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  direction: rtl;
+  text-align: right;
+  animation: fadeInUp 0.8s ease-out both;
+}
+
+.stats-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+  animation: float 2s ease-in-out infinite;
+}
+
+.feature-card {
+  background: white;
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  height: 100%;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  width: 100%;
+  direction: rtl;
+  text-align: right;
+  animation: fadeInUp 0.8s ease-out both;
+}
+
+@media (max-width: 768px) {
+  .feature-card {
+    padding: 24px;
+  }
+}
+
+.feature-card:hover {
+  transform: translateY(-12px) rotate(1deg);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+  animation: float 2.5s ease-in-out infinite;
+}
+
+.icon-wrapper {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-size: 24px;
+  animation: bounceIn 1s ease-out both;
+}
+
+.icon-wrapper:hover {
+  animation: pulse 1s ease-in-out infinite;
+}
+
+.testimonial-section {
+  background: rgba(102, 126, 234, 0.03);
+  border: 1px solid rgba(102, 126, 234, 0.1);
+  border-radius: 16px;
+  padding: 32px;
+  margin-top: 40px;
+  width: 100%;
+  direction: rtl;
+  text-align: right;
+  animation: fadeInUp 1s ease-out both;
+}
+
+@media (max-width: 768px) {
+  .testimonial-section {
+    padding: 24px;
+  }
+}
+
+.financial-summary-card {
+  border-radius: 16px;
+  padding: 24px;
+  height: 100%;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  width: 100%;
+  direction: rtl;
+  text-align: right;
+  animation: fadeInUp 0.8s ease-out both;
+}
+
+.financial-summary-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.12);
+  animation: float 2s ease-in-out infinite;
+}
+
+.income-card {
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.expense-card {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.centered-layout {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 104px);
+  padding: 20px;
+  width: 100%;
+  direction: rtl;
+  animation: fadeInUp 0.8s ease-out both;
+}
+
+.login-form {
+  background: linear-gradient(145deg, #ffffff, #f8fafc);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+  width: 100%;
+  max-width: 500px;
+  direction: rtl;
+  text-align: right;
+  animation: bounceIn 1s ease-out both;
+}
+
+@media (max-width: 768px) {
+  .login-form {
+    padding: 24px;
+    margin: 0;
+    border-radius: 16px;
+  }
+}
+
+.form-section {
+  background: white;
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  width: 100%;
+  direction: rtl;
+  text-align: right;
+  animation: fadeInUp 0.8s ease-out both;
+}
+
+@media (max-width: 768px) {
+  .form-section {
+    padding: 20px;
+    margin: 0;
+  }
+}
+
+/* Grid fixes for RTL */
+.ant-row {
+  width: 100% !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  direction: rtl !important;
+}
+
+.ant-col {
+  padding-left: 12px !important;
+  padding-right: 12px !important;
+  direction: rtl !important;
+  animation: fadeInUp 0.6s ease-out both !important;
+  animation-delay: calc(var(--col-index, 0) * 0.1s) !important;
+}
+
+@media (max-width: 768px) {
+  .ant-col {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+}
+
+/* Table responsive */
+.ant-table-wrapper {
+  width: 100% !important;
+  overflow-x: auto !important;
+  direction: rtl !important;
+  animation: fadeInUp 0.8s ease-out both !important;
+}
+
+.ant-table {
+  min-width: 800px !important;
+  direction: rtl !important;
+}
+
+.ant-table-thead>tr>th {
+  text-align: right !important;
+}
+
+.ant-table-tbody>tr>td {
+  text-align: right !important;
+}
+
+.ant-table-tbody>tr {
+  transition: all 0.3s ease !important;
+}
+
+.ant-table-tbody>tr:hover {
+  transform: scale(1.01) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+}
+
+@media (max-width: 768px) {
+  .ant-table {
+    min-width: 600px !important;
+  }
+}
+
+/* Typography RTL */
+.ant-typography {
+  direction: rtl !important;
+  text-align: center;
+}
+
+/* Space component RTL */
+.ant-space {
+  direction: rtl !important;
+}
+
+/* Upload component RTL */
+.ant-upload-drag {
+  direction: rtl !important;
+  text-align: center !important;
+  transition: all 0.3s ease !important;
+}
+
+.ant-upload-drag:hover {
+  animation: pulse 0.6s ease-in-out !important;
+}
+
+/* Progress RTL */
+.ant-progress {
+  direction: rtl !important;
+}
+
+.ant-progress-line-path {
+  animation: shimmer 2s ease-in-out infinite !important;
+}
+
+/* Alert RTL */
+.ant-alert {
+  direction: rtl !important;
+  text-align: right !important;
+  animation: fadeInUp 0.6s ease-out both !important;
+}
+
+/* Statistic RTL */
+.ant-statistic {
+  direction: rtl !important;
+  text-align: right !important;
+}
+
+.ant-statistic-content {
+  direction: rtl !important;
+  text-align: right !important;
+}
+
+.ant-statistic-content-value {
+  animation: bounceIn 1s ease-out both !important;
+}
+
+/* Loading animations */
+.ant-spin {
+  animation: rotateIn 1s ease-out both !important;
+}
+
+/* Drawer animations */
+.ant-drawer-mask {
+  animation: fadeInUp 0.3s ease-out !important;
+}
+
+.ant-drawer-content {
+  animation: slideInRight 0.5s ease-out !important;
+}
+
+/* Menu item index animations */
+.ant-menu-item:nth-child(1) {
+  --item-index: 1;
+}
+
+.ant-menu-item:nth-child(2) {
+  --item-index: 2;
+}
+
+.ant-menu-item:nth-child(3) {
+  --item-index: 3;
+}
+
+.ant-menu-item:nth-child(4) {
+  --item-index: 4;
+}
+
+.ant-menu-item:nth-child(5) {
+  --item-index: 5;
+}
+
+.ant-menu-item:nth-child(6) {
+  --item-index: 6;
+}
+
+.ant-menu-item:nth-child(7) {
+  --item-index: 7;
+}
+
+.ant-menu-item:nth-child(8) {
+  --item-index: 8;
+}
+
+.ant-menu-item:nth-child(9) {
+  --item-index: 9;
+}
+
+.ant-menu-item:nth-child(10) {
+  --item-index: 10;
+}
+
+/* Nav button index animations */
+.nav-btn:nth-child(1) {
+  --btn-index: 1;
+}
+
+.nav-btn:nth-child(2) {
+  --btn-index: 2;
+}
+
+.nav-btn:nth-child(3) {
+  --btn-index: 3;
+}
+
+.nav-btn:nth-child(4) {
+  --btn-index: 4;
+}
+
+/* Form item index animations */
+.ant-form-item:nth-child(1) {
+  --form-item-index: 1;
+}
+
+.ant-form-item:nth-child(2) {
+  --form-item-index: 2;
+}
+
+.ant-form-item:nth-child(3) {
+  --form-item-index: 3;
+}
+
+.ant-form-item:nth-child(4) {
+  --form-item-index: 4;
+}
+
+.ant-form-item:nth-child(5) {
+  --form-item-index: 5;
+}
+
+.ant-form-item:nth-child(6) {
+  --form-item-index: 6;
+}
+
+/* Col index animations */
+.ant-col:nth-child(1) {
+  --col-index: 1;
+}
+
+.ant-col:nth-child(2) {
+  --col-index: 2;
+}
+
+.ant-col:nth-child(3) {
+  --col-index: 3;
+}
+
+.ant-col:nth-child(4) {
+  --col-index: 4;
+}
+
+.ant-col:nth-child(5) {
+  --col-index: 5;
+}
+
+.ant-col:nth-child(6) {
+  --col-index: 6;
+}
+
+/* Special upload animations */
+.upload-container {
+  animation: fadeInUp 0.8s ease-out both;
+}
+
+.upload-dragger {
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.upload-dragger::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, transparent, rgba(102, 126, 234, 0.1), transparent);
+  animation: shimmer 3s ease-in-out infinite;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.upload-dragger:hover::before {
+  opacity: 1;
+}
+
+.upload-dragger:hover {
+  transform: scale(1.02);
+  border-color: #667eea !important;
+  animation: glow 1s ease-in-out infinite alternate;
+}
+
+/* Business data display animations */
+.business-data-container {
+  animation: fadeInUp 0.8s ease-out both;
+}
+
+.business-metric {
+  animation: fadeInUp 0.6s ease-out both;
+  animation-delay: calc(var(--metric-index, 0) * 0.1s);
+  transition: all 0.3s ease;
+}
+
+.business-metric:hover {
+  transform: translateY(-5px) scale(1.02);
+  animation: float 2s ease-in-out infinite;
+}
+
+.edit-mode {
+  animation: bounceIn 0.6s ease-out both;
+}
+
+/* Responsive animations */
+@media (max-width: 768px) {
+  .hero-section::before {
+    animation-duration: 2s;
+  }
+
+  .stats-card:hover {
+    transform: translateY(-4px) scale(1.01);
+  }
+
+  .feature-card:hover {
+    transform: translateY(-6px);
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

@@ -1,22 +1,14 @@
-import { Box } from "@mui/material";
-import React from "react";
+import { ConfigProvider } from "antd"
+import type React from "react"
 
 const CenteredLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <Box
-      sx={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        minHeight: "100vh", // חשוב! כדי שיתפוס את כל הגובה
-        width: "100%",
-        px: 2,
-      }}
-    >
-      <Box sx={{ width: "100%", maxWidth: 600 }}>{children}</Box>
-    </Box>
-  );
-};
+    <ConfigProvider direction="rtl">
+      <div className="centered-layout">
+        <div style={{ width: "100%", maxWidth: 600 }}>{children}</div>
+      </div>
+    </ConfigProvider>
+  )
+}
 
-export default CenteredLayout;
-
+export default CenteredLayout

@@ -68,14 +68,19 @@ namespace BusinessMan.API.Controllers
 
         // PUT api/<UserController>/5
         [HttpPut("{id}")]
-        public async Task<ActionResult<UserDto>> PutAsync(int id, [FromBody] User value)
+        public async Task<ActionResult<UserDto>> PutAsync(int id, [FromBody] UserDto value)
         {
-            var updatedUser = await _allUsers.UpdateAsync(id, value);
-            if (updatedUser == null)
+            var existingUser = await _allUsers.GetByIdAsync(id);
+            if (existingUser == null)
             {
                 return NotFound();
             }
-            return Ok(_mapper.Map<UserDto>(updatedUser)); // החזר את ה-DTO
+
+            // מעדכנים את המופע הקיים עם הערכים החדשים
+            _mapper.Map(value, existingUser);
+
+            var updatedUser = await _allUsers.UpdateAsync(id, existingUser);
+            return Ok(_mapper.Map<UserDto>(updatedUser));
         }
 
         // DELETE api/<UserController>/5
