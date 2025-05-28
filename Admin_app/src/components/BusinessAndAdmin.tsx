@@ -7,62 +7,16 @@ import axios from "axios"
 import type { BusinessResponsePutModel } from "../models/BusinessResponsePutModel"
 import AdminRegister from "./AdminRegister"
 import type { UserDto } from "../models/UserDto"
-import {
-  Box,
-  Button,
-  Typography,
-  Paper,
-  Container,
-  Stepper,
-  Step,
-  StepLabel,
-  Divider,
-  Alert,
-  ThemeProvider,
-  createTheme,
-  CssBaseline,
-} from "@mui/material"
-import { Business, Person, Check } from "@mui/icons-material"
+import { Button, Typography, Card, Steps, Divider, Alert, ConfigProvider, Space, Avatar, Row, Col } from "antd"
+import { ShopOutlined, UserOutlined, CheckCircleOutlined, RocketOutlined } from "@ant-design/icons"
 
-// Create a custom theme with RTL support and Hebrew font
-const theme = createTheme({
-  direction: "rtl",
-  typography: {
-    fontFamily: '"Assistant", "Rubik", "Heebo", sans-serif',
-  },
-  palette: {
-    primary: {
-      main: "#3f51b5",
-    },
-    secondary: {
-      main: "#f50057",
-    },
-    success: {
-      main: "#4caf50",
-    },
-    background: {
-      default: "#f5f5f5",
-    },
-  },
-  components: {
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          borderRadius: 8,
-          padding: "10px 24px",
-          textTransform: "none",
-          fontSize: "1rem",
-        },
-      },
-    },
-  },
-})
+const { Title, Text } = Typography
 
 const BusinessAndAdmin = () => {
   const [isBusiness, setIsBusiness] = useState(false)
   const [isAdmin, setIsAdmin] = useState(false)
   const [businessDone, setBusinessDone] = useState(false)
-  const [adminDone] = useState(false)
+  const [adminDone, setAdminDone] = useState(false)
   const [activeStep, setActiveStep] = useState(0)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
@@ -71,14 +25,11 @@ const BusinessAndAdmin = () => {
 
   useEffect(() => {
     if (businessDone && adminDone) {
-      // OK
       updateObjects()
-      // שניהם הסתיימו => אפשר להמשיך לשלב הבא או לנווט
       console.log("הטפסים נוספו בהצלחה")
     }
   }, [businessDone, adminDone])
 
-  // עדכון קשרים בין עסק למשתמש - מנהל
   const updateObjects = async () => {
     setError(null)
 
@@ -98,14 +49,13 @@ const BusinessAndAdmin = () => {
     globalContextDetails.setBusinessGlobal(updateBusiness)
 
     try {
-      console.log("updateAdmin ", updateAdmin)
-      console.log("updateBusiness ", updateBusiness)
-
-      await axios.put<UserDto>(`${url}/api/User/${globalContextDetails.user.id}`, updateAdmin, { withCredentials: true })
+      await axios.put<UserDto>(`${url}/api/User/${globalContextDetails.user.id}`, updateAdmin, {
+        withCredentials: true,
+      })
       await axios.put<BusinessResponsePutModel>(
         `${url}/api/Business/${globalContextDetails.business_global.id}`,
         updateBusiness,
-        { withCredentials: true }
+        { withCredentials: true },
       )
 
       globalContextDetails.setBusinessGlobal(updateBusiness)
@@ -118,102 +68,155 @@ const BusinessAndAdmin = () => {
     }
   }
 
+  const handleAdminSuccess = () => {
+    setAdminDone(true)
+    setActiveStep((prevStep) => Math.max(prevStep, 1))
+  }
+
   const handleBusinessSuccess = () => {
     setBusinessDone(true)
     setActiveStep((prevStep) => Math.max(prevStep, 2))
   }
 
-  const steps = ["התחלה", "פרטי מנהל", "פרטי עסק", "סיום"]
+  const steps = [
+    {
+      title: "התחלה",
+      icon: <RocketOutlined />,
+    },
+    {
+      title: "פרטי מנהל",
+      icon: <UserOutlined />,
+    },
+    {
+      title: "פרטי עסק",
+      icon: <ShopOutlined />,
+    },
+    {
+      title: "סיום",
+      icon: <CheckCircleOutlined />,
+    },
+  ]
 
   return (
-    <ThemeProvider theme={theme}>
-      <div style={{ marginTop: "65vh" }}></div>
+    <ConfigProvider direction="rtl">
+      <div style={{ padding: "40px 20px", maxWidth: 1000, margin: "0 auto" }}>
+        <Card className="form-section">
+          <div style={{ textAlign: "center", marginBottom: 32 }}>
+            <Avatar
+              size={80}
+              style={{
+                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                marginBottom: 16,
+                boxShadow: "0 4px 14px rgba(102, 126, 234, 0.3)",
+              }}
+            >
+              <RocketOutlined style={{ fontSize: 40 }} />
+            </Avatar>
 
-      <CssBaseline />
-      <Container maxWidth="md" sx={{ py: 4 }}>
-        <Paper
-          elevation={3}
-          sx={{
-            p: 4,
-            borderRadius: 3,
-            boxShadow: "0 8px 32px rgba(0, 0, 0, 0.1)",
-          }}
-        >
-          <Typography variant="h4" component="h1" align="center" gutterBottom fontWeight="bold" color="primary">
-            הגדרת עסק ומנהל
-          </Typography>
+            <Title level={2} style={{ marginBottom: 8, color: "#2d3748", textAlign: "center" }}>
+              הגדרת עסק ומנהל
+            </Title>
 
-          <Stepper activeStep={activeStep} sx={{ mb: 4, mt: 3 }}>
-            {steps.map((label) => (
-              <Step key={label}>
-                <StepLabel>{label}</StepLabel>
-              </Step>
-            ))}
-          </Stepper>
+            <Text type="secondary" style={{ fontSize: 16 }}>
+              הגדר את העסק שלך ופרטי המנהל בתהליך פשוט ומהיר
+            </Text>
 
-          <Divider sx={{ mb: 4 }} />
+            <Divider />
+          </div>
+
+          <Steps current={activeStep} items={steps} style={{ marginBottom: 32 }} />
 
           {success ? (
-            <Box sx={{ textAlign: "center", py: 3 }}>
-              <Check sx={{ fontSize: 60, color: "success.main", mb: 2 }} />
-              <Typography variant="h5" gutterBottom color="success.main" fontWeight="bold">
+            <div style={{ textAlign: "center", padding: "60px 20px" }}>
+              <Avatar
+                size={100}
+                style={{
+                  background: "linear-gradient(135deg, #52c41a 0%, #389e0d 100%)",
+                  marginBottom: 24,
+                }}
+              >
+                <CheckCircleOutlined style={{ fontSize: 50 }} />
+              </Avatar>
+              <Title level={3} style={{ color: "#52c41a", marginBottom: 16 }}>
                 הרישום הושלם בהצלחה!
-              </Typography>
-              <Typography variant="body1" paragraph>
-                פרטי העסק והמנהל נשמרו במערכת.
-              </Typography>
-            </Box>
+              </Title>
+              <Text type="secondary" style={{ fontSize: 16 }}>
+                פרטי העסק והמנהל נשמרו במערכת בהצלחה
+              </Text>
+            </div>
           ) : (
-            <>
-              <Box sx={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                <Box>
-                  <Button
-                    onClick={() => {
-                      setIsAdmin(!isAdmin)
-                      if (!isAdmin) setActiveStep(1)
-                    }}
-                    variant={isAdmin ? "outlined" : "contained"}
-                    startIcon={<Person />}
-                    fullWidth
-                    size="large"
-                    sx={{ mb: isAdmin ? 2 : 0 }}
+            <Space direction="vertical" style={{ width: "100%" }} size="large">
+              <Row gutter={[24, 24]}>
+                <Col xs={24} lg={12}>
+                  <Card
+                    title={
+                      <Space>
+                        <UserOutlined style={{ color: "#667eea" }} />
+                        <span>רישום פרטי מנהל</span>
+                      </Space>
+                    }
+                    style={{ height: "100%" }}
                   >
-                    {isAdmin ? "סגור טופס רישום מנהל" : "רישום פרטי מנהל"}
-                  </Button>
+                    <div style={{ marginBottom: 16 }}>
+                      <Text type="secondary">הזן את פרטי המנהל שיהיה אחראי על ניהול העסק במערכת</Text>
+                    </div>
+                    <Button
+                      onClick={() => {
+                        setIsAdmin(!isAdmin)
+                        if (!isAdmin) setActiveStep(1)
+                      }}
+                      type={isAdmin ? "default" : "primary"}
+                      size="large"
+                      icon={<UserOutlined />}
+                      block
+                      style={{ marginBottom: isAdmin ? 16 : 0 }}
+                    >
+                      {isAdmin ? "סגור טופס רישום מנהל" : "פתח טופס רישום מנהל"}
+                    </Button>
+                    {isAdmin && <AdminRegister onSubmitSuccess={handleAdminSuccess} />}
+                  </Card>
+                </Col>
 
-                  {isAdmin && <AdminRegister />}
-                </Box>
-
-                <Box>
-                  <Button
-                    onClick={() => {
-                      setIsBusiness(!isBusiness)
-                      if (!isBusiness && adminDone) setActiveStep(2)
-                    }}
-                    variant={isBusiness ? "outlined" : "contained"}
-                    startIcon={<Business />}
-                    fullWidth
-                    size="large"
-                    sx={{ mb: isBusiness ? 2 : 0 }}
-                    disabled={!adminDone}
+                <Col xs={24} lg={12}>
+                  <Card
+                    title={
+                      <Space>
+                        <ShopOutlined style={{ color: "#667eea" }} />
+                        <span>רישום פרטי עסק</span>
+                      </Space>
+                    }
+                    style={{ height: "100%" }}
                   >
-                    {isBusiness ? "סגור טופס רישום עסק" : "רישום פרטי עסק"}
-                  </Button>
-
-                  {isBusiness && <RegisterBusinessData onSubmitSuccess={handleBusinessSuccess} />}
-                </Box>
-              </Box>
+                    <div style={{ marginBottom: 16 }}>
+                      <Text type="secondary">הזן את פרטי העסק הפיננסיים והבסיסיים</Text>
+                    </div>
+                    <Button
+                      onClick={() => {
+                        setIsBusiness(!isBusiness)
+                        if (!isBusiness && adminDone) setActiveStep(2)
+                      }}
+                      type={isBusiness ? "default" : "primary"}
+                      size="large"
+                      icon={<ShopOutlined />}
+                      block
+                      disabled={!adminDone}
+                      style={{ marginBottom: isBusiness ? 16 : 0 }}
+                    >
+                      {isBusiness ? "סגור טופס רישום עסק" : "פתח טופס רישום עסק"}
+                    </Button>
+                    {isBusiness && <RegisterBusinessData onSubmitSuccess={handleBusinessSuccess} />}
+                  </Card>
+                </Col>
+              </Row>
 
               {error && (
-                <Alert severity="error" sx={{ mt: 3 }}>
-                  {error}
-                </Alert>
+                <Alert message="שגיאה!" description={error} type="error" showIcon style={{ borderRadius: 8 }} />
               )}
-            </>
+            </Space>
           )}
-        </Paper>
-      </Container>
-    </ThemeProvider>
+        </Card>
+      </div>
+    </ConfigProvider>
   )
 }
 

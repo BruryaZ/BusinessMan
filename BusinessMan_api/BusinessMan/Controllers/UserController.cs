@@ -42,6 +42,16 @@ namespace BusinessMan.API.Controllers
             return Ok(_mapper.Map<UserDto>(user)); // החזר את ה-DTO
         }
 
+        [HttpGet("users-by-business/{id}")]
+        public async Task<ActionResult<IEnumerable<UserDto>>> GetUsersByBusinessAsync(int id)
+        {
+            var users = await _allUsers.GetUserInBusiness(id);
+            if (users == null)
+                return NotFound();
+            var usersDto = _mapper.Map<IEnumerable<UserDto>>(users);
+            return Ok(usersDto);
+        }
+
         // POST api/<UserController>
         [HttpPost]
         public async Task<ActionResult<UserDto>> PostAsync([FromBody] UserPostModel value)

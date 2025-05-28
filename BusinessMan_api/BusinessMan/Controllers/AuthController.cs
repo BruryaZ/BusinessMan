@@ -28,8 +28,9 @@ namespace BusinessMan.API.Controllers
         private readonly IMapper _mapper;
         private readonly IAuthService _authService;
         private readonly IUserService _userService;
+        private readonly IRepositoryManager _repositoryManager;
 
-        public AuthController(DataContext context, IConfiguration configuration, IUserRepository userRepository, IMapper mapper, IAuthService authService, IUserService userService)
+        public AuthController(DataContext context, IConfiguration configuration, IUserRepository userRepository, IMapper mapper, IAuthService authService, IUserService userService, IRepositoryManager repositoryManager)
         {
             _context = context;
             _configuration = configuration;
@@ -37,6 +38,7 @@ namespace BusinessMan.API.Controllers
             _mapper = mapper;
             _authService = authService;
             _userService = userService;
+            _repositoryManager = repositoryManager;
         }
 
         [HttpPost("user-login")]// כניסת משתמש רגיל
@@ -87,6 +89,8 @@ namespace BusinessMan.API.Controllers
 
             // הוסף את המשתמש החדש למסד הנתונים
             var userToAdd = _mapper.Map<User>(user);
+            userToAdd.BusinessId =  int.Parse(User.FindFirst("business_id").Value);
+            userToAdd.Business = await _repositoryManager.Business.GetByIdAsync(userToAdd.BusinessId ?? 0);
             await _context.Users.AddAsync(userToAdd);
             await _context.SaveChangesAsync();
 

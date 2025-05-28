@@ -1,97 +1,58 @@
 "use client"
-
-import type React from "react"
-
 import axios from "axios"
 import { useState, useContext } from "react"
 import { globalContext } from "../context/GlobalContext"
 import type { BusinessPostModel } from "../models/BusinessPostModel"
 import { convertToBusiness } from "../utils/convertToBusiness"
 import { validationSchemaBusinessRegister } from "../utils/validationSchema"
-import * as Yup from "yup"
 import {
-  Box,
-  TextField,
+  Form,
+  Input,
   Button,
   Typography,
-  Paper,
-  Container,
-  Grid,
+  Card,
   Alert,
-  InputAdornment,
-  ThemeProvider,
-  createTheme,
-  CssBaseline,
+  Row,
+  Col,
+  Avatar,
   Divider,
-} from "@mui/material"
+  ConfigProvider,
+  InputNumber,
+} from "antd"
 import {
-  Business,
-  LocationOn,
-  Email,
-  Category,
-  AttachMoney,
-  MoneyOff,
-  AccountBalance,
-  Savings,
-  CreditCard,
-  Calculate,
-} from "@mui/icons-material"
+  ShopOutlined,
+  MailOutlined,
+  EnvironmentOutlined,
+  TagOutlined,
+  DollarOutlined,
+  MinusCircleOutlined,
+  BankOutlined,
+  SaveOutlined,
+  ArrowLeftOutlined,
+  CreditCardOutlined,
+  CalculatorOutlined,
+} from "@ant-design/icons"
 
-// Create a custom theme with RTL support and Hebrew font
-const theme = createTheme({
-  direction: "rtl",
-  typography: {
-    fontFamily: '"Assistant", "Rubik", "Heebo", sans-serif',
-  },
-  palette: {
-    primary: {
-      main: "#3f51b5",
-    },
-    secondary: {
-      main: "#f50057",
-    },
-    background: {
-      default: "#f5f5f5",
-    },
-  },
-  components: {
-    MuiTextField: {
-      styleOverrides: {
-        root: {
-          direction: "rtl",
-        },
-      },
-    },
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          borderRadius: 8,
-          padding: "10px 24px",
-          textTransform: "none",
-          fontSize: "1rem",
-        },
-      },
-    },
-  },
-})
+const { Title, Text } = Typography
 
 const RegisterBusinessData = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => {
   const url = import.meta.env.VITE_API_URL
   const [errors, setErrors] = useState<string[]>([])
+  const [loading, setLoading] = useState(false)
   const validationSchema = validationSchemaBusinessRegister
   const globalContextDetails = useContext(globalContext)
   const [businessData, setBusinessData] = useState({
     id: 0,
-    businessId: 1, // ערך ברירת מחדל
-    name: "עסק לדוגמה", // ערך ברירת מחדל
-    address: "כתובת לדוגמה", // ערך ברירת מחדל
-    email: "example@business.com", // ערך ברירת מחדל
-    businessType: "סוג עסק לדוגמה", // ערך ברירת מחדל
-    income: 10000, // ערך ברירת מחדל
-    expenses: 5000, // ערך ברירת מחדל
-    cashFlow: 5000, // ערך ברירת מחדל
-    totalAssets: 20000, // ערך ברירת מחדל
-    totalLiabilities: 10000, // ערך ברירת מחדל
+    businessId: 1,
+    name: "עסק לדוגמה",
+    address: "כתובת לדוגמה",
+    email: "example@business.com",
+    businessType: "סוג עסק לדוגמה",
+    income: 10000,
+    expenses: 5000,
+    cashFlow: 5000,
+    totalAssets: 20000,
+    totalLiabilities: 10000,
     netWorth: 10000,
     revenueGrowthRate: undefined,
     profitMargin: undefined,
@@ -105,319 +66,273 @@ const RegisterBusinessData = ({ onSubmitSuccess }: { onSubmitSuccess?: () => voi
     invoices: [],
   })
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
+  const handleChange = (field: string, value: any) => {
     setBusinessData((prevData) => ({
       ...prevData,
-      [name]: value,
+      [field]: value,
     }))
   }
 
-  const handleSubmit = (businessDetails: BusinessPostModel) => async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    validationSchema
-      .isValid(businessDetails)
-      .then(async (valid) => {
-        setErrors([])
-        if (valid) {
-          try {
-            const { data } = await axios.post<BusinessPostModel>(`${url}/api/Business`, businessDetails, { withCredentials: true })
-            console.log("The data", data)
-            globalContextDetails.setBusinessGlobal(convertToBusiness(data))
-            console.log("globalContextDetails.business_global", globalContextDetails.business_global)
-            console.log("convertToBusiness(data)", convertToBusiness(data))
+  const handleSubmit = async () => {
+    setLoading(true)
+    try {
+      const valid = await validationSchema.isValid(businessData)
+      setErrors([])
 
-            if (onSubmitSuccess) onSubmitSuccess()
-          } catch (e) {
-            console.log(e)
-            setErrors(["שגיאה בשמירת נתוני העסק"])
-          }
-        } else {
-          setErrors(["נא למלא את כל השדות הנדרשים"])
-        }
-      })
-      .catch((err) => {
-        console.log("Validation error:", err.errors)
-        if (err instanceof Yup.ValidationError) {
-          setErrors(err.errors)
-        }
-      })
-    setErrors([])
+      if (valid) {
+        const { data } = await axios.post<BusinessPostModel>(`${url}/api/Business`, businessData, {
+          withCredentials: true,
+        })
+        globalContextDetails.setBusinessGlobal(convertToBusiness(data))
+        if (onSubmitSuccess) onSubmitSuccess()
+      } else {
+        setErrors(["נא למלא את כל השדות הנדרשים"])
+      }
+    } catch (e) {
+      console.log(e)
+      setErrors(["שגיאה בשמירת נתוני העסק"])
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
-    <ThemeProvider theme={theme}>
-            <div style={{marginTop: "50vh"}}></div>
-
-      <CssBaseline />
-      <Container maxWidth="md">
-        <Paper
-          elevation={3}
-          sx={{
-            p: 4,
-            borderRadius: 3,
-            boxShadow: "0 8px 32px rgba(0, 0, 0, 0.1)",
-          }}
-        >
-          <Box sx={{ mb: 4, textAlign: "center" }}>
-            <Business color="primary" sx={{ fontSize: 48, mb: 2 }} />
-            <Typography variant="h4" component="h1" gutterBottom fontWeight="bold">
-              רישום פרטי העסק
-            </Typography>
-            <Typography variant="body1" color="text.secondary">
-              נא למלא את כל הפרטים הנדרשים לרישום העסק שלך
-            </Typography>
-            <Divider sx={{ mt: 3 }} />
-          </Box>
-
-          <Box
-            component="form"
-            onSubmit={handleSubmit(businessData)}
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              gap: 3,
-            }}
-          >
-            <Typography variant="h6" fontWeight="bold" color="primary">
-              פרטים בסיסיים
-            </Typography>
-
-            <Grid container spacing={2}>
-              <Grid item xs={12} md={6} {...({} as any)}>
-                <TextField
-                  fullWidth
-                  label="מזהה ייחודי לעסק"
-                  name="businessId"
-                  type="number"
-                  value={businessData.businessId}
-                  onChange={handleChange}
-                  variant="outlined"
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <Business color="action" />
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12} md={6} {...({} as any)}>
-                <TextField
-                  fullWidth
-                  label="שם העסק"
-                  name="name"
-                  value={businessData.name}
-                  onChange={handleChange}
-                  variant="outlined"
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <Business color="action" />
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12} md={6} {...({} as any)}>
-                <TextField
-                  fullWidth
-                  label="כתובת העסק"
-                  name="address"
-                  value={businessData.address}
-                  onChange={handleChange}
-                  variant="outlined"
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <LocationOn color="action" />
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12} md={6} {...({} as any)}>
-                <TextField
-                  fullWidth
-                  label="אימייל של העסק"
-                  name="email"
-                  type="email"
-                  value={businessData.email}
-                  onChange={handleChange}
-                  variant="outlined"
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <Email color="action" />
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12} {...({} as any)}>
-                <TextField
-                  fullWidth
-                  label="סוג העסק"
-                  name="businessType"
-                  value={businessData.businessType}
-                  onChange={handleChange}
-                  variant="outlined"
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <Category color="action" />
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              </Grid>
-            </Grid>
-
-            <Divider sx={{ my: 2 }} />
-
-            <Typography variant="h6" fontWeight="bold" color="primary">
-              נתונים פיננסיים
-            </Typography>
-
-            <Grid container spacing={2}>
-              <Grid item xs={12} md={4} {...({} as any)}>
-                <TextField
-                  fullWidth
-                  label="הכנסות העסק"
-                  name="income"
-                  type="number"
-                  value={businessData.income}
-                  onChange={handleChange}
-                  variant="outlined"
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <AttachMoney color="action" />
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12} md={4} {...({} as any)}>
-                <TextField
-                  fullWidth
-                  label="הוצאות העסק"
-                  name="expenses"
-                  type="number"
-                  value={businessData.expenses}
-                  onChange={handleChange}
-                  variant="outlined"
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <MoneyOff color="action" />
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12} md={4} {...({} as any)}>
-                <TextField
-                  fullWidth
-                  label="תזרים מזומנים"
-                  name="cashFlow"
-                  type="number"
-                  value={businessData.cashFlow}
-                  onChange={handleChange}
-                  variant="outlined"
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <AccountBalance color="action" />
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12} md={4} {...({} as any)}>
-                <TextField
-                  fullWidth
-                  label="סך הנכסים"
-                  name="totalAssets"
-                  type="number"
-                  value={businessData.totalAssets}
-                  onChange={handleChange}
-                  variant="outlined"
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <Savings color="action" />
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12} md={4} {...({} as any)}>
-                <TextField
-                  fullWidth
-                  label="סך ההתחייבויות"
-                  name="totalLiabilities"
-                  type="number"
-                  value={businessData.totalLiabilities}
-                  onChange={handleChange}
-                  variant="outlined"
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <CreditCard color="action" />
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12} md={4} {...({} as any)}>
-                <TextField
-                  fullWidth
-                  label="שווי נקי"
-                  name="netWorth"
-                  type="number"
-                  value={businessData.netWorth}
-                  onChange={handleChange}
-                  variant="outlined"
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <Calculate color="action" />
-                      </InputAdornment>
-                    ),
-                  }}
-                />
-              </Grid>
-            </Grid>
-
-            <Button
-              type="submit"
-              variant="contained"
-              size="large"
-              sx={{
-                mt: 3,
-                py: 1.5,
-                fontWeight: "bold",
-                fontSize: "1.1rem",
-                boxShadow: "0 4px 12px rgba(63, 81, 181, 0.4)",
+    <ConfigProvider direction="rtl">
+      <div style={{ padding: "40px 20px", maxWidth: 1000, margin: "0 auto" }}>
+        <Card className="form-section">
+          <div style={{ textAlign: "center", marginBottom: 32 }}>
+            <Avatar
+              size={80}
+              style={{
+                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                marginBottom: 16,
+                boxShadow: "0 4px 14px rgba(102, 126, 234, 0.3)",
               }}
             >
-              שמור פרטי עסק
-            </Button>
+              <ShopOutlined style={{ fontSize: 40 }} />
+            </Avatar>
+
+            <Title level={2} style={{ marginBottom: 8, color: "#2d3748", textAlign: "center" }}>
+              רישום פרטי העסק
+            </Title>
+
+            <Text type="secondary" style={{ fontSize: 16 }}>
+              נא למלא את כל הפרטים הנדרשים לרישום העסק שלך
+            </Text>
+
+            <Divider />
+          </div>
+
+          <Form layout="vertical" onFinish={handleSubmit}>
+            <Title level={4} style={{ marginBottom: 24, color: "#667eea" }}>
+              פרטים בסיסיים
+            </Title>
+
+            <Row gutter={[16, 0]}>
+              <Col xs={24} md={12}>
+                <Form.Item label="מזהה ייחודי לעסק" required>
+                  <InputNumber
+                    prefix={<ShopOutlined style={{ color: "#667eea" }} />}
+                    placeholder="הזן מזהה עסק"
+                    size="large"
+                    style={{ width: "100%" }}
+                    value={businessData.businessId}
+                    onChange={(value) => handleChange("businessId", value || 1)}
+                  />
+                </Form.Item>
+              </Col>
+              <Col xs={24} md={12}>
+                <Form.Item label="שם העסק" required>
+                  <Input
+                    prefix={<ShopOutlined style={{ color: "#667eea" }} />}
+                    placeholder="הזן שם העסק"
+                    size="large"
+                    value={businessData.name}
+                    onChange={(e) => handleChange("name", e.target.value)}
+                  />
+                </Form.Item>
+              </Col>
+              <Col xs={24} md={12}>
+                <Form.Item label="כתובת העסק" required>
+                  <Input
+                    prefix={<EnvironmentOutlined style={{ color: "#667eea" }} />}
+                    placeholder="הזן כתובת העסק"
+                    size="large"
+                    value={businessData.address}
+                    onChange={(e) => handleChange("address", e.target.value)}
+                  />
+                </Form.Item>
+              </Col>
+              <Col xs={24} md={12}>
+                <Form.Item label="אימייל של העסק" required>
+                  <Input
+                    prefix={<MailOutlined style={{ color: "#667eea" }} />}
+                    placeholder="הזן אימייל העסק"
+                    size="large"
+                    type="email"
+                    value={businessData.email}
+                    onChange={(e) => handleChange("email", e.target.value)}
+                  />
+                </Form.Item>
+              </Col>
+              <Col xs={24}>
+                <Form.Item label="סוג העסק" required>
+                  <Input
+                    prefix={<TagOutlined style={{ color: "#667eea" }} />}
+                    placeholder="הזן סוג העסק"
+                    size="large"
+                    value={businessData.businessType}
+                    onChange={(e) => handleChange("businessType", e.target.value)}
+                  />
+                </Form.Item>
+              </Col>
+            </Row>
+
+            <Divider />
+
+            <Title level={4} style={{ marginBottom: 24, color: "#667eea" }}>
+              נתונים פיננסיים
+            </Title>
+
+            <Row gutter={[16, 0]}>
+              <Col xs={24} md={8}>
+                <Form.Item label="הכנסות העסק" required>
+                  <InputNumber
+                    prefix={<DollarOutlined style={{ color: "#667eea" }} />}
+                    placeholder="הזן הכנסות"
+                    size="large"
+                    style={{ width: "100%" }}
+                    value={businessData.income}
+                    onChange={(value) => handleChange("income", value || 0)}
+                    formatter={(value) => `₪ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                    parser={(value) => Number(value!.replace(/₪\s?|(,*)/g, ""))}
+                  />
+                </Form.Item>
+              </Col>
+              <Col xs={24} md={8}>
+                <Form.Item label="הוצאות העסק" required>
+                  <InputNumber
+                    prefix={<MinusCircleOutlined style={{ color: "#667eea" }} />}
+                    placeholder="הזן הוצאות"
+                    size="large"
+                    style={{ width: "100%" }}
+                    value={businessData.expenses}
+                    onChange={(value) => handleChange("expenses", value || 0)}
+                    formatter={(value) => `₪ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                    parser={(value) => Number(value!.replace(/₪\s?|(,*)/g, ""))}
+                  />
+                </Form.Item>
+              </Col>
+              <Col xs={24} md={8}>
+                <Form.Item label="תזרים מזומנים" required>
+                  <InputNumber
+                    prefix={<BankOutlined style={{ color: "#667eea" }} />}
+                    placeholder="הזן תזרים מזומנים"
+                    size="large"
+                    style={{ width: "100%" }}
+                    value={businessData.cashFlow}
+                    onChange={(value) => handleChange("cashFlow", value || 0)}
+                    formatter={(value) => `₪ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                    parser={(value) => Number(value!.replace(/₪\s?|(,*)/g, ""))}
+                  />
+                </Form.Item>
+              </Col>
+              <Col xs={24} md={8}>
+                <Form.Item label="סך הנכסים" required>
+                  <InputNumber
+                    prefix={<BankOutlined style={{ color: "#667eea" }} />}
+                    placeholder="הזן סך נכסים"
+                    size="large"
+                    style={{ width: "100%" }}
+                    value={businessData.totalAssets}
+                    onChange={(value) => handleChange("totalAssets", value || 0)}
+                    formatter={(value) => `₪ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                    parser={(value) => Number(value!.replace(/₪\s?|(,*)/g, ""))}
+                  />
+                </Form.Item>
+              </Col>
+              <Col xs={24} md={8}>
+                <Form.Item label="סך ההתחייבויות" required>
+                  <InputNumber
+                    prefix={<CreditCardOutlined style={{ color: "#667eea" }} />}
+                    placeholder="הזן התחייבויות"
+                    size="large"
+                    style={{ width: "100%" }}
+                    value={businessData.totalLiabilities}
+                    onChange={(value) => handleChange("totalLiabilities", value || 0)}
+                    formatter={(value) => `₪ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                    parser={(value) => Number(value!.replace(/₪\s?|(,*)/g, ""))}
+                  />
+                </Form.Item>
+              </Col>
+              <Col xs={24} md={8}>
+                <Form.Item label="שווי נקי" required>
+                  <InputNumber
+                    prefix={<CalculatorOutlined style={{ color: "#667eea" }} />}
+                    placeholder="הזן שווי נקי"
+                    size="large"
+                    style={{ width: "100%" }}
+                    value={businessData.netWorth}
+                    onChange={(value) => handleChange("netWorth", value || 0)}
+                    formatter={(value) => `₪ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                    parser={(value) => Number(value!.replace(/₪\s?|(,*)/g, ""))}
+                  />
+                </Form.Item>
+              </Col>
+            </Row>
+
+            <Row gutter={[16, 16]} style={{ marginTop: 32 }}>
+              <Col xs={24} sm={12}>
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  size="large"
+                  loading={loading}
+                  icon={<SaveOutlined />}
+                  block
+                  style={{
+                    height: 48,
+                    fontWeight: 600,
+                    fontSize: 16,
+                  }}
+                >
+                  שמור פרטי עסק
+                </Button>
+              </Col>
+              <Col xs={24} sm={12}>
+                <Button
+                  type="default"
+                  size="large"
+                  icon={<ArrowLeftOutlined />}
+                  block
+                  style={{
+                    height: 48,
+                    fontWeight: 600,
+                    borderWidth: 2,
+                  }}
+                >
+                  חזרה
+                </Button>
+              </Col>
+            </Row>
 
             {errors.length > 0 && (
-              <Box sx={{ width: "100%", mt: 2 }}>
+              <div style={{ marginTop: 16 }}>
                 {errors.map((error, index) => (
-                  <Alert key={index} severity="error" sx={{ mb: 1 }}>
-                    {error}
-                  </Alert>
+                  <Alert
+                    key={index}
+                    message={error}
+                    type="error"
+                    showIcon
+                    style={{ marginBottom: 8, borderRadius: 8 }}
+                  />
                 ))}
-              </Box>
+              </div>
             )}
-          </Box>
-        </Paper>
-      </Container>
-    </ThemeProvider>
+          </Form>
+        </Card>
+      </div>
+    </ConfigProvider>
   )
 }
 

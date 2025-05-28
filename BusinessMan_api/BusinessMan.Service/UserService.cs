@@ -84,30 +84,15 @@ namespace BusinessMan.Service
             return true; // המחיקה בוצעה בהצלחה
         }
 
-        //////
-        //public async Task<User?> AuthenticateAsync(string username, string password)
-        //{
-        //    var user = await _userRepository.GetByUsernameAsync(username);
-        //    if (user != null && user.PasswordHash == Hash(password)) 
-        //        return user;
-
-        //    return null;
-        //}
+        public async Task<IEnumerable<User>> GetUserInBusiness(int businessId)
+        {
+            var users = await _repositoryManager.User.GetAllAsync();
+            return users.Where(u => u.BusinessId == businessId).ToList();
+        }
 
         public async Task<User?> GetUserWithBusinessAsync(int userId)
         {
             return await _userRepository.GetWithBusinessAsync(userId);
-        }
-
-        private string Hash(string password)
-        {
-            // הצפנת סיסמה פשוטה – החליפי ב־BCrypt/Hash
-            return Convert.ToBase64String(Encoding.UTF8.GetBytes(password));
-        }
-
-        public Task<User?> AuthenticateAsync(string username, string password)
-        {
-            throw new NotImplementedException();
         }
     }
 }

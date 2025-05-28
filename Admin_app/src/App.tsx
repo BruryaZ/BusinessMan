@@ -1,24 +1,10 @@
+//Brurya
 "use client"
 
 import { useState } from "react"
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from "react-router-dom"
 import { Layout, Menu, Button, Typography, Avatar, Space, Drawer, ConfigProvider, theme as antTheme } from "antd"
-import {
-  MenuOutlined,
-  UserAddOutlined,
-  LoginOutlined,
-  CrownOutlined,
-  UploadOutlined,
-  EyeOutlined,
-  TeamOutlined,
-  BarChartOutlined,
-  DollarOutlined,
-  ShopOutlined,
-  BankOutlined,
-  DashboardOutlined,
-  MenuFoldOutlined,
-  MenuUnfoldOutlined,
-} from "@ant-design/icons"
+import { MenuOutlined, UserAddOutlined, MenuFoldOutlined, MenuUnfoldOutlined, BuildOutlined, BankOutlined, BarChartOutlined, CrownOutlined, DollarOutlined, EyeOutlined, LoginOutlined, ShopOutlined, TeamOutlined, UploadOutlined } from "@ant-design/icons"
 import { useMediaQuery } from "react-responsive"
 import "./app.css"
 import AdminLogin from "./components/AdminLogin"
@@ -38,7 +24,6 @@ import MyHome from "./components/MyHome"
 import EditUserPage from "./components/EditUserPage"
 
 // Components
-
 
 const { Header, Sider, Content } = Layout
 const { Title } = Typography
@@ -82,7 +67,11 @@ function ResponsiveDrawer() {
   const menuItems = navItems.map((item) => ({
     key: item.key,
     icon: item.icon,
-    label: <Link to={item.path}>{item.label}</Link>,
+    label: (
+      <Link to={item.path} onClick={(e) => e.stopPropagation()}>
+        {item.label}
+      </Link>
+    ),
   }))
 
   const siderContent = (
@@ -108,7 +97,7 @@ function ResponsiveDrawer() {
             marginBottom: collapsed ? 0 : 8,
           }}
         >
-          <DashboardOutlined />
+          <BuildOutlined />
         </Avatar>
         {!collapsed && (
           <Title level={4} className="logo-title" style={{ margin: "8px 0 0 0", color: "#667eea" }}>
@@ -128,7 +117,10 @@ function ResponsiveDrawer() {
           direction: "rtl",
         }}
         items={menuItems}
-        onClick={() => isMobile && setMobileOpen(false)}
+        onClick={(e) => {
+          e.domEvent.stopPropagation()
+          if (isMobile) setMobileOpen(false)
+        }}
       />
 
       <div
@@ -188,7 +180,7 @@ function ResponsiveDrawer() {
             title={
               <Space style={{ direction: "rtl" }}>
                 <Avatar style={{ background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)" }}>
-                  <DashboardOutlined />
+                  <BuildOutlined />
                 </Avatar>
                 <span>BusinessMan</span>
               </Space>
@@ -245,7 +237,7 @@ function ResponsiveDrawer() {
                 style={{ fontSize: "16px" }}
               />
               <Space style={{ direction: "rtl" }}>
-                <DashboardOutlined className="header-icon" style={{ color: "#667eea", fontSize: "20px" }} />
+                <BuildOutlined className="header-icon" style={{ color: "#667eea", fontSize: "20px" }} />
                 <Title level={4} className="header-title" style={{ margin: 0, color: "#2d3748" }}>
                   מערכת ניהול עסקים
                 </Title>
@@ -264,8 +256,11 @@ function ResponsiveDrawer() {
                       borderRadius: "8px",
                       fontWeight: location.pathname === item.path ? 600 : 400,
                     }}
+                    onClick={(e) => e.stopPropagation()}
                   >
-                    <Link to={item.path}>{item.label}</Link>
+                    <Link to={item.path} onClick={(e) => e.stopPropagation()}>
+                      {item.label}
+                    </Link>
                   </Button>
                 ))}
               </Space>
@@ -281,14 +276,14 @@ function ResponsiveDrawer() {
               width: "100%",
               overflow: "auto",
               direction: "rtl",
+              paddingTop: "20px",
             }}
           >
             <div
               className="content-wrapper"
               style={{
-                paddingTop: "40px",
-                minHeight: "calc(100vh - 104px)",
-                padding: "40px 24px 24px 24px",
+                minHeight: "calc(100vh - 84px)",
+                padding: "20px 24px 24px 24px",
               }}
             >
               <Routes>

@@ -13,6 +13,7 @@ import {
   UploadOutlined,
   RiseOutlined,
   FallOutlined,
+  BuildOutlined,
 } from "@ant-design/icons"
 import { useNavigate } from "react-router-dom"
 import { globalContext } from "../context/GlobalContext"
@@ -161,7 +162,7 @@ const MyHome = () => {
                   border: "1px solid rgba(255,255,255,0.2)",
                 }}
               >
-                <DashboardOutlined style={{ fontSize: 120, color: "rgba(255,255,255,0.8)" }} />
+                <BuildOutlined style={{ fontSize: 120, color: "rgba(255,255,255,0.8)" }} />
               </div>
             </Col>
           </Row>
