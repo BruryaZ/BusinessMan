@@ -1,3 +1,4 @@
+//Brurya
 "use client"
 
 import { useState } from "react"
@@ -5,7 +6,6 @@ import { BrowserRouter as Router, Routes, Route, Link, useLocation } from "react
 import { Layout, Menu, Button, Typography, Avatar, Space, Drawer, ConfigProvider, theme as antTheme } from "antd"
 import {
   MenuOutlined,
-  HomeOutlined,
   UserAddOutlined,
   LoginOutlined,
   CrownOutlined,
@@ -21,29 +21,32 @@ import {
   MenuUnfoldOutlined,
 } from "@ant-design/icons"
 import { useMediaQuery } from "react-responsive"
-import "./App.css"
-
-// Components
-import GlobalContext from "./context/GlobalContext"
-import UserLogin from "./components/UserLogin"
+import "./app.css"
 import AdminLogin from "./components/AdminLogin"
-import AdminRoute from "./components/AdminRoute"
 import BusinessAndAdmin from "./components/BusinessAndAdmin"
+import DataViewing from "./components/DataViweing"
 import IncomAndExpennses from "./components/Incom&Expennses"
 import ProductionReports from "./components/ProductionReports"
 import RegisterBusinessData from "./components/RegisterBusinessData"
+import UploadFiles from "./components/UploadFiles"
+import UserLogin from "./components/UserLogin"
 import UserManagemet from "./components/UserManagemet"
 import UserRegister from "./components/UserRegister"
-import Home from "./components/Home"
-import UploadFiles from "./components/UploadFiles"
-import DataViweing from "./components/DataViweing"
+import GlobalContext from "./context/GlobalContext"
+import AdminRoute from "./components/AdminRoute"
+import { Home } from "@mui/icons-material"
+import MyHome from "./components/MyHome"
+import EditUserPage from "./components/EditUserPage"
+
+// Components
+
 
 const { Header, Sider, Content } = Layout
 const { Title } = Typography
 
 // Navigation items with icons
 const navItems = [
-  { key: "/", label: "בית", icon: <HomeOutlined />, path: "/" },
+  { key: "/", label: "בית", icon: <Home />, path: "/" },
   { key: "/register-user", label: "רישום משתמש", icon: <UserAddOutlined />, path: "/register-user" },
   { key: "/user-login", label: "כניסת משתמש", icon: <LoginOutlined />, path: "/user-login" },
   { key: "/admin-login", label: "כניסת מנהל", icon: <CrownOutlined />, path: "/admin-login" },
@@ -67,8 +70,7 @@ function ResponsiveDrawer() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const location = useLocation()
   const isMobile = useMediaQuery({ maxWidth: 768 })
-  const isSmallScreen = useMediaQuery({ maxWidth: 1024 });
-
+  const isSmallScreen = useMediaQuery({ maxWidth: 1024 })
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen)
@@ -87,6 +89,7 @@ function ResponsiveDrawer() {
   const siderContent = (
     <div style={{ height: "100%", display: "flex", flexDirection: "column", direction: "rtl", width: "100%" }}>
       <div
+        className="logo-section"
         style={{
           padding: "24px 16px",
           borderBottom: "1px solid #f0f0f0",
@@ -95,11 +98,12 @@ function ResponsiveDrawer() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          flexDirection: "column"
+          flexDirection: "column",
         }}
       >
         <Avatar
           size={collapsed ? 32 : 48}
+          className="logo-avatar"
           style={{
             background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
             marginBottom: collapsed ? 0 : 8,
@@ -108,7 +112,7 @@ function ResponsiveDrawer() {
           <DashboardOutlined />
         </Avatar>
         {!collapsed && (
-          <Title level={4} style={{ margin: "8px 0 0 0", color: "#667eea" }}>
+          <Title level={4} className="logo-title" style={{ margin: "8px 0 0 0", color: "#667eea" }}>
             BusinessMan
           </Title>
         )}
@@ -117,6 +121,7 @@ function ResponsiveDrawer() {
       <Menu
         mode="inline"
         selectedKeys={[location.pathname]}
+        className="sidebar-menu"
         style={{
           border: "none",
           flex: 1,
@@ -163,6 +168,7 @@ function ResponsiveDrawer() {
             collapsed={collapsed}
             width={280}
             collapsedWidth={80}
+            className="desktop-sider"
             style={{
               background: "#fff",
               position: "fixed",
@@ -192,6 +198,7 @@ function ResponsiveDrawer() {
             onClose={handleDrawerToggle}
             open={mobileOpen}
             width={280}
+            className="mobile-drawer"
             style={{ padding: 0, direction: "rtl" }}
           >
             <Menu
@@ -214,6 +221,7 @@ function ResponsiveDrawer() {
           }}
         >
           <Header
+            className="main-header"
             style={{
               background: "#fff",
               padding: "0 24px",
@@ -226,30 +234,33 @@ function ResponsiveDrawer() {
               zIndex: 100,
               width: "100%",
               direction: "rtl",
+              height: "64px",
             }}
           >
             <Space style={{ direction: "rtl" }}>
               <Button
                 type="text"
+                className="menu-toggle-btn"
                 icon={isMobile ? <MenuOutlined /> : collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
                 onClick={isMobile ? handleDrawerToggle : handleCollapse}
                 style={{ fontSize: "16px" }}
               />
               <Space style={{ direction: "rtl" }}>
-                <DashboardOutlined style={{ color: "#667eea", fontSize: "20px" }} />
-                <Title level={4} style={{ margin: 0, color: "#2d3748" }}>
+                <DashboardOutlined className="header-icon" style={{ color: "#667eea", fontSize: "20px" }} />
+                <Title level={4} className="header-title" style={{ margin: 0, color: "#2d3748" }}>
                   מערכת ניהול עסקים
                 </Title>
               </Space>
             </Space>
 
             {!isSmallScreen && (
-              <Space style={{ direction: "rtl" }}>
+              <Space className="header-nav" style={{ direction: "rtl" }}>
                 {navItems.slice(0, 4).map((item) => (
                   <Button
                     key={item.key}
                     type={location.pathname === item.path ? "primary" : "text"}
                     icon={item.icon}
+                    className="nav-btn"
                     style={{
                       borderRadius: "8px",
                       fontWeight: location.pathname === item.path ? 600 : 400,
@@ -260,12 +271,12 @@ function ResponsiveDrawer() {
                 ))}
               </Space>
             )}
-
           </Header>
 
           <Content
+            className="main-content"
             style={{
-              padding: "24px",
+              padding: "0",
               background: "transparent",
               minHeight: "calc(100vh - 64px)",
               width: "100%",
@@ -273,14 +284,22 @@ function ResponsiveDrawer() {
               direction: "rtl",
             }}
           >
-            <div className="content-wrapper">
+            <div
+              className="content-wrapper"
+              style={{
+                paddingTop: "40px",
+                minHeight: "calc(100vh - 104px)",
+                padding: "40px 24px 24px 24px",
+              }}
+            >
               <Routes>
-                <Route path="/" element={<Home />} />
+                <Route path="/" element={<MyHome />} />
                 <Route path="/register-user" element={<UserRegister />} />
                 <Route path="/user-login" element={<UserLogin />} />
                 <Route path="/admin-login" element={<AdminLogin />} />
                 <Route path="/upload-file" element={<UploadFiles />} />
                 <Route path="/register-admin&business" element={<BusinessAndAdmin />} />
+                <Route path="/edit-user/:id" element={<EditUserPage />} />
 
                 <Route
                   path="/production-reports"
@@ -294,7 +313,7 @@ function ResponsiveDrawer() {
                   path="/view-data"
                   element={
                     <AdminRoute>
-                      <DataViweing />
+                      <DataViewing />
                     </AdminRoute>
                   }
                 />
@@ -344,7 +363,7 @@ function App() {
 }
 
 export default App
-App.css:
+APP.CSS
 /* Import Hebrew fonts */
 @import url("https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;500;600;700&family=Heebo:wght@300;400;500;600;700&family=Rubik:wght@300;400;500;600;700&display=swap");
 
@@ -364,6 +383,11 @@ body {
   overflow-x: hidden;
 }
 
+::selection {
+  background-color: #8581d4;
+  color: white;
+}
+
 #root {
   width: 100%;
   min-height: 100vh;
@@ -372,6 +396,193 @@ body {
 a {
   text-decoration: none;
   color: inherit;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes bounceIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+
+  70% {
+    transform: scale(0.9);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.05);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes glow {
+
+  0%,
+  100% {
+    box-shadow: 0 0 5px rgba(102, 126, 234, 0.5);
+  }
+
+  50% {
+    box-shadow: 0 0 20px rgba(102, 126, 234, 0.8), 0 0 30px rgba(102, 126, 234, 0.6);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200px 0;
+  }
+
+  100% {
+    background-position: calc(200px + 100%) 0;
+  }
+}
+
+@keyframes rotateIn {
+  from {
+    opacity: 0;
+    transform: rotate(-200deg);
+  }
+
+  to {
+    opacity: 1;
+    transform: rotate(0deg);
+  }
+}
+
+/* Component Animations */
+.logo-section {
+  animation: slideInRight 0.8s ease-out;
+}
+
+.logo-avatar {
+  animation: bounceIn 1s ease-out 0.3s both;
+}
+
+.logo-title {
+  animation: fadeInUp 0.8s ease-out 0.5s both;
+}
+
+.sidebar-menu {
+  animation: slideInRight 0.8s ease-out 0.2s both;
+}
+
+.sidebar-menu .ant-menu-item {
+  animation: fadeInUp 0.6s ease-out both;
+  animation-delay: calc(var(--item-index, 0) * 0.1s);
+}
+
+.main-header {
+  animation: slideInLeft 0.8s ease-out;
+}
+
+.header-icon {
+  animation: rotateIn 1s ease-out 0.5s both;
+}
+
+.header-title {
+  animation: fadeInUp 0.8s ease-out 0.3s both;
+}
+
+.nav-btn {
+  animation: fadeInUp 0.6s ease-out both;
+  animation-delay: calc(var(--btn-index, 0) * 0.1s);
+  transition: all 0.3s ease;
+}
+
+.nav-btn:hover {
+  transform: translateY(-2px);
+  animation: pulse 0.6s ease-in-out infinite;
+}
+
+.menu-toggle-btn {
+  transition: all 0.3s ease;
+}
+
+.menu-toggle-btn:hover {
+  animation: pulse 0.6s ease-in-out;
+}
+
+.desktop-sider {
+  animation: slideInRight 1s ease-out;
+}
+
+.mobile-drawer .ant-drawer-content {
+  animation: slideInRight 0.5s ease-out;
+}
+
+.main-content {
+  animation: fadeInUp 0.8s ease-out 0.3s both;
+}
+
+.content-wrapper {
+  animation: fadeInUp 1s ease-out 0.5s both;
 }
 
 /* Custom scrollbar */
@@ -388,6 +599,7 @@ a {
 ::-webkit-scrollbar-thumb {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   border-radius: 4px;
+  animation: glow 2s ease-in-out infinite alternate;
 }
 
 ::-webkit-scrollbar-thumb:hover {
@@ -415,32 +627,11 @@ body:lang(he) {
   direction: rtl !important;
 }
 
-/* Fixed header height */
-.header-fixed {
-  position: fixed !important;
-  top: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-  z-index: 1000 !important;
-  background: #fff !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
-  height: 64px !important;
-  line-height: 64px !important;
-  padding: 0 24px !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  direction: rtl !important;
-}
-
 .ant-layout-content {
   width: 100% !important;
-  padding: 24px !important;
   margin: 0 !important;
-  min-height: calc(100vh - 64px) !important;
   background: transparent !important;
-  margin-top: 64px !important; /* Space for fixed header */
-  padding-top: 40px !important; /* Additional padding to ensure content starts below header */
+  direction: rtl !important;
 }
 
 /* RTL Sider positioning */
@@ -458,7 +649,7 @@ body:lang(he) {
 .main-layout {
   margin-right: 280px !important;
   width: calc(100% - 280px) !important;
-  transition: all 0.2s !important;
+  transition: all 0.3s ease !important;
   min-height: 100vh !important;
 }
 
@@ -467,53 +658,17 @@ body:lang(he) {
   width: calc(100% - 80px) !important;
 }
 
-/* Header adjustments for sider */
-.header-fixed.with-sider {
-  right: 280px !important;
-  width: calc(100% - 280px) !important;
-}
-
-.header-fixed.with-sider.collapsed {
-  right: 80px !important;
-  width: calc(100% - 80px) !important;
-}
-
 /* Mobile responsive */
 @media (max-width: 768px) {
+
   .main-layout,
   .main-layout.collapsed {
     margin-right: 0 !important;
     width: 100% !important;
   }
 
-  .header-fixed,
-  .header-fixed.with-sider,
-  .header-fixed.with-sider.collapsed {
-    right: 0 !important;
-    width: 100% !important;
-    padding: 0 16px !important;
-  }
-
   .ant-layout-sider {
     transform: translateX(100%) !important;
-  }
-
-  .ant-layout-content {
-    padding: 16px !important;
-    margin-top: 64px !important;
-    padding-top: 32px !important; /* Additional padding for mobile */
-  }
-
-  /* Hide desktop nav buttons on mobile */
-  .desktop-nav {
-    display: none !important;
-  }
-}
-
-/* Show desktop nav only on desktop */
-@media (min-width: 769px) {
-  .mobile-nav {
-    display: none !important;
   }
 }
 
@@ -537,11 +692,24 @@ body:lang(he) {
   border-radius: 8px !important;
   margin: 4px 8px !important;
   text-align: right !important;
+  transition: all 0.3s ease !important;
+}
+
+.ant-menu-item:hover {
+  transform: translateX(-5px) !important;
+  animation: glow 0.6s ease-in-out !important;
 }
 
 .ant-menu-item-selected {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
   color: white !important;
+  animation: shimmer 2s ease-in-out infinite !important;
+  background-size: 200px 100% !important;
+  background-image: linear-gradient(90deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.2) 20%,
+      rgba(255, 255, 255, 0.5) 60%,
+      rgba(255, 255, 255, 0)) !important;
 }
 
 .ant-menu-item-selected .anticon {
@@ -560,11 +728,13 @@ body:lang(he) {
   transition: all 0.3s ease !important;
   width: 100% !important;
   direction: rtl !important;
+  animation: fadeInUp 0.8s ease-out both !important;
 }
 
 .ant-card:hover {
-  transform: translateY(-4px) !important;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12) !important;
+  transform: translateY(-8px) !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.15) !important;
+  animation: float 3s ease-in-out infinite !important;
 }
 
 .ant-card-body {
@@ -582,6 +752,12 @@ body:lang(he) {
   align-items: center !important;
   justify-content: center !important;
   direction: rtl !important;
+  transition: all 0.3s ease !important;
+}
+
+.ant-btn:hover {
+  transform: translateY(-2px) !important;
+  animation: pulse 0.6s ease-in-out !important;
 }
 
 .ant-btn-primary {
@@ -592,34 +768,8 @@ body:lang(he) {
 
 .ant-btn-primary:hover {
   background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%) !important;
-  transform: translateY(-2px) !important;
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6) !important;
-}
-
-/* Responsive navigation buttons */
-.nav-buttons {
-  display: flex !important;
-  gap: 8px !important;
-  flex-wrap: wrap !important;
-  direction: rtl !important;
-}
-
-@media (max-width: 1200px) {
-  .nav-buttons .ant-btn {
-    padding: 8px 12px !important;
-    font-size: 12px !important;
-  }
-}
-
-@media (max-width: 992px) {
-  .nav-buttons .ant-btn span {
-    display: none !important;
-  }
-
-  .nav-buttons .ant-btn {
-    padding: 8px !important;
-    min-width: 40px !important;
-  }
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6) !important;
+  animation: glow 0.6s ease-in-out !important;
 }
 
 /* Input and form fixes */
@@ -635,9 +785,10 @@ body:lang(he) {
 .ant-input:focus {
   border-color: #667eea !important;
   box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2) !important;
+  animation: glow 0.6s ease-in-out !important;
 }
 
-.ant-form-item-label > label {
+.ant-form-item-label>label {
   font-weight: 600 !important;
   color: #2d3748 !important;
   text-align: right !important;
@@ -645,6 +796,8 @@ body:lang(he) {
 
 .ant-form-item {
   direction: rtl !important;
+  animation: fadeInUp 0.6s ease-out both !important;
+  animation-delay: calc(var(--form-item-index, 0) * 0.1s) !important;
 }
 
 .ant-input-number {
@@ -669,32 +822,14 @@ body:lang(he) {
   width: 100% !important;
   max-width: 1200px !important;
   margin: 0 auto !important;
-  padding: 0 24px !important;
+  padding: 40px 24px 24px 24px !important;
   direction: rtl !important;
-}
-
-/* Ensure content starts below fixed header */
-.content-container {
-  width: 100% !important;
-  max-width: 1200px !important;
-  margin: 0 auto !important;
-  padding: 0 !important;
-  direction: rtl !important;
-  position: relative !important;
-  z-index: 1 !important; /* Ensure content is below header */
-}
-
-.content-container {
-  width: 100% !important;
-  max-width: 1200px !important;
-  margin: 0 auto !important;
-  padding: 0 !important;
-  direction: rtl !important;
+  min-height: calc(100vh - 104px) !important;
 }
 
 @media (max-width: 768px) {
   .content-wrapper {
-    padding: 0 16px !important;
+    padding: 32px 16px 16px 16px !important;
   }
 }
 
@@ -709,6 +844,18 @@ body:lang(he) {
   overflow: hidden;
   width: 100%;
   direction: rtl;
+  animation: fadeInUp 1s ease-out both;
+}
+
+.hero-section::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  animation: shimmer 3s ease-in-out infinite;
 }
 
 @media (max-width: 768px) {
@@ -732,11 +879,13 @@ body:lang(he) {
   height: 100%;
   direction: rtl;
   text-align: right;
+  animation: fadeInUp 0.8s ease-out both;
 }
 
 .stats-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+  animation: float 2s ease-in-out infinite;
 }
 
 .feature-card {
@@ -750,6 +899,7 @@ body:lang(he) {
   width: 100%;
   direction: rtl;
   text-align: right;
+  animation: fadeInUp 0.8s ease-out both;
 }
 
 @media (max-width: 768px) {
@@ -759,8 +909,9 @@ body:lang(he) {
 }
 
 .feature-card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12);
+  transform: translateY(-12px) rotate(1deg);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+  animation: float 2.5s ease-in-out infinite;
 }
 
 .icon-wrapper {
@@ -774,6 +925,11 @@ body:lang(he) {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   font-size: 24px;
+  animation: bounceIn 1s ease-out both;
+}
+
+.icon-wrapper:hover {
+  animation: pulse 1s ease-in-out infinite;
 }
 
 .testimonial-section {
@@ -785,6 +941,7 @@ body:lang(he) {
   width: 100%;
   direction: rtl;
   text-align: right;
+  animation: fadeInUp 1s ease-out both;
 }
 
 @media (max-width: 768px) {
@@ -802,11 +959,13 @@ body:lang(he) {
   width: 100%;
   direction: rtl;
   text-align: right;
+  animation: fadeInUp 0.8s ease-out both;
 }
 
 .financial-summary-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.12);
+  animation: float 2s ease-in-out infinite;
 }
 
 .income-card {
@@ -823,10 +982,11 @@ body:lang(he) {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
+  min-height: calc(100vh - 104px);
   padding: 20px;
   width: 100%;
   direction: rtl;
+  animation: fadeInUp 0.8s ease-out both;
 }
 
 .login-form {
@@ -839,6 +999,7 @@ body:lang(he) {
   max-width: 500px;
   direction: rtl;
   text-align: right;
+  animation: bounceIn 1s ease-out both;
 }
 
 @media (max-width: 768px) {
@@ -858,6 +1019,7 @@ body:lang(he) {
   width: 100%;
   direction: rtl;
   text-align: right;
+  animation: fadeInUp 0.8s ease-out both;
 }
 
 @media (max-width: 768px) {
@@ -879,6 +1041,8 @@ body:lang(he) {
   padding-left: 12px !important;
   padding-right: 12px !important;
   direction: rtl !important;
+  animation: fadeInUp 0.6s ease-out both !important;
+  animation-delay: calc(var(--col-index, 0) * 0.1s) !important;
 }
 
 @media (max-width: 768px) {
@@ -893,6 +1057,7 @@ body:lang(he) {
   width: 100% !important;
   overflow-x: auto !important;
   direction: rtl !important;
+  animation: fadeInUp 0.8s ease-out both !important;
 }
 
 .ant-table {
@@ -900,12 +1065,21 @@ body:lang(he) {
   direction: rtl !important;
 }
 
-.ant-table-thead > tr > th {
+.ant-table-thead>tr>th {
   text-align: right !important;
 }
 
-.ant-table-tbody > tr > td {
+.ant-table-tbody>tr>td {
   text-align: right !important;
+}
+
+.ant-table-tbody>tr {
+  transition: all 0.3s ease !important;
+}
+
+.ant-table-tbody>tr:hover {
+  transform: scale(1.01) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
 }
 
 @media (max-width: 768px) {
@@ -917,7 +1091,7 @@ body:lang(he) {
 /* Typography RTL */
 .ant-typography {
   direction: rtl !important;
-  text-align: right !important;
+  text-align: center;
 }
 
 /* Space component RTL */
@@ -929,6 +1103,11 @@ body:lang(he) {
 .ant-upload-drag {
   direction: rtl !important;
   text-align: center !important;
+  transition: all 0.3s ease !important;
+}
+
+.ant-upload-drag:hover {
+  animation: pulse 0.6s ease-in-out !important;
 }
 
 /* Progress RTL */
@@ -936,10 +1115,15 @@ body:lang(he) {
   direction: rtl !important;
 }
 
+.ant-progress-line-path {
+  animation: shimmer 2s ease-in-out infinite !important;
+}
+
 /* Alert RTL */
 .ant-alert {
   direction: rtl !important;
   text-align: right !important;
+  animation: fadeInUp 0.6s ease-out both !important;
 }
 
 /* Statistic RTL */
@@ -953,13 +1137,212 @@ body:lang(he) {
   text-align: right !important;
 }
 
-/* Add safe area for content */
-.page-content {
-  min-height: calc(100vh - 128px) !important; /* Account for header + padding */
-  padding-top: 20px !important;
+.ant-statistic-content-value {
+  animation: bounceIn 1s ease-out both !important;
 }
-//Brurya
 
+/* Loading animations */
+.ant-spin {
+  animation: rotateIn 1s ease-out both !important;
+}
+
+/* Drawer animations */
+.ant-drawer-mask {
+  animation: fadeInUp 0.3s ease-out !important;
+}
+
+.ant-drawer-content {
+  animation: slideInRight 0.5s ease-out !important;
+}
+
+/* Menu item index animations */
+.ant-menu-item:nth-child(1) {
+  --item-index: 1;
+}
+
+.ant-menu-item:nth-child(2) {
+  --item-index: 2;
+}
+
+.ant-menu-item:nth-child(3) {
+  --item-index: 3;
+}
+
+.ant-menu-item:nth-child(4) {
+  --item-index: 4;
+}
+
+.ant-menu-item:nth-child(5) {
+  --item-index: 5;
+}
+
+.ant-menu-item:nth-child(6) {
+  --item-index: 6;
+}
+
+.ant-menu-item:nth-child(7) {
+  --item-index: 7;
+}
+
+.ant-menu-item:nth-child(8) {
+  --item-index: 8;
+}
+
+.ant-menu-item:nth-child(9) {
+  --item-index: 9;
+}
+
+.ant-menu-item:nth-child(10) {
+  --item-index: 10;
+}
+
+/* Nav button index animations */
+.nav-btn:nth-child(1) {
+  --btn-index: 1;
+}
+
+.nav-btn:nth-child(2) {
+  --btn-index: 2;
+}
+
+.nav-btn:nth-child(3) {
+  --btn-index: 3;
+}
+
+.nav-btn:nth-child(4) {
+  --btn-index: 4;
+}
+
+/* Form item index animations */
+.ant-form-item:nth-child(1) {
+  --form-item-index: 1;
+}
+
+.ant-form-item:nth-child(2) {
+  --form-item-index: 2;
+}
+
+.ant-form-item:nth-child(3) {
+  --form-item-index: 3;
+}
+
+.ant-form-item:nth-child(4) {
+  --form-item-index: 4;
+}
+
+.ant-form-item:nth-child(5) {
+  --form-item-index: 5;
+}
+
+.ant-form-item:nth-child(6) {
+  --form-item-index: 6;
+}
+
+/* Col index animations */
+.ant-col:nth-child(1) {
+  --col-index: 1;
+}
+
+.ant-col:nth-child(2) {
+  --col-index: 2;
+}
+
+.ant-col:nth-child(3) {
+  --col-index: 3;
+}
+
+.ant-col:nth-child(4) {
+  --col-index: 4;
+}
+
+.ant-col:nth-child(5) {
+  --col-index: 5;
+}
+
+.ant-col:nth-child(6) {
+  --col-index: 6;
+}
+
+/* Special upload animations */
+.upload-container {
+  animation: fadeInUp 0.8s ease-out both;
+}
+
+.upload-dragger {
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.upload-dragger::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, transparent, rgba(102, 126, 234, 0.1), transparent);
+  animation: shimmer 3s ease-in-out infinite;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.upload-dragger:hover::before {
+  opacity: 1;
+}
+
+.upload-dragger:hover {
+  transform: scale(1.02);
+  border-color: #667eea !important;
+  animation: glow 1s ease-in-out infinite alternate;
+}
+
+/* Business data display animations */
+.business-data-container {
+  animation: fadeInUp 0.8s ease-out both;
+}
+
+.business-metric {
+  animation: fadeInUp 0.6s ease-out both;
+  animation-delay: calc(var(--metric-index, 0) * 0.1s);
+  transition: all 0.3s ease;
+}
+
+.business-metric:hover {
+  transform: translateY(-5px) scale(1.02);
+  animation: float 2s ease-in-out infinite;
+}
+
+.edit-mode {
+  animation: bounceIn 0.6s ease-out both;
+}
+
+/* Responsive animations */
+@media (max-width: 768px) {
+  .hero-section::before {
+    animation-duration: 2s;
+  }
+
+  .stats-card:hover {
+    transform: translateY(-4px) scale(1.01);
+  }
+
+  .feature-card:hover {
+    transform: translateY(-6px);
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
 "use client"
 import { useContext, useState } from "react"
 import type { Admin } from "../models/Admin"
@@ -992,7 +1375,14 @@ const AdminLogin = () => {
         const { data } = await axios.post<any>(`${url}/Auth/admin-login`, admin, { withCredentials: true })
         globalContextDetails.setUser(data.user)
         globalContextDetails.setIsAdmin(true)
-        globalContextDetails.setBusinessGlobal(data.business)
+
+        try {
+          const res = await axios.get<any>(`${url}/api/Business/${data.user.businessId}`, { withCredentials: true })
+          globalContextDetails.setBusinessGlobal(res.data)
+        }
+        catch (e) {
+          console.error("Error setting business global:", e)
+        }
         nav("/")
       } else {
         setErrors(["נא למלא את כל השדות הנדרשים"])
@@ -1011,6 +1401,7 @@ const AdminLogin = () => {
 
   return (
     <ConfigProvider direction="rtl" >
+      <div style={{ marginTop: "35vh" }}></div>
       <CenteredLayout>
         <Card className="login-form" style={{ maxWidth: 500, width: "100%" }}>
           <div style={{ textAlign: "center", marginBottom: 32 }}>
@@ -1025,7 +1416,7 @@ const AdminLogin = () => {
               <CrownOutlined style={{ fontSize: 40 }} />
             </Avatar>
 
-            <Title level={2} style={{ marginBottom: 8, color: "#2d3748" }}>
+            <Title level={2} style={{ marginBottom: 8, color: "#2d3748", textAlign: "center" }}>
               כניסת מנהל
             </Title>
 
@@ -1111,72 +1502,303 @@ const AdminLogin = () => {
 export default AdminLogin
 "use client"
 
-import { useContext } from "react"
+import type React from "react"
+
+import { useContext, useState } from "react"
+import * as Yup from "yup"
+import axios from "axios"
+import type { UserPostModel } from "../models/UserPostModel"
+import { validationSchemaUserRegister } from "../utils/validationSchema"
 import { globalContext } from "../context/GlobalContext"
-import { Typography, Button, Card, Space, ConfigProvider } from "antd"
-import { StopOutlined } from "@ant-design/icons"
-import { useNavigate } from "react-router-dom"
-import CenteredLayout from "./CenteredLayout"
+import type { UserDto } from "../models/UserDto"
+import { converFromUserDto } from "../utils/convertFromUserDto"
+// MUI imports
+import {
+    Box,
+    TextField,
+    Button,
+    Typography,
+    Paper,
+    Container,
+    Alert,
+    Grid,
+    ThemeProvider,
+    createTheme,
+    CssBaseline,
+    InputAdornment,
+    Divider,
+} from "@mui/material"
+import { Person, Email, Phone, Badge, Lock, AdminPanelSettings } from "@mui/icons-material"
 
-const { Title, Text } = Typography
+// Create a custom theme with RTL support and Hebrew font
+const theme = createTheme({
+    direction: "rtl",
+    typography: {
+        fontFamily: '"Assistant", "Rubik", "Heebo", sans-serif',
+        h4: {
+            fontWeight: 700,
+        },
+        button: {
+            fontWeight: 600,
+        },
+    },
+    palette: {
+        primary: {
+            main: "#3f51b5",
+        },
+        secondary: {
+            main: "#f50057",
+        },
+        background: {
+            default: "#f5f5f5",
+        },
+    },
+    components: {
+        MuiTextField: {
+            styleOverrides: {
+                root: {
+                    direction: "rtl",
+                },
+            },
+        },
+        MuiButton: {
+            styleOverrides: {
+                root: {
+                    borderRadius: 8,
+                    padding: "10px 24px",
+                    textTransform: "none",
+                    fontSize: "1rem",
+                },
+            },
+        },
+    },
+})
 
-const AdminRoute = () => {
-  const { isAdmin } = useContext(globalContext)
-  const navigate = useNavigate()
+const AdminRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => {
+    const validationSchema = validationSchemaUserRegister
+    const [myAdmin, setMyAdmin] = useState<UserPostModel>({
+        firstName: "יוסי", // ערך ברירת מחדל
+        lastName: "כהן", // ערך ברירת מחדל
+        email: "a@a", // ערך ברירת מחדל
+        password: "", // ערך ברירת מחדל
+        phone: "050-1234567", // ערך ברירת מחדל
+        role: 1, // ערך ברירת מחדל
+        idNumber: "123456789", // ערך ברירת מחדל
+    })
+    const [errors, setErrors] = useState<string[]>([])
+    const globalContextDetails = useContext(globalContext)
+    const url = import.meta.env.VITE_API_URL
 
-  if (isAdmin === false) {
+    const handleSubmit = (adminRegister: UserPostModel) => async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault()
+
+        validationSchema
+            .isValid(adminRegister)
+            .then(async (valid) => {
+                setErrors([])
+                if (valid) {
+                    try {
+                        const { data } = await axios.post<UserDto>(`${url}/Auth/admin-register`, adminRegister, { withCredentials: true })
+                        globalContextDetails.setUser(converFromUserDto(data))
+                        if (data.role == 1) {
+                            globalContextDetails.setIsAdmin(true)
+                        }
+                        if (onSubmitSuccess) onSubmitSuccess()
+                    } catch (e) {
+                        console.log(e)
+                        setErrors(["שגיאה ברישום"])
+                    }
+                } else {
+                    setErrors(["נא למלא את כל השדות הנדרשים"])
+                }
+            })
+            .catch((err) => {
+                console.log("Validation error:", err.errors)
+                if (err instanceof Yup.ValidationError) {
+                    setErrors(err.errors)
+                }
+            })
+    }
+
+    const handleChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
+        const { name, value, type } = event.target
+        setMyAdmin((prevUser) => ({
+            ...prevUser,
+            [name]: type === "number" ? Number(value) : value,
+        }))
+    }
+
     return (
-      <ConfigProvider direction="rtl">
-        <CenteredLayout>
-          <Card
-            style={{
-              textAlign: "center",
-              padding: 40,
-              borderRadius: 16,
-              boxShadow: "0 8px 32px rgba(0, 0, 0, 0.1)",
-            }}
-          >
-            <Space direction="vertical" size="large" style={{ width: "100%" }}>
-              <StopOutlined
-                style={{
-                  fontSize: 80,
-                  color: "#ff4d4f",
-                  marginBottom: 16,
-                }}
-              />
+        <ThemeProvider theme={theme}>
+            <CssBaseline />
+            <Container maxWidth="md" sx={{ py: 4 }}>
+                <Paper
+                    elevation={3}
+                    sx={{
+                        p: 4,
+                        borderRadius: 3,
+                        boxShadow: "0 8px 32px rgba(0, 0, 0, 0.1)",
+                    }}
+                >
+                    <Box sx={{ mb: 4, textAlign: "center" }}>
+                        <AdminPanelSettings color="primary" sx={{ fontSize: 48, mb: 2 }} />
+                        <Typography variant="h4" component="h1" gutterBottom>
+                            רישום מנהל חדש
+                        </Typography>
+                        <Typography variant="body1" color="text.secondary">
+                            נא למלא את כל הפרטים הנדרשים
+                        </Typography>
+                        <Divider sx={{ mt: 3 }} />
+                    </Box>
 
-              <Title level={2} style={{ color: "#ff4d4f", margin: 0 }}>
-                גישה נדחתה
-              </Title>
+                    <Box
+                        component="form"
+                        onSubmit={handleSubmit(myAdmin)}
+                        sx={{
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: 3,
+                        }}
+                    >
+                        <Grid container spacing={2}>
+                            <Grid item xs={12} md={6} {...({} as any)}>
+                                <TextField
+                                    fullWidth
+                                    label="שם פרטי"
+                                    name="firstName"
+                                    value={myAdmin.firstName}
+                                    onChange={handleChange}
+                                    variant="outlined"
+                                    InputProps={{
+                                        startAdornment: (
+                                            <InputAdornment position="start">
+                                                <Person color="action" />
+                                            </InputAdornment>
+                                        ),
+                                    }}
+                                />
+                            </Grid>
+                            <Grid item xs={12} md={6} {...({} as any)}>
+                                <TextField
+                                    fullWidth
+                                    label="שם משפחה"
+                                    name="lastName"
+                                    value={myAdmin.lastName}
+                                    onChange={handleChange}
+                                    variant="outlined"
+                                    InputProps={{
+                                        startAdornment: (
+                                            <InputAdornment position="start">
+                                                <Person color="action" />
+                                            </InputAdornment>
+                                        ),
+                                    }}
+                                />
+                            </Grid>
+                            <Grid item xs={12} md={6} {...({} as any)}>
+                                <TextField
+                                    fullWidth
+                                    label="טלפון"
+                                    name="phone"
+                                    value={myAdmin.phone}
+                                    onChange={handleChange}
+                                    variant="outlined"
+                                    InputProps={{
+                                        startAdornment: (
+                                            <InputAdornment position="start">
+                                                <Phone color="action" />
+                                            </InputAdornment>
+                                        ),
+                                    }}
+                                />
+                            </Grid>
+                            <Grid item xs={12} md={6} {...({} as any)}>
+                                <TextField
+                                    fullWidth
+                                    label="מספר תעודת זהות"
+                                    name="idNumber"
+                                    value={myAdmin.idNumber}
+                                    onChange={handleChange}
+                                    variant="outlined"
+                                    InputProps={{
+                                        startAdornment: (
+                                            <InputAdornment position="start">
+                                                <Badge color="action" />
+                                            </InputAdornment>
+                                        ),
+                                    }}
+                                />
+                            </Grid>
+                            <Grid item xs={12} {...({} as any)}>
+                                <TextField
+                                    fullWidth
+                                    label="אימייל"
+                                    name="email"
+                                    type="email"
+                                    value={myAdmin.email}
+                                    onChange={handleChange}
+                                    variant="outlined"
+                                    InputProps={{
+                                        startAdornment: (
+                                            <InputAdornment position="start">
+                                                <Email color="action" />
+                                            </InputAdornment>
+                                        ),
+                                    }}
+                                />
+                            </Grid>
+                            <Grid item xs={12} {...({} as any)}>
+                                <TextField
+                                    fullWidth
+                                    label="סיסמא"
+                                    name="password"
+                                    type="password"
+                                    value={myAdmin.password}
+                                    onChange={handleChange}
+                                    variant="outlined"
+                                    InputProps={{
+                                        startAdornment: (
+                                            <InputAdornment position="start">
+                                                <Lock color="action" />
+                                            </InputAdornment>
+                                        ),
+                                    }}
+                                />
+                            </Grid>
+                        </Grid>
 
-              <Text type="secondary" style={{ fontSize: 16 }}>
-                אין לך הרשאה לצפות בדף זה. רק מנהלים יכולים לגשת לתוכן זה.
-              </Text>
+                        <Button
+                            type="submit"
+                            variant="contained"
+                            size="large"
+                            sx={{
+                                mt: 2,
+                                py: 1.5,
+                                fontWeight: "bold",
+                                fontSize: "1.1rem",
+                                boxShadow: "0 4px 12px rgba(63, 81, 181, 0.4)",
+                            }}
+                        >
+                            שמור פרטים
+                        </Button>
 
-              <Button
-                type="primary"
-                size="large"
-                onClick={() => navigate("/")}
-                style={{
-                  height: 48,
-                  padding: "0 32px",
-                  fontWeight: 600,
-                  marginTop: 16,
-                }}
-              >
-                חזרה לדף הבית
-              </Button>
-            </Space>
-          </Card>
-        </CenteredLayout>
-      </ConfigProvider>
+                        {errors.length > 0 && (
+                            <Box sx={{ width: "100%", mt: 2 }}>
+                                {errors.map((error, index) => (
+                                    <Alert key={index} severity="error" sx={{ mb: 1 }}>
+                                        {error}
+                                    </Alert>
+                                ))}
+                            </Box>
+                        )}
+                    </Box>
+                </Paper>
+            </Container>
+        </ThemeProvider>
     )
-
-  }
-  return <></>
 }
 
-export default AdminRoute
+export default AdminRegister
 "use client"
 
 import { type JSX, useContext } from "react"
@@ -1388,6 +2010,8 @@ const BusinessAndAdmin = () => {
 
   return (
     <ThemeProvider theme={theme}>
+      <div style={{ marginTop: "65vh" }}></div>
+
       <CssBaseline />
       <Container maxWidth="md" sx={{ py: 4 }}>
         <Paper
@@ -1593,21 +2217,61 @@ const CenteredLayout = ({ children }: { children: React.ReactNode }) => {
 export default CenteredLayout
 "use client"
 import axios from "axios"
+import type React from "react"
+
 import { useState, useContext } from "react"
+import {
+  Button,
+  Typography,
+  Card,
+  Alert,
+  Spin,
+  ConfigProvider,
+  Space,
+  Avatar,
+  Divider,
+  Row,
+  Col,
+  Statistic,
+  Progress,
+  Tag,
+  Input,
+  Form,
+  Modal,
+  InputNumber,
+  message,
+} from "antd"
+import {
+  EyeOutlined,
+  ShopOutlined,
+  EditOutlined,
+  SaveOutlined,
+  CloseOutlined,
+  DollarOutlined,
+  WarningOutlined,
+  BarChartOutlined,
+  PieChartOutlined,
+  LineChartOutlined,
+  BankOutlined,
+  CreditCardOutlined,
+  WalletOutlined,
+  RiseOutlined,
+  FallOutlined,
+} from "@ant-design/icons"
+import { Business } from "../models/Business"
 import { globalContext } from "../context/GlobalContext"
-import type { Business } from "../models/Business"
-import BusinessTable from "./BusinessTable"
-import { Button, Typography, Card, Alert, Spin, ConfigProvider, Space, Avatar, Divider } from "antd"
-import { EyeOutlined, ShopOutlined } from "@ant-design/icons"
 
 const { Title, Text } = Typography
 
-function DataViweing() {
+function DataViewing() {
   const url = import.meta.env.VITE_API_URL
   const [errors, setErrors] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
   const [dataLoaded, setDataLoaded] = useState(false)
-  const globalContextDetails = useContext(globalContext)
+  const [editModalVisible, setEditModalVisible] = useState(false)
+  const globalContextDetails = useContext(globalContext) as { user: { businessId: number } }
+  const [form] = Form.useForm()
+
   const [business, setBusiness] = useState<Business>({
     id: 0,
     businessId: 0,
@@ -1658,9 +2322,126 @@ function DataViweing() {
     }
   }
 
+  const handleEdit = () => {
+    form.setFieldsValue(business)
+    setEditModalVisible(true)
+  }
+
+  const handleSave = async () => {
+    try {
+      const values = await form.validateFields()
+      const updatedBusiness = { ...business, ...values }
+
+      // Here you would typically make an API call to update the business
+      // await axios.put(`${url}/api/Business/${business.id}`, updatedBusiness)
+
+      setBusiness(updatedBusiness)
+      setEditModalVisible(false)
+      message.success("נתוני העסק עודכנו בהצלחה!")
+    } catch (error) {
+      message.error("שגיאה בעדכון נתוני העסק")
+    }
+  }
+
+
+  const getChangeIcon = (value: number) => {
+    return value > 0 ? <RiseOutlined style={{ color: "#52c41a" }} /> : <FallOutlined style={{ color: "#ff4d4f" }} />
+  }
+
+  const calculateProfitMargin = () => {
+    if (business.income === 0) return 0
+    return (((business.income - business.expenses) / business.income) * 100).toFixed(1)
+  }
+
+  const calculateROI = () => {
+    if (business.totalAssets === 0) return 0
+    return ((business.netWorth / business.totalAssets) * 100).toFixed(1)
+  }
+
+  const businessMetrics = [
+    {
+      title: "הכנסות כוללות",
+      value: business.income,
+      prefix: "₪",
+      icon: <DollarOutlined />,
+      color: "#52c41a",
+      change: 12.5,
+      description: "גידול של 12.5% מהחודש הקודם",
+    },
+    {
+      title: "הוצאות כוללות",
+      value: business.expenses,
+      prefix: "₪",
+      icon: <CreditCardOutlined />,
+      color: "#ff4d4f",
+      change: -3.2,
+      description: "ירידה של 3.2% מהחודש הקודם",
+    },
+    {
+      title: "תזרים מזומנים",
+      value: business.cashFlow,
+      prefix: "₪",
+      icon: <WalletOutlined />,
+      color: business.cashFlow > 0 ? "#52c41a" : "#ff4d4f",
+      change: 8.7,
+      description: "שיפור של 8.7% מהחודש הקודם",
+    },
+    {
+      title: "סך נכסים",
+      value: business.totalAssets,
+      prefix: "₪",
+      icon: <BankOutlined />,
+      color: "#1890ff",
+      change: 5.3,
+      description: "גידול של 5.3% מהחודש הקודם",
+    },
+    {
+      title: "התחייבויות",
+      value: business.totalLiabilities,
+      prefix: "₪",
+      icon: <CreditCardOutlined />,
+      color: "#fa8c16",
+      change: -2.1,
+      description: "ירידה של 2.1% מהחודש הקודם",
+    },
+    {
+      title: "שווי נקי",
+      value: business.netWorth,
+      prefix: "₪",
+      icon: <WarningOutlined />,
+      color: "#722ed1",
+      change: 15.4,
+      description: "גידול של 15.4% מהחודש הקודם",
+    },
+  ]
+
+  const performanceMetrics = [
+    {
+      title: "שיעור רווח",
+      value: calculateProfitMargin(),
+      suffix: "%",
+      target: 25,
+      color: "#52c41a",
+    },
+    {
+      title: "תשואה על השקעה",
+      value: calculateROI(),
+      suffix: "%",
+      target: 15,
+      color: "#1890ff",
+    },
+    {
+      title: "יחס חוב להון",
+      value: business.totalAssets > 0 ? ((business.totalLiabilities / business.totalAssets) * 100).toFixed(1) : 0,
+      suffix: "%",
+      target: 40,
+      color: "#fa8c16",
+    },
+  ]
+
   return (
     <ConfigProvider direction="rtl">
-      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "40px 20px" }}>
+      <div className="business-data-container" style={{ maxWidth: 1400, margin: "0 auto" }}>
         <Card className="form-section">
           <div style={{ textAlign: "center", marginBottom: 32 }}>
             <Avatar
@@ -1675,18 +2456,18 @@ function DataViweing() {
             </Avatar>
 
             <Title level={2} style={{ marginBottom: 8, color: "#2d3748" }}>
-              צפייה בנתוני העסק
+              לוח בקרה עסקי מתקדם
             </Title>
 
             <Text type="secondary" style={{ fontSize: 16 }}>
-              לחץ על הכפתור כדי לטעון את נתוני העסק העדכניים
+              צפה ונהל את נתוני העסק שלך בצורה חכמה ויעילה
             </Text>
 
             <Divider />
           </div>
 
-          <Space direction="vertical" style={{ width: "100%" }} size="large">
-            <div style={{ textAlign: "center" }}>
+          {!dataLoaded ? (
+            <div style={{ textAlign: "center", marginBottom: 32 }}>
               <Button
                 type="primary"
                 size="large"
@@ -1695,34 +2476,581 @@ function DataViweing() {
                 icon={<EyeOutlined />}
                 onClick={handleSubmit}
                 style={{
-                  height: 48,
-                  padding: "0 32px",
+                  height: 56,
+                  padding: "0 40px",
                   fontWeight: 600,
-                  fontSize: 16,
+                  fontSize: 18,
+                  borderRadius: 16,
                 }}
               >
-                {loading ? "טוען נתונים..." : "צפה בנתונים"}
+                {loading ? "טוען נתונים..." : "טען נתוני עסק"}
               </Button>
             </div>
+          ) : (
+            <Space direction="vertical" style={{ width: "100%" }} size="large">
+              {/* Business Header */}
+              <Card
+                style={{
+                  background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                  color: "white",
+                  border: "none",
+                }}
+              >
+                <Row align="middle" justify="space-between">
+                  <Col>
+                    <Space direction="vertical" size="small">
+                      <Title level={3} style={{ color: "white", margin: 0 }}>
+                        {business.name}
+                      </Title>
+                      <Text style={{ color: "rgba(255,255,255,0.8)", fontSize: 16 }}>
+                        {business.businessType} • {business.address}
+                      </Text>
+                      <Tag color="gold" style={{ marginTop: 8 }}>
+                        {business.email}
+                      </Tag>
+                    </Space>
+                  </Col>
+                  <Col>
+                    <Button
+                      type="primary"
+                      ghost
+                      icon={<EditOutlined />}
+                      onClick={handleEdit}
+                      size="large"
+                      style={{
+                        borderColor: "white",
+                        color: "white",
+                        fontWeight: 600,
+                      }}
+                    >
+                      ערוך פרטים
+                    </Button>
+                  </Col>
+                </Row>
+              </Card>
 
-            {loading && (
-              <div style={{ textAlign: "center", padding: "40px 0" }}>
-                <Spin size="large" />
-                <div style={{ marginTop: 16 }}>
-                  <Text type="secondary">טוען נתוני העסק...</Text>
-                </div>
+              {/* Financial Metrics */}
+              <div>
+                <Title level={4} style={{ marginBottom: 16 }}>
+                  מדדים פיננסיים עיקריים
+                </Title>
+                <Row gutter={[16, 16]}>
+                  {businessMetrics.map((metric, index) => (
+                    <Col xs={24} sm={12} lg={8} key={index}>
+                      <Card
+                        className="business-metric"
+                        style={
+                          {
+                            height: "100%",
+                            background: `${metric.color}08`,
+                            border: `1px solid ${metric.color}30`,
+                            borderRadius: 16,
+                            "--metric-index": index,
+                          } as React.CSSProperties
+                        }
+                      >
+                        <Space direction="vertical" style={{ width: "100%" }}>
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                            <Text type="secondary" style={{ fontSize: 14 }}>
+                              {metric.title}
+                            </Text>
+                            <Avatar
+                              size={40}
+                              style={{
+                                background: `${metric.color}20`,
+                                color: metric.color,
+                              }}
+                            >
+                              {metric.icon}
+                            </Avatar>
+                          </div>
+
+                          <Statistic
+                            value={metric.value}
+                            prefix={metric.prefix}
+                            valueStyle={{
+                              color: metric.color,
+                              fontSize: "1.8rem",
+                              fontWeight: "bold",
+                            }}
+                          />
+
+                          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                            {getChangeIcon(metric.change)}
+                            <Text
+                              style={{
+                                color: metric.change > 0 ? "#52c41a" : "#ff4d4f",
+                                fontWeight: 600,
+                              }}
+                            >
+                              {metric.change > 0 ? "+" : ""}
+                              {metric.change}%
+                            </Text>
+                          </div>
+
+                          <Text type="secondary" style={{ fontSize: 12 }}>
+                            {metric.description}
+                          </Text>
+                        </Space>
+                      </Card>
+                    </Col>
+                  ))}
+                </Row>
               </div>
-            )}
 
-            {dataLoaded && !loading && <BusinessTable business={business} />}
+              {/* Performance Indicators */}
+              <div>
+                <Title level={4} style={{ marginBottom: 16 }}>
+                  מדדי ביצועים
+                </Title>
+                <Row gutter={[16, 16]}>
+                  {performanceMetrics.map((metric, index) => (
+                    <Col xs={24} md={8} key={index}>
+                      <Card style={{ height: "100%", borderRadius: 16 }}>
+                        <Space direction="vertical" style={{ width: "100%" }}>
+                          <Text strong style={{ fontSize: 16 }}>
+                            {metric.title}
+                          </Text>
+
+                          <div style={{ textAlign: "center", margin: "16px 0" }}>
+                            <Progress
+                              type="circle"
+                              percent={Math.min(
+                                (Number.parseFloat(metric.value.toString()) /
+                                  Number.parseFloat(metric.target.toString())) *
+                                  100,
+                                100,
+                              )}
+                              format={() => (
+                                <div>
+                                  <div style={{ fontSize: "1.5rem", fontWeight: "bold", color: metric.color }}>
+                                    {metric.value}
+                                    {metric.suffix}
+                                  </div>
+                                  <div style={{ fontSize: "0.8rem", color: "#666" }}>
+                                    יעד: {metric.target}
+                                    {metric.suffix}
+                                  </div>
+                                </div>
+                              )}
+                              strokeColor={metric.color}
+                              size={120}
+                            />
+                          </div>
+
+                          <div style={{ textAlign: "center" }}>
+                            <Tag
+                              color={
+                                Number.parseFloat(metric.value.toString()) >=
+                                Number.parseFloat(metric.target.toString())
+                                  ? "success"
+                                  : "warning"
+                              }
+                            >
+                              {Number.parseFloat(metric.value.toString()) >= Number.parseFloat(metric.target.toString())
+                                ? "עומד ביעד"
+                                : "מתחת ליעד"}
+                            </Tag>
+                          </div>
+                        </Space>
+                      </Card>
+                    </Col>
+                  ))}
+                </Row>
+              </div>
+
+              {/* Quick Actions */}
+              <Card title="פעולות מהירות" style={{ borderRadius: 16 }}>
+                <Row gutter={[16, 16]}>
+                  <Col xs={24} sm={8}>
+                    <Button
+                      type="primary"
+                      icon={<BarChartOutlined />}
+                      block
+                      size="large"
+                      style={{ height: 48, borderRadius: 12 }}
+                    >
+                      דוח מפורט
+                    </Button>
+                  </Col>
+                  <Col xs={24} sm={8}>
+                    <Button
+                      type="default"
+                      icon={<PieChartOutlined />}
+                      block
+                      size="large"
+                      style={{ height: 48, borderRadius: 12, borderWidth: 2 }}
+                    >
+                      ניתוח מגמות
+                    </Button>
+                  </Col>
+                  <Col xs={24} sm={8}>
+                    <Button
+                      type="default"
+                      icon={<LineChartOutlined />}
+                      block
+                      size="large"
+                      style={{ height: 48, borderRadius: 12, borderWidth: 2 }}
+                    >
+                      תחזית עתידית
+                    </Button>
+                  </Col>
+                </Row>
+              </Card>
+            </Space>
+          )}
+
+          {loading && (
+            <div style={{ textAlign: "center", padding: "60px 0" }}>
+              <Spin size="large" />
+              <div style={{ marginTop: 24 }}>
+                <Text type="secondary" style={{ fontSize: 16 }}>
+                  טוען נתוני העסק...
+                </Text>
+              </div>
+            </div>
+          )}
+
+          {errors.length > 0 && (
+            <div>
+              {errors.map((error, index) => (
+                <Alert
+                  key={index}
+                  message="שגיאה"
+                  description={error}
+                  type="error"
+                  showIcon
+                  style={{ marginBottom: 8, borderRadius: 12 }}
+                />
+              ))}
+            </div>
+          )}
+        </Card>
+
+        {/* Edit Modal */}
+        <Modal
+          title="עריכת נתוני עסק"
+          open={editModalVisible}
+          onCancel={() => setEditModalVisible(false)}
+          footer={[
+            <Button key="cancel" onClick={() => setEditModalVisible(false)} icon={<CloseOutlined />}>
+              ביטול
+            </Button>,
+            <Button key="save" type="primary" onClick={handleSave} icon={<SaveOutlined />}>
+              שמור שינויים
+            </Button>,
+          ]}
+          width={800}
+          className="edit-mode"
+        >
+          <Form form={form} layout="vertical" style={{ marginTop: 16 }}>
+            <Row gutter={[16, 16]}>
+              <Col xs={24} md={12}>
+                <Form.Item label="שם העסק" name="name">
+                  <Input size="large" />
+                </Form.Item>
+              </Col>
+              <Col xs={24} md={12}>
+                <Form.Item label="סוג העסק" name="businessType">
+                  <Input size="large" />
+                </Form.Item>
+              </Col>
+              <Col xs={24}>
+                <Form.Item label="כתובת" name="address">
+                  <Input size="large" />
+                </Form.Item>
+              </Col>
+              <Col xs={24} md={12}>
+                <Form.Item label="הכנסות" name="income">
+                  <InputNumber
+                    size="large"
+                    style={{ width: "100%" }}
+                    formatter={(value) => `₪ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                    parser={(value) => value!.replace(/₪\s?|(,*)/g, "")}
+                  />
+                </Form.Item>
+              </Col>
+              <Col xs={24} md={12}>
+                <Form.Item label="הוצאות" name="expenses">
+                  <InputNumber
+                    size="large"
+                    style={{ width: "100%" }}
+                    formatter={(value) => `₪ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                    parser={(value) => value!.replace(/₪\s?|(,*)/g, "")}
+                  />
+                </Form.Item>
+              </Col>
+              <Col xs={24} md={12}>
+                <Form.Item label="סך נכסים" name="totalAssets">
+                  <InputNumber
+                    size="large"
+                    style={{ width: "100%" }}
+                    formatter={(value) => `₪ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                    parser={(value) => value!.replace(/₪\s?|(,*)/g, "")}
+                  />
+                </Form.Item>
+              </Col>
+              <Col xs={24} md={12}>
+                <Form.Item label="התחייבויות" name="totalLiabilities">
+                  <InputNumber
+                    size="large"
+                    style={{ width: "100%" }}
+                    formatter={(value) => `₪ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                    parser={(value) => value!.replace(/₪\s?|(,*)/g, "")}
+                  />
+                </Form.Item>
+              </Col>
+            </Row>
+          </Form>
+        </Modal>
+      </div>
+    </ConfigProvider>
+  )
+}
+
+export default DataViewing
+"use client"
+import { useContext, useEffect, useState } from "react"
+import axios from "axios"
+import { useNavigate, useParams } from "react-router-dom"
+import { validationSchemaUserRegister } from "../utils/validationSchema"
+import { globalContext } from "../context/GlobalContext"
+import { convertToUser } from "../utils/converToUser"
+import type { UserPostModel } from "../models/UserPostModel"
+import {
+  Form,
+  Input,
+  Button,
+  Typography,
+  Card,
+  Alert,
+  Row,
+  Col,
+  Avatar,
+  Divider,
+  ConfigProvider,
+  InputNumber,
+} from "antd"
+import {
+  UserOutlined,
+  MailOutlined,
+  PhoneOutlined,
+  IdcardOutlined,
+  LockOutlined,
+  EditOutlined,
+  ArrowLeftOutlined,
+} from "@ant-design/icons"
+import { UserDto } from "../models/UserDto"
+
+const { Title, Text } = Typography
+
+const EditUserPage = () => {
+  const { id } = useParams()
+  const nav = useNavigate()
+  const validationSchema = validationSchemaUserRegister
+  const [errors, setErrors] = useState<string[]>([])
+  const [loading, setLoading] = useState(false)
+  const { setUser } = useContext(globalContext)
+  const url = import.meta.env.VITE_API_URL
+  const [myUser, setMyUser] = useState<UserDto>({
+    id: 0,
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    idNumber: "",
+    password: "",
+    role: 0,
+    status: "", // Default value for status
+    lastLogin: new Date(), // Default value for lastLogin
+    createdAt: new Date(), // Default value for createdAt
+    updateAt: new Date(), // Default value for updateAt
+    businessId: 0, // Default value for businessId
+  })
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const { data } = await axios.get<UserDto>(`${url}/api/User/${id}`, { withCredentials: true })
+        setMyUser(data)
+      } catch (e) {
+        setErrors(["שגיאה בטעינת נתוני המשתמש"])
+      }
+    }
+
+    if (id) fetchUser()
+  }, [id, url])
+
+  const handleChange = (field: string, value: any) => {
+    setMyUser((prev) => ({ ...prev, [field]: value }))
+  }
+
+  const handleSubmit = async () => {
+    setLoading(true)
+    try {
+      const valid = await validationSchema.isValid(myUser)
+      setErrors([])
+
+      if (valid && id) {
+        console.log(myUser);
+        
+        const { data } = await axios.put<UserPostModel>(`${url}/api/User/${id}`, myUser, { withCredentials: true })
+        setUser(convertToUser(data))
+        nav("/user-management")
+      } else {
+        setErrors(["נא למלא את כל השדות הנדרשים"])
+      }
+    } catch (e) {
+      console.log(e)
+      setErrors(["שגיאה בעדכון המשתמש"])
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <ConfigProvider direction="rtl">
+      <div style={{ padding: "40px 20px", maxWidth: 800, margin: "0 auto", marginTop: "70vh" }}>
+        <Card className="form-section">
+          <div style={{ textAlign: "center", marginBottom: 32 }}>
+            <Avatar
+              size={80}
+              style={{
+                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                marginBottom: 16,
+                boxShadow: "0 4px 14px rgba(102, 126, 234, 0.3)",
+              }}
+            >
+              <EditOutlined style={{ fontSize: 40 }} />
+            </Avatar>
+
+            <Title level={2} style={{ marginBottom: 8, color: "#2d3748", textAlign: "center" }}>
+              עריכת משתמש
+            </Title>
+
+            <Text type="secondary" style={{ fontSize: 16 }}>
+              עדכן את פרטי המשתמש
+            </Text>
+
+            <Divider />
+          </div>
+
+          <Form layout="vertical" onFinish={handleSubmit}>
+            <Row gutter={[16, 0]}>
+              <Col xs={24} md={12}>
+                <Form.Item label="שם פרטי" required>
+                  <Input
+                    prefix={<UserOutlined />}
+                    placeholder="הזן שם פרטי"
+                    size="large"
+                    value={myUser.firstName}
+                    onChange={(e) => handleChange("firstName", e.target.value)}
+                  />
+                </Form.Item>
+              </Col>
+              <Col xs={24} md={12}>
+                <Form.Item label="שם משפחה" required>
+                  <Input
+                    prefix={<UserOutlined />}
+                    placeholder="הזן שם משפחה"
+                    size="large"
+                    value={myUser.lastName}
+                    onChange={(e) => handleChange("lastName", e.target.value)}
+                  />
+                </Form.Item>
+              </Col>
+              <Col xs={24} md={12}>
+                <Form.Item label="טלפון" required>
+                  <Input
+                    prefix={<PhoneOutlined />}
+                    placeholder="הזן מספר טלפון"
+                    size="large"
+                    value={myUser.phone}
+                    onChange={(e) => handleChange("phone", e.target.value)}
+                  />
+                </Form.Item>
+              </Col>
+              <Col xs={24} md={12}>
+                <Form.Item label="מספר תעודת זהות" required>
+                  <Input
+                    prefix={<IdcardOutlined />}
+                    placeholder="הזן מספר תעודת זהות"
+                    size="large"
+                    value={myUser.idNumber}
+                    onChange={(e) => handleChange("idNumber", e.target.value)}
+                  />
+                </Form.Item>
+              </Col>
+              <Col xs={24}>
+                <Form.Item label="אימייל" required>
+                  <Input
+                    prefix={<MailOutlined />}
+                    placeholder="הזן כתובת אימייל"
+                    size="large"
+                    type="email"
+                    value={myUser.email}
+                    onChange={(e) => handleChange("email", e.target.value)}
+                  />
+                </Form.Item>
+              </Col>
+              <Col xs={24} md={12}>
+                <Form.Item label="סיסמא (חדשה)" required>
+                  <Input.Password
+                    prefix={<LockOutlined />}
+                    placeholder="הזן סיסמא"
+                    size="large"
+                    value={myUser.password}
+                    onChange={(e) => handleChange("password", e.target.value)}
+                  />
+                </Form.Item>
+              </Col>
+              <Col xs={24} md={12}>
+                <Form.Item label="תפקיד" required>
+                  <InputNumber
+                    placeholder="הזן קוד תפקיד"
+                    size="large"
+                    style={{ width: "100%" }}
+                    value={myUser.role}
+                    onChange={(value) => handleChange("role", value || 0)}
+                  />
+                </Form.Item>
+              </Col>
+            </Row>
+
+            <Row gutter={[16, 16]} style={{ marginTop: 24 }}>
+              <Col xs={24} sm={12}>
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  size="large"
+                  loading={loading}
+                  icon={<EditOutlined />}
+                  block
+                  style={{ height: 48, fontWeight: 600, fontSize: 16 }}
+                >
+                  עדכן משתמש
+                </Button>
+              </Col>
+              <Col xs={24} sm={12}>
+                <Button
+                  type="default"
+                  size="large"
+                  icon={<ArrowLeftOutlined />}
+                  onClick={() => nav(-1)}
+                  block
+                  style={{ height: 48, fontWeight: 600, borderWidth: 2 }}
+                >
+                  חזרה
+                </Button>
+              </Col>
+            </Row>
 
             {errors.length > 0 && (
-              <div>
+              <div style={{ marginTop: 16 }}>
                 {errors.map((error, index) => (
                   <Alert
                     key={index}
-                    message="שגיאה"
-                    description={error}
+                    message={error}
                     type="error"
                     showIcon
                     style={{ marginBottom: 8, borderRadius: 8 }}
@@ -1730,18 +3058,335 @@ function DataViweing() {
                 ))}
               </div>
             )}
-          </Space>
+          </Form>
         </Card>
       </div>
     </ConfigProvider>
   )
 }
 
-export default DataViweing
+export default EditUserPage
+"use client"
+import axios from "axios"
+import { useContext, useEffect, useState } from "react"
+import type { InvoiceDto } from "../models/InvoiceDto"
+import { globalContext } from "../context/GlobalContext"
+import {
+  Form,
+  InputNumber,
+  Button,
+  Typography,
+  Card,
+  Row,
+  Col,
+  Alert,
+  Statistic,
+  ConfigProvider,
+  Divider,
+  Avatar,
+  Spin,
+} from "antd"
+import {
+  DollarOutlined,
+  MinusCircleOutlined,
+  SendOutlined,
+  FileTextOutlined,
+  WarningOutlined,
+  DingdingOutlined,
+  BarChartOutlined,
+  ClearOutlined,
+} from "@ant-design/icons"
+
+const { Title, Text } = Typography
+
+const IncomAndExpennses = () => {
+  const [income, setIncome] = useState(0)
+  const [expenditure, setExpenditure] = useState(0)
+  const [success, setSuccess] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [summaryLoading, setSummaryLoading] = useState(true)
+  const [financialSummary, setFinancialSummary] = useState<any[]>([])
+
+  const globalContextDetails = useContext(globalContext)
+
+  const fetchSummaryData = async () => {
+    const businessId = globalContextDetails.user.businessId
+    const now = new Date()
+    const year = now.getFullYear()
+    const month = now.getMonth() + 1
+
+    try {
+      const response = await axios.get(`https://localhost:7031/api/Reports/monthly?businessId=${businessId}&year=${year}&month=${month}`, {
+        withCredentials: true,
+      })
+
+      const data = response.data
+
+      const summary = [
+        {
+          title: "הכנסות החודש",
+          amount: data.currentMonthIncome,
+          change: data.incomeChangePercent,
+          icon: <WarningOutlined />,
+          color: "#52c41a",
+        },
+        {
+          title: "הוצאות החודש",
+          amount: data.currentMonthExpenses,
+          change: data.expensesChangePercent,
+          icon: <DingdingOutlined />,
+          color: "#ff4d4f",
+        },
+        {
+          title: "רווח נקי",
+          amount: data.currentMonthNetProfit,
+          change: data.netProfitChangePercent,
+          icon: <BarChartOutlined />,
+          color: "#1890ff",
+        },
+      ]
+
+      setFinancialSummary(summary)
+    } catch (err) {
+      console.error("Failed to fetch financial summary", err)
+      setError("שגיאה בטעינת סיכום פיננסי.")
+    } finally {
+      setSummaryLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchSummaryData()
+  }, [])
+
+  const handleSubmit = async () => {
+    setLoading(true)
+    setSuccess(false)
+    setError(null)
+
+    const invoiceToSend: InvoiceDto = {
+      id: 0,
+      amountDebit: expenditure,
+      amountCredit: income,
+      invoiceDate: new Date(),
+      status: 1,
+      notes: "",
+      createdAt: new Date(),
+      createdBy: globalContextDetails.user.firstName + " " + globalContextDetails.user.lastName,
+      updatedAt: new Date(),
+      updatedBy: globalContextDetails.user.firstName + " " + globalContextDetails.user.lastName,
+      invoicePath: "",
+      userId: globalContextDetails.user.id,
+      businessId: globalContextDetails.user.businessId ?? 0,
+    }
+
+    try {
+      await axios.post("https://localhost:7031/api/Invoice", invoiceToSend, { withCredentials: true })
+      setSuccess(true)
+      setIncome(0)
+      setExpenditure(0)
+      fetchSummaryData() // טען מחדש את הסיכום אחרי שמירת תנועה
+    } catch (error) {
+      console.error("Error saving invoice:", error)
+      setError("אירעה שגיאה בשמירת הנתונים. אנא נסה שנית.")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleReset = () => {
+    setIncome(0)
+    setExpenditure(0)
+    setSuccess(false)
+    setError(null)
+  }
+
+  return (
+    <ConfigProvider direction="rtl">
+      <div style={{ padding: "0 0 40px 0", marginTop: "80vh" }}>
+        <Card className="form-section" style={{ marginBottom: 32 }}>
+          <div style={{ textAlign: "center", marginBottom: 32 }}>
+            <Avatar
+              size={80}
+              style={{
+                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                marginBottom: 16,
+                boxShadow: "0 4px 14px rgba(102, 126, 234, 0.3)",
+              }}
+            >
+              <FileTextOutlined style={{ fontSize: 40 }} />
+            </Avatar>
+
+            <Title level={2} style={{ marginBottom: 8, color: "#2d3748" }}>
+              ניהול הכנסות והוצאות
+            </Title>
+
+            <Text type="secondary" style={{ fontSize: 16 }}>
+              הזן את ההכנסות וההוצאות של העסק שלך לניהול פיננסי יעיל
+            </Text>
+
+            <Divider />
+          </div>
+
+          {/* Financial Summary */}
+          {summaryLoading ? (
+            <div style={{ textAlign: "center", marginBottom: 40 }}>
+              <Spin size="large" />
+            </div>
+          ) : (
+            <Row gutter={[24, 24]} style={{ marginBottom: 40 }}>
+              {financialSummary.map((item, index) => (
+                <Col xs={24} md={8} key={index}>
+                  <Card className="financial-summary-card">
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+                      <Title level={5} style={{ margin: 0, color: "#2d3748" }}>
+                        {item.title}
+                      </Title>
+                      <Avatar size={48} style={{ background: `${item.color}20`, color: item.color }}>
+                        {item.icon}
+                      </Avatar>
+                    </div>
+                    <Statistic
+                      value={item.amount}
+                      prefix="₪"
+                      valueStyle={{ color: item.color, fontSize: "1.8rem", fontWeight: "bold" }}
+                    />
+                    <div style={{ display: "flex", alignItems: "center", marginTop: 8 }}>
+                      <Text
+                        style={{
+                          color: item.change > 0 ? "#52c41a" : "#ff4d4f",
+                          fontWeight: 600,
+                          marginLeft: 8,
+                        }}
+                      >
+                        {item.change > 0 ? "+" : ""}
+                        {item.change}%
+                      </Text>
+                      <Text type="secondary">מהחודש הקודם</Text>
+                    </div>
+                  </Card>
+                </Col>
+              ))}
+            </Row>
+          )}
+
+          <Form layout="vertical" onFinish={handleSubmit}>
+            <Title level={4} style={{ marginBottom: 24 }}>
+              הוספת תנועה חדשה
+            </Title>
+
+            <Row gutter={[24, 24]}>
+              <Col xs={24} md={12}>
+                <Card className="income-card" style={{ height: "100%" }}>
+                  <div style={{ display: "flex", alignItems: "center", marginBottom: 20 }}>
+                    <Avatar style={{ background: "#52c41a", color: "white", marginLeft: 12 }}>
+                      <DollarOutlined />
+                    </Avatar>
+                    <Title level={5} style={{ margin: 0, color: "#389e0d" }}>
+                      הכנסות
+                    </Title>
+                  </div>
+                  <Form.Item label="סכום ההכנסה" required>
+                    <InputNumber
+                      size="large"
+                      style={{ width: "100%" }}
+                      placeholder="הזן סכום הכנסה"
+                      value={income || undefined}
+                      onChange={(value) => setIncome(value || 0)}
+                      prefix="₪"
+                      formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                      parser={(value) => parseFloat(value!.replace(/\$\s?|(,*)/g, "")) || 0}
+                    />
+                  </Form.Item>
+                </Card>
+              </Col>
+
+              <Col xs={24} md={12}>
+                <Card className="expense-card" style={{ height: "100%" }}>
+                  <div style={{ display: "flex", alignItems: "center", marginBottom: 20 }}>
+                    <Avatar style={{ background: "#ff4d4f", color: "white", marginLeft: 12 }}>
+                      <MinusCircleOutlined />
+                    </Avatar>
+                    <Title level={5} style={{ margin: 0, color: "#cf1322" }}>
+                      הוצאות
+                    </Title>
+                  </div>
+                  <Form.Item label="סכום ההוצאה" required>
+                    <InputNumber
+                      size="large"
+                      style={{ width: "100%" }}
+                      placeholder="הזן סכום הוצאה"
+                      value={expenditure || undefined}
+                      onChange={(value) => setExpenditure(value || 0)}
+                      prefix="₪"
+                      formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                      parser={(value) => parseFloat(value!.replace(/\$\s?|(,*)/g, "")) || 0}
+                    />
+                  </Form.Item>
+                </Card>
+              </Col>
+            </Row>
+
+            <Row gutter={[16, 16]} style={{ marginTop: 32 }}>
+              <Col xs={24} sm={12}>
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  size="large"
+                  loading={loading}
+                  icon={<SendOutlined />}
+                  block
+                  style={{ height: 48, fontWeight: 600, fontSize: 16 }}
+                >
+                  שמור נתונים
+                </Button>
+              </Col>
+
+              <Col xs={24} sm={12}>
+                <Button
+                  type="default"
+                  size="large"
+                  onClick={handleReset}
+                  icon={<ClearOutlined />}
+                  block
+                  style={{ height: 48, fontWeight: 600, borderWidth: 2 }}
+                >
+                  נקה טופס
+                </Button>
+              </Col>
+            </Row>
+
+            {success && (
+              <Alert
+                message="הנתונים נשמרו בהצלחה!"
+                description="התנועה הפיננסית נוספה למערכת בהצלחה."
+                type="success"
+                showIcon
+                style={{ marginTop: 24, borderRadius: 8, border: "1px solid #b7eb8f" }}
+              />
+            )}
+
+            {error && (
+              <Alert
+                message="שגיאה!"
+                description={error}
+                type="error"
+                showIcon
+                style={{ marginTop: 24, borderRadius: 8, border: "1px solid #ffccc7" }}
+              />
+            )}
+          </Form>
+        </Card>
+      </div>
+    </ConfigProvider>
+  )
+}
+
+export default IncomAndExpennses
 "use client"
 
 import { useContext } from "react"
-import { globalContext } from "../context/GlobalContext"
 import { Typography, Row, Col, Card, Button, Space, Avatar, Statistic, ConfigProvider } from "antd"
 import {
   DashboardOutlined,
@@ -1756,11 +3401,16 @@ import {
   FallOutlined,
 } from "@ant-design/icons"
 import { useNavigate } from "react-router-dom"
+import { globalContext } from "../context/GlobalContext"
 
 const { Title, Text, Paragraph } = Typography
 
-const Home = () => {
+const MyHome = () => {
   const globalContextDetails = useContext(globalContext)
+
+  if (!globalContextDetails) {
+    throw new Error("globalContext must be used within a GlobalContextProvider")
+  }
   const navigate = useNavigate()
 
   const menuItems = [
@@ -1835,9 +3485,9 @@ const Home = () => {
 
   return (
     <ConfigProvider direction="rtl">
-      <div style={{ padding: "1250px 0 40px 0" }}>
+      <div>
         {/* Hero Section */}
-        <div className="hero-section" style={{ position: "relative", zIndex: 1 }}>
+        <div className="hero-section" style={{ position: "relative", zIndex: 1, marginTop: "1300px" }}>
           <Row gutter={[32, 32]} align="middle">
             <Col xs={24} lg={14}>
               <Title level={1} style={{ color: "white", marginBottom: 16, fontSize: "2.5rem" }}>
@@ -2098,333 +3748,10 @@ const Home = () => {
   )
 }
 
-export default Home
-"use client"
-import axios from "axios"
-import { useContext, useState } from "react"
-import type { InvoiceDto } from "../models/InvoiceDto"
-import { globalContext } from "../context/GlobalContext"
-import {
-  Form,
-  InputNumber,
-  Button,
-  Typography,
-  Card,
-  Row,
-  Col,
-  Alert,
-  Statistic,
-  ConfigProvider,
-  Divider,
-  Avatar,
-} from "antd"
-import {
-  DollarOutlined,
-  MinusCircleOutlined,
-  SendOutlined,
-  FileTextOutlined,
-  WarningOutlined,
-  DingdingOutlined,
-  BarChartOutlined,
-  ClearOutlined,
-} from "@ant-design/icons"
-
-const { Title, Text } = Typography
-
-const IncomAndExpennses = () => {
-  const [income, setIncome] = useState(0)
-  const [expenditure, setExpenditure] = useState(0)
-  const [success, setSuccess] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
-  const globalContextDetails = useContext(globalContext)
-
-  const handleSubmit = async () => {
-    setLoading(true)
-    setSuccess(false)
-    setError(null)
-
-    const invoiceToSend: InvoiceDto = {
-      id: 0,
-      amountDebit: expenditure,
-      amountCredit: income,
-      invoiceDate: new Date(),
-      status: 1,
-      notes: "",
-      createdAt: new Date(),
-      createdBy: globalContextDetails.user.firstName + " " + globalContextDetails.user.lastName,
-      updatedAt: new Date(),
-      updatedBy: globalContextDetails.user.firstName + " " + globalContextDetails.user.lastName,
-      invoicePath: "",
-      userId: globalContextDetails.user.id,
-      businessId: globalContextDetails.user.businessId ?? 0,
-    }
-
-    try {
-      await axios.post("https://localhost:7031/api/Invoice", invoiceToSend, { withCredentials: true })
-      setSuccess(true)
-      setIncome(0)
-      setExpenditure(0)
-    } catch (error) {
-      console.error("Error saving invoice:", error)
-      setError("אירעה שגיאה בשמירת הנתונים. אנא נסה שנית.")
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleReset = () => {
-    setIncome(0)
-    setExpenditure(0)
-    setSuccess(false)
-    setError(null)
-  }
-
-  // Sample data for the financial summary
-  const financialSummary = [
-    {
-      title: "הכנסות החודש",
-      amount: 15750,
-      change: 12,
-      icon: <WarningOutlined />,
-      color: "#52c41a",
-    },
-    {
-      title: "הוצאות החודש",
-      amount: 8320,
-      change: -5,
-      icon: <DingdingOutlined />,
-      color: "#ff4d4f",
-    },
-    {
-      title: "רווח נקי",
-      amount: 7430,
-      change: 18,
-      icon: <BarChartOutlined />,
-      color: "#1890ff",
-    },
-  ]
-
-  return (
-    <ConfigProvider direction="rtl">
-      <div style={{ padding: "0 0 40px 0" }}>
-        <Card className="form-section" style={{ marginBottom: 32 }}>
-          <div style={{ textAlign: "center", marginBottom: 32 }}>
-            <Avatar
-              size={80}
-              style={{
-                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                marginBottom: 16,
-                boxShadow: "0 4px 14px rgba(102, 126, 234, 0.3)",
-              }}
-            >
-              <FileTextOutlined style={{ fontSize: 40 }} />
-            </Avatar>
-
-            <Title level={2} style={{ marginBottom: 8, color: "#2d3748" }}>
-              ניהול הכנסות והוצאות
-            </Title>
-
-            <Text type="secondary" style={{ fontSize: 16 }}>
-              הזן את ההכנסות וההוצאות של העסק שלך לניהול פיננסי יעיל
-            </Text>
-
-            <Divider />
-          </div>
-
-          {/* Financial Summary */}
-          <Row gutter={[24, 24]} style={{ marginBottom: 40 }}>
-            {financialSummary.map((item, index) => (
-              <Col xs={24} md={8} key={index}>
-                <Card className="financial-summary-card">
-                  <div
-                    style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}
-                  >
-                    <Title level={5} style={{ margin: 0, color: "#2d3748" }}>
-                      {item.title}
-                    </Title>
-                    <Avatar
-                      size={48}
-                      style={{
-                        background: `${item.color}20`,
-                        color: item.color,
-                      }}
-                    >
-                      {item.icon}
-                    </Avatar>
-                  </div>
-                  <Statistic
-                    value={item.amount}
-                    prefix="₪"
-                    valueStyle={{
-                      color: item.color,
-                      fontSize: "1.8rem",
-                      fontWeight: "bold",
-                    }}
-                  />
-                  <div style={{ display: "flex", alignItems: "center", marginTop: 8 }}>
-                    <Text
-                      style={{
-                        color: item.change > 0 ? "#52c41a" : "#ff4d4f",
-                        fontWeight: 600,
-                        marginLeft: 8,
-                      }}
-                    >
-                      {item.change > 0 ? "+" : ""}
-                      {item.change}%
-                    </Text>
-                    <Text type="secondary">מהחודש הקודם</Text>
-                  </div>
-                </Card>
-              </Col>
-            ))}
-          </Row>
-
-          <Form layout="vertical" onFinish={handleSubmit}>
-            <Title level={4} style={{ marginBottom: 24 }}>
-              הוספת תנועה חדשה
-            </Title>
-
-            <Row gutter={[24, 24]}>
-              <Col xs={24} md={12}>
-                <Card className="income-card" style={{ height: "100%" }}>
-                  <div style={{ display: "flex", alignItems: "center", marginBottom: 20 }}>
-                    <Avatar
-                      style={{
-                        background: "#52c41a",
-                        color: "white",
-                        marginLeft: 12,
-                      }}
-                    >
-                      <DollarOutlined />
-                    </Avatar>
-                    <Title level={5} style={{ margin: 0, color: "#389e0d" }}>
-                      הכנסות
-                    </Title>
-                  </div>
-                  <Form.Item label="סכום ההכנסה" required>
-                    <InputNumber
-                      size="large"
-                      style={{ width: "100%" }}
-                      placeholder="הזן סכום הכנסה"
-                      value={income || undefined}
-                      onChange={(value) => setIncome(value || 0)}
-                      prefix="₪"
-                      formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-                      parser={(value) => parseFloat(value!.replace(/\$\s?|(,*)/g, "")) || 0}
-                    />
-                  </Form.Item>
-                </Card>
-              </Col>
-
-              <Col xs={24} md={12}>
-                <Card className="expense-card" style={{ height: "100%" }}>
-                  <div style={{ display: "flex", alignItems: "center", marginBottom: 20 }}>
-                    <Avatar
-                      style={{
-                        background: "#ff4d4f",
-                        color: "white",
-                        marginLeft: 12,
-                      }}
-                    >
-                      <MinusCircleOutlined />
-                    </Avatar>
-                    <Title level={5} style={{ margin: 0, color: "#cf1322" }}>
-                      הוצאות
-                    </Title>
-                  </div>
-                  <Form.Item label="סכום ההוצאה" required>
-                    <InputNumber
-                      size="large"
-                      style={{ width: "100%" }}
-                      placeholder="הזן סכום הוצאה"
-                      value={expenditure || undefined}
-                      onChange={(value) => setExpenditure(value || 0)}
-                      prefix="₪"
-                      formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-                      parser={(value) => parseFloat(value!.replace(/\$\s?|(,*)/g, "")) || 0}
-                    />
-                  </Form.Item>
-                </Card>
-              </Col>
-            </Row>
-
-            <Row gutter={[16, 16]} style={{ marginTop: 32 }}>
-              <Col xs={24} sm={12}>
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  size="large"
-                  loading={loading}
-                  icon={<SendOutlined />}
-                  block
-                  style={{
-                    height: 48,
-                    fontWeight: 600,
-                    fontSize: 16,
-                  }}
-                >
-                  שמור נתונים
-                </Button>
-              </Col>
-
-              <Col xs={24} sm={12}>
-                <Button
-                  type="default"
-                  size="large"
-                  onClick={handleReset}
-                  icon={<ClearOutlined />}
-                  block
-                  style={{
-                    height: 48,
-                    fontWeight: 600,
-                    borderWidth: 2,
-                  }}
-                >
-                  נקה טופס
-                </Button>
-              </Col>
-            </Row>
-
-            {success && (
-              <Alert
-                message="הנתונים נשמרו בהצלחה!"
-                description="התנועה הפיננסית נוספה למערכת בהצלחה."
-                type="success"
-                showIcon
-                style={{
-                  marginTop: 24,
-                  borderRadius: 8,
-                  border: "1px solid #b7eb8f",
-                }}
-              />
-            )}
-
-            {error && (
-              <Alert
-                message="שגיאה!"
-                description={error}
-                type="error"
-                showIcon
-                style={{
-                  marginTop: 24,
-                  borderRadius: 8,
-                  border: "1px solid #ffccc7",
-                }}
-              />
-            )}
-          </Form>
-        </Card>
-      </div>
-    </ConfigProvider>
-  )
-}
-
-export default IncomAndExpennses
+export default MyHome
 "use client"
 
 import type React from "react"
-
 import {
   Box,
   Typography,
@@ -2439,26 +3766,31 @@ import {
   Tabs,
   Tab,
   Divider,
+  CircularProgress,
 } from "@mui/material"
-import { BarChart, PieChart, Timeline, Assessment, TrendingUp, TrendingDown, ShowChart } from "@mui/icons-material"
-import { useState } from "react"
+import {
+  BarChart,
+  PieChart,
+  Timeline,
+  Assessment,
+  TrendingUp,
+  TrendingDown,
+  QueryStats,
+} from "@mui/icons-material"
+import { useContext, useEffect, useState } from "react"
+import axios from "axios"
+import { globalContext } from "../context/GlobalContext"
+import { ProdactionReportData } from "../models/ProdactionReportData"
 
-// Create a custom theme with RTL support and Hebrew font
 const theme = createTheme({
   direction: "rtl",
   typography: {
     fontFamily: '"Assistant", "Rubik", "Heebo", sans-serif',
   },
   palette: {
-    primary: {
-      main: "#3f51b5",
-    },
-    secondary: {
-      main: "#f50057",
-    },
-    background: {
-      default: "#f5f5f5",
-    },
+    primary: { main: "#3f51b5" },
+    secondary: { main: "#f50057" },
+    background: { default: "#f5f5f5" },
   },
   components: {
     MuiCard: {
@@ -2474,52 +3806,50 @@ const theme = createTheme({
 
 const ProductionReports = () => {
   const [tabValue, setTabValue] = useState(0)
+  const [reportData, setReportData] = useState<ProdactionReportData | null>(null)
+  const [loading, setLoading] = useState(true)
+  const globalContextDetails = useContext(globalContext)
+  const url = import.meta.env.VITE_API_URL
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue)
   }
 
+  useEffect(() => {
+    const fetchReport = async () => {
+      try {
+        const { data } = await axios.get(
+          `${url}/api/Reports/business-report/${globalContextDetails.business_global.id}`,
+          { withCredentials: true }
+        )
+        setReportData(data)
+      } catch (error) {
+        console.error("שגיאה בטעינת דוח ייצור:", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchReport()
+  }, [])
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Box
-        sx={{
-          minHeight: "100vh",
-          background: "linear-gradient(to bottom, #f5f7ff, #ffffff)",
-          py: 4,
-        }}
-      >
+      <Box sx={{ minHeight: "100vh", background: "linear-gradient(to bottom, #f5f7ff, #ffffff)", py: 4 }}>
         <Container>
-          <Paper
-            elevation={3}
-            sx={{
-              p: 4,
-              borderRadius: 3,
-              boxShadow: "0 8px 32px rgba(0, 0, 0, 0.1)",
-            }}
-          >
+          <Paper elevation={3} sx={{ p: 4, borderRadius: 3 }}>
             <Box sx={{ textAlign: "center", mb: 4 }}>
               <Assessment color="primary" sx={{ fontSize: 48, mb: 2 }} />
-              <Typography variant="h4" component="h1" gutterBottom fontWeight="bold">
-                דוחות ייצור
+              <Typography variant="h4" fontWeight="bold">
+                דוח ייצור - {reportData?.businessName ?? "טוען..."}
               </Typography>
               <Typography variant="body1" color="text.secondary">
-                צפה בנתוני הייצור והביצועים של העסק שלך
+                צפה בביצועי הייצור של העסק שלך
               </Typography>
             </Box>
 
-            <Tabs
-              value={tabValue}
-              onChange={handleTabChange}
-              variant="fullWidth"
-              sx={{ mb: 4 }}
-              TabIndicatorProps={{
-                style: {
-                  height: 4,
-                  borderRadius: 4,
-                },
-              }}
-            >
+            <Tabs value={tabValue} onChange={handleTabChange} variant="fullWidth" sx={{ mb: 4 }}>
               <Tab icon={<BarChart />} label="סקירה כללית" />
               <Tab icon={<Timeline />} label="מגמות" />
               <Tab icon={<PieChart />} label="התפלגות" />
@@ -2527,152 +3857,80 @@ const ProductionReports = () => {
 
             <Divider sx={{ mb: 4 }} />
 
-            {tabValue === 0 && (
+            {loading ? (
+              <Box sx={{ display: "flex", justifyContent: "center", py: 10 }}>
+                <CircularProgress />
+              </Box>
+            ) : reportData && tabValue === 0 ? (
               <Grid container spacing={3}>
-                <Grid item xs={12} md={6} lg={3} {...({} as any)}>
-                  <Card>
-                    <CardContent sx={{ p: 3 }}>
-                      <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                        <Box
-                          sx={{
-                            bgcolor: "primary.light",
-                            borderRadius: "50%",
-                            p: 1,
-                            mr: 2,
-                            display: "flex",
-                          }}
-                        >
-                          <BarChart color="primary" />
+                {[
+                  {
+                    label: "סה״כ הכנסות",
+                    value: `₪${reportData.totalIncome.toLocaleString()}`,
+                    icon: <TrendingUp color="success" />,
+                    color: "success.light",
+                  },
+                  {
+                    label: "סה״כ הוצאות",
+                    value: `₪${reportData.totalExpenses.toLocaleString()}`,
+                    icon: <TrendingDown color="error" />,
+                    color: "error.light",
+                  },
+                  {
+                    label: "רווח נקי",
+                    value: `₪${reportData.netProfit.toLocaleString()}`,
+                    icon: <QueryStats color="primary" />,
+                    color: "primary.light",
+                  },
+                  {
+                    label: "תזרים מזומנים",
+                    value: `₪${reportData.cashFlow.toLocaleString()}`,
+                    icon: <BarChart color="secondary" />,
+                    color: "secondary.light",
+                  },
+                  {
+                    label: "מספר חשבוניות",
+                    value: `${reportData.invoiceCount}`,
+                    icon: <Assessment color="info" />,
+                    color: "info.light",
+                  },
+                  {
+                    label: "סה״כ חיובים",
+                    value: `₪${reportData.totalDebit.toLocaleString()}`,
+                    icon: <TrendingDown color="warning" />,
+                    color: "warning.light",
+                  },
+                  {
+                    label: "סה״כ זיכויים",
+                    value: `₪${reportData.totalCredit.toLocaleString()}`,
+                    icon: <TrendingUp color="info" />,
+                    color: "info.light",
+                  },
+                  {
+                    label: "תאריך הדוח",
+                    value: new Date(reportData.reportDate).toLocaleDateString("he-IL"),
+                    icon: <Timeline color="disabled" />,
+                    color: "grey.300",
+                  },
+                ].map((item, index) => (
+                  <Grid item xs={12} md={6} lg={3} key={index} {...({} as any)}>
+                    <Card>
+                      <CardContent sx={{ p: 3 }}>
+                        <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                          <Box sx={{ bgcolor: item.color, borderRadius: "50%", p: 1, mr: 2 }}>{item.icon}</Box>
+                          <Typography variant="h6" fontWeight="bold">
+                            {item.label}
+                          </Typography>
                         </Box>
-                        <Typography variant="h6" fontWeight="bold">
-                          סה"כ ייצור
+                        <Typography variant="h4" fontWeight="bold">
+                          {item.value}
                         </Typography>
-                      </Box>
-                      <Typography variant="h4" fontWeight="bold" color="primary.main">
-                        1,245
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        יחידות בחודש האחרון
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                </Grid>
-
-                <Grid item xs={12} md={6} lg={3} {...({} as any)}>
-                  <Card>
-                    <CardContent sx={{ p: 3 }}>
-                      <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                        <Box
-                          sx={{
-                            bgcolor: "success.light",
-                            borderRadius: "50%",
-                            p: 1,
-                            mr: 2,
-                            display: "flex",
-                          }}
-                        >
-                          <TrendingUp color="success" />
-                        </Box>
-                        <Typography variant="h6" fontWeight="bold">
-                          יעילות
-                        </Typography>
-                      </Box>
-                      <Typography variant="h4" fontWeight="bold" color="success.main">
-                        92%
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        שיפור של 3% מהחודש הקודם
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                </Grid>
-
-                <Grid item xs={12} md={6} lg={3} {...({} as any)}>
-                  <Card>
-                    <CardContent sx={{ p: 3 }}>
-                      <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                        <Box
-                          sx={{
-                            bgcolor: "error.light",
-                            borderRadius: "50%",
-                            p: 1,
-                            mr: 2,
-                            display: "flex",
-                          }}
-                        >
-                          <TrendingDown color="error" />
-                        </Box>
-                        <Typography variant="h6" fontWeight="bold">
-                          פחת
-                        </Typography>
-                      </Box>
-                      <Typography variant="h4" fontWeight="bold" color="error.main">
-                        2.4%
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        ירידה של 0.8% מהחודש הקודם
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                </Grid>
-
-                <Grid item xs={12} md={6} lg={3} {...({} as any)}>
-                  <Card>
-                    <CardContent sx={{ p: 3 }}>
-                      <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                        <Box
-                          sx={{
-                            bgcolor: "secondary.light",
-                            borderRadius: "50%",
-                            p: 1,
-                            mr: 2,
-                            display: "flex",
-                          }}
-                        >
-                          <ShowChart color="secondary" />
-                        </Box>
-                        <Typography variant="h6" fontWeight="bold">
-                          עלות ייצור
-                        </Typography>
-                      </Box>
-                      <Typography variant="h4" fontWeight="bold" color="secondary.main">
-                        ₪85
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        עלות ממוצעת ליחידה
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                </Grid>
-
-                <Grid item xs={12} {...({} as any)}>
-                  <Card sx={{ mt: 2 }}>
-                    <CardContent sx={{ p: 3 }}>
-                      <Typography variant="h6" fontWeight="bold" gutterBottom>
-                        נתוני ייצור חודשיים
-                      </Typography>
-                      <Box
-                        sx={{
-                          height: 300,
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          bgcolor: "grey.100",
-                          borderRadius: 2,
-                          p: 2,
-                        }}
-                      >
-                        <Typography variant="body1" color="text.secondary">
-                          כאן יוצג גרף נתוני הייצור החודשיים
-                        </Typography>
-                      </Box>
-                    </CardContent>
-                  </Card>
-                </Grid>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                ))}
               </Grid>
-            )}
-
-            {tabValue === 1 && (
+            ) : tabValue === 1 ? (
               <Box
                 sx={{
                   height: 400,
@@ -2688,9 +3946,7 @@ const ProductionReports = () => {
                   כאן יוצגו נתוני המגמות
                 </Typography>
               </Box>
-            )}
-
-            {tabValue === 2 && (
+            ) : tabValue === 2 ? (
               <Box
                 sx={{
                   height: 400,
@@ -2706,6 +3962,8 @@ const ProductionReports = () => {
                   כאן תוצג התפלגות הנתונים
                 </Typography>
               </Box>
+            ) : (
+              <Typography color="error">שגיאה בטעינת הנתונים</Typography>
             )}
           </Paper>
         </Container>
@@ -2864,6 +4122,8 @@ const RegisterBusinessData = ({ onSubmitSuccess }: { onSubmitSuccess?: () => voi
 
   return (
     <ThemeProvider theme={theme}>
+            <div style={{marginTop: "50vh"}}></div>
+
       <CssBaseline />
       <Container maxWidth="md">
         <Paper
@@ -3140,8 +4400,31 @@ export default RegisterBusinessData
 "use client"
 import { useState } from "react"
 import axios from "axios"
-import { Upload, Button, Typography, Card, Alert, Progress, ConfigProvider, Space, Avatar, Divider } from "antd"
-import { CloudUploadOutlined, CheckCircleOutlined, ExclamationCircleOutlined, InboxOutlined } from "@ant-design/icons"
+import {
+  Upload,
+  Button,
+  Typography,
+  Card,
+  Alert,
+  Progress,
+  ConfigProvider,
+  Space,
+  Avatar,
+  Divider,
+  Row,
+  Col,
+} from "antd"
+import {
+  CloudUploadOutlined,
+  CheckCircleOutlined,
+  ExclamationCircleOutlined,
+  InboxOutlined,
+  FileOutlined,
+  DeleteOutlined,
+  EyeOutlined,
+  DownloadOutlined,
+  RocketOutlined,
+} from "@ant-design/icons"
 import type { UploadProps } from "antd"
 
 const { Title, Text } = Typography
@@ -3153,6 +4436,8 @@ const UploadFiles = () => {
   const [error, setError] = useState<string | null>(null)
   const [uploading, setUploading] = useState(false)
   const [progress, setProgress] = useState(0)
+  const [uploadComplete, setUploadComplete] = useState(false)
+  const [dragActive, setDragActive] = useState(false)
 
   const url = import.meta.env.VITE_API_URL
 
@@ -3164,13 +4449,19 @@ const UploadFiles = () => {
       setFile(file)
       setMessage(null)
       setError(null)
+      setUploadComplete(false)
       return false // Prevent automatic upload
     },
     onRemove: () => {
       setFile(null)
       setMessage(null)
       setError(null)
+      setUploadComplete(false)
+      setProgress(0)
     },
+    // Removed onDragEnter as it is not a valid property of UploadProps
+    // onDragLeave: () => setDragActive(false),
+    onDrop: () => setDragActive(false),
   }
 
   const handleSubmit = async () => {
@@ -3186,16 +4477,16 @@ const UploadFiles = () => {
     formData.append("fileUpload", file)
 
     try {
-      // Simulate progress for better UX
+      // Simulate realistic progress
       const progressInterval = setInterval(() => {
         setProgress((prev) => {
           if (prev >= 90) {
             clearInterval(progressInterval)
             return 90
           }
-          return prev + 10
+          return prev + Math.random() * 15
         })
-      }, 300)
+      }, 200)
 
       const response = await axios.post(`${url}/FileUpload/upload`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
@@ -3209,8 +4500,8 @@ const UploadFiles = () => {
         setMessage(response.data.message || "הקובץ הועלה בהצלחה")
         setError(null)
         setUploading(false)
-        setFile(null)
-      }, 500)
+        setUploadComplete(true)
+      }, 800)
     } catch (err: any) {
       setProgress(0)
       setUploading(false)
@@ -3220,108 +4511,304 @@ const UploadFiles = () => {
     }
   }
 
+  const formatFileSize = (bytes: number) => {
+    if (bytes === 0) return "0 Bytes"
+    const k = 1024
+    const sizes = ["Bytes", "KB", "MB", "GB"]
+    const i = Math.floor(Math.log(bytes) / Math.log(k))
+    return Number.parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i]
+  }
+
+  const getFileIcon = (fileName: string) => {
+    const extension = fileName.split(".").pop()?.toLowerCase()
+    switch (extension) {
+      case "pdf":
+        return <FileOutlined style={{ color: "#ff4d4f" }} />
+      case "jpg":
+      case "jpeg":
+      case "png":
+        return <FileOutlined style={{ color: "#52c41a" }} />
+      case "docx":
+      case "doc":
+        return <FileOutlined style={{ color: "#1890ff" }} />
+      default:
+        return <FileOutlined style={{ color: "#666" }} />
+    }
+  }
+
   return (
     <ConfigProvider direction="rtl">
-      <div style={{ maxWidth: 800, margin: "0 auto", padding: "40px 20px" }}>
+      <div className="upload-container" style={{ maxWidth: 900, margin: "0 auto", marginTop: "45vh" }}>
         <Card className="form-section">
           <div style={{ textAlign: "center", marginBottom: 32 }}>
             <Avatar
               size={80}
+              className="upload-avatar"
               style={{
                 background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
                 marginBottom: 16,
                 boxShadow: "0 4px 14px rgba(102, 126, 234, 0.3)",
               }}
             >
-              <CloudUploadOutlined style={{ fontSize: 40 }} />
+              <RocketOutlined style={{ fontSize: 40 }} />
             </Avatar>
 
-            <Title level={2} style={{ marginBottom: 8, color: "#2d3748" }}>
-              העלאת קבצים
+            <Title level={2} style={{ marginBottom: 8, color: "#2d3748" , textAlign:"center"}}>
+              העלאת קבצים וניתוח נתונים לעסק עם AI
             </Title>
 
             <Text type="secondary" style={{ fontSize: 16 }}>
-              בחר קובץ להעלאה למערכת
+              גרור קבצים או לחץ לבחירה - תמיכה מלאה בכל סוגי הקבצים
             </Text>
 
             <Divider />
           </div>
 
-          <Dragger
-            {...uploadProps}
-            style={{
-              background: "linear-gradient(145deg, #f8fafc, #ffffff)",
-              border: "2px dashed #667eea",
-              borderRadius: 16,
-              padding: "40px 20px",
-              marginBottom: 24,
-            }}
-          >
-            <p className="ant-upload-drag-icon">
-              <InboxOutlined style={{ fontSize: 64, color: "#667eea" }} />
-            </p>
-            <Title level={4} style={{ color: "#2d3748", marginBottom: 8 }}>
-              גרור קובץ לכאן או לחץ לבחירת קובץ
-            </Title>
-            <Text type="secondary" style={{ fontSize: 14 }}>
-              תומך בקבצים מסוג JPG, PNG, PDF, DOCX, TXT
-            </Text>
-          </Dragger>
-
-          {uploading && (
-            <div style={{ marginBottom: 24 }}>
-              <Text style={{ marginBottom: 8, display: "block" }}>מעלה... {progress}%</Text>
-              <Progress
-                percent={progress}
-                strokeColor={{
-                  "0%": "#667eea",
-                  "100%": "#764ba2",
+          <Row gutter={[24, 24]}>
+            <Col xs={24} lg={16}>
+              <Dragger
+                {...uploadProps}
+                className={`upload-dragger ${dragActive ? "drag-active" : ""}`}
+                style={{
+                  background: dragActive
+                    ? "linear-gradient(145deg, #f0f7ff, #e6f4ff)"
+                    : "linear-gradient(145deg, #f8fafc, #ffffff)",
+                  border: dragActive ? "3px dashed #1890ff" : "2px dashed #667eea",
+                  borderRadius: 20,
+                  padding: "60px 20px",
+                  marginBottom: 24,
+                  position: "relative",
+                  overflow: "hidden",
+                  transition: "all 0.3s ease",
                 }}
-                style={{ marginBottom: 16 }}
-              />
-            </div>
+              >
+                <div style={{ position: "relative", zIndex: 2, display:"flex", alignItems:"center", justifyContent:"center", flexDirection:"column" }}>
+                  <p className="ant-upload-drag-icon">
+                    <InboxOutlined
+                      style={{
+                        fontSize: 80,
+                        color: dragActive ? "#1890ff" : "#667eea",
+                        transition: "all 0.3s ease",
+                      }}
+                    />
+                  </p>
+                  <Title
+                    level={3}
+                    style={{
+                      color: "#2d3748",
+                      marginBottom: 12,
+                      transition: "all 0.3s ease",
+                    }}
+                  >
+                    {dragActive ? "שחרר כאן!" : "גרור קובץ לכאן או לחץ לבחירה"}
+                  </Title>
+                  <Text type="secondary" style={{ fontSize: 16, display: "block", marginBottom: 16 }}>
+                    תומך בקבצים מסוג JPG, PNG, PDF, DOCX, TXT
+                  </Text>
+                  <Text type="secondary" style={{ fontSize: 14 }}>
+                    גודל מקסימלי: 10MB
+                  </Text>
+                </div>
+              </Dragger>
+
+              {file && (
+                <Card
+                  size="small"
+                  style={{
+                    marginBottom: 24,
+                    background: "linear-gradient(145deg, #f0f9ff, #ffffff)",
+                    border: "1px solid #e6f4ff",
+                    borderRadius: 12,
+                  }}
+                >
+                  <Row align="middle" gutter={[16, 16]}>
+                    <Col flex="auto">
+                      <Space>
+                        {getFileIcon(file.name)}
+                        <div>
+                          <Text strong>{file.name}</Text>
+                          <br />
+                          <Text type="secondary" style={{ fontSize: 12 }}>
+                            {formatFileSize(file.size)}
+                          </Text>
+                        </div>
+                      </Space>
+                    </Col>
+                    <Col>
+                      <Space>
+                        <Button type="text" icon={<EyeOutlined />} size="small" style={{ color: "#1890ff" }}>
+                          תצוגה מקדימה
+                        </Button>
+                        <Button
+                          type="text"
+                          icon={<DeleteOutlined />}
+                          size="small"
+                          danger
+                          onClick={() => {
+                            setFile(null)
+                            setMessage(null)
+                            setError(null)
+                            setUploadComplete(false)
+                          }}
+                        >
+                          הסר
+                        </Button>
+                      </Space>
+                    </Col>
+                  </Row>
+                </Card>
+              )}
+
+              {uploading && (
+                <Card
+                  size="small"
+                  style={{
+                    marginBottom: 24,
+                    background: "linear-gradient(145deg, #fff7e6, #ffffff)",
+                    border: "1px solid #ffd591",
+                  }}
+                >
+                  <Space direction="vertical" style={{ width: "100%" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                      <Text strong>מעלה קובץ...</Text>
+                      <Text style={{ color: "#fa8c16" }}>{Math.round(progress)}%</Text>
+                    </div>
+                    <Progress
+                      percent={progress}
+                      strokeColor={{
+                        "0%": "#667eea",
+                        "50%": "#764ba2",
+                        "100%": "#52c41a",
+                      }}
+                      strokeWidth={8}
+                      style={{ marginBottom: 8 }}
+                      showInfo={false}
+                    />
+                    <Text type="secondary" style={{ fontSize: 12 }}>
+                      {progress < 30 && "מתחיל העלאה..."}
+                      {progress >= 30 && progress < 60 && "מעלה נתונים..."}
+                      {progress >= 60 && progress < 90 && "מעבד קובץ..."}
+                      {progress >= 90 && "משלים העלאה..."}
+                    </Text>
+                  </Space>
+                </Card>
+              )}
+            </Col>
+
+            <Col xs={24} lg={8}>
+              <Card title="פעולות מהירות" size="small" style={{ marginBottom: 24 }}>
+                <Space direction="vertical" style={{ width: "100%" }}>
+                  <Button
+                    type="primary"
+                    size="large"
+                    disabled={!file || uploading}
+                    loading={uploading}
+                    icon={uploadComplete ? <CheckCircleOutlined /> : <CloudUploadOutlined />}
+                    onClick={handleSubmit}
+                    block
+                    style={{
+                      height: 48,
+                      fontWeight: 600,
+                      fontSize: 16,
+                      background: uploadComplete ? "linear-gradient(135deg, #52c41a 0%, #389e0d 100%)" : undefined,
+                    }}
+                  >
+                    {uploading ? "מעלה..." : uploadComplete ? "הועלה בהצלחה!" : "העלה קובץ"}
+                  </Button>
+
+                  {uploadComplete && (
+                    <Button
+                      type="default"
+                      size="large"
+                      icon={<DownloadOutlined />}
+                      block
+                      style={{
+                        height: 40,
+                        fontWeight: 600,
+                        borderWidth: 2,
+                      }}
+                    >
+                      הורד קובץ
+                    </Button>
+                  )}
+                </Space>
+              </Card>
+
+              <Card title="מידע שימושי" size="small">
+                <Space direction="vertical" style={{ width: "100%" }}>
+                  <div>
+                    <Text strong style={{ color: "#52c41a" }}>
+                      ✓
+                    </Text>
+                    <Text style={{ marginRight: 8 }}>העלאה מאובטחת</Text>
+                  </div>
+                  <div>
+                    <Text strong style={{ color: "#52c41a" }}>
+                      ✓
+                    </Text>
+                    <Text style={{ marginRight: 8 }}>גיבוי אוטומטי</Text>
+                  </div>
+                  <div>
+                    <Text strong style={{ color: "#52c41a" }}>
+                      ✓
+                    </Text>
+                    <Text style={{ marginRight: 8 }}>סריקת וירוסים</Text>
+                  </div>
+                  <div>
+                    <Text strong style={{ color: "#52c41a" }}>
+                      ✓
+                    </Text>
+                    <Text style={{ marginRight: 8 }}>דחיסה אוטומטית</Text>
+                  </div>
+                </Space>
+              </Card>
+            </Col>
+          </Row>
+
+          {message && (
+            <Alert
+              message="הצלחה!"
+              description={
+                <Space direction="vertical">
+                  <Text>{message}</Text>
+                  <Text type="secondary">הקובץ נשמר בבטחה במערכת</Text>
+                </Space>
+              }
+              type="success"
+              showIcon
+              icon={<CheckCircleOutlined />}
+              style={{
+                borderRadius: 12,
+                border: "1px solid #b7eb8f",
+                background: "linear-gradient(145deg, #f6ffed, #ffffff)",
+              }}
+              action={
+                <Button size="small" type="primary" ghost>
+                  צפה בקובץ
+                </Button>
+              }
+            />
           )}
 
-          <Space direction="vertical" style={{ width: "100%" }}>
-            <Button
-              type="primary"
-              size="large"
-              disabled={!file || uploading}
-              loading={uploading}
-              icon={<CloudUploadOutlined />}
-              onClick={handleSubmit}
-              block
+          {error && (
+            <Alert
+              message="שגיאה!"
+              description={error}
+              type="error"
+              showIcon
+              icon={<ExclamationCircleOutlined />}
               style={{
-                height: 48,
-                fontWeight: 600,
-                fontSize: 16,
+                borderRadius: 12,
+                border: "1px solid #ffccc7",
+                background: "linear-gradient(145deg, #fff2f0, #ffffff)",
               }}
-            >
-              {uploading ? "מעלה..." : "העלה קובץ"}
-            </Button>
-
-            {message && (
-              <Alert
-                message="הצלחה!"
-                description={message}
-                type="success"
-                showIcon
-                icon={<CheckCircleOutlined />}
-                style={{ borderRadius: 8 }}
-              />
-            )}
-
-            {error && (
-              <Alert
-                message="שגיאה!"
-                description={error}
-                type="error"
-                showIcon
-                icon={<ExclamationCircleOutlined />}
-                style={{ borderRadius: 8 }}
-              />
-            )}
-          </Space>
+              action={
+                <Button size="small" danger ghost>
+                  נסה שוב
+                </Button>
+              }
+            />
+          )}
         </Card>
       </div>
     </ConfigProvider>
@@ -3378,7 +4865,8 @@ const UserLogin = () => {
 
   return (
     <ConfigProvider direction="rtl">
-      <CenteredLayout>
+      <div style={{marginTop: "50vh"}}></div>
+      <CenteredLayout >
         <Card className="login-form" style={{ maxWidth: 500, width: "100%" }}>
           <div style={{ textAlign: "center", marginBottom: 32 }}>
             <Avatar
@@ -3392,7 +4880,7 @@ const UserLogin = () => {
               <UserOutlined style={{ fontSize: 40 }} />
             </Avatar>
 
-            <Title level={2} style={{ marginBottom: 8, color: "#2d3748" }}>
+            <Title level={2} style={{ marginBottom: 8, color: "#2d3748" , textAlign:"center"}}>
               כניסת משתמש
             </Title>
 
@@ -3492,6 +4980,7 @@ const UserLogin = () => {
 }
 
 export default UserLogin
+import React, { useEffect, useState } from "react"
 import {
   Box,
   Typography,
@@ -3511,24 +5000,38 @@ import {
   Chip,
   Divider,
 } from "@mui/material"
-import { Person, Edit, Delete, Add, AdminPanelSettings, PersonOutline } from "@mui/icons-material"
+import {
+  Person,
+  Edit,
+  Delete,
+  Add,
+  AdminPanelSettings,
+  PersonOutline,
+} from "@mui/icons-material"
+import axios from "axios"
+import { useNavigate } from "react-router-dom"
+const url = import.meta.env.VITE_API_URL
 
-// Create a custom theme with RTL support and Hebrew font
+// טיפוס לנתוני המשתמש
+interface User {
+  id: number
+  firstName: string
+  lastName: string
+  email: string
+  phone: string
+  role: number // 0 = רגיל, 1 = מנהל
+}
+
+// ערכת נושא עם RTL וגופן עברי
 const theme = createTheme({
   direction: "rtl",
   typography: {
     fontFamily: '"Assistant", "Rubik", "Heebo", sans-serif',
   },
   palette: {
-    primary: {
-      main: "#3f51b5",
-    },
-    secondary: {
-      main: "#f50057",
-    },
-    background: {
-      default: "#f5f5f5",
-    },
+    primary: { main: "#3f51b5" },
+    secondary: { main: "#f50057" },
+    background: { default: "#f5f5f5" },
   },
   components: {
     MuiButton: {
@@ -3542,133 +5045,145 @@ const theme = createTheme({
   },
 })
 
-// Mock data for demonstration
-const mockUsers = [
-  { id: 1, firstName: "יוסי", lastName: "כהן", email: "yossi@example.com", role: 1, phone: "050-1234567" },
-  { id: 2, firstName: "רונית", lastName: "לוי", email: "ronit@example.com", role: 0, phone: "052-7654321" },
-  { id: 3, firstName: "אבי", lastName: "ישראלי", email: "avi@example.com", role: 0, phone: "054-9876543" },
-  { id: 4, firstName: "מיכל", lastName: "דוד", email: "michal@example.com", role: 1, phone: "053-1472583" },
-]
+const UserManagement: React.FC = () => {
+  const [users, setUsers] = useState<User[]>([])
+  const nav = useNavigate()
 
-const UserManagemet = () => {
-  return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Box
-        sx={{
-          minHeight: "100vh",
-          background: "linear-gradient(to bottom, #f5f7ff, #ffffff)",
-          py: 4,
-        }}
-      >
-        <Container>
-          <Paper
-            elevation={3}
-            sx={{
-              p: 4,
-              borderRadius: 3,
-              boxShadow: "0 8px 32px rgba(0, 0, 0, 0.1)",
-            }}
-          >
-            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 4 }}>
-              <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                <Person color="primary" sx={{ fontSize: 40 }} />
-                <Box>
-                  <Typography variant="h4" component="h1" fontWeight="bold">
-                    ניהול משתמשים
-                  </Typography>
-                  <Typography variant="body1" color="text.secondary">
-                    צפה, הוסף, ערוך או מחק משתמשים במערכת
-                  </Typography>
-                </Box>
-              </Box>
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const {data} = await axios.get<User[]>(`${url}/api/User`)
+        setUsers(data)
+      } catch (err) {
+        console.error("שגיאה בטעינת משתמשים:", err)
+      }
+    }
+    fetchUsers()
+  }, [])
 
-              <Button
-                variant="contained"
-                startIcon={<Add />}
+  const handleDelete = async (id: number) => {
+    console.log(id);
+    
+    if (window.confirm("האם אתה בטוח שברצונך למחוק את המשתמש?")) {
+      await axios.delete(`${url}/api/User/${id}`)
+      try {
+        const res = await axios.delete(`${url}/api/User/${id}`);
+        if (res.status >= 200 && res.status < 300) {
+          setUsers((prev) => prev.filter((user) => user.id !== id));
+        } else {
+          alert("מחיקה נכשלה");
+        }
+      } catch (err) {
+        console.error("שגיאה במחיקה:", err);
+      }
+      }
+    }
+  
+    const handleEdit = (id: number) => {
+      nav(`/edit-user/${id}`)
+    }
+
+    return (
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <Box
+          sx={{
+            minHeight: "100vh",
+            background: "linear-gradient(to bottom, #f5f7ff, #ffffff)",
+            py: 4,
+          }}
+        >
+          <Container>
+            <Paper elevation={3} sx={{ p: 4, borderRadius: 3 }}>
+              <Box
                 sx={{
-                  py: 1,
-                  px: 3,
-                  fontWeight: "bold",
-                  boxShadow: "0 4px 12px rgba(63, 81, 181, 0.4)",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  mb: 4,
                 }}
               >
-                הוסף משתמש חדש
-              </Button>
-            </Box>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                  <Person color="primary" sx={{ fontSize: 40 }} />
+                  <Box>
+                    <Typography variant="h4" fontWeight="bold">
+                      ניהול משתמשים
+                    </Typography>
+                    <Typography variant="body1" color="text.secondary">
+                      צפה, הוסף, ערוך או מחק משתמשים במערכת
+                    </Typography>
+                  </Box>
+                </Box>
 
-            <Divider sx={{ mb: 4 }} />
+                <Button
+                  variant="contained"
+                  startIcon={<Add />}
+                  sx={{ py: 1, px: 3, fontWeight: "bold" }}
+                  onClick={() => nav("/register-user")}
+                >
+                  הוסף משתמש חדש
+                </Button>
+              </Box>
 
-            <TableContainer component={Paper} sx={{ boxShadow: "none", borderRadius: 2 }}>
-              <Table sx={{ minWidth: 650 }} aria-label="users table">
-                <TableHead sx={{ bgcolor: "primary.main" }}>
-                  <TableRow>
-                    <TableCell align="right" sx={{ color: "white", fontWeight: "bold" }}>
-                      מזהה
-                    </TableCell>
-                    <TableCell align="right" sx={{ color: "white", fontWeight: "bold" }}>
-                      שם פרטי
-                    </TableCell>
-                    <TableCell align="right" sx={{ color: "white", fontWeight: "bold" }}>
-                      שם משפחה
-                    </TableCell>
-                    <TableCell align="right" sx={{ color: "white", fontWeight: "bold" }}>
-                      אימייל
-                    </TableCell>
-                    <TableCell align="right" sx={{ color: "white", fontWeight: "bold" }}>
-                      טלפון
-                    </TableCell>
-                    <TableCell align="right" sx={{ color: "white", fontWeight: "bold" }}>
-                      תפקיד
-                    </TableCell>
-                    <TableCell align="right" sx={{ color: "white", fontWeight: "bold" }}>
-                      פעולות
-                    </TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {mockUsers.map((user) => (
-                    <TableRow
-                      key={user.id}
-                      sx={{ "&:last-child td, &:last-child th": { border: 0 }, "&:hover": { bgcolor: "action.hover" } }}
-                    >
-                      <TableCell align="right">{user.id}</TableCell>
-                      <TableCell align="right">{user.firstName}</TableCell>
-                      <TableCell align="right">{user.lastName}</TableCell>
-                      <TableCell align="right">{user.email}</TableCell>
-                      <TableCell align="right">{user.phone}</TableCell>
-                      <TableCell align="right">
-                        <Chip
-                          icon={user.role === 1 ? <AdminPanelSettings /> : <PersonOutline />}
-                          label={user.role === 1 ? "מנהל" : "משתמש רגיל"}
-                          color={user.role === 1 ? "primary" : "default"}
-                          variant={user.role === 1 ? "filled" : "outlined"}
-                          size="small"
-                        />
-                      </TableCell>
-                      <TableCell align="right">
-                        <Box sx={{ display: "flex", gap: 1, justifyContent: "flex-end" }}>
-                          <IconButton color="primary" size="small">
-                            <Edit fontSize="small" />
-                          </IconButton>
-                          <IconButton color="error" size="small">
-                            <Delete fontSize="small" />
-                          </IconButton>
-                        </Box>
-                      </TableCell>
+              <Divider sx={{ mb: 4 }} />
+
+              <TableContainer component={Paper} sx={{ boxShadow: "none", borderRadius: 2 }}>
+                <Table sx={{ minWidth: 650 }} aria-label="users table">
+                  <TableHead sx={{ bgcolor: "primary.main" }}>
+                    <TableRow>
+                      {["מזהה", "שם פרטי", "שם משפחה", "אימייל", "טלפון", "תפקיד", "פעולות"].map((col) => (
+                        <TableCell key={col} align="right" sx={{ color: "white", fontWeight: "bold" }}>
+                          {col}
+                        </TableCell>
+                      ))}
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Paper>
-        </Container>
-      </Box>
-    </ThemeProvider>
-  )
-}
+                  </TableHead>
+                  <TableBody>
+                    {users.map((user) => (
+                      <TableRow
+                        key={user.id}
+                        sx={{
+                          "&:last-child td": { border: 0 },
+                          "&:hover": { bgcolor: "action.hover" },
+                        }}
+                      >
+                        <TableCell align="right">{user.id}</TableCell>
+                        <TableCell align="right">{user.firstName}</TableCell>
+                        <TableCell align="right">{user.lastName}</TableCell>
+                        <TableCell align="right">{user.email}</TableCell>
+                        <TableCell align="right">{user.phone}</TableCell>
+                        <TableCell align="right">
+                          <Chip
+                            icon={user.role === 1 ? <AdminPanelSettings /> : <PersonOutline />}
+                            label={user.role === 1 ? "מנהל" : "משתמש רגיל"}
+                            color={user.role === 1 ? "primary" : "default"}
+                            variant={user.role === 1 ? "filled" : "outlined"}
+                            size="small"
+                          />
+                        </TableCell>
+                        <TableCell align="right">
+                          <Box sx={{ display: "flex", gap: 1, justifyContent: "flex-end" }}>
+                            <IconButton color="primary" size="small" onClick={() => handleEdit(user.id)}>
+                              <Edit fontSize="small" />
+                            </IconButton>
+                            <IconButton color="error" size="small" onClick={() => handleDelete(user.id)}>
+                              <Delete fontSize="small" />
+                            </IconButton>
+                          </Box>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Paper>
+          </Container>
+        </Box>
+      </ThemeProvider>
+    )
+  }
 
-export default UserManagemet
+  export default UserManagement
 "use client"
 import { useContext, useState } from "react"
 import axios from "axios"
@@ -3750,7 +5265,7 @@ const UserRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => 
 
   return (
     <ConfigProvider direction="rtl">
-      <div style={{ padding: "40px 20px", maxWidth: 800, margin: "0 auto" }}>
+      <div style={{ padding: "40px 20px", maxWidth: 800, margin: "0 auto" , marginTop: "70vh"}}>
         <Card className="form-section">
           <div style={{ textAlign: "center", marginBottom: 32 }}>
             <Avatar
@@ -3764,7 +5279,7 @@ const UserRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => 
               <UserAddOutlined style={{ fontSize: 40 }} />
             </Avatar>
 
-            <Title level={2} style={{ marginBottom: 8, color: "#2d3748" }}>
+            <Title level={2} style={{ marginBottom: 8, color: "#2d3748", textAlign:"center" }}>
               הרשמת משתמש חדש
             </Title>
 
