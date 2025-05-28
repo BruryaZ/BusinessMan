@@ -27,6 +27,8 @@ const AdminLogin = () => {
       setErrors([])
 
       if (valid) {
+        console.log("Admin login data:", admin);
+        
         const { data } = await axios.post<any>(`${url}/Auth/admin-login`, admin, { withCredentials: true })
         globalContextDetails.setUser(data.user)
         globalContextDetails.setIsAdmin(true)

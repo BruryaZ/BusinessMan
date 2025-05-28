@@ -131,7 +131,7 @@ const ProductionReports = () => {
 
   return (
     <ConfigProvider direction="rtl">
-      <div style={{ padding: "40px 20px", maxWidth: 1400, margin: "0 auto" }}>
+      <div style={{ padding: "40px 20px", maxWidth: 1400, margin: "0 auto", marginTop: "115vh" }}>
         <Card className="form-section">
           <div style={{ textAlign: "center", marginBottom: 32 }}>
             <Avatar

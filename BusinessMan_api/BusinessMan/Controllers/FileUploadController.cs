@@ -152,14 +152,14 @@ namespace BusinessMan.API.Controllers
         [HttpGet("my-files-download-zip")]
         public async Task<IActionResult> DownloadAllMyFilesAsZip()
         {
-            var userIdClaim = User?.FindFirst("user_id")?.Value;
-            if (string.IsNullOrEmpty(userIdClaim))
-                return Unauthorized("המשתמש לא מזוהה.");
+            var businessIdClaim = User?.FindFirst("business_id")?.Value;
+            if (string.IsNullOrEmpty(businessIdClaim))
+                return Unauthorized("העסק לא מזוהה.");
 
-            int userId = int.Parse(userIdClaim);
+            int businessId = int.Parse(businessIdClaim);
 
             var allFiles = await _fileService.GetListAsync();
-            var myFiles = allFiles.Where(f => f.UserId == userId);
+            var myFiles = allFiles.Where(f => f.BusinessId == businessId);
 
             using var memoryStream = new MemoryStream();
             using (var archive = new System.IO.Compression.ZipArchive(memoryStream, System.IO.Compression.ZipArchiveMode.Create, true))
@@ -172,6 +172,7 @@ namespace BusinessMan.API.Controllers
                         Key = ExtractKeyFromUrl(file.FilePath)
                     };
 
+                    Console.WriteLine("🗝️🔐🔑Key: " + request.Key);
                     using var response = await _s3Client.GetObjectAsync(request);
                     using var responseStream = response.ResponseStream;
                     var entry = archive.CreateEntry(file.FileName, System.IO.Compression.CompressionLevel.Fastest);

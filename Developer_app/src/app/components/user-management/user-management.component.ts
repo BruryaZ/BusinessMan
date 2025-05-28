@@ -1,52 +1,69 @@
-import { Component } from '@angular/core';
-import { BusinessOwnerService } from '../../services/business-owner.service';
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { NzMessageService } from 'ng-zorro-antd/message';
+import { User } from '../../models/User.model';
+import { UserService } from '../../services/users.service';
 
 @Component({
   selector: 'app-user-management',
-  standalone: true,
-  imports: [],
   templateUrl: './user-management.component.html',
-  styleUrl: './user-management.component.css'
+  styleUrls: ['./user-management.component.css']
 })
-export class UserManagementComponent {
-  email_to_add: string = '';
-  email_to_remove: string = '';
+export class UserManagementComponent implements OnInit {
+  users: User[] = [];
+  loading = false;
+  selectedUser: User | null = null;
+  modalVisible = false;
 
-  constructor(private businessOwner: BusinessOwnerService) { }
+  // לדוגמה, יש להכניס את מזהה העסק דרך context או service
+  businessId = 1;
 
-  register() {
-    this.businessOwner.registerBusinessOwner(this.email_to_add).subscribe({
-      next: (res) => {
-        console.log('User registered with ID:', res.id);
-      },
-      error: (error) => {
-        console.log('Error registering user:', error);
-        this.email_to_add = ''
-      },
-      complete: () => {
-        console.log('Registration process completed.');
-        this.email_to_add = ''
-      }
-    });
+  constructor(
+    private userService: UserService,
+    private router: Router,
+    private message: NzMessageService
+  ) {}
 
-    {/*next: פונקציה שמתקבלת כאשר יש נתונים חדשים מה-Observable.
-    error: פונקציה שמתקבלת כאשר יש שגיאה.
-    complete: פונקציה שמתקבלת כאשר הזרם מסתיים. */}
+  ngOnInit(): void {
+    this.fetchUsers();
   }
 
-  remove() {
-    this.businessOwner.removeBusinessOwner(this.email_to_remove).subscribe({
-      next: (res) => {
-        console.log('User removed successfully:', res);
+  fetchUsers(): void {
+    this.loading = true;
+    this.userService.getUsersByBusiness(this.businessId).subscribe({
+      next: (data) => {
+        this.users = data;
+        this.loading = false;
       },
-      error: (error) => {
-        console.log('Error removing user:', error.error);
-        this.email_to_remove = ''
-      },
-      complete: () => {
-        console.log('Removal process completed.');
-        this.email_to_remove = ''
+      error: (err) => {
+        this.message.error('שגיאה בטעינת רשימת המשתמשים');
+        this.loading = false;
       }
     });
+  }
+
+  handleDelete(id: number): void {
+    this.userService.deleteUser(id).subscribe({
+      next: () => {
+        this.users = this.users.filter(u => u.id !== id);
+        this.message.success('המשתמש נמחק בהצלחה');
+      },
+      error: () => {
+        this.message.error('שגיאה במחיקת המשתמש');
+      }
+    });
+  }
+
+  handleEdit(id: number): void {
+    this.router.navigate([`/edit-user/${id}`]);
+  }
+
+  handleViewDetails(user: User): void {
+    this.selectedUser = user;
+    this.modalVisible = true;
+  }
+
+  closeModal(): void {
+    this.modalVisible = false;
   }
 }

@@ -224,6 +224,8 @@ function DataViewing() {
 
   return (
     <ConfigProvider direction="rtl">
+      <div style={{ marginTop: "150vh" }}></div>
+
       <div className="business-data-container" style={{ maxWidth: 1400, margin: "0 auto" }}>
         <Card className="form-section">
           <div style={{ textAlign: "center", marginBottom: 32 }}>
@@ -401,7 +403,7 @@ function DataViewing() {
                               percent={Math.min(
                                 (Number.parseFloat(metric.value.toString()) /
                                   Number.parseFloat(metric.target.toString())) *
-                                  100,
+                                100,
                                 100,
                               )}
                               format={() => (
@@ -425,7 +427,7 @@ function DataViewing() {
                             <Tag
                               color={
                                 Number.parseFloat(metric.value.toString()) >=
-                                Number.parseFloat(metric.target.toString())
+                                  Number.parseFloat(metric.target.toString())
                                   ? "success"
                                   : "warning"
                               }

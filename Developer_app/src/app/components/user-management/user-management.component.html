@@ -1,1 +1,167 @@
-<p>user-management works!</p>
+<nz-card>
+    <div style="text-align: center; margin-bottom: 32px;">
+      <nz-avatar
+        [nzSize]="80"
+        style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); margin-bottom: 16px; box-shadow: 0 4px 14px rgba(102, 126, 234, 0.3);"
+        nzIcon="team"
+      ></nz-avatar>
+      <h2 style="color: #2d3748;">ניהול משתמשים</h2>
+      <p style="font-size: 16px; color: rgba(0,0,0,0.45);">
+        צפה, הוסף, ערוך או מחק משתמשים במערכת
+      </p>
+      <nz-divider></nz-divider>
+    </div>
+  
+    <div style="display: flex; justify-content: space-between; margin-bottom: 24px;">
+      <div>
+        <span style="font-weight: bold; font-size: 16px;">סה״כ משתמשים: {{ users.length }}</span>
+        <nz-tag color="blue">מנהלים: {{ users.filter(u => u.role === 1).length }}</nz-tag>
+        <nz-tag color="green">משתמשים: {{ users.filter(u => u.role === 2).length }}</nz-tag>
+        <nz-tag color="orange">מנהלי חשבונות: {{ users.filter(u => u.role === 3).length }}</nz-tag>
+      </div>
+      <button nz-button nzType="primary" nzSize="large" (click)="router.navigate(['/register-user'])">
+        <i nz-icon nzType="plus"></i> הוסף משתמש חדש
+      </button>
+    </div>
+  
+    <nz-table
+      [nzData]="users"
+      [nzLoading]="loading"
+      [nzPageSize]="10"
+      [nzShowSizeChanger]="true"
+      [nzShowQuickJumper]="true"
+      [nzScroll]="{ x: '800px' }"
+      [nzFrontPagination]="true"
+      [nzPageSizeOptions]="[10, 20, 50]"
+      [nzShowTotal]="total => `${total} משתמשים`"
+      [nzPageIndex]="1"
+      [nzTableLayout]="'fixed'"
+      [nzRowKey]="'id'"
+      [nzDirection]="'rtl'"
+    >
+      <thead>
+        <tr>
+          <th style="width: 80px; text-align: center;">מזהה</th>
+          <th>שם מלא</th>
+          <th>פרטי קשר</th>
+          <th style="text-align: center;">תפקיד</th>
+          <th style="text-align: center;">סטטוס</th>
+          <th>כניסה אחרונה</th>
+          <th style="text-align: center;">פעולות</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of users">
+          <td style="text-align: center;">{{ user.id }}</td>
+          <td>
+            <nz-avatar
+              [nzSize]="32"
+              [nzStyle]="{ background: user.role === 1 ? '#722ed1' : '#1890ff' }"
+              [nzIcon]="user.role === 1 ? 'crown' : 'user'"
+            ></nz-avatar>
+            <span style="font-weight: 600; margin-left: 8px;">{{ user.firstName }} {{ user.lastName }}</span>
+            <br />
+            <small style="color: rgba(0,0,0,0.45); font-size: 12px;">ת.ז: {{ user.idNumber }}</small>
+          </td>
+          <td>
+            <div>
+              <i nz-icon nzType="mail" nzTheme="fill" style="color: #1890ff; margin-right: 6px;"></i>{{ user.email }}
+            </div>
+            <div>
+              <i nz-icon nzType="phone" nzTheme="fill" style="color: #52c41a; margin-right: 6px;"></i>{{ user.phone }}
+            </div>
+          </td>
+          <td style="text-align: center;">
+            <nz-tag [nzColor]="user.role === 1 ? 'purple' : 'blue'">
+              <i nz-icon [nzType]="user.role === 1 ? 'crown' : 'user'"></i>
+              {{ user.role === 1 ? 'מנהל' : 'משתמש רגיל' }}
+            </nz-tag>
+          </td>
+          <td style="text-align: center;">
+            <nz-tag [nzColor]="user.status === 'active' ? 'green' : 'default'">
+              {{ user.status === 'active' ? 'פעיל' : 'לא פעיל' }}
+            </nz-tag>
+          </td>
+          <td>{{ user.lastLogin | date: 'dd/MM/yyyy' }}</td>
+          <td style="text-align: center;">
+            <button nz-button nzType="link" (click)="handleViewDetails(user)" style="color: #1890ff;">צפה</button>
+            <button nz-button nzType="link" (click)="handleEdit(user.id)" style="color: #fa8c16;">ערוך</button>
+            <nz-popconfirm
+              nzTitle="מחיקת משתמש"
+              nzDescription="האם אתה בטוח שברצונך למחוק את המשתמש?"
+              (nzOnConfirm)="handleDelete(user.id)"
+              nzOkText="כן"
+              nzCancelText="לא"
+            >
+              <button nz-button nzType="link" nzDanger>מחק</button>
+            </nz-popconfirm>
+          </td>
+        </tr>
+      </tbody>
+    </nz-table>
+  
+    <nz-modal
+      [(nzVisible)]="modalVisible"
+      nzTitle="פרטי משתמש"
+      (nzOnCancel)="closeModal()"
+      [nzFooter]="modalFooter"
+      [nzWidth]="600"
+    >
+      <ng-container *ngIf="selectedUser">
+        <div style="text-align: center; margin-bottom: 24px;">
+          <nz-avatar
+            [nzSize]="64"
+            [nzStyle]="{ background: selectedUser.role === 1 ? '#722ed1' : '#1890ff' }"
+            [nzIcon]="selectedUser.role === 1 ? 'crown' : 'user'"
+            style="margin-bottom: 8px;"
+          ></nz-avatar>
+          <h4>{{ selectedUser.firstName }} {{ selectedUser.lastName }}</h4>
+          <nz-tag [nzColor]="selectedUser.role === 1 ? 'purple' : 'blue'" style="margin-top: 8px;">
+            {{ selectedUser.role === 1 ? 'מנהל' : 'משתמש רגיל' }}
+          </nz-tag>
+        </div>
+  
+        <div style="display: flex; flex-wrap: wrap; gap: 16px;">
+          <div style="flex: 1 1 45%;">
+            <strong>אימייל:</strong>
+            <p>{{ selectedUser.email }}</p>
+          </div>
+          <div style="flex: 1 1 45%;">
+            <strong>טלפון:</strong>
+            <p>{{ selectedUser.phone }}</p>
+          </div>
+          <div style="flex: 1 1 45%;">
+            <strong>תעודת זהות:</strong>
+            <p>{{ selectedUser.idNumber }}</p>
+          </div>
+          <div style="flex: 1 1 45%;">
+            <strong>סטטוס:</strong>
+            <nz-tag [nzColor]="selectedUser.status === 'active' ? 'green' : 'default'">
+              {{ selectedUser.status === 'active' ? 'פעיל' : 'לא פעיל' }}
+            </nz-tag>
+          </div>
+          <div style="flex: 1 1 45%;">
+            <strong>כניסה אחרונה:</strong>
+            <p>{{ selectedUser.lastLogin | date: 'dd/MM/yyyy' }}</p>
+          </div>
+          <div style="flex: 1 1 45%;">
+            <strong>תאריך הצטרפות:</strong>
+            <p>{{ selectedUser.createdAt | date: 'dd/MM/yyyy' }}</p>
+          </div>
+        </div>
+      </ng-container>
+  
+      <ng-template #modalFooter>
+        <button nz-button (click)="closeModal()">סגור</button>
+        <button
+          nz-button
+          nzType="primary"
+          (click)="handleEdit(selectedUser?.id); closeModal()"
+          [disabled]="!selectedUser"
+        >
+          ערוך משתמש
+        </button>
+      </ng-template>
+    </nz-modal>
+  </nz-card>
+  

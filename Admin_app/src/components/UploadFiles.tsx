@@ -154,7 +154,7 @@ const UploadFiles = () => {
               <RocketOutlined style={{ fontSize: 40 }} />
             </Avatar>
 
-            <Title level={2} style={{ marginBottom: 8, color: "#2d3748" , textAlign:"center"}}>
+            <Title level={2} style={{ marginBottom: 8, color: "#2d3748", textAlign: "center" }}>
               העלאת קבצים וניתוח נתונים לעסק עם AI
             </Title>
 
@@ -183,7 +183,7 @@ const UploadFiles = () => {
                   transition: "all 0.3s ease",
                 }}
               >
-                <div style={{ position: "relative", zIndex: 2, display:"flex", alignItems:"center", justifyContent:"center", flexDirection:"column" }}>
+                <div style={{ position: "relative", zIndex: 2, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column" }}>
                   <p className="ant-upload-drag-icon">
                     <InboxOutlined
                       style={{
@@ -347,19 +347,19 @@ const UploadFiles = () => {
                     <Text strong style={{ color: "#52c41a" }}>
                       ✓
                     </Text>
+                    <Text style={{ marginRight: 8 }}>ניתוח נתונים לעסק עם AI</Text>
+                  </div>
+                  <div>
+                    <Text strong style={{ color: "#52c41a" }}>
+                      ✓
+                    </Text>
+                    <Text style={{ marginRight: 8 }}>עדכון נתונים</Text>
+                  </div>
+                  <div>
+                    <Text strong style={{ color: "#52c41a" }}>
+                      ✓
+                    </Text>
                     <Text style={{ marginRight: 8 }}>גיבוי אוטומטי</Text>
-                  </div>
-                  <div>
-                    <Text strong style={{ color: "#52c41a" }}>
-                      ✓
-                    </Text>
-                    <Text style={{ marginRight: 8 }}>סריקת וירוסים</Text>
-                  </div>
-                  <div>
-                    <Text strong style={{ color: "#52c41a" }}>
-                      ✓
-                    </Text>
-                    <Text style={{ marginRight: 8 }}>דחיסה אוטומטית</Text>
                   </div>
                 </Space>
               </Card>

@@ -211,6 +211,8 @@ const UserManagement: React.FC = () => {
 
   return (
     <ConfigProvider direction="rtl">
+      <div style={{ marginTop: "50vh" }}></div>
+
       <div style={{ padding: "40px 20px", maxWidth: 1400, margin: "0 auto" }}>
         <Card className="form-section">
           <div style={{ textAlign: "center", marginBottom: 32 }}>
@@ -243,7 +245,8 @@ const UserManagement: React.FC = () => {
                   סה״כ משתמשים: {users.length}
                 </Text>
                 <Tag color="blue">מנהלים: {users.filter((u) => u.role === 1).length}</Tag>
-                <Tag color="green">משתמשים: {users.filter((u) => u.role === 0).length}</Tag>
+                <Tag color="green">משתמשים: {users.filter((u) => u.role === 2).length}</Tag>
+                <Tag color="orange">מנהלי חשבונות: {users.filter((u) => u.role === 3).length}</Tag>
               </Space>
             </Col>
             <Col>

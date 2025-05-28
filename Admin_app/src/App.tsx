@@ -4,7 +4,7 @@
 import { useState } from "react"
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from "react-router-dom"
 import { Layout, Menu, Button, Typography, Avatar, Space, Drawer, ConfigProvider, theme as antTheme } from "antd"
-import { MenuOutlined, UserAddOutlined, MenuFoldOutlined, MenuUnfoldOutlined, BuildOutlined, BankOutlined, BarChartOutlined, CrownOutlined, DollarOutlined, EyeOutlined, LoginOutlined, ShopOutlined, TeamOutlined, UploadOutlined } from "@ant-design/icons"
+import { MenuOutlined, UserAddOutlined, MenuFoldOutlined, MenuUnfoldOutlined, BuildOutlined, BankOutlined, BarChartOutlined, CrownOutlined, DollarOutlined, EyeOutlined, LoginOutlined, ShopOutlined, TeamOutlined, UploadOutlined, CloudDownloadOutlined } from "@ant-design/icons"
 import { useMediaQuery } from "react-responsive"
 import "./app.css"
 import AdminLogin from "./components/AdminLogin"
@@ -22,6 +22,7 @@ import AdminRoute from "./components/AdminRoute"
 import { Home } from "@mui/icons-material"
 import MyHome from "./components/MyHome"
 import EditUserPage from "./components/EditUserPage"
+import BusinessFiles from "./components/BusinessFiles"
 
 // Components
 
@@ -34,6 +35,7 @@ const navItems = [
   { key: "/register-user", label: "רישום משתמש", icon: <UserAddOutlined />, path: "/register-user" },
   { key: "/user-login", label: "כניסת משתמש", icon: <LoginOutlined />, path: "/user-login" },
   { key: "/admin-login", label: "כניסת מנהל", icon: <CrownOutlined />, path: "/admin-login" },
+  { key: "/business-files", label: "קבצי העסק", icon: <CloudDownloadOutlined />, path: "/business-files" },
   { key: "/upload-file", label: "העלאת קבצים", icon: <UploadOutlined />, path: "/upload-file" },
   { key: "/view-data", label: "צפייה בנתונים", icon: <EyeOutlined />, path: "/view-data" },
   { key: "/user-management", label: "ניהול משתמשים", icon: <TeamOutlined />, path: "/user-management" },
@@ -300,6 +302,14 @@ function ResponsiveDrawer() {
                   element={
                     <AdminRoute>
                       <ProductionReports />
+                    </AdminRoute>
+                  }
+                />
+                <Route
+                  path="/business-files"
+                  element={
+                    <AdminRoute>
+                      <BusinessFiles />
                     </AdminRoute>
                   }
                 />
