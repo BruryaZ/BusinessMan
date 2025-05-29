@@ -34,8 +34,7 @@ const UserLogin = () => {
         setErrors(["נא למלא את כל השדות הנדרשים"])
       }
     } catch (e) {
-      console.log(e)
-      setErrors(["שם משתמש או סיסמה שגויים"])
+      setErrors(e instanceof Error ? [e.message] : ["שגיאה לא צפויה, נא לנסות שוב מאוחר יותר"])
     } finally {
       setLoading(false)
     }
@@ -47,7 +46,7 @@ const UserLogin = () => {
 
   return (
     <ConfigProvider direction="rtl">
-      <div style={{marginTop: "50vh"}}></div>
+      <div style={{ marginTop: "50vh" }}></div>
       <CenteredLayout >
         <Card className="login-form" style={{ maxWidth: 500, width: "100%" }}>
           <div style={{ textAlign: "center", marginBottom: 32 }}>
@@ -62,7 +61,7 @@ const UserLogin = () => {
               <UserOutlined style={{ fontSize: 40 }} />
             </Avatar>
 
-            <Title level={2} style={{ marginBottom: 8, color: "#2d3748" , textAlign:"center"}}>
+            <Title level={2} style={{ marginBottom: 8, color: "#2d3748", textAlign: "center" }}>
               כניסת משתמש
             </Title>
 

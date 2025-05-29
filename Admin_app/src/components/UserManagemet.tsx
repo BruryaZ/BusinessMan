@@ -27,6 +27,7 @@ import {
   CrownOutlined,
   MailOutlined,
   PhoneOutlined,
+  DollarOutlined,
 } from "@ant-design/icons"
 import axios from "axios"
 import { useNavigate } from "react-router-dom"
@@ -99,35 +100,41 @@ const UserManagement: React.FC = () => {
 
   const columns: ColumnsType<User> = [
     {
-      title: "מזהה",
-      dataIndex: "id",
-      key: "id",
+      title: "ת.ז",
+      dataIndex: "idNumber",
+      key: "idNumber",
       width: 80,
       align: "center",
     },
     {
       title: "שם מלא",
       key: "fullName",
-      render: (_, record) => (
-        <Space>
-          <Avatar
-            size={32}
-            style={{
-              background: record.role === 1 ? "#722ed1" : "#1890ff",
-            }}
-          >
-            {record.role === 1 ? <CrownOutlined /> : <UserOutlined />}
-          </Avatar>
-          <div>
-            <div style={{ fontWeight: 600 }}>
-              {record.firstName} {record.lastName}
+      render: (_, record) => {
+        let avatarBg = "#1890ff"
+        let icon = <UserOutlined />
+        if (record.role === 1) {
+          avatarBg = "#722ed1"
+          icon = <CrownOutlined />
+        } else if (record.role === 3) {
+          avatarBg = "#faad14" // כתום זהוב למנהל חשבונות
+          icon = <DollarOutlined />
+        }
+        return (
+          <Space>
+            <Avatar size={32} style={{ background: avatarBg }}>
+              {icon}
+            </Avatar>
+            <div>
+              <div style={{ fontWeight: 600 }}>
+                {record.firstName} {record.lastName}
+              </div>
+              <Text type="secondary" style={{ fontSize: 12 }}>
+                ת.ז: {record.idNumber}
+              </Text>
             </div>
-            <Text type="secondary" style={{ fontSize: 12 }}>
-              ת.ז: {record.idNumber}
-            </Text>
-          </div>
-        </Space>
-      ),
+          </Space>
+        )
+      },
     },
     {
       title: "פרטי קשר",
@@ -150,11 +157,27 @@ const UserManagement: React.FC = () => {
       dataIndex: "role",
       key: "role",
       align: "center",
-      render: (role: number) => (
-        <Tag color={role === 1 ? "purple" : "blue"} icon={role === 1 ? <CrownOutlined /> : <UserOutlined />}>
-          {role === 1 ? "מנהל" : "משתמש רגיל"}
-        </Tag>
-      ),
+      render: (role: number) => {
+        if (role === 1)
+          return (
+            <Tag color="purple" icon={<CrownOutlined />}>
+              מנהל
+            </Tag>
+          )
+        if (role === 2)
+          return (
+            <Tag color="blue" icon={<UserOutlined />}>
+              משתמש רגיל
+            </Tag>
+          )
+        if (role === 3)
+          return (
+            <Tag color="orange" icon={<DollarOutlined />}>
+              מנהל חשבונות
+            </Tag>
+          )
+        return <Tag>לא ידוע</Tag>
+      },
     },
     {
       title: "סטטוס",
@@ -244,8 +267,8 @@ const UserManagement: React.FC = () => {
                 <Text strong style={{ fontSize: 16 }}>
                   סה״כ משתמשים: {users.length}
                 </Text>
-                <Tag color="blue">מנהלים: {users.filter((u) => u.role === 1).length}</Tag>
-                <Tag color="green">משתמשים: {users.filter((u) => u.role === 2).length}</Tag>
+                <Tag color="purple">מנהלים: {users.filter((u) => u.role === 1).length}</Tag>
+                <Tag color="blue">משתמשים: {users.filter((u) => u.role === 2).length}</Tag>
                 <Tag color="orange">מנהלי חשבונות: {users.filter((u) => u.role === 3).length}</Tag>
               </Space>
             </Col>
@@ -320,18 +343,42 @@ const UserManagement: React.FC = () => {
                       <Avatar
                         size={64}
                         style={{
-                          background: selectedUser.role === 1 ? "#722ed1" : "#1890ff",
+                          background:
+                            selectedUser.role === 1
+                              ? "#722ed1"
+                              : selectedUser.role === 3
+                              ? "#faad14"
+                              : "#1890ff",
                           marginBottom: 8,
                         }}
                       >
-                        {selectedUser.role === 1 ? <CrownOutlined /> : <UserOutlined />}
+                        {selectedUser.role === 1 ? (
+                          <CrownOutlined />
+                        ) : selectedUser.role === 3 ? (
+                          <DollarOutlined />
+                        ) : (
+                          <UserOutlined />
+                        )}
                       </Avatar>
                       <div>
                         <Title level={4} style={{ margin: 0 }}>
                           {selectedUser.firstName} {selectedUser.lastName}
                         </Title>
-                        <Tag color={selectedUser.role === 1 ? "purple" : "blue"} style={{ marginTop: 8 }}>
-                          {selectedUser.role === 1 ? "מנהל" : "משתמש רגיל"}
+                        <Tag
+                          color={
+                            selectedUser.role === 1
+                              ? "purple"
+                              : selectedUser.role === 3
+                              ? "orange"
+                              : "blue"
+                          }
+                          style={{ marginTop: 8 }}
+                        >
+                          {selectedUser.role === 1
+                            ? "מנהל"
+                            : selectedUser.role === 3
+                            ? "מנהל חשבונות"
+                            : "משתמש רגיל"}
                         </Tag>
                       </div>
                     </div>

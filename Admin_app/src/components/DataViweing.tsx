@@ -74,10 +74,11 @@ function DataViewing() {
     updatedBy: "",
   })
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
     setErrors([])
     setLoading(true)
-
+    
     try {
       const res = await axios.get<Business>(`${url}/api/Business/${globalContextDetails.user.businessId}`, {
         withCredentials: true,
@@ -94,7 +95,6 @@ function DataViewing() {
         setLoading(false)
         return
       }
-
       setBusiness(res.data)
       setDataLoaded(true)
       setLoading(false)

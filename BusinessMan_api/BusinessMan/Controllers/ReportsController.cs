@@ -41,6 +41,5 @@ namespace BusinessMan.API.Controllers
 
             return Ok(report);
         }
-
     }
 }

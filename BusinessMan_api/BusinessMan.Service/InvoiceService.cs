@@ -9,10 +9,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using InvoiceType = BusinessMan.Core.Models.InvoiceType;
 
 namespace BusinessMan.Service
 {
-    // TODO: Implement the UserService class
     public class InvoiceService : IInvoiceService
     {
         private readonly IRepositoryManager _repositoryManager;
@@ -33,16 +33,54 @@ namespace BusinessMan.Service
         {
             return await _repositoryManager.Invoice.GetAllAsync();
         }
-
         public async Task<Invoice> AddAsync(Invoice invoice)
         {
-            // עדכון נתוני העסק
             var business = await _repositoryManager.Business.GetByIdAsync(invoice.BusinessId ?? 0);
             if (business != null)
             {
-                business.Income += invoice.AmountCredit;
-                business.Expenses += invoice.AmountDebit;
-                business.CashFlow += invoice.AmountCredit - invoice.AmountDebit;
+                switch (invoice.Type)
+                {
+                    case InvoiceType.Income:
+                        business.Income += invoice.AmountCredit;
+                        business.CashFlow += invoice.AmountCredit;
+                        business.TotalAssets += invoice.AmountCredit;  // הכנסה מגדילה נכסים
+                        break;
+
+                    case InvoiceType.Expense:
+                        business.Expenses += invoice.AmountDebit;
+                        business.CashFlow -= invoice.AmountDebit;
+                        business.TotalAssets -= invoice.AmountDebit;  // הוצאה מקטינה נכסים
+                        break;
+
+                    case InvoiceType.AssetIncrease:
+                        business.TotalAssets += invoice.AmountCredit;
+                        business.CashFlow += invoice.AmountCredit;
+                        break;
+
+                    case InvoiceType.AssetDecrease:
+                        business.TotalAssets -= invoice.AmountDebit;
+                        business.CashFlow -= invoice.AmountDebit;
+                        break;
+
+                    case InvoiceType.LiabilityIncrease:
+                        business.TotalLiabilities += invoice.AmountCredit;
+                        break;
+
+                    case InvoiceType.LiabilityDecrease:
+                        business.TotalLiabilities -= invoice.AmountDebit;
+                        break;
+
+                    case InvoiceType.EquityIncrease:
+                        business.CashFlow = invoice.AmountCredit;
+                        break;
+
+                    case InvoiceType.EquityDecrease:
+                        // מפחית את ההון העצמי
+                        break;
+
+                    default:
+                        throw new ArgumentException("סוג חשבונית לא מוכר");
+                }
 
                 business.UpdatedAt = DateTime.UtcNow;
                 await _repositoryManager.Business.UpdateAsync(business.Id, business);
@@ -52,7 +90,6 @@ namespace BusinessMan.Service
             await _repositoryManager.SaveAsync();
             return invoice;
         }
-
         public async Task DeleteAsync(Invoice invoice)
         {
             await _repositoryManager.Invoice.DeleteAsync(invoice);
@@ -92,12 +129,19 @@ namespace BusinessMan.Service
                             i.InvoiceDate >= previousMonthStart &&
                             i.InvoiceDate < previousMonthEnd);
 
-            var currentMonthIncome = currentMonthInvoices.Sum(i => i.AmountCredit);
-            var currentMonthExpenses = currentMonthInvoices.Sum(i => i.AmountDebit);
+            // חישוב לפי סוג החשבונית בלבד:
+            decimal SumIncome(IEnumerable<Invoice> invoices) =>
+                invoices.Where(i => i.Type == InvoiceType.Income).Sum(i => i.AmountCredit);
+
+            decimal SumExpenses(IEnumerable<Invoice> invoices) =>
+                invoices.Where(i => i.Type == InvoiceType.Expense).Sum(i => i.AmountDebit);
+
+            var currentMonthIncome = SumIncome(currentMonthInvoices);
+            var currentMonthExpenses = SumExpenses(currentMonthInvoices);
             var currentNetProfit = currentMonthIncome - currentMonthExpenses;
 
-            var previousMonthIncome = previousMonthInvoices.Sum(i => i.AmountCredit);
-            var previousMonthExpenses = previousMonthInvoices.Sum(i => i.AmountDebit);
+            var previousMonthIncome = SumIncome(previousMonthInvoices);
+            var previousMonthExpenses = SumExpenses(previousMonthInvoices);
             var previousNetProfit = previousMonthIncome - previousMonthExpenses;
 
             decimal CalcPercentChange(decimal current, decimal previous)

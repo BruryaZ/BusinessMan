@@ -7,8 +7,23 @@ import axios from "axios"
 import type { BusinessResponsePutModel } from "../models/BusinessResponsePutModel"
 import AdminRegister from "./AdminRegister"
 import type { UserDto } from "../models/UserDto"
-import { Button, Typography, Card, Steps, Divider, Alert, ConfigProvider, Space, Avatar, Row, Col } from "antd"
-import { ShopOutlined, UserOutlined, CheckCircleOutlined, RocketOutlined } from "@ant-design/icons"
+import {
+  Button,
+  Typography,
+  Card,
+  Steps,
+  Divider,
+  Alert,
+  ConfigProvider,
+  Space,
+  Avatar,
+} from "antd"
+import {
+  ShopOutlined,
+  UserOutlined,
+  CheckCircleOutlined,
+  RocketOutlined,
+} from "@ant-design/icons"
 
 const { Title, Text } = Typography
 
@@ -38,20 +53,30 @@ const BusinessAndAdmin = () => {
       businessId: globalContextDetails.business_global.id,
       business: globalContextDetails.business_global,
       role: 1,
-      updateBy: globalContextDetails.user.firstName + " " + globalContextDetails.user.lastName,
+      updateBy:
+        globalContextDetails.user.firstName +
+        " " +
+        globalContextDetails.user.lastName,
     }
     const updateBusiness = {
       ...globalContextDetails.business_global,
       users: [globalContextDetails.user],
-      updateBy: globalContextDetails.user.firstName + " " + globalContextDetails.user.lastName,
+      updateBy:
+        globalContextDetails.user.firstName +
+        " " +
+        globalContextDetails.user.lastName,
     }
     globalContextDetails.setUser(updateAdmin)
     globalContextDetails.setBusinessGlobal(updateBusiness)
 
     try {
-      await axios.put<UserDto>(`${url}/api/User/${globalContextDetails.user.id}`, updateAdmin, {
-        withCredentials: true,
-      })
+      await axios.put<UserDto>(
+        `${url}/api/User/${globalContextDetails.user.id}`,
+        updateAdmin,
+        {
+          withCredentials: true,
+        },
+      )
       await axios.put<BusinessResponsePutModel>(
         `${url}/api/Business/${globalContextDetails.business_global.id}`,
         updateBusiness,
@@ -99,8 +124,18 @@ const BusinessAndAdmin = () => {
 
   return (
     <ConfigProvider direction="rtl">
-      <div style={{ padding: "40px 20px", maxWidth: 1000, margin: "0 auto" }}>
-        <Card className="form-section">
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          flexDirection: "column",
+          padding: "40px 20px",
+          minHeight: "100vh",
+          background: "#f0f2f5",
+          marginTop: "30vh",
+        }}
+      >        <Card className="form-section">
           <div style={{ textAlign: "center", marginBottom: 32 }}>
             <Avatar
               size={80}
@@ -113,7 +148,7 @@ const BusinessAndAdmin = () => {
               <RocketOutlined style={{ fontSize: 40 }} />
             </Avatar>
 
-            <Title level={2} style={{ marginBottom: 8, color: "#2d3748", textAlign: "center" }}>
+            <Title level={2} style={{ marginBottom: 8, color: "#2d3748" }}>
               הגדרת עסק ומנהל
             </Title>
 
@@ -146,71 +181,88 @@ const BusinessAndAdmin = () => {
             </div>
           ) : (
             <Space direction="vertical" style={{ width: "100%" }} size="large">
-              <Row gutter={[24, 24]}>
-                <Col xs={24} lg={12}>
-                  <Card
-                    title={
-                      <Space>
-                        <UserOutlined style={{ color: "#667eea" }} />
-                        <span>רישום פרטי מנהל</span>
-                      </Space>
-                    }
-                    style={{ height: "100%" }}
-                  >
-                    <div style={{ marginBottom: 16 }}>
-                      <Text type="secondary">הזן את פרטי המנהל שיהיה אחראי על ניהול העסק במערכת</Text>
-                    </div>
-                    <Button
-                      onClick={() => {
-                        setIsAdmin(!isAdmin)
-                        if (!isAdmin) setActiveStep(1)
-                      }}
-                      type={isAdmin ? "default" : "primary"}
-                      size="large"
-                      icon={<UserOutlined />}
-                      block
-                      style={{ marginBottom: isAdmin ? 16 : 0 }}
-                    >
-                      {isAdmin ? "סגור טופס רישום מנהל" : "פתח טופס רישום מנהל"}
-                    </Button>
-                    {isAdmin && <AdminRegister onSubmitSuccess={handleAdminSuccess} />}
-                  </Card>
-                </Col>
+              <Card
+                title={
+                  <Space>
+                    <UserOutlined style={{ color: "#667eea" }} />
+                    <span>רישום פרטי מנהל</span>
+                  </Space>
+                }
+              >
+                <Text type="secondary" style={{ display: "block", marginBottom: 16 }}>
+                  הזן את פרטי המנהל שיהיה אחראי על ניהול העסק במערכת
+                </Text>
+                <Button
+                  onClick={() => {
+                    setIsAdmin(!isAdmin)
+                    if (!isAdmin) setActiveStep(1)
+                  }}
+                  type={isAdmin ? "default" : "primary"}
+                  size="large"
+                  icon={<UserOutlined />}
+                  block
+                  style={{
+                    marginBottom: isAdmin ? 24 : 0,
+                    height: 48,
+                    fontWeight: 600,
+                    maxWidth: 220,
+                  }}
+                >
+                  {isAdmin ? "סגור טופס רישום מנהל" : "פתח טופס רישום מנהל"}
+                </Button>
+                {isAdmin && (
+                  <div style={{ marginTop: 24 }}>
+                    <AdminRegister onSubmitSuccess={handleAdminSuccess} />
+                  </div>
+                )}
+              </Card>
 
-                <Col xs={24} lg={12}>
-                  <Card
-                    title={
-                      <Space>
-                        <ShopOutlined style={{ color: "#667eea" }} />
-                        <span>רישום פרטי עסק</span>
-                      </Space>
-                    }
-                    style={{ height: "100%" }}
+              {adminDone && (
+                <Card
+                  title={
+                    <Space>
+                      <ShopOutlined style={{ color: "#667eea" }} />
+                      <span>רישום פרטי עסק</span>
+                    </Space>
+                  }
+                >
+                  <Text type="secondary" style={{ display: "block", marginBottom: 16 }}>
+                    הזן את פרטי העסק הפיננסיים והבסיסיים
+                  </Text>
+                  <Button
+                    onClick={() => {
+                      setIsBusiness(!isBusiness)
+                      if (!isBusiness) setActiveStep(2)
+                    }}
+                    type={isBusiness ? "default" : "primary"}
+                    size="large"
+                    icon={<ShopOutlined />}
+                    block
+                    style={{
+                      marginBottom: isBusiness ? 24 : 0,
+                      height: 48,
+                      fontWeight: 600,
+                      maxWidth: 220,
+                    }}
                   >
-                    <div style={{ marginBottom: 16 }}>
-                      <Text type="secondary">הזן את פרטי העסק הפיננסיים והבסיסיים</Text>
+                    {isBusiness ? "סגור טופס רישום עסק" : "פתח טופס רישום עסק"}
+                  </Button>
+                  {isBusiness && (
+                    <div style={{ marginTop: 24 }}>
+                      <RegisterBusinessData onSubmitSuccess={handleBusinessSuccess} />
                     </div>
-                    <Button
-                      onClick={() => {
-                        setIsBusiness(!isBusiness)
-                        if (!isBusiness && adminDone) setActiveStep(2)
-                      }}
-                      type={isBusiness ? "default" : "primary"}
-                      size="large"
-                      icon={<ShopOutlined />}
-                      block
-                      disabled={!adminDone}
-                      style={{ marginBottom: isBusiness ? 16 : 0 }}
-                    >
-                      {isBusiness ? "סגור טופס רישום עסק" : "פתח טופס רישום עסק"}
-                    </Button>
-                    {isBusiness && <RegisterBusinessData onSubmitSuccess={handleBusinessSuccess} />}
-                  </Card>
-                </Col>
-              </Row>
+                  )}
+                </Card>
+              )}
 
               {error && (
-                <Alert message="שגיאה!" description={error} type="error" showIcon style={{ borderRadius: 8 }} />
+                <Alert
+                  message="שגיאה!"
+                  description={error}
+                  type="error"
+                  showIcon
+                  style={{ borderRadius: 8 }}
+                />
               )}
             </Space>
           )}

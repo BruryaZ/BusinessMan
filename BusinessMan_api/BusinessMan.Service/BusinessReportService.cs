@@ -28,18 +28,15 @@ namespace BusinessMan.Service
             var invoices = await _repository.Invoice.GetAllAsync();
             var businessInvoices = invoices.Where(i => i.BusinessId == businessId).ToList();
 
-            var totalIncome = businessInvoices.Sum(i => i.AmountCredit);
-            var totalExpenses = businessInvoices.Sum(i => i.AmountDebit);
-
             return new BusinessReportDto
             {
                 BusinessName = business.Name,
-                TotalIncome = totalIncome,
-                TotalExpenses = totalExpenses,
-                CashFlow = totalIncome - totalExpenses,
+                TotalIncome = business.Income,
+                TotalExpenses = business.Expenses,
+                CashFlow = business.CashFlow,
                 InvoiceCount = businessInvoices.Count,
-                TotalDebit = totalExpenses,
-                TotalCredit = totalIncome
+                TotalDebit = businessInvoices.Sum(i => i.AmountDebit),  
+                TotalCredit = businessInvoices.Sum(i => i.AmountCredit) 
             };
         }
     }

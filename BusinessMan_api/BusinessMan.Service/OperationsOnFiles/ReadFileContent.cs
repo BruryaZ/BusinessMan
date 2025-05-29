@@ -46,9 +46,9 @@ namespace BusinessMan.Service.OperationsOnFiles
             else if (!string.IsNullOrEmpty(fileUpload.FilePath) && fileUpload.FilePath.Contains("s3"))
             {
                 // הקובץ שמור ב-S3 - נשלוף אותו
-                var s3Client = new AmazonS3Client(); 
-                var bucketName = "businessfiles235"; 
-                var key = GetS3KeyFromUrl(fileUpload.FilePath); 
+                var s3Client = new AmazonS3Client();
+                var bucketName = "businessfiles235";
+                var key = GetS3KeyFromUrl(fileUpload.FilePath);
 
                 var getRequest = new GetObjectRequest
                 {
@@ -170,7 +170,7 @@ namespace BusinessMan.Service.OperationsOnFiles
     {
         ChatMessage.FromSystem("אתה עוזר לנתח חשבוניות ולהחזיר תוצאה כ־JSON לפי מבנה קבוע."),
         ChatMessage.FromUser(
-            @$"הנה תוכן חשבונית:
+    @$"הנה תוכן חשבונית:
 
 {invoiceText}
 
@@ -184,7 +184,8 @@ namespace BusinessMan.Service.OperationsOnFiles
   ""CreatedBy"": ""gpt"",
   ""UpdatedBy"": ""gpt"",
   ""UserId"": null,
-  ""BusinessId"": null
+  ""BusinessId"": null,
+  ""Type"": ""<מספר של enum>"" // אחד מהערכים: Income = 0, Expense = 1, AssetIncrease = 2, AssetDecrease = 3, LiabilityIncrease = 4, LiabilityDecrease = 5, EquityIncrease = 6, EquityDecrease = 7
 }}
 
 החזר את ה-JSON בלבד וללא טקסט נוסף. החזר את התאריך בפורמט yyyy-MM-dd")

@@ -1,10 +1,8 @@
 "use client"
-import { useContext, useState } from "react"
+import { useState } from "react"
 import axios from "axios"
 import { useNavigate } from "react-router-dom"
 import { validationSchemaUserRegister } from "../utils/validationSchema"
-import { globalContext } from "../context/GlobalContext"
-import { convertToUser } from "../utils/converToUser"
 import type { UserPostModel } from "../models/UserPostModel"
 import {
   Form,
@@ -38,7 +36,7 @@ const UserRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => 
   const validationSchema = validationSchemaUserRegister
   const [errors, setErrors] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
-  const { setUser } = useContext(globalContext)
+  // const { setUser } = useContext(globalContext)
   const url = import.meta.env.VITE_API_URL
   const [myUser, setMyUser] = useState<UserPostModel>({
     firstName: "",
@@ -61,11 +59,11 @@ const UserRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => 
       setErrors([])
 
       if (valid) {
-        const { data } = await axios.post<UserPostModel>(`${url}/Auth/user-register`, myUser, { withCredentials: true })
-        setUser(convertToUser(data))
+        await axios.post<UserPostModel>(`${url}/Auth/user-register`, myUser, { withCredentials: true })
+        // setUser(convertToUser(data))
 
         if (onSubmitSuccess) onSubmitSuccess()
-        nav("/")
+        nav(-1) // Go back to the previous page
       } else {
         setErrors(["נא למלא את כל השדות הנדרשים"])
       }

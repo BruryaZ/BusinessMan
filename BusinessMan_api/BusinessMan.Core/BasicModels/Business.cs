@@ -23,7 +23,7 @@ namespace BusinessMan.Core.Models
         public decimal CashFlow { get; set; } // תזרים מזומנים של העסק
         public decimal TotalAssets { get; set; } // סך הנכסים של העסק
         public decimal TotalLiabilities { get; set; } // סך ההתחייבויות של העסק
-        public decimal NetWorth => TotalAssets - TotalLiabilities; // שווי נקי
+        public decimal NetWorth => TotalAssets - TotalLiabilities ; // שווי נקי
         public decimal RevenueGrowthRate { get; set; } = 0.00m; // שיעור צמיחת ההכנסות
         public decimal ProfitMargin { get; set; } = 0.00m; // שיעור הרווח
         public decimal CurrentRatio { get; set; } = 0.00m; // יחס נוכחי

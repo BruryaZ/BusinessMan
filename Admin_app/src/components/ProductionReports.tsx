@@ -47,9 +47,8 @@ const ProductionReports = () => {
   useEffect(() => {
     const fetchReport = async () => {
       try {
-        const { data } = await axios.get(
-          `${url}/api/Reports/business-report/${globalContextDetails.business_global.id}`,
-          { withCredentials: true },
+        const { data } = await axios.get(`${url}/api/Reports/business-report/${globalContextDetails.business_global.id}`,
+          { withCredentials: true }
         )
         setReportData(data)
       } catch (error) {

@@ -32,6 +32,7 @@ namespace BusinessMan.Service
 
         public async Task<Business> AddAsync(Business business)
         {
+            //business.CurrentRatio = 
             await _repositoryManager.Business.AddAsync(business);
             await _repositoryManager.SaveAsync(); 
             return business;

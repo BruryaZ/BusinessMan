@@ -27,8 +27,6 @@ const AdminLogin = () => {
       setErrors([])
 
       if (valid) {
-        console.log("Admin login data:", admin);
-        
         const { data } = await axios.post<any>(`${url}/Auth/admin-login`, admin, { withCredentials: true })
         globalContextDetails.setUser(data.user)
         globalContextDetails.setIsAdmin(true)
@@ -38,15 +36,14 @@ const AdminLogin = () => {
           globalContextDetails.setBusinessGlobal(res.data)
         }
         catch (e) {
-          console.error("Error setting business global:", e)
+          setErrors(e instanceof Error ? [e.message] : ["שגיאה בטעינת העסק, נא לנסות שוב מאוחר יותר"])
         }
         nav("/")
       } else {
         setErrors(["נא למלא את כל השדות הנדרשים"])
       }
     } catch (e) {
-      console.log(e)
-      setErrors(["שם משתמש או סיסמה שגויים"])
+      setErrors(e instanceof Error ? [e.message] : ["שגיאה לא צפויה, נא לנסות שוב מאוחר יותר"])
     } finally {
       setLoading(false)
     }

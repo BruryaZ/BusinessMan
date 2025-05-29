@@ -1,7 +1,9 @@
-﻿using System;
+﻿using BusinessMan.Core.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace BusinessMan.Core.DTO_s
@@ -19,6 +21,8 @@ namespace BusinessMan.Core.DTO_s
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow; // תאריך עדכון
         public string UpdatedBy { get; set; } // עודכן על ידי
         public string InvoicePath { get; set; }
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public InvoiceType Type { get; set; } = InvoiceType.Income;
 
         // אובייקטים לקשרים בין הטבלאות
         public int? UserId { get; set; } // מזהה המשתמש (קשר לטבלת Users)
