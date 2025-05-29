@@ -6,7 +6,7 @@ import { BrowserRouter as Router, Routes, Route, Link, useLocation } from "react
 import { Layout, Menu, Button, Typography, Avatar, Space, Drawer, ConfigProvider, theme as antTheme } from "antd"
 import { MenuOutlined, UserAddOutlined, MenuFoldOutlined, MenuUnfoldOutlined, BuildOutlined, BankOutlined, BarChartOutlined, CrownOutlined, DollarOutlined, EyeOutlined, LoginOutlined, ShopOutlined, TeamOutlined, UploadOutlined, CloudDownloadOutlined } from "@ant-design/icons"
 import { useMediaQuery } from "react-responsive"
-import "./app.css"
+import "./App.css"
 import AdminLogin from "./components/AdminLogin"
 import BusinessAndAdmin from "./components/BusinessAndAdmin"
 import DataViewing from "./components/DataViweing"
