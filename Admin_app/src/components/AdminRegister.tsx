@@ -52,7 +52,7 @@ const AdminRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) =>
   const globalContextDetails = useContext(globalContext)
   const url = import.meta.env.VITE_API_URL
 
-  const handleSubmit = (adminRegister: UserPostModel) => async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (adminRegister: UserPostModel) => async () => {
     setLoading(true)
 
     validationSchema
