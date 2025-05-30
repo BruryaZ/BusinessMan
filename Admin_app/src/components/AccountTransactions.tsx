@@ -47,7 +47,7 @@ const invoiceTypes = [
   { value: InvoiceType.EquityDecrease, label: "ירידה בהון עצמי" },
 ]
 
-const IncomAndExpenses = () => {
+const AccountTransactions = () => {
   const { user } = useContext(globalContext)
   const [form] = Form.useForm()
   const [loading, setLoading] = useState(false)
@@ -273,4 +273,4 @@ const IncomAndExpenses = () => {
   )
 }
 
-export default IncomAndExpenses
+export default AccountTransactions

@@ -10,7 +10,6 @@ import "./App.css"
 import AdminLogin from "./components/AdminLogin"
 import BusinessAndAdmin from "./components/BusinessAndAdmin"
 import DataViewing from "./components/DataViweing"
-import IncomAndExpennses from "./components/Incom&Expennses"
 import ProductionReports from "./components/ProductionReports"
 import RegisterBusinessData from "./components/RegisterBusinessData"
 import UploadFiles from "./components/UploadFiles"
@@ -23,6 +22,7 @@ import { Home } from "@mui/icons-material"
 import MyHome from "./components/MyHome"
 import EditUserPage from "./components/EditUserPage"
 import BusinessFiles from "./components/BusinessFiles"
+import AccountTransactions from "./components/accountTransactions"
 
 // Components
 
@@ -38,9 +38,9 @@ const navItems = [
   { key: "/business-files", label: "קבצי העסק", icon: <CloudDownloadOutlined />, path: "/business-files" },
   { key: "/upload-file", label: "העלאת קבצים", icon: <UploadOutlined />, path: "/upload-file" },
   { key: "/view-data", label: "צפייה בנתונים", icon: <EyeOutlined />, path: "/view-data" },
-  { key: "/user-management", label: "ניהול משתמשים", icon: <TeamOutlined />, path: "/user-management" },
+  { key: "/user-management", label: "לקוחות", icon: <TeamOutlined />, path: "/user-management" },
   { key: "/production-reports", label: 'דו"ח ייצור', icon: <BarChartOutlined />, path: "/production-reports" },
-  { key: "/incom&Expennses", label: "ניהול הוצאות והכנסות", icon: <DollarOutlined />, path: "/incom&Expennses" },
+  { key: "/account-transactions", label: "הוספת תנועה בחשבון", icon: <DollarOutlined />, path: "/account-transactions" },
   {
     key: "/register-admin&business",
     label: "רישום עסק ומנהל חדש",
@@ -240,7 +240,7 @@ function ResponsiveDrawer() {
               <Space style={{ direction: "rtl" }}>
                 <BuildOutlined className="header-icon" style={{ color: "#667eea", fontSize: "20px" }} />
                 <Title level={4} className="header-title" style={{ margin: 0, color: "#2d3748" }}>
-                  מערכת ניהול עסקים
+                  מערכת לניהול עסק
                 </Title>
               </Space>
             </Space>
@@ -337,10 +337,10 @@ function ResponsiveDrawer() {
                   }
                 />
                 <Route
-                  path="/incom&Expennses"
+                  path="/account-transactions"
                   element={
                     <AdminRoute>
-                      <IncomAndExpennses />
+                      <AccountTransactions />
                     </AdminRoute>
                   }
                 />

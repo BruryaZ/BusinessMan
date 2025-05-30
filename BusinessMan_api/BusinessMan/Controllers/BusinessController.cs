@@ -40,6 +40,16 @@ namespace BusinessMan.API.Controllers
             return Ok(_mapper.Map<BusinessDto>(business));
         }
 
+        // GET api/<BusinessController>/5
+        [HttpGet("all-details{id}")]
+        public async Task<ActionResult<Business>> GetAllDetailsAsync(int id)
+        {
+            var business = await _allBusinesses.GetByIdAsync(id);
+            if (business == null)
+                return NotFound();
+            return Ok(business);
+        }
+
         // POST api/<BusinessController>
         [HttpPost]
         public async Task<ActionResult<BusinessDto>> PostAsync([FromBody] BusinessPostModel value)

@@ -28,5 +28,6 @@ namespace BusinessMan.Core.DTO_s
         public string CreatedBy { get; set; } // נוצר על ידי
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow; // תאריך עדכון
         public string UpdatedBy { get; set; } // עודכן על ידי
+        public int UsersCount { get; set; } = 0;
     }
 }

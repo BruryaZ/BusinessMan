@@ -22,10 +22,11 @@ const { Title, Text, Paragraph } = Typography
 
 const MyHome = () => {
   const globalContextDetails = useContext(globalContext)
+  const incomes = globalContextDetails.business_global.income || 0
+  const users = globalContextDetails.business_global.users?.length || 0
+  console.log(globalContextDetails);
+  
 
-  if (!globalContextDetails) {
-    throw new Error("globalContext must be used within a GlobalContextProvider")
-  }
   const navigate = useNavigate()
 
   const menuItems = [
@@ -68,7 +69,7 @@ const MyHome = () => {
   const statsData = [
     {
       title: "הכנסות החודש",
-      value: 10500,
+      value: incomes,
       prefix: "₪",
       trend: 12.5,
       color: "#52c41a",
@@ -76,7 +77,7 @@ const MyHome = () => {
     },
     {
       title: "משתמשים פעילים",
-      value: 24,
+      value: users,
       trend: 3,
       color: "#1890ff",
       icon: <TeamOutlined />,
@@ -132,7 +133,7 @@ const MyHome = () => {
                 </Button>
                 <Button
                   size="large"
-                  onClick={() => navigate("/business-register")}
+                  onClick={() => navigate("/account-transactions")}
                   style={{
                     height: 48,
                     padding: "0 32px",
@@ -143,7 +144,7 @@ const MyHome = () => {
                     fontSize: 16,
                   }}
                 >
-                  עדכן פרטי עסק
+                 נהל תנועות בעסק
                 </Button>
               </Space>
             </Col>

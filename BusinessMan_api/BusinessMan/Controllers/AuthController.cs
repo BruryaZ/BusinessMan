@@ -88,8 +88,11 @@ namespace BusinessMan.API.Controllers
             }
 
             // הוסף את המשתמש החדש למסד הנתונים
+            int businessId = int.Parse(User.FindFirst("business_id").Value);
             var userToAdd = _mapper.Map<User>(user);
-            userToAdd.BusinessId =  int.Parse(User.FindFirst("business_id").Value);
+            userToAdd.BusinessId =  businessId;
+            var business = await _repositoryManager.Business.GetByIdAsync(businessId);
+            business.Users.Add(userToAdd);
             userToAdd.Business = await _repositoryManager.Business.GetByIdAsync(userToAdd.BusinessId ?? 0);
             await _context.Users.AddAsync(userToAdd);
             await _context.SaveChangesAsync();
