@@ -13,7 +13,7 @@ const { Title, Text, Link } = Typography
 
 const AdminLogin = () => {
   const nav = useNavigate()
-  const [admin, setAdmin] = useState<Admin>({ email: "", password: "" })
+  const [admin, setAdmin] = useState<Admin>({ email: "c@c", password: "1" })//TODO: remove default values
   const [errors, setErrors] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
   const url = import.meta.env.VITE_API_URL

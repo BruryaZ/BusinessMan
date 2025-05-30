@@ -185,6 +185,54 @@ namespace BusinessMan.API.Controllers
             memoryStream.Position = 0;
             return File(memoryStream.ToArray(), "application/zip", "my-files.zip");
         }
+
+        // GET api/FileUpload/download-file/{id}
+        [HttpGet("download-file/{id}")]
+        public async Task<IActionResult> DownloadFile(int id)
+        {
+            var file = await _fileService.GetByIdAsync(id);
+            if (file == null)
+                return NotFound("הקובץ לא נמצא.");
+
+            // הוצאת המפתח (Key) מתוך כתובת ה-URL של הקובץ ב-S3
+            var key = ExtractKeyFromUrl(file.FilePath);
+
+            try
+            {
+                var request = new Amazon.S3.Model.GetObjectRequest
+                {
+                    BucketName = _bucketName,
+                    Key = key
+                };
+
+                using var response = await _s3Client.GetObjectAsync(request);
+                using var responseStream = response.ResponseStream;
+
+                // קריאה לזרם התגובה לזיכרון
+                using var memoryStream = new MemoryStream();
+                await responseStream.CopyToAsync(memoryStream);
+                memoryStream.Position = 0;
+
+                // החזרת הקובץ עם סוג התוכן המקורי והשם לשמירה
+                return File(memoryStream.ToArray(), response.Headers.ContentType, file.FileName);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"שגיאה בהורדת הקובץ: {ex.Message}");
+            }
+        }
+
+        [HttpGet("my-files")]
+        public async Task<IActionResult> GetMyFiles()
+        {
+            var businessIdClaim = User?.FindFirst("business_id")?.Value;
+            if (string.IsNullOrEmpty(businessIdClaim))
+                return Unauthorized("העסק לא מזוהה.");
+            int businessId = int.Parse(businessIdClaim);
+            var allFiles = await _fileService.GetListAsync();
+            var myFiles = allFiles.Where(f => f.BusinessId == businessId);
+            return Ok(myFiles);
+        }
         private string ExtractKeyFromUrl(string url)
         {
             // מניח שה־Key מתחיל אחרי amazonaws.com/

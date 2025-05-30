@@ -60,8 +60,6 @@ const UploadFiles = () => {
       setUploadComplete(false)
       setProgress(0)
     },
-    // Removed onDragEnter as it is not a valid property of UploadProps
-    // onDragLeave: () => setDragActive(false),
     onDrop: () => setDragActive(false),
   }
 
@@ -139,6 +137,53 @@ const UploadFiles = () => {
 
   return (
     <ConfigProvider direction="rtl">
+      {/* Floating Upload Status Overlay */}
+      {uploading && file && (
+        <div
+          style={{
+            position: "fixed",
+            top: "20px",
+            left: "50%",
+            transform: "translateX(-50%)",
+            zIndex: 9999,
+            background: "rgba(255, 255, 255, 0.95)",
+            backdropFilter: "blur(10px)",
+            border: "1px solid #d9d9d9",
+            borderRadius: "12px",
+            padding: "16px 24px",
+            boxShadow: "0 4px 20px rgba(0, 0, 0, 0.15)",
+            minWidth: "300px",
+            maxWidth: "500px",
+          }}
+        >
+          <Space direction="vertical" style={{ width: "100%" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <Space>
+                {getFileIcon(file.name)}
+                <Text strong>{file.name}</Text>
+              </Space>
+              <Text style={{ color: "#fa8c16", fontWeight: "bold" }}>{Math.round(progress)}%</Text>
+            </div>
+            <Progress
+              percent={progress}
+              strokeColor={{
+                "0%": "#667eea",
+                "50%": "#764ba2",
+                "100%": "#52c41a",
+              }}
+              strokeWidth={6}
+              showInfo={false}
+            />
+            <Text type="secondary" style={{ fontSize: 12, textAlign: "center" }}>
+              {progress < 30 && "מתחיל העלאה..."}
+              {progress >= 30 && progress < 60 && "מעלה נתונים..."}
+              {progress >= 60 && progress < 90 && "מעבד קובץ..."}
+              {progress >= 90 && "משלים העלאה..."}
+            </Text>
+          </Space>
+        </div>
+      )}
+
       <div className="upload-container" style={{ maxWidth: 900, margin: "0 auto", marginTop: "45vh" }}>
         <Card className="form-section">
           <div style={{ textAlign: "center", marginBottom: 32 }}>
@@ -180,16 +225,23 @@ const UploadFiles = () => {
                   marginBottom: 24,
                   position: "relative",
                   overflow: "hidden",
-                  transition: "all 0.3s ease",
                 }}
               >
-                <div style={{ position: "relative", zIndex: 2, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column" }}>
+                <div
+                  style={{
+                    position: "relative",
+                    zIndex: 2,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexDirection: "column",
+                  }}
+                >
                   <p className="ant-upload-drag-icon">
                     <InboxOutlined
                       style={{
                         fontSize: 80,
                         color: dragActive ? "#1890ff" : "#667eea",
-                        transition: "all 0.3s ease",
                       }}
                     />
                   </p>
@@ -198,7 +250,6 @@ const UploadFiles = () => {
                     style={{
                       color: "#2d3748",
                       marginBottom: 12,
-                      transition: "all 0.3s ease",
                     }}
                   >
                     {dragActive ? "שחרר כאן!" : "גרור קובץ לכאן או לחץ לבחירה"}
@@ -212,7 +263,7 @@ const UploadFiles = () => {
                 </div>
               </Dragger>
 
-              {file && (
+              {file && !uploading && (
                 <Card
                   size="small"
                   style={{
@@ -257,41 +308,6 @@ const UploadFiles = () => {
                       </Space>
                     </Col>
                   </Row>
-                </Card>
-              )}
-
-              {uploading && (
-                <Card
-                  size="small"
-                  style={{
-                    marginBottom: 24,
-                    background: "linear-gradient(145deg, #fff7e6, #ffffff)",
-                    border: "1px solid #ffd591",
-                  }}
-                >
-                  <Space direction="vertical" style={{ width: "100%" }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                      <Text strong>מעלה קובץ...</Text>
-                      <Text style={{ color: "#fa8c16" }}>{Math.round(progress)}%</Text>
-                    </div>
-                    <Progress
-                      percent={progress}
-                      strokeColor={{
-                        "0%": "#667eea",
-                        "50%": "#764ba2",
-                        "100%": "#52c41a",
-                      }}
-                      strokeWidth={8}
-                      style={{ marginBottom: 8 }}
-                      showInfo={false}
-                    />
-                    <Text type="secondary" style={{ fontSize: 12 }}>
-                      {progress < 30 && "מתחיל העלאה..."}
-                      {progress >= 30 && progress < 60 && "מעלה נתונים..."}
-                      {progress >= 60 && progress < 90 && "מעבד קובץ..."}
-                      {progress >= 90 && "משלים העלאה..."}
-                    </Text>
-                  </Space>
                 </Card>
               )}
             </Col>

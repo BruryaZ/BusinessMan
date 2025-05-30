@@ -115,9 +115,6 @@ function DataViewing() {
       const values = await form.validateFields()
       const updatedBusiness = { ...business, ...values }
 
-      // Here you would typically make an API call to update the business
-      // await axios.put(`${url}/api/Business/${business.id}`, updatedBusiness)
-
       setBusiness(updatedBusiness)
       setEditModalVisible(false)
       message.success("נתוני העסק עודכנו בהצלחה!")
@@ -224,7 +221,7 @@ function DataViewing() {
 
   return (
     <ConfigProvider direction="rtl">
-      <div style={{ marginTop: "150vh" }}></div>
+      <div style={{ marginTop: "100vh" }}></div>
 
       <div className="business-data-container" style={{ maxWidth: 1400, margin: "0 auto" }}>
         <Card className="form-section">
@@ -284,7 +281,7 @@ function DataViewing() {
                 <Row align="middle" justify="space-between">
                   <Col>
                     <Space direction="vertical" size="small">
-                      <Title level={3} style={{ color: "white", margin: 0 }}>
+                      <Title level={3} style={{ color: "white", margin: 0, textAlign: "right" }}>
                         {business.name}
                       </Title>
                       <Text style={{ color: "rgba(255,255,255,0.8)", fontSize: 16 }}>

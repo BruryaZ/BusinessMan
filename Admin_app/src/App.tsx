@@ -4,7 +4,7 @@
 import { useState } from "react"
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from "react-router-dom"
 import { Layout, Menu, Button, Typography, Avatar, Space, Drawer, ConfigProvider, theme as antTheme } from "antd"
-import { MenuOutlined, UserAddOutlined, MenuFoldOutlined, MenuUnfoldOutlined, BuildOutlined, BankOutlined, BarChartOutlined, CrownOutlined, DollarOutlined, EyeOutlined, LoginOutlined, ShopOutlined, TeamOutlined, UploadOutlined, CloudDownloadOutlined } from "@ant-design/icons"
+import { MenuOutlined, UserAddOutlined, MenuFoldOutlined, MenuUnfoldOutlined, BuildOutlined, BankOutlined, BarChartOutlined, CrownOutlined, DollarOutlined, EyeOutlined, LoginOutlined, TeamOutlined, UploadOutlined, CloudDownloadOutlined } from "@ant-design/icons"
 import { useMediaQuery } from "react-responsive"
 import "./App.css"
 import AdminLogin from "./components/AdminLogin"
@@ -41,7 +41,6 @@ const navItems = [
   { key: "/user-management", label: "ניהול משתמשים", icon: <TeamOutlined />, path: "/user-management" },
   { key: "/production-reports", label: 'דו"ח ייצור', icon: <BarChartOutlined />, path: "/production-reports" },
   { key: "/incom&Expennses", label: "ניהול הוצאות והכנסות", icon: <DollarOutlined />, path: "/incom&Expennses" },
-  { key: "/business-register", label: "רישום עסק חדש", icon: <ShopOutlined />, path: "/business-register" },
   {
     key: "/register-admin&business",
     label: "רישום עסק ומנהל חדש",
