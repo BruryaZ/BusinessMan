@@ -16,6 +16,7 @@ namespace BusinessMan.Core.Repositories
         IRepository<Example> Examples { get; }
         IRepository<FileDto> Files { get; }
         IRepository<Email>? EmailList { get; }
+        Task<Business> GetBusinessWithUsersAsync(int id);
         Task SaveAsync();
     }
 }

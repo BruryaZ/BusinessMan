@@ -1,6 +1,6 @@
 "use client"
 
-import { useContext } from "react"
+import { useContext, useEffect, useState } from "react"
 import { Typography, Row, Col, Card, Button, Space, Avatar, Statistic, ConfigProvider } from "antd"
 import {
   DashboardOutlined,
@@ -17,15 +17,21 @@ import {
 } from "@ant-design/icons"
 import { useNavigate } from "react-router-dom"
 import { globalContext } from "../context/GlobalContext"
+import axios from "axios"
+import dayjs from "dayjs"
+import { UserDto } from "../models/UserDto"
 
 const { Title, Text, Paragraph } = Typography
 
 const MyHome = () => {
   const globalContextDetails = useContext(globalContext)
-  const incomes = globalContextDetails.business_global.income || 0
-  const users = globalContextDetails.business_global.users?.length || 0
-  console.log(globalContextDetails);
-  
+  const [incomes, setIcomes] = useState<number>(0)
+  const [incomesPrecent, setIcomesPrecent] = useState<number>(0)
+  const [expenses, setExpenses] = useState<number>(0)
+  const [expensesPrecent, setExpensesPrecent] = useState<number>(0)
+  const [userPrecent, setUserPrecent] = useState<number>(0)
+  const users = globalContextDetails.usersCount || 0
+  const [monthlyReport, setMonthlyReport] = useState<number | null>(null)
 
   const navigate = useNavigate()
 
@@ -40,15 +46,15 @@ const MyHome = () => {
     {
       title: "פרטי העסק",
       icon: <ShopOutlined style={{ fontSize: 32, color: "#52c41a" }} />,
-      description: "נהל את פרטי העסק שלך",
-      path: "/business-register",
+      description: " אין לך עדיין עסק? בוא נקים אותו יחד:)",
+      path: "/register-admin&business",
       color: "#52c41a",
     },
     {
-      title: "הכנסות והוצאות",
+      title: "הוספת תנועה בחשבון",
       icon: <DollarOutlined style={{ fontSize: 32, color: "#fa8c16" }} />,
-      description: "נהל את התקציב והתזרים של העסק",
-      path: "/incom&Expennses",
+      description: "נהל תנועות שונות בחשבון שלך",
+      path: "/account-transactions",
       color: "#fa8c16",
     },
     {
@@ -71,33 +77,96 @@ const MyHome = () => {
       title: "הכנסות החודש",
       value: incomes,
       prefix: "₪",
-      trend: 12.5,
+      trend: incomesPrecent,
       color: "#52c41a",
       icon: <DollarOutlined />,
     },
     {
       title: "משתמשים פעילים",
       value: users,
-      trend: 3,
+      trend: userPrecent,
       color: "#1890ff",
       icon: <TeamOutlined />,
     },
     {
-      title: "יעילות תפעולית",
-      value: 92,
+      title: "מדד חודשי",
+      value: monthlyReport ?? 0,
       suffix: "%",
-      trend: 5.2,
+      trend: incomesPrecent,
       color: "#722ed1",
       icon: <RiseOutlined />,
     },
     {
-      title: "פרויקטים פעילים",
-      value: 18,
-      trend: 2,
+      title: "הוצאות החודש",
+      value: expenses,
+      trend: expensesPrecent,
       color: "#fa8c16",
       icon: <BarChartOutlined />,
     },
   ]
+
+
+  const fetchUserGrowthPercent = async (businessId: number): Promise<number> => {
+    try {
+      const response = await axios.get<UserDto[]>(`https://localhost:7031/api/User/users-by-business/${businessId}`)
+      const users = response.data
+
+      const now = dayjs()
+      const currentMonth = now.month()
+      const currentYear = now.year()
+      const lastMonth = now.subtract(1, 'month').month()
+      const lastMonthYear = now.subtract(1, 'month').year()
+
+      const usersThisMonth = users.filter(user => {
+        const created = dayjs(user.createdAt)
+        return created.month() === currentMonth && created.year() === currentYear
+      })
+
+      const usersLastMonth = users.filter(user => {
+        const created = dayjs(user.createdAt)
+        return created.month() === lastMonth && created.year() === lastMonthYear
+      })
+
+      const countThisMonth = usersThisMonth.length
+      const countLastMonth = usersLastMonth.length
+
+      if (countLastMonth === 0) {
+        return countThisMonth > 0 ? 100 : 0 // אם בחודש שעבר לא היו משתמשים בכלל
+      }
+
+      const percentGrowth = ((countThisMonth - countLastMonth) / countLastMonth) * 100
+      return Math.round(percentGrowth)
+    } catch (error) {
+      console.error('שגיאה בעת שליפת המשתמשים:', error)
+      return 0
+    }
+  }
+
+  useEffect(() => {
+    const fetchMonthlyReport = async () => {
+      try {
+        const businessId = globalContextDetails.business_global.id
+        const year = new Date().getFullYear()
+        const month = new Date().getMonth() + 1
+        const res = await axios.get(
+          `https://localhost:7031/api/Reports/monthly?businessId=${businessId}&year=${year}&month=${month}`
+        )
+        setMonthlyReport(res.data?.monthlyMetric ?? 0)
+        setIcomes(res.data?.currentMonthIncome ?? 0)
+        setIcomesPrecent(res.data?.incomeChangePercent ?? 0)
+        setExpenses(res.data?.currentMonthExpenses ?? 0)
+        setExpensesPrecent(res.data?.expensesChangePercent ?? 0)
+        setUserPrecent(await fetchUserGrowthPercent(businessId))
+      } catch (err) {
+        console.error("שגיאה בקבלת דוח חודשי:", err)
+        setMonthlyReport(0)
+      }
+    }
+
+    if (globalContextDetails.business_global?.id) {
+      fetchMonthlyReport()
+    }
+  }, [globalContextDetails.business_global?.id])
 
   return (
     <ConfigProvider direction="rtl">
@@ -144,7 +213,7 @@ const MyHome = () => {
                     fontSize: 16,
                   }}
                 >
-                 נהל תנועות בעסק
+                  נהל תנועות בעסק
                 </Button>
               </Space>
             </Col>

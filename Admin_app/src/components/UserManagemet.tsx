@@ -33,22 +33,10 @@ import axios from "axios"
 import { useNavigate } from "react-router-dom"
 import type { ColumnsType } from "antd/es/table"
 import { globalContext } from "../context/GlobalContext"
+import { User } from "../models/User"
 
 const { Title, Text } = Typography
 const url = import.meta.env.VITE_API_URL
-
-interface User {
-  id: number
-  firstName: string
-  lastName: string
-  email: string
-  phone: string
-  idNumber: string
-  role: number
-  status: string
-  lastLogin: Date
-  createdAt: Date
-}
 
 const UserManagement: React.FC = () => {
   const [users, setUsers] = useState<User[]>([])
@@ -80,6 +68,7 @@ const UserManagement: React.FC = () => {
     try {
       const res = await axios.delete(`${url}/api/User/${id}`, { withCredentials: true })
       if (res.status >= 200 && res.status < 300) {
+        globalContextDetails.setUserCount(globalContextDetails.usersCount - 1)
         setUsers((prev) => prev.filter((user) => user.id !== id))
         message.success("המשתמש נמחק בהצלחה")
       }

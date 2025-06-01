@@ -1,7 +1,7 @@
-import { Business } from "./Business";
+import { BusinessDto } from "../components/BusinessDto";
 import { User } from "./User";
 
-export const defaultBusiness: Business = {
+export const defaultBusiness: BusinessDto = {
   id: 0,
   businessId: 0,
   name: '',
@@ -18,12 +18,11 @@ export const defaultBusiness: Business = {
   profitMargin: 0,
   currentRatio: 0,
   quickRatio: 0,
-  createdAt: new Date(),
   createdBy: '',
-  updatedAt: new Date(),
   updatedBy: '',
-  users: [],
-  invoices: []
+  usersCount: 0,
+  createdAt: "",
+  updatedAt: ""
 };
 
 export const defaultUser: User = {

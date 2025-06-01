@@ -1,6 +1,7 @@
 ﻿using BusinessMan.Core.DTO_s;
 using BusinessMan.Core.Models;
 using BusinessMan.Core.Repositories;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,6 +20,12 @@ namespace BusinessMan.Data.Repositories
         public IRepository<Business> Business => business_r;
         public IRepository<FileDto> Files => file_r;
         public IRepository<Email> EmailList => email_r;
+        public async Task<Business> GetBusinessWithUsersAsync(int id)
+        {
+            return await _dataContext.Businesses
+                                     .Include(b => b.Users)
+                                     .FirstOrDefaultAsync(b => b.Id == id);
+        }
 
         public async Task SaveAsync()
         {

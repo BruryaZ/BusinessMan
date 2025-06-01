@@ -1,5 +1,5 @@
 "use client"
-import { useState } from "react"
+import { useContext, useState } from "react"
 import axios from "axios"
 import { useNavigate } from "react-router-dom"
 import { validationSchemaUserRegister } from "../utils/validationSchema"
@@ -28,6 +28,7 @@ import {
   UserAddOutlined,
   ArrowLeftOutlined,
 } from "@ant-design/icons"
+import { globalContext } from "../context/GlobalContext"
 
 const { Title, Text, Link } = Typography
 
@@ -36,16 +37,17 @@ const UserRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => 
   const validationSchema = validationSchemaUserRegister
   const [errors, setErrors] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
-  // const { setUser } = useContext(globalContext)
   const url = import.meta.env.VITE_API_URL
+  const globalContextDetails = useContext(globalContext)
+
   const [myUser, setMyUser] = useState<UserPostModel>({
-    firstName: "",
-    lastName: "",
-    email: "",
-    password: "",
-    phone: "",
-    role: 0,
-    idNumber: "",
+    firstName: "מוישי",
+    lastName: "זרביב",
+    email: "z@z",
+    password: "1",
+    phone: "0556758422",
+    role: 1,
+    idNumber: "123321452",
   })
 
   const handleChange = (field: string, value: any) => {
@@ -55,21 +57,20 @@ const UserRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => 
   const handleSubmit = async () => {
     setLoading(true)
     try {
-      const valid = await validationSchema.isValid(myUser)
+      await validationSchema.validate(myUser, { abortEarly: false });
       setErrors([])
 
-      if (valid) {
+      try {
         await axios.post<UserPostModel>(`${url}/Auth/user-register`, myUser, { withCredentials: true })
-        // setUser(convertToUser(data))
-
+        globalContextDetails.setUserCount(globalContextDetails.usersCount + 1)
         if (onSubmitSuccess) onSubmitSuccess()
         nav(-1) // Go back to the previous page
-      } else {
-        setErrors(["נא למלא את כל השדות הנדרשים"])
+      } catch (e) {
+        setErrors(["שגיאה ברישום המשתמש"])
       }
+      
     } catch (e) {
-      console.log(e)
-      setErrors(["שגיאה ברישום המשתמש"])
+      setErrors(e instanceof Error ? [e.message] : ["שגיאה ברישום המשתמש, נא לנסות שוב מאוחר יותר"])
     } finally {
       setLoading(false)
     }
@@ -77,7 +78,7 @@ const UserRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => 
 
   return (
     <ConfigProvider direction="rtl">
-      <div style={{ padding: "40px 20px", maxWidth: 800, margin: "0 auto" , marginTop: "70vh"}}>
+      <div style={{ padding: "40px 20px", maxWidth: 800, margin: "0 auto", marginTop: "70vh" }}>
         <Card className="form-section">
           <div style={{ textAlign: "center", marginBottom: 32 }}>
             <Avatar
@@ -91,7 +92,7 @@ const UserRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => 
               <UserAddOutlined style={{ fontSize: 40 }} />
             </Avatar>
 
-            <Title level={2} style={{ marginBottom: 8, color: "#2d3748", textAlign:"center" }}>
+            <Title level={2} style={{ marginBottom: 8, color: "#2d3748", textAlign: "center" }}>
               הרשמת משתמש חדש
             </Title>
 

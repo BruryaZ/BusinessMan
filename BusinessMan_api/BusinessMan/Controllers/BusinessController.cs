@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BusinessMan.Core.DTO_s;
 using BusinessMan.Core.Models;
+using BusinessMan.Core.Repositories;
 using BusinessMan.Core.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -13,11 +14,13 @@ namespace BusinessMan.API.Controllers
     {
         private readonly IService<Business> _allBusinesses;
         private readonly IMapper _mapper;
+        private readonly IRepositoryManager _repositoryManager;
 
-        public BusinessController(IService<Business> businesses, IMapper mapper)
+        public BusinessController(IService<Business> businesses, IMapper mapper, IRepositoryManager repositoryManager)
         {
             _allBusinesses = businesses;
             _mapper = mapper;
+            _repositoryManager = repositoryManager;
         }
 
         // GET: api/<BusinessController>
@@ -27,18 +30,27 @@ namespace BusinessMan.API.Controllers
             var businesses = await _allBusinesses.GetListAsync();
             var businessesDTO = _mapper.Map<IEnumerable<BusinessDto>>(businesses);
 
+            foreach (var business in businessesDTO)
+            {
+                business.UsersCount = business.UsersCount > 0 ? business.UsersCount : 1; 
+            }
+
             return Ok(businessesDTO);
         }
 
-        // GET api/<BusinessController>/5
         [HttpGet("{id}")]
         public async Task<ActionResult<BusinessDto>> GetAsync(int id)
         {
-            var business = await _allBusinesses.GetByIdAsync(id);
+            var business = await _repositoryManager.GetBusinessWithUsersAsync(id);
             if (business == null)
                 return NotFound();
-            return Ok(_mapper.Map<BusinessDto>(business));
+
+            var businessDto = _mapper.Map<BusinessDto>(business);
+            businessDto.UsersCount = business.Users?.Count ?? 0;
+
+            return Ok(businessDto);
         }
+
 
         // GET api/<BusinessController>/5
         [HttpGet("all-details{id}")]

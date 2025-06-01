@@ -79,21 +79,17 @@ namespace BusinessMan.API.Controllers
         [HttpPost("user-register")]// רישום משתמש רגיל
         public async Task<ActionResult<UserDto>> RegisterAsync([FromBody] UserPostModel user)
         {
-            // בדוק אם המשתמש כבר קיים
             var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.IdNumber == user.IdNumber);
-
             if (existingUser != null)
             {
                 return BadRequest(new { Message = "משתמש כבר קיים" });
             }
 
-            // הוסף את המשתמש החדש למסד הנתונים
             int businessId = int.Parse(User.FindFirst("business_id").Value);
+
             var userToAdd = _mapper.Map<User>(user);
-            userToAdd.BusinessId =  businessId;
-            var business = await _repositoryManager.Business.GetByIdAsync(businessId);
-            business.Users.Add(userToAdd);
-            userToAdd.Business = await _repositoryManager.Business.GetByIdAsync(userToAdd.BusinessId ?? 0);
+            userToAdd.BusinessId = businessId;
+
             await _context.Users.AddAsync(userToAdd);
             await _context.SaveChangesAsync();
 

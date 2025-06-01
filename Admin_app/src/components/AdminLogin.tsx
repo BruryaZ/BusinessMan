@@ -8,6 +8,7 @@ import { globalContext } from "../context/GlobalContext"
 import { Form, Input, Button, Typography, Card, Alert, Space, Avatar, Divider, ConfigProvider } from "antd"
 import { MailOutlined, LockOutlined, CrownOutlined, LoginOutlined } from "@ant-design/icons"
 import CenteredLayout from "./CenteredLayout"
+import { BusinessDto } from "./BusinessDto"
 
 const { Title, Text, Link } = Typography
 
@@ -32,8 +33,9 @@ const AdminLogin = () => {
         globalContextDetails.setIsAdmin(true)
 
         try {
-          const res = await axios.get<any>(`${url}/api/Business/${data.user.businessId}`, { withCredentials: true })
+          const res = await axios.get<BusinessDto>(`${url}/api/Business/${data.user.businessId}`, { withCredentials: true })
           globalContextDetails.setBusinessGlobal(res.data)
+          globalContextDetails.setUserCount(res.data.usersCount)
         }
         catch (e) {
           setErrors(e instanceof Error ? [e.message] : ["שגיאה בטעינת העסק, נא לנסות שוב מאוחר יותר"])

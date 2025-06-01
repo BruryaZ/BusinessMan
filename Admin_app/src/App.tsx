@@ -22,8 +22,7 @@ import { Home } from "@mui/icons-material"
 import MyHome from "./components/MyHome"
 import EditUserPage from "./components/EditUserPage"
 import BusinessFiles from "./components/BusinessFiles"
-import AccountTransactions from "./components/accountTransactions"
-
+import AccountTransactions from "./components/AccountTransactions"
 // Components
 
 const { Header, Sider, Content } = Layout
@@ -38,7 +37,7 @@ const navItems = [
   { key: "/business-files", label: "קבצי העסק", icon: <CloudDownloadOutlined />, path: "/business-files" },
   { key: "/upload-file", label: "העלאת קבצים", icon: <UploadOutlined />, path: "/upload-file" },
   { key: "/view-data", label: "צפייה בנתונים", icon: <EyeOutlined />, path: "/view-data" },
-  { key: "/user-management", label: "לקוחות", icon: <TeamOutlined />, path: "/user-management" },
+  { key: "/user-management", label: "משתמשים", icon: <TeamOutlined />, path: "/user-management" },
   { key: "/production-reports", label: 'דו"ח ייצור', icon: <BarChartOutlined />, path: "/production-reports" },
   { key: "/account-transactions", label: "הוספת תנועה בחשבון", icon: <DollarOutlined />, path: "/account-transactions" },
   {

@@ -29,6 +29,7 @@ namespace BusinessMan.Core.Models
 
         // אובייקטים לקשרים בין הטבלאות
         public int? BusinessId { get; set; } = null;// מזהה ייחודי לעסק
+        [ForeignKey("BusinessId")]
         public Business? Business { get; set; } = null;
         public List<Invoice>? Invoices { get; set; } = new List<Invoice>();
 

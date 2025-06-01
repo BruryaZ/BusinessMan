@@ -18,7 +18,7 @@ const UserLogin = () => {
   const [errors, setErrors] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
   const url = import.meta.env.VITE_API_URL
-  const { setUser } = useContext(globalContext)
+  const globalContextDetails = useContext(globalContext)
 
   const handleSubmit = async () => {
     setLoading(true)
@@ -28,7 +28,8 @@ const UserLogin = () => {
 
       if (valid) {
         const { data } = await axios.post<any>(`${url}/Auth/user-login`, userLogin, { withCredentials: true })
-        setUser(data.user)
+        globalContextDetails.setUserCount(data.user.businessUsersCount)
+        globalContextDetails.setUser(data.user)
         nav("/")
       } else {
         setErrors(["נא למלא את כל השדות הנדרשים"])
