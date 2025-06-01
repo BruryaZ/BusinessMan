@@ -8,13 +8,13 @@ import { globalContext } from "../context/GlobalContext"
 import { Form, Input, Button, Typography, Card, Alert, Space, Avatar, Divider, ConfigProvider } from "antd"
 import { MailOutlined, LockOutlined, CrownOutlined, LoginOutlined } from "@ant-design/icons"
 import CenteredLayout from "./CenteredLayout"
-import { BusinessDto } from "./BusinessDto"
+import { BusinessDto } from "../models/BusinessDto"
 
 const { Title, Text, Link } = Typography
 
 const AdminLogin = () => {
   const nav = useNavigate()
-  const [admin, setAdmin] = useState<Admin>({ email: "c@c", password: "1" })//TODO: remove default values
+  const [admin, setAdmin] = useState<Admin>({ email: "", password: "" })
   const [errors, setErrors] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
   const url = import.meta.env.VITE_API_URL

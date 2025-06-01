@@ -3,7 +3,7 @@ import axios from "axios"
 import { useState, useContext } from "react"
 import { globalContext } from "../context/GlobalContext"
 import type { BusinessPostModel } from "../models/BusinessPostModel"
-import { convertToBusiness } from "../utils/convertToBusiness"
+import {  convertToBusinessDto } from "../utils/convertToBusiness"
 import { validationSchemaBusinessRegister } from "../utils/validationSchema"
 import {
   Form,
@@ -67,17 +67,15 @@ const RegisterBusinessData = ({ onSubmitSuccess }: { onSubmitSuccess?: () => voi
     setErrors([])
     try {
       await validationSchema.validate(businessData, { abortEarly: false })
-      console.log("Submitting business data:", businessData);
 
       const { data } = await axios.post<Business>(`${url}/api/Business`, businessData, {
         withCredentials: true,
       })
-      globalContextDetails.setBusinessGlobal(convertToBusiness(data))
+      globalContextDetails.setBusinessGlobal(convertToBusinessDto(data))
       if (onSubmitSuccess) onSubmitSuccess()
     } catch (err: any) {
       if (err.name === "ValidationError") {
         if (axios.isAxiosError(err)) {
-          console.log("Axios error response:", err.response?.data)
           setErrors([
             err.response?.data?.message || "שגיאה כללית מהשרת"
           ])

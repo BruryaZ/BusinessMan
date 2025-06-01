@@ -71,7 +71,7 @@ namespace BusinessMan.Service
                         break;
 
                     case InvoiceType.EquityIncrease:
-                        business.CashFlow = invoice.AmountCredit;
+                        business.CashFlow += invoice.AmountCredit;
                         break;
 
                     case InvoiceType.EquityDecrease:

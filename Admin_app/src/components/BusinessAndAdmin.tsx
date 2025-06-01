@@ -41,7 +41,6 @@ const BusinessAndAdmin = () => {
   useEffect(() => {
     if (businessDone && adminDone) {
       updateObjects()
-      console.log("הטפסים נוספו בהצלחה")
     }
   }, [businessDone, adminDone])
 
@@ -51,7 +50,11 @@ const BusinessAndAdmin = () => {
     const updateAdmin = {
       ...globalContextDetails.user,
       businessId: globalContextDetails.business_global.id,
-      business: globalContextDetails.business_global,
+      business: {
+        ...globalContextDetails.business_global,
+        createdAt: new Date(globalContextDetails.business_global.createdAt),
+        updatedAt: new Date(globalContextDetails.business_global.updatedAt),
+      },
       role: 1,
       updateBy:
         globalContextDetails.user.firstName +
@@ -88,7 +91,6 @@ const BusinessAndAdmin = () => {
       setSuccess(true)
       setActiveStep(3)
     } catch (e) {
-      console.log(e)
       setError("אירעה שגיאה בעדכון הנתונים. אנא נסה שנית.")
     }
   }

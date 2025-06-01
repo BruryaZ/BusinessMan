@@ -70,7 +70,6 @@ const AdminRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) =>
             }
             if (onSubmitSuccess) onSubmitSuccess()
           } catch (e) {
-            console.log(e)
             setErrors(["שגיאה ברישום"])
           }
         } else {
@@ -78,7 +77,6 @@ const AdminRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) =>
         }
       })
       .catch((err) => {
-        console.log("Validation error:", err.errors)
         if (err instanceof Yup.ValidationError) {
           setErrors(err.errors)
         }

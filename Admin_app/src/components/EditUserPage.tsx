@@ -80,9 +80,7 @@ const EditUserPage = () => {
       const valid = await validationSchema.isValid(myUser)
       setErrors([])
 
-      if (valid && id) {
-        console.log(myUser);
-        
+      if (valid && id) {        
         const { data } = await axios.put<UserPostModel>(`${url}/api/User/${id}`, myUser, { withCredentials: true })
         setUser(convertToUser(data))
         nav("/user-management")
@@ -90,7 +88,6 @@ const EditUserPage = () => {
         setErrors(["נא למלא את כל השדות הנדרשים"])
       }
     } catch (e) {
-      console.log(e)
       setErrors(["שגיאה בעדכון המשתמש"])
     } finally {
       setLoading(false)

@@ -1,7 +1,7 @@
 import { createContext, ReactElement, useState } from "react"
 import { User } from "../models/User"
 import { defaultBusiness, defaultUser } from "../models/DefaultObjects"
-import { BusinessDto } from "../components/BusinessDto"
+import { BusinessDto } from "../models/BusinessDto"
 
 type GlobalContextType = {
     business_global: BusinessDto,

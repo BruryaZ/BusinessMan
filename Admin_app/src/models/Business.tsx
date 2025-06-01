@@ -2,6 +2,7 @@ import { Invoice } from "./Invoices";
 import { User } from "./User";
 
 export interface Business {
+    usersCount: number;
     id: number; // מזהה ייחודי
     businessId: number; // מזהה ייחודי לעסק
     name: string; // שם העסק
@@ -97,4 +98,5 @@ export class BusinessImpl implements Business {
         this.users = users;
         this.invoices = invoices;
     }
+    usersCount!: number;
 }

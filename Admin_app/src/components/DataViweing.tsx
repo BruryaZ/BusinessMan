@@ -2,7 +2,7 @@
 import axios from "axios"
 import type React from "react"
 
-import { useState, useContext } from "react"
+import { useState, useContext, useEffect } from "react"
 import {
   Button,
   Typography,
@@ -32,14 +32,11 @@ import {
   CloseOutlined,
   DollarOutlined,
   WarningOutlined,
-  BarChartOutlined,
-  PieChartOutlined,
-  LineChartOutlined,
-  BankOutlined,
   CreditCardOutlined,
   WalletOutlined,
   RiseOutlined,
   FallOutlined,
+  FileTextOutlined,
 } from "@ant-design/icons"
 import { Business } from "../models/Business"
 import { globalContext } from "../context/GlobalContext"
@@ -54,6 +51,9 @@ function DataViewing() {
   const [editModalVisible, setEditModalVisible] = useState(false)
   const globalContextDetails = useContext(globalContext) as { user: { businessId: number } }
   const [form] = Form.useForm()
+  const [businessReport, setBusinessReport] = useState<{ totalIncome: number; totalExpenses: number; cashFlow: number; netProfit: number; invoiceCount: number } | null>(null);
+  const [monthlyReport, setMonthlyReport] = useState<{ incomeChangePercent: number; expensesChangePercent: number; netProfitChangePercent: number } | null>(null);
+  const [error, setError] = useState<string[] | null>(null);
 
   const [business, setBusiness] = useState<Business>({
     id: 0,
@@ -72,13 +72,52 @@ function DataViewing() {
     createdBy: "",
     updatedAt: new Date(),
     updatedBy: "",
-  })
+    users: [],
+    invoices: [],
+    usersCount: 0,
+  });
+
+  useEffect(() => {
+    const fetchReports = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        // קריאה לדוח העסק
+        const businessReportResponse = await axios.get(
+          `https://localhost:7031/api/Reports/business-report/${globalContextDetails.user.businessId}`,
+          { withCredentials: true }
+        );
+
+        const monthlyReportResponse = await axios.get(
+          `${url}/api/Reports/monthly`,
+          {
+            params: {
+              businessId: globalContextDetails.user.businessId,
+              year: new Date().getFullYear(),
+              month: new Date().getMonth() + 1, // חודש ב-0 מבוסס, לכן מוסיפים 1
+            },
+          }
+        );
+
+        setBusinessReport(businessReportResponse.data);
+        setMonthlyReport(monthlyReportResponse.data);
+      } catch (err) {
+        console.error(err);
+        setError(["שגיאה בטעינת הדוחות"]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchReports();
+  }, [business]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setErrors([])
     setLoading(true)
-    
+
     try {
       const res = await axios.get<Business>(`${url}/api/Business/${globalContextDetails.user.businessId}`, {
         withCredentials: true,
@@ -141,80 +180,65 @@ function DataViewing() {
   const businessMetrics = [
     {
       title: "הכנסות כוללות",
-      value: business.income,
+      value: businessReport ? businessReport.totalIncome : 0,
       prefix: "₪",
       icon: <DollarOutlined />,
       color: "#52c41a",
-      change: 12.5,
-      description: "גידול של 12.5% מהחודש הקודם",
+      change: monthlyReport ? monthlyReport.incomeChangePercent : 0,
+      description: `שינוי של ${monthlyReport ? monthlyReport.incomeChangePercent : 0}% מהחודש הקודם`,
     },
     {
       title: "הוצאות כוללות",
-      value: business.expenses,
+      value: businessReport ? businessReport.totalExpenses : 0,
       prefix: "₪",
       icon: <CreditCardOutlined />,
       color: "#ff4d4f",
-      change: -3.2,
-      description: "ירידה של 3.2% מהחודש הקודם",
+      change: monthlyReport ? monthlyReport.expensesChangePercent : 0,
+      description: `שינוי של ${monthlyReport ? monthlyReport.expensesChangePercent : 0}% מהחודש הקודם`,
     },
     {
       title: "תזרים מזומנים",
-      value: business.cashFlow,
+      value: businessReport ? businessReport.cashFlow : 0,
       prefix: "₪",
       icon: <WalletOutlined />,
-      color: business.cashFlow > 0 ? "#52c41a" : "#ff4d4f",
-      change: 8.7,
-      description: "שיפור של 8.7% מהחודש הקודם",
+      color: businessReport ? businessReport.cashFlow : 0 > 0 ? "#52c41a" : "#ff4d4f",
+      change: null, // אין שינוי בדוח שלך, אפשר להוריד או להוסיף חישוב אם תרצה
+      description: "תזרים מזומנים נוכחי",
     },
     {
-      title: "סך נכסים",
-      value: business.totalAssets,
-      prefix: "₪",
-      icon: <BankOutlined />,
-      color: "#1890ff",
-      change: 5.3,
-      description: "גידול של 5.3% מהחודש הקודם",
-    },
-    {
-      title: "התחייבויות",
-      value: business.totalLiabilities,
-      prefix: "₪",
-      icon: <CreditCardOutlined />,
-      color: "#fa8c16",
-      change: -2.1,
-      description: "ירידה של 2.1% מהחודש הקודם",
-    },
-    {
-      title: "שווי נקי",
-      value: business.netWorth,
+      title: "רווח נקי",
+      value: businessReport ? businessReport.netProfit : 0,
       prefix: "₪",
       icon: <WarningOutlined />,
       color: "#722ed1",
-      change: 15.4,
-      description: "גידול של 15.4% מהחודש הקודם",
+      change: monthlyReport ? monthlyReport.netProfitChangePercent : 0,
+      description: `שינוי של ${monthlyReport ? monthlyReport.netProfitChangePercent : 0}% מהחודש הקודם`,
     },
-  ]
+    {
+      title: "מספר חשבוניות",
+      value: businessReport ? businessReport.invoiceCount : 0,
+      prefix: "",
+      icon: <FileTextOutlined />,
+      color: "#1890ff",
+      change: null,
+      description: "מספר החשבוניות בחודש",
+    },
+  ];
 
   const performanceMetrics = [
     {
       title: "שיעור רווח",
       value: calculateProfitMargin(),
-      suffix: "%",
-      target: 25,
       color: "#52c41a",
     },
     {
       title: "תשואה על השקעה",
       value: calculateROI(),
-      suffix: "%",
-      target: 15,
       color: "#1890ff",
     },
     {
       title: "יחס חוב להון",
       value: business.totalAssets > 0 ? ((business.totalLiabilities / business.totalAssets) * 100).toFixed(1) : 0,
-      suffix: "%",
-      target: 40,
       color: "#fa8c16",
     },
   ]
@@ -312,6 +336,7 @@ function DataViewing() {
               </Card>
 
               {/* Financial Metrics */}
+
               <div>
                 <Title level={4} style={{ marginBottom: 16 }}>
                   מדדים פיננסיים עיקריים
@@ -321,15 +346,13 @@ function DataViewing() {
                     <Col xs={24} sm={12} lg={8} key={index}>
                       <Card
                         className="business-metric"
-                        style={
-                          {
-                            height: "100%",
-                            background: `${metric.color}08`,
-                            border: `1px solid ${metric.color}30`,
-                            borderRadius: 16,
-                            "--metric-index": index,
-                          } as React.CSSProperties
-                        }
+                        style={{
+                          height: "100%",
+                          background: `${metric.color}08`,
+                          border: `1px solid ${metric.color}30`,
+                          borderRadius: 16,
+                          "--metric-index": index,
+                        } as React.CSSProperties}
                       >
                         <Space direction="vertical" style={{ width: "100%" }}>
                           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -340,7 +363,7 @@ function DataViewing() {
                               size={40}
                               style={{
                                 background: `${metric.color}20`,
-                                color: metric.color,
+                                color: String(metric.color),
                               }}
                             >
                               {metric.icon}
@@ -351,23 +374,25 @@ function DataViewing() {
                             value={metric.value}
                             prefix={metric.prefix}
                             valueStyle={{
-                              color: metric.color,
+                              color: String(metric.color),
                               fontSize: "1.8rem",
                               fontWeight: "bold",
                             }}
                           />
 
                           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                            {getChangeIcon(metric.change)}
-                            <Text
-                              style={{
-                                color: metric.change > 0 ? "#52c41a" : "#ff4d4f",
-                                fontWeight: 600,
-                              }}
-                            >
-                              {metric.change > 0 ? "+" : ""}
-                              {metric.change}%
-                            </Text>
+                            {getChangeIcon(metric.change ?? 0)}
+                            {metric.change !== null && (
+                              <Text
+                                style={{
+                                  color: metric.change > 0 ? "#52c41a" : "#ff4d4f",
+                                  fontWeight: 600,
+                                }}
+                              >
+                                {metric.change > 0 ? "+" : ""}
+                                {metric.change}%
+                              </Text>
+                            )}
                           </div>
 
                           <Text type="secondary" style={{ fontSize: 12 }}>
@@ -379,6 +404,16 @@ function DataViewing() {
                   ))}
                 </Row>
               </div>
+              {/* הצגת השגיאות */}
+              {error && (
+                <Alert
+                  message="שגיאה בטעינת דוחות"
+                  description={error.join(", ")}
+                  type="error"
+                  showIcon
+                  style={{ marginBottom: 16, borderRadius: 12 }}
+                />
+              )}
 
               {/* Performance Indicators */}
               <div>
@@ -397,21 +432,12 @@ function DataViewing() {
                           <div style={{ textAlign: "center", margin: "16px 0" }}>
                             <Progress
                               type="circle"
-                              percent={Math.min(
-                                (Number.parseFloat(metric.value.toString()) /
-                                  Number.parseFloat(metric.target.toString())) *
-                                100,
-                                100,
-                              )}
                               format={() => (
                                 <div>
                                   <div style={{ fontSize: "1.5rem", fontWeight: "bold", color: metric.color }}>
                                     {metric.value}
-                                    {metric.suffix}
                                   </div>
                                   <div style={{ fontSize: "0.8rem", color: "#666" }}>
-                                    יעד: {metric.target}
-                                    {metric.suffix}
                                   </div>
                                 </div>
                               )}
@@ -421,18 +447,6 @@ function DataViewing() {
                           </div>
 
                           <div style={{ textAlign: "center" }}>
-                            <Tag
-                              color={
-                                Number.parseFloat(metric.value.toString()) >=
-                                  Number.parseFloat(metric.target.toString())
-                                  ? "success"
-                                  : "warning"
-                              }
-                            >
-                              {Number.parseFloat(metric.value.toString()) >= Number.parseFloat(metric.target.toString())
-                                ? "עומד ביעד"
-                                : "מתחת ליעד"}
-                            </Tag>
                           </div>
                         </Space>
                       </Card>
@@ -440,45 +454,6 @@ function DataViewing() {
                   ))}
                 </Row>
               </div>
-
-              {/* Quick Actions */}
-              <Card title="פעולות מהירות" style={{ borderRadius: 16 }}>
-                <Row gutter={[16, 16]}>
-                  <Col xs={24} sm={8}>
-                    <Button
-                      type="primary"
-                      icon={<BarChartOutlined />}
-                      block
-                      size="large"
-                      style={{ height: 48, borderRadius: 12 }}
-                    >
-                      דוח מפורט
-                    </Button>
-                  </Col>
-                  <Col xs={24} sm={8}>
-                    <Button
-                      type="default"
-                      icon={<PieChartOutlined />}
-                      block
-                      size="large"
-                      style={{ height: 48, borderRadius: 12, borderWidth: 2 }}
-                    >
-                      ניתוח מגמות
-                    </Button>
-                  </Col>
-                  <Col xs={24} sm={8}>
-                    <Button
-                      type="default"
-                      icon={<LineChartOutlined />}
-                      block
-                      size="large"
-                      style={{ height: 48, borderRadius: 12, borderWidth: 2 }}
-                    >
-                      תחזית עתידית
-                    </Button>
-                  </Col>
-                </Row>
-              </Card>
             </Space>
           )}
 

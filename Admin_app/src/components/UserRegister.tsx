@@ -41,13 +41,13 @@ const UserRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => 
   const globalContextDetails = useContext(globalContext)
 
   const [myUser, setMyUser] = useState<UserPostModel>({
-    firstName: "מוישי",
-    lastName: "זרביב",
-    email: "z@z",
-    password: "1",
-    phone: "0556758422",
-    role: 1,
-    idNumber: "123321452",
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    phone: "",
+    role: 2,
+    idNumber: "",
   })
 
   const handleChange = (field: string, value: any) => {
@@ -68,7 +68,7 @@ const UserRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => 
       } catch (e) {
         setErrors(["שגיאה ברישום המשתמש"])
       }
-      
+
     } catch (e) {
       setErrors(e instanceof Error ? [e.message] : ["שגיאה ברישום המשתמש, נא לנסות שוב מאוחר יותר"])
     } finally {

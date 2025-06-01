@@ -1,4 +1,4 @@
-import { BusinessDto } from "../components/BusinessDto";
+import { BusinessDto } from "./BusinessDto";
 import { User } from "./User";
 
 export const defaultBusiness: BusinessDto = {
