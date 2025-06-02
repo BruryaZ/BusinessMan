@@ -66,8 +66,6 @@ namespace BusinessMan.Service
                 invoiceToAdd.UpdatedBy = user.FirstName + " " + user.LastName;
             }
 
-            Console.WriteLine("***********The result is: " + invoiceToAdd);
-
             await _repositoryManager.Files.AddAsync(fileUpload);
             await _invoiceService.AddAsync(invoiceToAdd);
             await _repositoryManager.SaveAsync();

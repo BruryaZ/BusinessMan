@@ -172,7 +172,6 @@ namespace BusinessMan.API.Controllers
                         Key = ExtractKeyFromUrl(file.FilePath)
                     };
 
-                    Console.WriteLine("🗝️🔐🔑Key: " + request.Key);
                     using var response = await _s3Client.GetObjectAsync(request);
                     using var responseStream = response.ResponseStream;
                     var entry = archive.CreateEntry(file.FileName, System.IO.Compression.CompressionLevel.Fastest);
