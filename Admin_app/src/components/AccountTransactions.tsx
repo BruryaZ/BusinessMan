@@ -1,107 +1,70 @@
-"use client"
-
-import { useContext, useEffect, useState } from "react"
-import axios from "axios"
+import React, { useState, useEffect, useContext } from "react"
 import {
   Form,
+  Input,
   InputNumber,
   Button,
-  Typography,
-  Card,
+  Select,
   Row,
   Col,
+  message,
   Alert,
-  Statistic,
-  ConfigProvider,
-  Divider,
-  Avatar,
-  Select,
-  Spin,
-  Input,
+  Typography,
+  Card,
 } from "antd"
-import {
-  FileTextOutlined,
-  WarningOutlined,
-  DingdingOutlined,
-  BarChartOutlined,
-  SendOutlined,
-  ClearOutlined,
-  TagsOutlined,
-} from "@ant-design/icons"
-
+import axios from "axios"
 import { globalContext } from "../context/GlobalContext"
-import { InvoiceType } from "../models/Invoices"
-import type { InvoiceDto } from "../models/InvoiceDto"
 
-const { Title, Text } = Typography
 const { Option } = Select
+const { Text } = Typography
 
-const invoiceTypes = [
-  { value: InvoiceType.Income, label: "הכנסה" },
-  { value: InvoiceType.Expense, label: "הוצאה" },
-  { value: InvoiceType.AssetIncrease, label: "עלייה בנכסים" },
-  { value: InvoiceType.AssetDecrease, label: "ירידה בנכסים" },
-  { value: InvoiceType.LiabilityIncrease, label: "עלייה בהתחייבויות" },
-  { value: InvoiceType.LiabilityDecrease, label: "ירידה בהתחייבויות" },
-  { value: InvoiceType.EquityIncrease, label: "עלייה בהון עצמי" },
-  { value: InvoiceType.EquityDecrease, label: "ירידה בהון עצמי" },
+const transactionTypes = [
+  { key: "Income", label: "הכנסה" },
+  { key: "Expense", label: "הוצאה" },
+  { key: "AssetIncrease", label: "הגדלת נכסים" },
+  { key: "AssetDecrease", label: "הקטנת נכסים" },
+  { key: "LiabilityIncrease", label: "הגדלת התחייבויות" },
+  { key: "LiabilityDecrease", label: "הקטנת התחייבויות" },
+  { key: "EquityIncrease", label: "הגדלת הון עצמי" },
+  { key: "EquityDecrease", label: "הקטנת הון עצמי" },
 ]
 
-const AccountTransactions = () => {
-  const { user } = useContext(globalContext)
+const AccountTransactions: React.FC = () => {
+  const globalContextDetails = useContext(globalContext)
   const [form] = Form.useForm()
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [summaryLoading, setSummaryLoading] = useState(true)
-  const [financialSummary, setFinancialSummary] = useState<any[]>([])
+  const url = import.meta.env.VITE_API_URL
+  const [totals, setTotals] = useState<{ debit: number; credit: number }>({
+    debit: 0,
+    credit: 0,
+  })
 
-  const fetchSummaryData = async () => {
-    const now = new Date()
-    const year = now.getFullYear()
-    const month = now.getMonth() + 1
+  const user = {
+    id: globalContextDetails.user.id,
+    firstName: globalContextDetails.user.firstName,
+    lastName: globalContextDetails.user.lastName,
+    businessId: globalContextDetails.business_global.id,
+  }
 
+  const fetchTotals = async () => {
     try {
-      const response = await axios.get(`https://localhost:7031/api/Reports/monthly?businessId=${user.businessId}&year=${year}&month=${month}`, {
-        withCredentials: true,
-      })
+      const { data } = await axios.get(
+        `${url}/api/Invoice/totals/${user.businessId}`,
+        { withCredentials: true }
+      )
+      console.log("Fetched totals:", data);
+      
 
-      const data = response.data
-
-      const summary = [
-        {
-          title: "הכנסות החודש",
-          amount: data.currentMonthIncome,
-          change: data.incomeChangePercent,
-          icon: <WarningOutlined />,
-          color: "#52c41a",
-        },
-        {
-          title: "הוצאות החודש",
-          amount: data.currentMonthExpenses,
-          change: data.expensesChangePercent,
-          icon: <DingdingOutlined />,
-          color: "#ff4d4f",
-        },
-        {
-          title: "רווח תפעולי",
-          amount: data.currentMonthNetProfit,
-          change: data.netProfitChangePercent,
-          icon: <BarChartOutlined />,
-          color: "#1890ff",
-        },
-      ]
-
-      setFinancialSummary(summary)
+      setTotals({ debit: data.totalDebit, credit: data.totalCredit })
     } catch (err) {
-      setError("שגיאה בטעינת הסיכום הפיננסי")
-    } finally {
-      setSummaryLoading(false)
+      console.error("Failed to fetch totals:", err)
     }
   }
 
   useEffect(() => {
-    fetchSummaryData()
+    fetchTotals()
   }, [])
 
   const handleFinish = async (values: any) => {
@@ -109,34 +72,51 @@ const AccountTransactions = () => {
     setSuccess(false)
     setError(null)
 
-    const invoiceToSend: InvoiceDto = {
+    let amountCredit = 0
+    let amountDebit = 0
+
+    switch (values.transactionType) {
+      case "Income":
+      case "LiabilityIncrease":
+      case "EquityIncrease":
+      case "AssetDecrease":
+        amountCredit = values.amount
+        break
+      case "Expense":
+      case "AssetIncrease":
+      case "LiabilityDecrease":
+      case "EquityDecrease":
+        amountDebit = values.amount
+        break
+      default:
+        break
+    }
+
+    const invoiceToSend = {
       id: 0,
-      amountCredit: [InvoiceType.Income, InvoiceType.AssetIncrease, InvoiceType.EquityIncrease].includes(values.type)
-        ? values.amount
-        : 0,
-      amountDebit: [InvoiceType.Expense, InvoiceType.AssetDecrease, InvoiceType.LiabilityIncrease, InvoiceType.LiabilityDecrease, InvoiceType.EquityDecrease].includes(values.type)
-        ? values.amount
-        : 0,
-      invoiceDate: new Date(),
+      amountCredit,
+      amountDebit,
+      invoiceDate: new Date().toISOString(),
       status: 1,
       notes: values.description ?? "",
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
       createdBy: `${user.firstName} ${user.lastName}`,
       updatedBy: `${user.firstName} ${user.lastName}`,
       invoicePath: "",
       userId: user.id,
       businessId: user.businessId ?? 0,
-      type: values.type,
+      type: values.transactionType,
     }
 
-    try {
-      await axios.post("https://localhost:7031/api/Invoice", invoiceToSend, {
+    try {    
+      await axios.post(`${url}/api/Invoice`, invoiceToSend, {
         withCredentials: true,
       })
       setSuccess(true)
       form.resetFields()
-      fetchSummaryData()
+      message.success("התנועה נוספה בהצלחה!")
+      await fetchTotals()
     } catch (err) {
       setError("אירעה שגיאה בשמירת התנועה.")
     } finally {
@@ -144,132 +124,82 @@ const AccountTransactions = () => {
     }
   }
 
+
   return (
-    <ConfigProvider direction="rtl">
-      <div style={{ paddingBottom: 40 }}>
-        <Card style={{ marginBottom: 32 }}>
-          <div style={{ textAlign: "center", marginBottom: 32 }}>
-            <Avatar size={80} style={{ background: "#667eea", marginBottom: 16 }}>
-              <FileTextOutlined style={{ fontSize: 40 }} />
-            </Avatar>
-            <Title level={2}>ניהול תנועות פיננסיות</Title>
-            <Text type="secondary">הזן תנועה חדשה לעסק</Text>
-            <Divider />
-          </div>
+    <div dir="rtl" style={{ maxWidth: 800, margin: "auto" }}>
+      <h2>רישום פקודת יומן</h2>
 
-          {summaryLoading ? (
-            <Spin size="large" style={{ display: "block", margin: "0 auto" }} />
-          ) : (
-            <Row gutter={[24, 24]} style={{ marginBottom: 40 }}>
-              {financialSummary.map((item, index) => (
-                <Col xs={24} md={8} key={index}>
-                  <Card>
-                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 16 }}>
-                      <Title level={5}>{item.title}</Title>
-                      <Avatar style={{ backgroundColor: item.color }}>{item.icon}</Avatar>
-                    </div>
-                    <Statistic value={item.amount} prefix="₪" valueStyle={{ color: item.color }} />
-                    <Text type="secondary">{item.change > 0 ? "+" : ""}{item.change}% מהחודש הקודם</Text>
-                  </Card>
-                </Col>
-              ))}
-            </Row>
-          )}
+      <Card style={{ marginBottom: 20 }}>
+        <Text strong>סכומים נוכחיים בעסק:</Text>
+        <Row gutter={16} style={{ marginTop: 10 }}>
+          <Col span={12}>
+            <Text type="success">
+              חובה (סכום כולל): ₪
+              {(totals.debit ?? 0).toLocaleString()}
+            </Text>
+          </Col>
+          <Col span={12}>
+            <Text type="danger">
+              זכות (סכום כולל): ₪
+              {(totals.credit ?? 0).toLocaleString()}
+            </Text>
+          </Col>
+        </Row>
+      </Card>
 
-          <Form form={form} layout="vertical" onFinish={handleFinish}>
-            <Row gutter={[24, 24]}>
-              <Col xs={24} md={12}>
-                <Form.Item
-                  name="type"
-                  label="סוג תנועה"
-                  rules={[{ required: true, message: "נא לבחור סוג תנועה" }]}
-                >
-                  <Select placeholder="בחר סוג" suffixIcon={<TagsOutlined />}>
-                    {invoiceTypes.map((item) => (
-                      <Option key={item.value} value={item.value}>{item.label}</Option>
-                    ))}
-                  </Select>
-                </Form.Item>
-              </Col>
+      {error && (
+        <Alert message={error} type="error" style={{ marginBottom: 16 }} />
+      )}
+      {success && (
+        <Alert
+          message="התנועה נשמרה בהצלחה"
+          type="success"
+          style={{ marginBottom: 16 }}
+        />
+      )}
 
-              <Col xs={24} md={12}>
-                <Form.Item
-                  name="amount"
-                  label="סכום"
-                  rules={[{ required: true, message: "נא להזין סכום" }]}
-                >
-                  <InputNumber
-                    placeholder="₪"
-                    style={{ width: "100%" }}
-                    min={0}
-                    formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-                    parser={(value) => {
-                      const parsedValue = parseFloat(value?.replace(/₪\s?|(,*)/g, "") || "0");
-                      return isNaN(parsedValue) ? 0 : (parsedValue as 0);
-                    }}
-                  />
-                </Form.Item>
-              </Col>
+      <Form form={form} layout="vertical" onFinish={handleFinish}>
+        <Form.Item
+          name="transactionType"
+          label="סוג תנועה"
+          rules={[{ required: true, message: "נא לבחור סוג תנועה" }]}
+        >
+          <Select placeholder="בחר סוג תנועה">
+            {transactionTypes.map((type) => (
+              <Option key={type.key} value={type.key}>
+                {type.label}
+              </Option>
+            ))}
+          </Select>
+        </Form.Item>
 
-              <Col span={24}>
-                <Form.Item name="description" label="תיאור">
-                  <Input.TextArea rows={2} placeholder="הוסף תיאור (אופציונלי)" />
-                </Form.Item>
-              </Col>
+        <Form.Item
+          name="amount"
+          label="סכום"
+          rules={[{ required: true, message: "נא להזין סכום" }]}
+        >
+          <InputNumber<number>
+            placeholder="₪"
+            style={{ width: "100%" }}
+            min={0.01}
+            formatter={(value) =>
+              `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+            }
+            parser={(value) =>
+              parseFloat(value?.replace(/₪\s?|(,*)/g, "") || "0")
+            }
+          />
+        </Form.Item>
 
-              <Col xs={24} sm={12}>
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  loading={loading}
-                  icon={<SendOutlined />}
-                  block
-                  size="large"
-                >
-                  שמור תנועה
-                </Button>
-              </Col>
+        <Form.Item name="description" label="תיאור">
+          <Input.TextArea rows={2} placeholder="הוסף תיאור (אופציונלי)" />
+        </Form.Item>
 
-              <Col xs={24} sm={12}>
-                <Button
-                  type="default"
-                  onClick={() => {
-                    form.resetFields()
-                    setSuccess(false)
-                    setError(null)
-                  }}
-                  icon={<ClearOutlined />}
-                  block
-                  size="large"
-                >
-                  נקה טופס
-                </Button>
-              </Col>
-            </Row>
-
-            {success && (
-              <Alert
-                message="הצלחה"
-                description="התנועה נשמרה בהצלחה."
-                type="success"
-                showIcon
-                style={{ marginTop: 24 }}
-              />
-            )}
-
-            {error && (
-              <Alert
-                message="שגיאה"
-                description={error}
-                type="error"
-                showIcon
-                style={{ marginTop: 24 }}
-              />
-            )}
-          </Form>
-        </Card>
-      </div>
-    </ConfigProvider>
+        <Button type="primary" htmlType="submit" loading={loading} block>
+          שמור פקודה
+        </Button>
+      </Form>
+    </div>
   )
 }
 

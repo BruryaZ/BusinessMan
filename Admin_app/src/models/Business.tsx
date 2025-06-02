@@ -9,6 +9,7 @@ export interface Business {
     address: string; // כתובת העסק
     email: string; // אימייל של העסק
     businessType: string; // סוג העסק
+    equity?: number; // הון עצמי של העסק (אופציונלי)
     income: number; // הכנסות העסק
     expenses: number; // הוצאות העסק
     cashFlow: number; // תזרים מזומנים של העסק

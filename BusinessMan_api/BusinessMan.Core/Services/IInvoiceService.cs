@@ -12,5 +12,6 @@ namespace BusinessMan.Core.Services
         Task DeleteAsync(Invoice item);
         Task<IEnumerable<InvoiceDto>> GetMyFiles(int userId);
         Task<MonthlyReportDto> GetMonthlyReportAsync(int businessId, int year, int month);
+        Task<(decimal totalDebit, decimal totalCredit)> GetTotalDebitAndCreditFromJournalAsync(int businessId);
     }
 }

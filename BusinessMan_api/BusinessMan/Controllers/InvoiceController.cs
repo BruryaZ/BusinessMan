@@ -2,6 +2,7 @@
 using BusinessMan.Core.BasicModels;
 using BusinessMan.Core.DTO_s;
 using BusinessMan.Core.Services;
+using BusinessMan.Service;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OpenAI.Interfaces;
@@ -74,6 +75,18 @@ namespace BusinessMan.API.Controllers
             }
             await _allInvoices.DeleteAsync(invoice);
             return NoContent();
+        }
+
+        [HttpGet("totals/{businessId}")]
+        public async Task<IActionResult> GetTotals(int businessId)
+        {
+            var (totalDebit, totalCredit) = await _allInvoices.GetTotalDebitAndCreditFromJournalAsync(businessId);
+
+            return Ok(new
+            {
+                TotalDebit = totalDebit,
+                TotalCredit = totalCredit
+            });
         }
 
         // קבלת קבצים של משתמש מסוים

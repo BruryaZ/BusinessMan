@@ -13,7 +13,7 @@ using InvoiceType = BusinessMan.Core.BasicModels.InvoiceType;
 
 namespace BusinessMan.Service
 {
-    public class InvoiceService : IInvoiceService
+    public class InvoiceService :IInvoiceService
     {
         private readonly IRepositoryManager _repositoryManager;
         private readonly IMapper _mapper;
@@ -129,6 +129,19 @@ namespace BusinessMan.Service
 
             return invoice;
         }
+
+        public async Task<(decimal totalDebit, decimal totalCredit)> GetTotalDebitAndCreditFromJournalAsync(int businessId)
+        {
+            var allJournalEntries = await _repositoryManager.JournalEntry.GetAllAsync();
+
+            var entriesOfBusiness = allJournalEntries.Where(e => e.BusinessId == businessId);
+
+            decimal totalDebit = entriesOfBusiness.Sum(e => e.Debit);
+            decimal totalCredit = entriesOfBusiness.Sum(e => e.Credit);
+
+            return (totalDebit, totalCredit);
+        }
+
 
         public async Task DeleteAsync(Invoice invoice)
         {
