@@ -1,5 +1,5 @@
-﻿using BusinessMan.Core.Extentions;
-using BusinessMan.Core.Models;
+﻿using BusinessMan.Core.BasicModels;
+using BusinessMan.Core.Extentions;
 using BusinessMan.Core.Repositories;
 using BusinessMan.Core.Services;
 using BusinessMan.Data.Repositories;

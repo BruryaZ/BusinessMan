@@ -1,4 +1,4 @@
-﻿using BusinessMan.Core.Models;
+﻿using BusinessMan.Core.BasicModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using BusinessMan.Core.BasicModels;
 using BusinessMan.Core.DTO_s;
 using BusinessMan.Core.Models;
 using BusinessMan.Core.Repositories;

@@ -7,7 +7,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace BusinessMan.Core.Models
+namespace BusinessMan.Core.BasicModels
 {
     public enum InvoiceType
     {

@@ -1,5 +1,5 @@
-﻿using BusinessMan.Core.DTO_s;
-using BusinessMan.Core.Models;
+﻿using BusinessMan.Core.BasicModels;
+using BusinessMan.Core.DTO_s;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -23,18 +23,18 @@ namespace BusinessMan.Data
         public DbSet<User> Users { get; set; }
         public DbSet<Invoice> Invoices { get; set; }
         public DbSet<Business> Businesses { get; set; }
-        public DbSet<Example> Examples { get; set; }
         public DbSet<FileDto> Files { get; set; }
         public DbSet<Email> EmailList { get; set; }
+        public DbSet<JournalEntry> JournalEntries { get; set; } 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // 🗃️ טבלאות
             modelBuilder.Entity<User>().ToTable("users");
             modelBuilder.Entity<Invoice>().ToTable("invoices");
             modelBuilder.Entity<Business>().ToTable("businesses");
-            modelBuilder.Entity<Example>().ToTable("examples");
             modelBuilder.Entity<FileDto>().ToTable("files");
-            modelBuilder.Entity<Email>().ToTable("EmailList");
+            modelBuilder.Entity<Email>().ToTable("email-list");
+            modelBuilder.Entity<JournalEntry>().ToTable("Journal-entries");
 
             // 📌 קשרים בין Invoice ל-User
             modelBuilder.Entity<Invoice>()

@@ -4,7 +4,6 @@ using Amazon.S3;
 using BusinessMan.API;
 using BusinessMan.Core;
 using BusinessMan.Core.DTO_s;
-using BusinessMan.Core.Models;
 using BusinessMan.Core.Repositories;
 using BusinessMan.Core.Services;
 using BusinessMan.Data;
@@ -18,6 +17,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
 using System.Text.Json.Serialization;
+using BusinessMan.Core.BasicModels;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -46,12 +46,11 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 builder.Services.AddScoped<IRepositoryManager, RepositoryManager>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRepository<User>, UserRepository>();
-builder.Services.AddScoped<IRepository<Example>, Repository<Example>>();
 builder.Services.AddScoped<IRepository<Email>, Repository<Email>>();
 builder.Services.AddScoped<IRepository<Invoice>, Repository<Invoice>>();
+builder.Services.AddScoped<IRepository<JournalEntry>, Repository<JournalEntry>>();
 builder.Services.AddScoped<IRepository<Business>, Repository<Business>>();
 builder.Services.AddScoped<IRepository<BusinessReportDto>, Repository<BusinessReportDto>>();
-builder.Services.AddScoped<IService<Example>, ExampleService>();
 builder.Services.AddScoped<IInvoiceService, InvoiceService>();
 builder.Services.AddScoped<IService<Business>, BusinessService>();
 builder.Services.AddScoped<IUserService, UserService>();

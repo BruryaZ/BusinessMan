@@ -1,7 +1,7 @@
-﻿using BusinessMan.Core.DTO_s;
-using BusinessMan.Core.Models;
+﻿using BusinessMan.Core.BasicModels;
+using BusinessMan.Core.DTO_s;
 
-namespace BusinessMan.Service
+namespace BusinessMan.Core.Services
 {
     public interface IInvoiceService
     {

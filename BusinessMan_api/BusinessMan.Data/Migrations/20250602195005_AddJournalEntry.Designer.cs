@@ -3,6 +3,7 @@ using System;
 using BusinessMan.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BusinessMan.Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20250602195005_AddJournalEntry")]
+    partial class AddJournalEntry
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -112,7 +115,25 @@ namespace BusinessMan.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("email-list", (string)null);
+                    b.ToTable("EmailList", (string)null);
+                });
+
+            modelBuilder.Entity("BusinessMan.Core.BasicModels.Example", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Num")
+                        .HasColumnType("integer")
+                        .HasColumnName("num");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("examples", (string)null);
                 });
 
             modelBuilder.Entity("BusinessMan.Core.BasicModels.Invoice", b =>
@@ -212,7 +233,7 @@ namespace BusinessMan.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Journal-entries", (string)null);
+                    b.ToTable("JournalEntries", (string)null);
                 });
 
             modelBuilder.Entity("BusinessMan.Core.BasicModels.User", b =>

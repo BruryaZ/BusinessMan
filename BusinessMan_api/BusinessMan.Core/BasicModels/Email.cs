@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BusinessMan.Core.Models
+namespace BusinessMan.Core.BasicModels
 {
     public class Email
     {

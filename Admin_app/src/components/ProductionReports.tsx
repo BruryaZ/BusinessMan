@@ -148,7 +148,6 @@ const ProductionReports = () => {
     ]
     : [];
 
-
   const handlePrint = () => {
     const printContent = document.getElementById("report-to-print")?.innerHTML;
     if (!printContent) return;
@@ -246,6 +245,7 @@ const ProductionReports = () => {
     newWindow?.print();
     newWindow?.close();
   };
+
   const handleDownload = () => {
     const input = document.getElementById("report-to-print");
     if (!input) return;

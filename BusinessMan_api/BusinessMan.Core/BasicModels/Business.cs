@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BusinessMan.Core.Models
+namespace BusinessMan.Core.BasicModels
 {
     public class Business
     {
@@ -18,6 +18,7 @@ namespace BusinessMan.Core.Models
         public string Address { get; set; } // כתובת העסק
         public string Email { get; set; } // אימייל של העסק
         public string BusinessType { get; set; } // סוג העסק
+        public decimal Equity { get; set; } // הון עצמי של העסק
         public decimal Income { get; set; } // הכנסות העסק
         public decimal Expenses { get; set; } // הוצאות העסק
         public decimal CashFlow { get; set; } // תזרים מזומנים של העסק

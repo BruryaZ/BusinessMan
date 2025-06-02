@@ -18,10 +18,10 @@ using System.Threading.Tasks;
 using Tesseract;
 using DocumentFormat.OpenXml.EMMA;
 using System.Text.Json;
-using BusinessMan.Core.Models;
 using Microsoft.Extensions.Configuration;
 using Amazon.S3;
 using Amazon.S3.Model;
+using BusinessMan.Core.BasicModels;
 
 namespace BusinessMan.Service.OperationsOnFiles
 {

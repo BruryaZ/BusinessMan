@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using BusinessMan.Core.DTO_s;
-using BusinessMan.Core.Models;
 using BusinessMan.Core.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -9,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using System.IO;
 using System.Threading.Tasks;
 using Amazon.S3;
+using BusinessMan.Core.BasicModels;
 
 namespace BusinessMan.API.Controllers
 {

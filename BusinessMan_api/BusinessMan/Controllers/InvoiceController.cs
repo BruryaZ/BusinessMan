@@ -1,8 +1,7 @@
 ﻿using AutoMapper;
+using BusinessMan.Core.BasicModels;
 using BusinessMan.Core.DTO_s;
-using BusinessMan.Core.Models;
 using BusinessMan.Core.Services;
-using BusinessMan.Service;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OpenAI.Interfaces;

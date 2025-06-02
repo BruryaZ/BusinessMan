@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
+using BusinessMan.Core.BasicModels;
 using BusinessMan.Core.DTO_s;
-using BusinessMan.Core.Models;
 using BusinessMan.Core.Repositories;
 using BusinessMan.Core.Services;
 using BusinessMan.Data.Repositories;
@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using InvoiceType = BusinessMan.Core.Models.InvoiceType;
+using InvoiceType = BusinessMan.Core.BasicModels.InvoiceType;
 
 namespace BusinessMan.Service
 {
@@ -36,60 +36,100 @@ namespace BusinessMan.Service
         public async Task<Invoice> AddAsync(Invoice invoice)
         {
             var business = await _repositoryManager.Business.GetByIdAsync(invoice.BusinessId ?? 0);
-            if (business != null)
+            if (business == null)
+                throw new InvalidOperationException("עסק לא קיים");
+
+            string debitAccount = "";
+            string creditAccount = "";
+            decimal amount = invoice.AmountCredit > 0 ? invoice.AmountCredit : invoice.AmountDebit;
+
+            switch (invoice.Type)
             {
-                switch (invoice.Type)
-                {
-                    case InvoiceType.Income:
-                        business.Income += invoice.AmountCredit;
-                        business.CashFlow += invoice.AmountCredit;
-                        business.TotalAssets += invoice.AmountCredit;  // הכנסה מגדילה נכסים
-                        break;
+                case InvoiceType.Income:
+                    debitAccount = "Cash";
+                    creditAccount = "Revenue";
+                    business.Income += amount;
+                    business.CashFlow += amount;
+                    business.TotalAssets += amount;
+                    break;
 
-                    case InvoiceType.Expense:
-                        business.Expenses += invoice.AmountDebit;
-                        business.CashFlow -= invoice.AmountDebit;
-                        business.TotalAssets -= invoice.AmountDebit;  // הוצאה מקטינה נכסים
-                        break;
+                case InvoiceType.Expense:
+                    debitAccount = "Expenses";
+                    creditAccount = "Cash";
+                    business.Expenses += amount;
+                    business.CashFlow -= amount;
+                    business.TotalAssets -= amount;
+                    break;
 
-                    case InvoiceType.AssetIncrease:
-                        business.TotalAssets += invoice.AmountCredit;
-                        business.CashFlow += invoice.AmountCredit;
-                        break;
+                case InvoiceType.AssetIncrease:
+                    debitAccount = "Assets";
+                    creditAccount = "Cash";
+                    business.TotalAssets += amount;
+                    business.CashFlow -= amount;
+                    break;
 
-                    case InvoiceType.AssetDecrease:
-                        business.TotalAssets -= invoice.AmountDebit;
-                        business.CashFlow -= invoice.AmountDebit;
-                        break;
+                case InvoiceType.AssetDecrease:
+                    debitAccount = "Cash";
+                    creditAccount = "Assets";
+                    business.TotalAssets -= amount;
+                    business.CashFlow += amount;
+                    break;
 
-                    case InvoiceType.LiabilityIncrease:
-                        business.TotalLiabilities += invoice.AmountCredit;
-                        break;
+                case InvoiceType.LiabilityIncrease:
+                    debitAccount = "Cash";
+                    creditAccount = "Liabilities";
+                    business.TotalLiabilities += amount;
+                    business.CashFlow += amount;
+                    break;
 
-                    case InvoiceType.LiabilityDecrease:
-                        business.TotalLiabilities -= invoice.AmountDebit;
-                        break;
+                case InvoiceType.LiabilityDecrease:
+                    debitAccount = "Liabilities";
+                    creditAccount = "Cash";
+                    business.TotalLiabilities -= amount;
+                    business.CashFlow -= amount;
+                    break;
 
-                    case InvoiceType.EquityIncrease:
-                        business.CashFlow += invoice.AmountCredit;
-                        break;
+                case InvoiceType.EquityIncrease:
+                    debitAccount = "Cash";
+                    creditAccount = "Equity";
+                    business.CashFlow += amount;
+                    business.Equity += amount;
+                    break;
 
-                    case InvoiceType.EquityDecrease:
-                        // מפחית את ההון העצמי
-                        break;
+                case InvoiceType.EquityDecrease:
+                    debitAccount = "Equity";
+                    creditAccount = "Cash";
+                    business.CashFlow -= amount;
+                    business.Equity -= amount;
+                    break;
 
-                    default:
-                        throw new ArgumentException("סוג חשבונית לא מוכר");
-                }
-
-                business.UpdatedAt = DateTime.UtcNow;
-                await _repositoryManager.Business.UpdateAsync(business.Id, business);
+                default:
+                    throw new ArgumentException("סוג חשבונית לא מוכר");
             }
 
+            // רישום כפול
+            var journalEntry = new JournalEntry
+            {
+                EntryDate = invoice.InvoiceDate,
+                Description = invoice.Notes,
+                Debit = invoice.AmountDebit,
+                Credit = invoice.AmountCredit,
+                DebitAccount = debitAccount,
+                CreditAccount = creditAccount,
+                InvoiceId = invoice.Id,
+                BusinessId = invoice.BusinessId ?? 0
+            };
+
+            business.UpdatedAt = DateTime.UtcNow;
+
             await _repositoryManager.Invoice.AddAsync(invoice);
+            await _repositoryManager.JournalEntry.AddAsync(journalEntry);
+            await _repositoryManager.Business.UpdateAsync(business.Id, business);
             await _repositoryManager.SaveAsync();
+
             return invoice;
         }
+
         public async Task DeleteAsync(Invoice invoice)
         {
             await _repositoryManager.Invoice.DeleteAsync(invoice);
