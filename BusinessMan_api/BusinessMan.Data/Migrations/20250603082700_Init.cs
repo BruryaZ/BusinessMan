@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BusinessMan.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class Init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -23,6 +23,7 @@ namespace BusinessMan.Data.Migrations
                     Address = table.Column<string>(type: "text", nullable: false),
                     Email = table.Column<string>(type: "text", nullable: false),
                     BusinessType = table.Column<string>(type: "text", nullable: false),
+                    Equity = table.Column<decimal>(type: "numeric", nullable: false),
                     Income = table.Column<decimal>(type: "numeric(18,2)", nullable: false),
                     Expenses = table.Column<decimal>(type: "numeric(18,2)", nullable: false),
                     CashFlow = table.Column<decimal>(type: "numeric(18,2)", nullable: false),
@@ -43,7 +44,7 @@ namespace BusinessMan.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "emails",
+                name: "email-list",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -52,20 +53,7 @@ namespace BusinessMan.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_emails", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "examples",
-                columns: table => new
-                {
-                    id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    num = table.Column<int>(type: "integer", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_examples", x => x.id);
+                    table.PrimaryKey("PK_email-list", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -77,11 +65,33 @@ namespace BusinessMan.Data.Migrations
                     FileName = table.Column<string>(type: "text", nullable: false),
                     FilePath = table.Column<string>(type: "text", nullable: false),
                     Size = table.Column<long>(type: "bigint", nullable: false),
-                    UploadDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    UserId = table.Column<int>(type: "integer", nullable: false),
+                    UploadDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    BusinessId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_files", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Journal-entries",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    EntryDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: false),
+                    Debit = table.Column<decimal>(type: "numeric", nullable: false),
+                    Credit = table.Column<decimal>(type: "numeric", nullable: false),
+                    DebitAccount = table.Column<string>(type: "text", nullable: false),
+                    CreditAccount = table.Column<string>(type: "text", nullable: false),
+                    InvoiceId = table.Column<int>(type: "integer", nullable: false),
+                    BusinessId = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Journal-entries", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -122,8 +132,8 @@ namespace BusinessMan.Data.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    AmountDebit = table.Column<string>(type: "text", nullable: false),
-                    AmountCredit = table.Column<string>(type: "text", nullable: false),
+                    AmountDebit = table.Column<decimal>(type: "numeric(18,2)", nullable: false),
+                    AmountCredit = table.Column<decimal>(type: "numeric(18,2)", nullable: false),
                     InvoiceDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     Status = table.Column<int>(type: "integer", nullable: false),
                     Notes = table.Column<string>(type: "text", nullable: false),
@@ -131,8 +141,10 @@ namespace BusinessMan.Data.Migrations
                     CreatedBy = table.Column<string>(type: "text", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedBy = table.Column<string>(type: "text", nullable: false),
+                    InvoicePath = table.Column<string>(type: "text", nullable: false),
                     UserId = table.Column<int>(type: "integer", nullable: true),
-                    BusinessId = table.Column<int>(type: "integer", nullable: true)
+                    BusinessId = table.Column<int>(type: "integer", nullable: true),
+                    Type = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -171,16 +183,16 @@ namespace BusinessMan.Data.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "emails");
-
-            migrationBuilder.DropTable(
-                name: "examples");
+                name: "email-list");
 
             migrationBuilder.DropTable(
                 name: "files");
 
             migrationBuilder.DropTable(
                 name: "invoices");
+
+            migrationBuilder.DropTable(
+                name: "Journal-entries");
 
             migrationBuilder.DropTable(
                 name: "users");

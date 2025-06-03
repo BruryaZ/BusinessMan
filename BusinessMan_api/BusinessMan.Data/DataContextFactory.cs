@@ -1,10 +1,11 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Design;
+using Microsoft.Extensions.Configuration;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Design;
 
 namespace BusinessMan.Data
 {
@@ -13,8 +14,16 @@ namespace BusinessMan.Data
         public DataContext CreateDbContext(string[] args)
         {
             var optionsBuilder = new DbContextOptionsBuilder<DataContext>();
-            //optionsBuilder.UseNpgsql("postgresql://postgres:mnVEUeJjwMbLclwATfTYVZVWytPctAKf@caboose.proxy.rlwy.net:58725/railway");
-            optionsBuilder.UseNpgsql("Host=caboose.proxy.rlwy.net;Port=58725;Username=postgres;Password=mnVEUeJjwMbLclwATfTYVZVWytPctAKf;Database=railway;SSL Mode=Require;Trust Server Certificate=true;Pooling=false;");
+
+            // טוען קובץ appsettings.json
+            var configuration = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.Development.json")
+                .Build();
+
+            var connectionString = configuration.GetConnectionString("DefaultConnection");
+
+            optionsBuilder.UseNpgsql(connectionString);
 
             return new DataContext(optionsBuilder.Options);
         }

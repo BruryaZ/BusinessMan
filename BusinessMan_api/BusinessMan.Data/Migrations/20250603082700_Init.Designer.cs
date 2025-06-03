@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BusinessMan.Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20250430141827_connectioFormat")]
-    partial class connectioFormat
+    [Migration("20250603082700_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,34 +25,7 @@ namespace BusinessMan.Data.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("BusinessMan.Core.DTO_s.FileDto", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("FileName")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("FilePath")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<long>("Size")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTime>("UploadDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("files", (string)null);
-                });
-
-            modelBuilder.Entity("BusinessMan.Core.Models.Business", b =>
+            modelBuilder.Entity("BusinessMan.Core.BasicModels.Business", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -87,6 +60,9 @@ namespace BusinessMan.Data.Migrations
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<decimal>("Equity")
+                        .HasColumnType("numeric");
 
                     b.Property<decimal>("Expenses")
                         .HasColumnType("decimal(18,2)");
@@ -125,7 +101,7 @@ namespace BusinessMan.Data.Migrations
                     b.ToTable("businesses", (string)null);
                 });
 
-            modelBuilder.Entity("BusinessMan.Core.Models.Email", b =>
+            modelBuilder.Entity("BusinessMan.Core.BasicModels.Email", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -139,28 +115,10 @@ namespace BusinessMan.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("emails", (string)null);
+                    b.ToTable("email-list", (string)null);
                 });
 
-            modelBuilder.Entity("BusinessMan.Core.Models.Example", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("Num")
-                        .HasColumnType("integer")
-                        .HasColumnName("num");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("examples", (string)null);
-                });
-
-            modelBuilder.Entity("BusinessMan.Core.Models.Invoice", b =>
+            modelBuilder.Entity("BusinessMan.Core.BasicModels.Invoice", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -168,13 +126,11 @@ namespace BusinessMan.Data.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("AmountCredit")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<decimal>("AmountCredit")
+                        .HasColumnType("numeric(18,2)");
 
-                    b.Property<string>("AmountDebit")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<decimal>("AmountDebit")
+                        .HasColumnType("numeric(18,2)");
 
                     b.Property<int?>("BusinessId")
                         .HasColumnType("integer");
@@ -189,11 +145,18 @@ namespace BusinessMan.Data.Migrations
                     b.Property<DateTime>("InvoiceDate")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("InvoicePath")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("Notes")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Type")
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("UpdatedAt")
@@ -215,7 +178,47 @@ namespace BusinessMan.Data.Migrations
                     b.ToTable("invoices", (string)null);
                 });
 
-            modelBuilder.Entity("BusinessMan.Core.Models.User", b =>
+            modelBuilder.Entity("BusinessMan.Core.BasicModels.JournalEntry", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BusinessId")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("Credit")
+                        .HasColumnType("numeric");
+
+                    b.Property<string>("CreditAccount")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<decimal>("Debit")
+                        .HasColumnType("numeric");
+
+                    b.Property<string>("DebitAccount")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("EntryDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("InvoiceId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Journal-entries", (string)null);
+                });
+
+            modelBuilder.Entity("BusinessMan.Core.BasicModels.User", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -281,14 +284,47 @@ namespace BusinessMan.Data.Migrations
                     b.ToTable("users", (string)null);
                 });
 
-            modelBuilder.Entity("BusinessMan.Core.Models.Invoice", b =>
+            modelBuilder.Entity("BusinessMan.Core.DTO_s.FileDto", b =>
                 {
-                    b.HasOne("BusinessMan.Core.Models.Business", "Business")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BusinessId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("FilePath")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<long>("Size")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("UploadDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("files", (string)null);
+                });
+
+            modelBuilder.Entity("BusinessMan.Core.BasicModels.Invoice", b =>
+                {
+                    b.HasOne("BusinessMan.Core.BasicModels.Business", "Business")
                         .WithMany("Invoices")
                         .HasForeignKey("BusinessId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("BusinessMan.Core.Models.User", "User")
+                    b.HasOne("BusinessMan.Core.BasicModels.User", "User")
                         .WithMany("Invoices")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -298,9 +334,9 @@ namespace BusinessMan.Data.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("BusinessMan.Core.Models.User", b =>
+            modelBuilder.Entity("BusinessMan.Core.BasicModels.User", b =>
                 {
-                    b.HasOne("BusinessMan.Core.Models.Business", "Business")
+                    b.HasOne("BusinessMan.Core.BasicModels.Business", "Business")
                         .WithMany("Users")
                         .HasForeignKey("BusinessId")
                         .OnDelete(DeleteBehavior.Restrict);
@@ -308,14 +344,14 @@ namespace BusinessMan.Data.Migrations
                     b.Navigation("Business");
                 });
 
-            modelBuilder.Entity("BusinessMan.Core.Models.Business", b =>
+            modelBuilder.Entity("BusinessMan.Core.BasicModels.Business", b =>
                 {
                     b.Navigation("Invoices");
 
                     b.Navigation("Users");
                 });
 
-            modelBuilder.Entity("BusinessMan.Core.Models.User", b =>
+            modelBuilder.Entity("BusinessMan.Core.BasicModels.User", b =>
                 {
                     b.Navigation("Invoices");
                 });
