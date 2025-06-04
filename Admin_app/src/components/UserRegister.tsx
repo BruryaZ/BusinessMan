@@ -64,14 +64,21 @@ const UserRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => 
         await axios.post<UserPostModel>(`${url}/Auth/user-register`, myUser, { withCredentials: true })
         globalContextDetails.setUserCount(globalContextDetails.usersCount + 1)
         if (onSubmitSuccess) onSubmitSuccess()
-        nav(-1) // Go back to the previous page
+        nav(-1)
       } catch (e) {
         setErrors(["שגיאה ברישום המשתמש"])
       }
 
     } catch (e) {
-      setErrors(e instanceof Error ? [e.message] : ["שגיאה ברישום המשתמש, נא לנסות שוב מאוחר יותר"])
-    } finally {
+      if (e instanceof Error && 'inner' in e) {
+        const validationErrors = (e as any).inner.map((err: any) => err.message)
+        setErrors(validationErrors)
+      } else {
+        setErrors(["שגיאה ברישום המשתמש, נא לנסות שוב מאוחר יותר"])
+      }
+    }
+
+    finally {
       setLoading(false)
     }
   }
@@ -95,11 +102,6 @@ const UserRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => 
             <Title level={2} style={{ marginBottom: 8, color: "#2d3748", textAlign: "center" }}>
               הרשמת משתמש חדש
             </Title>
-
-            <Text type="secondary" style={{ fontSize: 16 }}>
-              נא למלא את כל הפרטים הנדרשים
-            </Text>
-
             <Divider />
           </div>
 

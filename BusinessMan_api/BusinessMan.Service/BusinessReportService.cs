@@ -25,18 +25,34 @@ namespace BusinessMan.Service
             if (business == null)
                 throw new Exception("Business not found");
 
-            var invoices = await _repository.Invoice.GetAllAsync();
-            var businessInvoices = invoices.Where(i => i.BusinessId == businessId).ToList();
+            var entries = await _repository.JournalEntry.GetAllAsync();
+            var businessEntries = entries.Where(e => e.BusinessId == businessId).ToList();
+
+            var totalIncome = businessEntries
+                .Where(e => e.CreditAccount == "Income")
+                .Sum(e => e.Credit);
+
+            var totalExpenses = businessEntries
+                .Where(e => e.DebitAccount == "Expense")
+                .Sum(e => e.Debit);
+
+            var cashFlow = businessEntries
+                .Where(e => e.DebitAccount == "Cash" || e.CreditAccount == "Cash")
+                .Sum(e => e.Credit - e.Debit);
 
             return new BusinessReportDto
             {
                 BusinessName = business.Name,
-                TotalIncome = business.Income,
-                TotalExpenses = business.Expenses,
-                CashFlow = business.CashFlow,
-                InvoiceCount = businessInvoices.Count,
-                TotalDebit = businessInvoices.Sum(i => i.AmountDebit),  
-                TotalCredit = businessInvoices.Sum(i => i.AmountCredit) 
+                TotalIncome = totalIncome,
+                TotalExpenses = totalExpenses,
+                CashFlow = cashFlow,
+                InvoiceCount = businessEntries
+                    .Where(e => e.InvoiceId > 0)
+                    .Select(e => e.InvoiceId)
+                    .Distinct()
+                    .Count(),
+                TotalDebit = businessEntries.Sum(e => e.Debit),
+                TotalCredit = businessEntries.Sum(e => e.Credit)
             };
         }
     }

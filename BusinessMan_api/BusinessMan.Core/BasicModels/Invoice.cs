@@ -26,6 +26,7 @@ namespace BusinessMan.Core.BasicModels
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
+        public decimal Amount { get; set; }
         public decimal AmountDebit { get; set; }
         public decimal AmountCredit { get; set; }
         public DateTime InvoiceDate { get; set; } = DateTime.UtcNow;
@@ -45,10 +46,5 @@ namespace BusinessMan.Core.BasicModels
         // סוג העסקה
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public InvoiceType Type { get; set; } = InvoiceType.Income;
-
-        public override string ToString()
-        {
-            return $"Amount debit: {AmountDebit}, Amount credit: {AmountCredit}, Invoice date: {InvoiceDate}, Status: {Status}, Notes: {Notes}, Created at: {CreatedAt}, Created by: {CreatedBy}, Updated at: {UpdatedAt}, Updated by: {UpdatedBy}, Type: {Type}";
-        }
     }
 }

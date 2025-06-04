@@ -39,22 +39,30 @@ namespace BusinessMan.Service
             if (business == null)
                 throw new InvalidOperationException("עסק לא קיים");
 
+            // סכום אחיד, חובה וזכות יהיו שווים
+            if (invoice.Amount <= 0)
+                throw new InvalidOperationException("הסכום חייב להיות גדול מאפס");
+
+            invoice.AmountDebit = invoice.Amount;
+            invoice.AmountCredit = invoice.Amount;
+
+            decimal amount = invoice.AmountDebit; // זהה ל- AmountCredit
+
             string debitAccount = "";
             string creditAccount = "";
-            decimal amount = invoice.AmountCredit > 0 ? invoice.AmountCredit : invoice.AmountDebit;
 
             switch (invoice.Type)
             {
                 case InvoiceType.Income:
                     debitAccount = "Cash";
-                    creditAccount = "Revenue";
+                    creditAccount = "Income";
                     business.Income += amount;
                     business.CashFlow += amount;
                     business.TotalAssets += amount;
                     break;
 
                 case InvoiceType.Expense:
-                    debitAccount = "Expenses";
+                    debitAccount = "Expense";
                     creditAccount = "Cash";
                     business.Expenses += amount;
                     business.CashFlow -= amount;
@@ -62,7 +70,7 @@ namespace BusinessMan.Service
                     break;
 
                 case InvoiceType.AssetIncrease:
-                    debitAccount = "Assets";
+                    debitAccount = "Asset";
                     creditAccount = "Cash";
                     business.TotalAssets += amount;
                     business.CashFlow -= amount;
@@ -70,20 +78,20 @@ namespace BusinessMan.Service
 
                 case InvoiceType.AssetDecrease:
                     debitAccount = "Cash";
-                    creditAccount = "Assets";
+                    creditAccount = "Asset";
                     business.TotalAssets -= amount;
                     business.CashFlow += amount;
                     break;
 
                 case InvoiceType.LiabilityIncrease:
                     debitAccount = "Cash";
-                    creditAccount = "Liabilities";
+                    creditAccount = "Liability";
                     business.TotalLiabilities += amount;
                     business.CashFlow += amount;
                     break;
 
                 case InvoiceType.LiabilityDecrease:
-                    debitAccount = "Liabilities";
+                    debitAccount = "Liability";
                     creditAccount = "Cash";
                     business.TotalLiabilities -= amount;
                     business.CashFlow -= amount;
@@ -92,38 +100,55 @@ namespace BusinessMan.Service
                 case InvoiceType.EquityIncrease:
                     debitAccount = "Cash";
                     creditAccount = "Equity";
-                    business.CashFlow += amount;
                     business.Equity += amount;
+                    business.CashFlow += amount;
                     break;
 
                 case InvoiceType.EquityDecrease:
                     debitAccount = "Equity";
                     creditAccount = "Cash";
-                    business.CashFlow -= amount;
                     business.Equity -= amount;
+                    business.CashFlow -= amount;
                     break;
 
                 default:
                     throw new ArgumentException("סוג חשבונית לא מוכר");
             }
 
-            // רישום כפול
-            var journalEntry = new JournalEntry
+
+            invoice.UpdatedAt = DateTime.UtcNow;
+
+            await _repositoryManager.Invoice.AddAsync(invoice);
+            await _repositoryManager.SaveAsync();
+
+            var debitEntry = new JournalEntry
             {
                 EntryDate = invoice.InvoiceDate,
                 Description = invoice.Notes,
-                Debit = invoice.AmountDebit,
-                Credit = invoice.AmountCredit,
+                Debit = amount,
+                Credit = 0,
                 DebitAccount = debitAccount,
+                CreditAccount = null,
+                InvoiceId = invoice.Id,
+                BusinessId = invoice.BusinessId ?? 0
+            };
+
+            var creditEntry = new JournalEntry
+            {
+                EntryDate = invoice.InvoiceDate,
+                Description = invoice.Notes,
+                Debit = 0,
+                Credit = amount,
+                DebitAccount = null,
                 CreditAccount = creditAccount,
                 InvoiceId = invoice.Id,
                 BusinessId = invoice.BusinessId ?? 0
             };
 
-            business.UpdatedAt = DateTime.UtcNow;
+            await _repositoryManager.JournalEntry.AddAsync(debitEntry);
+            await _repositoryManager.JournalEntry.AddAsync(creditEntry);
 
-            await _repositoryManager.Invoice.AddAsync(invoice);
-            await _repositoryManager.JournalEntry.AddAsync(journalEntry);
+            business.UpdatedAt = DateTime.UtcNow;
             await _repositoryManager.Business.UpdateAsync(business.Id, business);
             await _repositoryManager.SaveAsync();
 
@@ -141,7 +166,6 @@ namespace BusinessMan.Service
 
             return (totalDebit, totalCredit);
         }
-
 
         public async Task DeleteAsync(Invoice invoice)
         {
@@ -170,31 +194,32 @@ namespace BusinessMan.Service
             var currentMonthEnd = currentMonthStart.AddMonths(1);
             var previousMonthEnd = previousMonthStart.AddMonths(1);
 
-            var allInvoices = await _repositoryManager.Invoice.GetAllAsync();
+            var allEntries = await _repositoryManager.JournalEntry.GetAllAsync();
 
-            var currentMonthInvoices = allInvoices
-                .Where(i => i.BusinessId == businessId &&
-                            i.InvoiceDate >= currentMonthStart &&
-                            i.InvoiceDate < currentMonthEnd);
+            var currentMonthEntries = allEntries
+                .Where(e => e.BusinessId == businessId &&
+                            e.EntryDate >= currentMonthStart &&
+                            e.EntryDate < currentMonthEnd);
 
-            var previousMonthInvoices = allInvoices
-                .Where(i => i.BusinessId == businessId &&
-                            i.InvoiceDate >= previousMonthStart &&
-                            i.InvoiceDate < previousMonthEnd);
+            var previousMonthEntries = allEntries
+                .Where(e => e.BusinessId == businessId &&
+                            e.EntryDate >= previousMonthStart &&
+                            e.EntryDate < previousMonthEnd);
 
-            // חישוב לפי סוג החשבונית בלבד:
-            decimal SumIncome(IEnumerable<Invoice> invoices) =>
-                invoices.Where(i => i.Type == InvoiceType.Income).Sum(i => i.AmountCredit);
+            // הכנסה = כל סכום שנזקף לזכות חשבון "Income"
+            decimal SumIncome(IEnumerable<JournalEntry> entries) =>
+                entries.Where(e => e.CreditAccount == "Income").Sum(e => e.Credit);
 
-            decimal SumExpenses(IEnumerable<Invoice> invoices) =>
-                invoices.Where(i => i.Type == InvoiceType.Expense).Sum(i => i.AmountDebit);
+            // הוצאה = כל סכום שנזקף לחובת חשבון "Expense"
+            decimal SumExpenses(IEnumerable<JournalEntry> entries) =>
+                entries.Where(e => e.DebitAccount == "Expense").Sum(e => e.Debit);
 
-            var currentMonthIncome = SumIncome(currentMonthInvoices);
-            var currentMonthExpenses = SumExpenses(currentMonthInvoices);
+            var currentMonthIncome = SumIncome(currentMonthEntries);
+            var currentMonthExpenses = SumExpenses(currentMonthEntries);
             var currentNetProfit = currentMonthIncome - currentMonthExpenses;
 
-            var previousMonthIncome = SumIncome(previousMonthInvoices);
-            var previousMonthExpenses = SumExpenses(previousMonthInvoices);
+            var previousMonthIncome = SumIncome(previousMonthEntries);
+            var previousMonthExpenses = SumExpenses(previousMonthEntries);
             var previousNetProfit = previousMonthIncome - previousMonthExpenses;
 
             decimal CalcPercentChange(decimal current, decimal previous)

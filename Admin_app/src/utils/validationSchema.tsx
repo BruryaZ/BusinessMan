@@ -19,7 +19,7 @@ export const validationSchemaBusinessRegister = Yup.object().shape({
 
 export const validationSchemaAdminLogin = Yup.object().shape({
   email: Yup.string().email('אימייל לא חוקי').required('אימייל הוא שדה חובה'),
-  password: Yup.string().required('סיסמא היא שדה חובה').min(1, 'סיסמא חייבת להיות לפחות 3 תווים')
+  password: Yup.string().required('סיסמא היא שדה חובה').min(1, 'סיסמא חייבת להיות לפחות 1 תווים')
 })
 
 export const validationSchemaUserLogin = Yup.object().shape({
@@ -31,4 +31,9 @@ export const validationSchemaUserRegister = Yup.object().shape({
   email: Yup.string().email('אימייל לא חוקי').required('אימייל הוא שדה חובה'),
   password: Yup.string().required('סיסמא היא שדה חובה').min(1, 'סיסמא חייבת להיות לפחות 3 תווים'),
   role: Yup.number().required('תפקיד הוא שדה חובה').min(2, 'תפקיד חייב להיות מעל 1').max(3, 'תפקיד חייב להיות בין 2 ל-3'),
+})
+
+export const validationSchemaAdminRegister = Yup.object().shape({
+  email: Yup.string().email('אימייל לא חוקי').required('אימייל הוא שדה חובה'),
+  password: Yup.string().required('סיסמא היא שדה חובה').min(1, 'סיסמא חייבת להיות לפחות 3 תווים'),
 })

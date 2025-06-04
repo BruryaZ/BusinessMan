@@ -11,8 +11,9 @@ namespace BusinessMan.Core.DTO_s
     public class InvoiceDto
     {
         public int Id { get; set; } // מזהה ייחודי
-        public decimal AmountDebit { get; set; } // סכום חובה
-        public decimal AmountCredit { get; set; } // סכום זכות
+        public decimal Amount { get; set; }
+        public decimal AmountDebit { get; set; }
+        public decimal AmountCredit { get; set; }
         public DateTime InvoiceDate { get; set; } = DateTime.UtcNow; // תאריך החשבונית
         public int Status { get; set; } // סטטוס החשבונית
         public string Notes { get; set; } // הערות

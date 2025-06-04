@@ -14,7 +14,7 @@ const { Title, Text, Link } = Typography
 
 const AdminLogin = () => {
   const nav = useNavigate()
-  const [admin, setAdmin] = useState<Admin>({ email: "c@c", password: "1" })
+  const [admin, setAdmin] = useState<Admin>({ email: "a@a", password: "1" })
   const [errors, setErrors] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
   const url = import.meta.env.VITE_API_URL
@@ -28,21 +28,34 @@ const AdminLogin = () => {
       setErrors([])
 
       if (valid) {
-        const { data } = await axios.post<any>(`${url}/Auth/admin-login`, admin, { withCredentials: true })
-        globalContextDetails.setUser(data.user)
-        globalContextDetails.setIsAdmin(true)
-
+        let data: any;
         try {
-          const res = await axios.get<BusinessDto>(`${url}/api/Business/${data.user.businessId}`, { withCredentials: true })
-          globalContextDetails.setBusinessGlobal(res.data)
-          globalContextDetails.setUserCount(res.data.usersCount)
+          const response = await axios.post<any>(`${url}/Auth/admin-login`, admin, { withCredentials: true });
+          data = response.data;
+          globalContextDetails.setUser(data.user);
+          globalContextDetails.setIsAdmin(true);
         }
         catch (e) {
-          setErrors(e instanceof Error ? [e.message] : ["שגיאה בטעינת העסק, נא לנסות שוב מאוחר יותר"])
+          if (axios.isAxiosError(e) && e.response?.status === 400) {
+            setErrors(["משתמש לא נמצא, נא לבדוק את האימייל והסיסמה"]);
+            return;
+          }
+          setErrors(e instanceof Error ? [e.message] : ["שגיאה בכניסה, נא לנסות שוב מאוחר יותר"]);
+          return;
+        }
+
+        try {
+          const res = await axios.get<BusinessDto>(`${url}/api/Business/${data.user.businessId}`, { withCredentials: true });
+          globalContextDetails.setBusinessGlobal(res.data);
+          globalContextDetails.setUserCount(res.data.usersCount);
+        }
+        catch (e) {
+          setErrors(e instanceof Error ? [e.message] : ["שגיאה בטעינת העסק, נא לנסות שוב מאוחר יותר"]);
         }
         nav("/")
       } else {
-        setErrors(["נא למלא את כל השדות הנדרשים"])
+        const validationErrors = await validationSchema.validate(admin).catch((err) => err.errors);
+        setErrors(validationErrors || []);
       }
     } catch (e) {
       setErrors(e instanceof Error ? [e.message] : ["שגיאה לא צפויה, נא לנסות שוב מאוחר יותר"])

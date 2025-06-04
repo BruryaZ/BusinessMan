@@ -27,6 +27,10 @@ const transactionTypes = [
   { key: "LiabilityDecrease", label: "הקטנת התחייבויות" },
   { key: "EquityIncrease", label: "הגדלת הון עצמי" },
   { key: "EquityDecrease", label: "הקטנת הון עצמי" },
+  { key: "Revenue", label: "הכנסות נוספות" },
+  { key: "CostOfGoodsSold", label: "עלות סחורה" },
+  { key: "OtherIncome", label: "הכנסה אחרת" },
+  { key: "OtherExpense", label: "הוצאה אחרת" },
 ]
 
 const AccountTransactions: React.FC = () => {
@@ -54,9 +58,6 @@ const AccountTransactions: React.FC = () => {
         `${url}/api/Invoice/totals/${user.businessId}`,
         { withCredentials: true }
       )
-      console.log("Fetched totals:", data);
-      
-
       setTotals({ debit: data.totalDebit, credit: data.totalCredit })
     } catch (err) {
       console.error("Failed to fetch totals:", err)
@@ -72,30 +73,15 @@ const AccountTransactions: React.FC = () => {
     setSuccess(false)
     setError(null)
 
-    let amountCredit = 0
-    let amountDebit = 0
-
-    switch (values.transactionType) {
-      case "Income":
-      case "LiabilityIncrease":
-      case "EquityIncrease":
-      case "AssetDecrease":
-        amountCredit = values.amount
-        break
-      case "Expense":
-      case "AssetIncrease":
-      case "LiabilityDecrease":
-      case "EquityDecrease":
-        amountDebit = values.amount
-        break
-      default:
-        break
+    if (!values.amount || values.amount <= 0) {
+      setError("נא להזין סכום תקין הגדול מאפס")
+      setLoading(false)
+      return
     }
 
     const invoiceToSend = {
       id: 0,
-      amountCredit,
-      amountDebit,
+      amount: values.amount, // שולחים סכום אחד בלבד
       invoiceDate: new Date().toISOString(),
       status: 1,
       notes: values.description ?? "",
@@ -109,7 +95,7 @@ const AccountTransactions: React.FC = () => {
       type: values.transactionType,
     }
 
-    try {    
+    try {
       await axios.post(`${url}/api/Invoice`, invoiceToSend, {
         withCredentials: true,
       })
@@ -123,7 +109,6 @@ const AccountTransactions: React.FC = () => {
       setLoading(false)
     }
   }
-
 
   return (
     <div dir="rtl" style={{ maxWidth: 800, margin: "auto" }}>
@@ -176,7 +161,14 @@ const AccountTransactions: React.FC = () => {
         <Form.Item
           name="amount"
           label="סכום"
-          rules={[{ required: true, message: "נא להזין סכום" }]}
+          rules={[
+            { required: true, message: "נא להזין סכום" },
+            {
+              type: "number",
+              min: 0.01,
+              message: "הסכום חייב להיות גדול מאפס",
+            },
+          ]}
         >
           <InputNumber<number>
             placeholder="₪"

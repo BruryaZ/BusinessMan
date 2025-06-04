@@ -5,7 +5,7 @@ import { useContext, useState } from "react"
 import * as Yup from "yup"
 import axios from "axios"
 import type { UserPostModel } from "../models/UserPostModel"
-import { validationSchemaUserRegister } from "../utils/validationSchema"
+import { validationSchemaAdminLogin } from "../utils/validationSchema"
 import { globalContext } from "../context/GlobalContext"
 import type { UserDto } from "../models/UserDto"
 import { converFromUserDto } from "../utils/convertFromUserDto"
@@ -21,7 +21,6 @@ import {
   Avatar,
   Divider,
   ConfigProvider,
-  InputNumber,
 } from "antd"
 import {
   UserOutlined,
@@ -29,7 +28,6 @@ import {
   PhoneOutlined,
   IdcardOutlined,
   LockOutlined,
-  TeamOutlined,
   UserAddOutlined,
   CrownOutlined,
 } from "@ant-design/icons"
@@ -37,7 +35,7 @@ import {
 const { Title, Text } = Typography
 
 const AdminRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => {
-  const validationSchema = validationSchemaUserRegister
+  const validationSchema = validationSchemaAdminLogin
   const [myAdmin, setMyAdmin] = useState<UserPostModel>({
     firstName: "יוסי",
     lastName: "כהן",
@@ -54,50 +52,46 @@ const AdminRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) =>
 
   const handleSubmit = (adminRegister: UserPostModel) => async () => {
     setLoading(true)
-
-    validationSchema
-      .isValid(adminRegister)
-      .then(async (valid) => {
-        setErrors([])
-        if (valid) {
-          try {
-            const { data } = await axios.post<UserDto>(`${url}/Auth/admin-register`, adminRegister, {
-              withCredentials: true,
-            })
-            globalContextDetails.setUser(converFromUserDto(data))
-            if (data.role == 1) {
-              globalContextDetails.setIsAdmin(true)
-            }
-            if (onSubmitSuccess) onSubmitSuccess()
-          } catch (e) {
-            setErrors(["שגיאה ברישום"])
-          }
-        } else {
-          setErrors(["נא למלא את כל השדות הנדרשים"])
+  
+    try {
+      // נוודא שכל השדות נבדקים לפי הסכמה, כולל הודעות שגיאה
+      await validationSchema.validate(adminRegister, { abortEarly: false })
+  
+      // אם עבר ולידציה, נמשיך לנסות לשלוח לשרת
+      try {
+        const { data } = await axios.post<UserDto>(
+          `${url}/Auth/admin-register`,
+          adminRegister,
+          { withCredentials: true }
+        )
+  
+        globalContextDetails.setUser(converFromUserDto(data))
+        if (data.role == 1) {
+          globalContextDetails.setIsAdmin(true)
         }
-      })
-      .catch((err) => {
-        if (err instanceof Yup.ValidationError) {
-          setErrors(err.errors)
-        }
-      })
-      .finally(() => {
-        setLoading(false)
-      })
+  
+        if (onSubmitSuccess) onSubmitSuccess()
+        setErrors([]) // ננקה שגיאות אם הכל עבר
+      } catch (e) {
+        setErrors(["שגיאה ברישום"])
+      }
+    } catch (err) {
+      // נציג את כל שגיאות ה־Yup
+      if (err instanceof Yup.ValidationError) {
+        setErrors(err.errors)
+      } else {
+        setErrors(["שגיאה כללית בוולידציה"])
+      }
+    } finally {
+      setLoading(false)
+    }
   }
-
+  
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const { name, value, type } = event.target
     setMyAdmin((prevUser) => ({
       ...prevUser,
       [name]: type === "number" ? Number(value) : value,
-    }))
-  }
-
-  const handleNumberChange = (field: string, value: number | null) => {
-    setMyAdmin((prevUser) => ({
-      ...prevUser,
-      [field]: value || 0,
     }))
   }
 
@@ -213,18 +207,6 @@ const AdminRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) =>
               </Form.Item>
             </Col>
             <Col xs={24} md={12}>
-              <Form.Item label="תפקיד" required>
-                <InputNumber
-                  prefix={<TeamOutlined style={{ color: "#667eea" }} />}
-                  placeholder="הזן קוד תפקיד (1 = מנהל)"
-                  size="large"
-                  style={{ width: "100%", height: 48 }}
-                  value={myAdmin.role}
-                  onChange={(value) => handleNumberChange("role", value)}
-                  min={1}
-                  max={3}
-                />
-              </Form.Item>
             </Col>
           </Row>
 
