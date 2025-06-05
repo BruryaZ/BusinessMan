@@ -1,34 +1,52 @@
-//Brurya
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useContext } from "react"
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from "react-router-dom"
-import { Layout, Menu, Button, Typography, Avatar, Space, Drawer, ConfigProvider, theme as antTheme } from "antd"
-import { MenuOutlined, UserAddOutlined, MenuFoldOutlined, MenuUnfoldOutlined, BuildOutlined, BankOutlined, BarChartOutlined, CrownOutlined, DollarOutlined, EyeOutlined, LoginOutlined, TeamOutlined, UploadOutlined, CloudDownloadOutlined } from "@ant-design/icons"
+import {
+  Layout,
+  Menu,
+  Typography,
+  Avatar,
+  Space,
+  Drawer,
+  ConfigProvider,
+  theme as antTheme,
+} from "antd"
+import {
+  MenuOutlined,
+  UserAddOutlined,
+  BuildOutlined,
+  BankOutlined,
+  BarChartOutlined,
+  CrownOutlined,
+  DollarOutlined,
+  EyeOutlined,
+  LoginOutlined,
+  TeamOutlined,
+  UploadOutlined,
+  CloudDownloadOutlined,
+} from "@ant-design/icons"
 import { useMediaQuery } from "react-responsive"
 import "./App.css"
+
 import AdminLogin from "./components/AdminLogin"
 import BusinessAndAdmin from "./components/BusinessAndAdmin"
-import DataViewing from "./components/DataViweing"
 import ProductionReports from "./components/ProductionReports"
-import RegisterBusinessData from "./components/RegisterBusinessData"
 import UploadFiles from "./components/UploadFiles"
 import UserLogin from "./components/UserLogin"
-import UserManagemet from "./components/UserManagemet"
 import UserRegister from "./components/UserRegister"
-import GlobalContext from "./context/GlobalContext"
-import AdminRoute from "./components/AdminRoute"
+import GlobalContext, { globalContext } from "./context/GlobalContext"
 import { Home } from "@mui/icons-material"
 import MyHome from "./components/MyHome"
 import EditUserPage from "./components/EditUserPage"
 import BusinessFiles from "./components/BusinessFiles"
 import AccountTransactions from "./components/AccountTransactions"
-// Components
+import DataViewing from "./components/DataViweing"
+import UserManagement from "./components/UserManagemet"
 
 const { Header, Sider, Content } = Layout
 const { Title } = Typography
 
-// Navigation items with icons
 const navItems = [
   { key: "/", label: "בית", icon: <Home />, path: "/" },
   { key: "/register-user", label: "רישום משתמש", icon: <UserAddOutlined />, path: "/register-user" },
@@ -48,13 +66,39 @@ const navItems = [
   },
 ]
 
-// Responsive drawer component
 function ResponsiveDrawer() {
   const [collapsed, setCollapsed] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const location = useLocation()
   const isMobile = useMediaQuery({ maxWidth: 768 })
-  const isSmallScreen = useMediaQuery({ maxWidth: 1024 })
+  const globalContextDetails = useContext(globalContext)
+
+  const [pageTitle, setPageTitle] = useState("")
+  const [clientName, setClientName] = useState('אורח')
+
+  useEffect(() => {
+    const routeTitles: { [key: string]: string } = {
+      "/": "דף הבית",
+      "/register-user": "רישום משתמש",
+      "/user-login": "כניסת משתמש",
+      "/admin-login": "כניסת מנהל",
+      "/business-files": "קבצי העסק",
+      "/upload-file": "העלאת קבצים",
+      "/view-data": "צפייה בנתונים",
+      "/user-management": "ניהול משתמשים",
+      "/production-reports": 'דו"ח ייצור',
+      "/account-transactions": "תנועות חשבון",
+      "/register-admin&business": "רישום עסק ומנהל",
+    }
+
+    if (location.pathname.startsWith("/edit-user/")) {
+      setPageTitle("עריכת משתמש")
+    } else {
+      setPageTitle(routeTitles[location.pathname] || "עמוד לא מזוהה")
+    }
+
+    setClientName(globalContextDetails.user.firstName + " " + globalContextDetails.user.lastName)
+  }, [location.pathname])
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen)
@@ -75,7 +119,15 @@ function ResponsiveDrawer() {
   }))
 
   const siderContent = (
-    <div style={{ height: "100%", display: "flex", flexDirection: "column", direction: "rtl", width: "100%" }}>
+    <div
+      style={{
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        direction: "rtl",
+        width: "100%",
+      }}
+    >
       <div
         className="logo-section"
         style={{
@@ -151,7 +203,6 @@ function ResponsiveDrawer() {
       }}
     >
       <Layout style={{ minHeight: "100vh", width: "100%", direction: "rtl" }}>
-        {/* Desktop Sider */}
         {!isMobile && (
           <Sider
             trigger={null}
@@ -174,7 +225,6 @@ function ResponsiveDrawer() {
           </Sider>
         )}
 
-        {/* Mobile Drawer */}
         {isMobile && (
           <Drawer
             title={
@@ -212,7 +262,6 @@ function ResponsiveDrawer() {
           }}
         >
           <Header
-            className="main-header"
             style={{
               background: "#fff",
               padding: "0 24px",
@@ -220,131 +269,74 @@ function ResponsiveDrawer() {
               display: "flex",
               alignItems: "center",
               justifyContent: "space-between",
+              flexDirection: "row-reverse", // כבר מוגדר
               position: "sticky",
               top: 0,
               zIndex: 100,
-              width: "100%",
-              direction: "rtl",
               height: "64px",
             }}
           >
-            <Space style={{ direction: "rtl" }}>
-              <Button
-                type="text"
-                className="menu-toggle-btn"
-                icon={isMobile ? <MenuOutlined /> : collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-                onClick={isMobile ? handleDrawerToggle : handleCollapse}
-                style={{ fontSize: "16px" }}
-              />
-              <Space style={{ direction: "rtl" }}>
-                <BuildOutlined className="header-icon" style={{ color: "#667eea", fontSize: "20px" }} />
-                <Title level={4} className="header-title" style={{ margin: 0, color: "#2d3748" }}>
-                  מערכת לניהול עסק
+            <Space
+              size="middle"
+              style={{ alignItems: "center", flexDirection: "row-reverse", flex: 1, justifyContent: "space-between" }}
+            >
+              {/* pageTitle מוצג בצד ימין */}
+              {!isMobile && (
+                <Title level={5} style={{ margin: 0, color: "#444" }}>
+                  {pageTitle}
                 </Title>
+              )}
+
+              <Space size="middle" style={{ alignItems: "center", flexDirection: "row-reverse" }}>
+                {!isMobile && (
+                  <Avatar
+                    size={32}
+                    style={{
+                      background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                      borderRadius: "10px",
+                      width: "62px",
+                      height: "32px",
+                    }}
+                  >
+                    {clientName ? clientName : "אורח"}
+                  </Avatar>
+                )}
+
+                {isMobile && (
+                  <MenuOutlined
+                    style={{ fontSize: "20px", cursor: "pointer", color: "#667eea" }}
+                    onClick={handleDrawerToggle}
+                  />
+                )}
               </Space>
             </Space>
-
-            {!isSmallScreen && (
-              <Space className="header-nav" style={{ direction: "rtl" }}>
-                {navItems.slice(0, 4).map((item) => (
-                  <Button
-                    key={item.key}
-                    type={location.pathname === item.path ? "primary" : "text"}
-                    icon={item.icon}
-                    className="nav-btn"
-                    style={{
-                      borderRadius: "8px",
-                      fontWeight: location.pathname === item.path ? 600 : 400,
-                    }}
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <Link to={item.path} onClick={(e) => e.stopPropagation()}>
-                      {item.label}
-                    </Link>
-                  </Button>
-                ))}
-              </Space>
-            )}
           </Header>
 
+
           <Content
-            className="main-content"
             style={{
-              padding: "0",
-              background: "transparent",
-              minHeight: "calc(100vh - 64px)",
-              width: "100%",
-              overflow: "auto",
+              margin: "24px 24px 24px 24px",
+              padding: 24,
+              background: "#fff",
+              minHeight: 280,
               direction: "rtl",
-              paddingTop: "20px",
+              overflow: "auto",
             }}
           >
-            <div
-              className="content-wrapper"
-              style={{
-                minHeight: "calc(100vh - 84px)",
-                padding: "20px 24px 24px 24px",
-              }}
-            >
-              <Routes>
-                <Route path="/" element={<MyHome />} />
-                <Route path="/register-user" element={<UserRegister />} />
-                <Route path="/user-login" element={<UserLogin />} />
-                <Route path="/admin-login" element={<AdminLogin />} />
-                <Route path="/upload-file" element={<UploadFiles />} />
-                <Route path="/register-admin&business" element={<BusinessAndAdmin />} />
-                <Route path="/edit-user/:id" element={<EditUserPage />} />
-
-                <Route
-                  path="/production-reports"
-                  element={
-                    <AdminRoute>
-                      <ProductionReports />
-                    </AdminRoute>
-                  }
-                />
-                <Route
-                  path="/business-files"
-                  element={
-                    <AdminRoute>
-                      <BusinessFiles />
-                    </AdminRoute>
-                  }
-                />
-                <Route
-                  path="/view-data"
-                  element={
-                    <AdminRoute>
-                      <DataViewing />
-                    </AdminRoute>
-                  }
-                />
-                <Route
-                  path="/user-management"
-                  element={
-                    <AdminRoute>
-                      <UserManagemet />
-                    </AdminRoute>
-                  }
-                />
-                <Route
-                  path="/business-register"
-                  element={
-                    <AdminRoute>
-                      <RegisterBusinessData />
-                    </AdminRoute>
-                  }
-                />
-                <Route
-                  path="/account-transactions"
-                  element={
-                    <AdminRoute>
-                      <AccountTransactions />
-                    </AdminRoute>
-                  }
-                />
-              </Routes>
-            </div>
+            <Routes>
+              <Route path="/" element={<MyHome />} />
+              <Route path="/register-user" element={<UserRegister />} />
+              <Route path="/user-login" element={<UserLogin />} />
+              <Route path="/admin-login" element={<AdminLogin />} />
+              <Route path="/business-files" element={<BusinessFiles />} />
+              <Route path="/upload-file" element={<UploadFiles />} />
+              <Route path="/view-data" element={<DataViewing />} />
+              <Route path="/user-management" element={<UserManagement />} />
+              <Route path="/production-reports" element={<ProductionReports />} />
+              <Route path="/account-transactions" element={<AccountTransactions />} />
+              <Route path="/register-admin&business" element={<BusinessAndAdmin />} />
+              <Route path="/edit-user/:id" element={<EditUserPage />} />
+            </Routes>
           </Content>
         </Layout>
       </Layout>
@@ -352,16 +344,12 @@ function ResponsiveDrawer() {
   )
 }
 
-function App() {
+export default function App() {
   return (
-    <div style={{ width: "100%", minHeight: "100vh", direction: "rtl" }}>
+    <Router>
       <GlobalContext>
-        <Router>
-          <ResponsiveDrawer />
-        </Router>
+        <ResponsiveDrawer />
       </GlobalContext>
-    </div>
+    </Router>
   )
 }
-
-export default App

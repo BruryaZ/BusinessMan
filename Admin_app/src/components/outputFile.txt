@@ -1,5 +1,887 @@
 //Brurya"
+app.css:
+/* Import Hebrew fonts */
+@import url("https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;500;600;700&family=Heebo:wght@300;400;500;600;700&family=Rubik:wght@300;400;500;600;700&display=swap");
 
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  direction: rtl;
+  font-family: "Assistant", "Rubik", "Heebo", sans-serif;
+  background: linear-gradient(135deg, #f5f7ff 0%, #ffffff 100%);
+  overflow-x: hidden;
+}
+
+::selection {
+  background-color: #d1cff2;
+  color: inherit;
+}
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Subtle Animations - Less dramatic */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes gentleBounce {
+  0% {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.01);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes subtlePulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes gentleFloat {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes softGlow {
+  0%,
+  100% {
+    box-shadow: 0 0 3px rgba(102, 126, 234, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 8px rgba(102, 126, 234, 0.5);
+  }
+}
+
+/* Modal Overlay Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeInUp 0.3s ease-out;
+}
+
+.modal-content {
+  position: relative;
+  z-index: 10000;
+  animation: gentleBounce 0.4s ease-out;
+}
+
+/* Component Animations - Subtle */
+.logo-section {
+  animation: slideInRight 0.5s ease-out;
+}
+
+.logo-avatar {
+  animation: gentleBounce 0.6s ease-out 0.2s both;
+}
+
+.logo-title {
+  animation: fadeInUp 0.5s ease-out 0.3s both;
+}
+
+.sidebar-menu {
+  animation: slideInRight 0.5s ease-out 0.1s both;
+}
+
+.sidebar-menu .ant-menu-item {
+  animation: fadeInUp 0.4s ease-out both;
+  animation-delay: calc(var(--item-index, 0) * 0.05s);
+}
+
+.main-header {
+  animation: slideInLeft 0.5s ease-out;
+}
+
+.header-icon {
+  animation: fadeInUp 0.6s ease-out 0.3s both;
+}
+
+.header-title {
+  animation: fadeInUp 0.5s ease-out 0.2s both;
+}
+
+.nav-btn {
+  animation: fadeInUp 0.4s ease-out both;
+  animation-delay: calc(var(--btn-index, 0) * 0.05s);
+  transition: all 0.2s ease;
+}
+
+.nav-btn:hover {
+  transform: translateY(-1px);
+  animation: subtlePulse 0.4s ease-in-out;
+}
+
+.menu-toggle-btn {
+  transition: all 0.2s ease;
+}
+
+.menu-toggle-btn:hover {
+  animation: subtlePulse 0.4s ease-in-out;
+}
+
+.desktop-sider {
+  animation: slideInRight 0.6s ease-out;
+}
+
+.mobile-drawer .ant-drawer-content {
+  animation: slideInRight 0.3s ease-out;
+}
+
+.main-content {
+  animation: fadeInUp 0.5s ease-out 0.2s both;
+}
+
+.content-wrapper {
+  animation: fadeInUp 0.6s ease-out 0.3s both;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 4px;
+  animation: softGlow 2s ease-in-out infinite alternate;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+}
+
+html:lang(he),
+body:lang(he) {
+  direction: rtl;
+  text-align: right;
+}
+
+.ltr {
+  direction: ltr !important;
+}
+
+.rtl {
+  direction: rtl !important;
+}
+
+/* Ant Design Layout Fixes for RTL */
+.ant-layout {
+  min-height: 100vh !important;
+  width: 100% !important;
+  direction: rtl !important;
+}
+
+.ant-layout-content {
+  width: 100% !important;
+  margin: 0 !important;
+  background: transparent !important;
+  direction: rtl !important;
+}
+
+/* RTL Sider positioning */
+.ant-layout-sider {
+  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.05) !important;
+  position: fixed !important;
+  height: 100vh !important;
+  right: 0 !important;
+  top: 0 !important;
+  z-index: 1001 !important;
+  background: #fff !important;
+}
+
+/* Content area adjustments for RTL */
+.main-layout {
+  margin-right: 280px !important;
+  width: calc(100% - 280px) !important;
+  transition: all 0.2s ease !important;
+  min-height: 100vh !important;
+}
+
+.main-layout.collapsed {
+  margin-right: 80px !important;
+  width: calc(100% - 80px) !important;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .main-layout,
+  .main-layout.collapsed {
+    margin-right: 0 !important;
+    width: 100% !important;
+  }
+
+  .ant-layout-sider {
+    transform: translateX(100%) !important;
+  }
+}
+
+/* Drawer RTL fix */
+.ant-drawer-content-wrapper {
+  right: 0 !important;
+  left: auto !important;
+}
+
+.ant-drawer-body {
+  padding: 0 !important;
+  direction: rtl !important;
+}
+
+/* Menu RTL fixes */
+.ant-menu {
+  direction: rtl !important;
+}
+
+.ant-menu-item {
+  border-radius: 8px !important;
+  margin: 4px 8px !important;
+  text-align: right !important;
+  transition: all 0.2s ease !important;
+}
+
+.ant-menu-item:hover {
+  transform: translateX(-2px) !important;
+  animation: softGlow 0.4s ease-in-out !important;
+}
+
+.ant-menu-item-selected {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  color: white !important;
+}
+
+.ant-menu-item-selected .anticon {
+  color: white !important;
+}
+
+.ant-menu-item .ant-menu-title-content {
+  margin-right: 12px !important;
+  margin-left: 0 !important;
+}
+
+/* Unified Card Styles */
+.ant-card {
+  border-radius: 16px !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08) !important;
+  transition: all 0.2s ease !important;
+  width: 100% !important;
+  direction: rtl !important;
+  animation: fadeInUp 0.5s ease-out both !important;
+  border: 1px solid rgba(0, 0, 0, 0.06) !important;
+}
+
+.ant-card:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12) !important;
+  animation: gentleFloat 2s ease-in-out infinite !important;
+}
+
+.ant-card-body {
+  direction: rtl !important;
+  text-align: right !important;
+  padding: 24px !important;
+}
+
+/* Unified Button Styles */
+.ant-btn {
+  border-radius: 10px !important;
+  font-weight: 600 !important;
+  height: auto !important;
+  padding: 10px 20px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  direction: rtl !important;
+  transition: all 0.2s ease !important;
+  font-family: "Assistant", "Rubik", "Heebo", sans-serif !important;
+}
+
+.ant-btn:hover {
+  transform: translateY(-1px) !important;
+  animation: subtlePulse 0.4s ease-in-out !important;
+}
+
+.ant-btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  border: none !important;
+  box-shadow: 0 4px 14px rgba(102, 126, 234, 0.4) !important;
+}
+
+.ant-btn-primary:hover {
+  background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%) !important;
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5) !important;
+  animation: softGlow 0.4s ease-in-out !important;
+}
+
+/* Unified Input Styles */
+.ant-input,
+.ant-input-number,
+.ant-select-selector {
+  border-radius: 10px !important;
+  padding: 12px 16px !important;
+  border: 2px solid #e1e5e9 !important;
+  transition: all 0.2s ease !important;
+  direction: rtl !important;
+  text-align: right !important;
+  font-family: "Assistant", "Rubik", "Heebo", sans-serif !important;
+}
+
+.ant-input:focus,
+.ant-input-number:focus,
+.ant-select-focused .ant-select-selector {
+  border-color: #667eea !important;
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2) !important;
+  animation: softGlow 0.4s ease-in-out !important;
+}
+
+/* Error Display Styles */
+.error-message {
+  background: linear-gradient(135deg, #fff2f0 0%, #ffebe8 100%);
+  border: 1px solid #ffccc7;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin: 8px 0;
+  color: #cf1322;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: fadeInUp 0.3s ease-out;
+}
+
+.error-message .anticon {
+  color: #cf1322;
+}
+
+/* Success Message Styles */
+.success-message {
+  background: linear-gradient(135deg, #f6ffed 0%, #e6f7d2 100%);
+  border: 1px solid #b7eb8f;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin: 8px 0;
+  color: #389e0d;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: fadeInUp 0.3s ease-out;
+}
+
+.success-message .anticon {
+  color: #389e0d;
+}
+
+/* Form Styles */
+.ant-form-item-label > label {
+  font-weight: 600 !important;
+  color: #2d3748 !important;
+  text-align: right !important;
+  font-family: "Assistant", "Rubik", "Heebo", sans-serif !important;
+}
+
+.ant-form-item {
+  direction: rtl !important;
+  animation: fadeInUp 0.4s ease-out both !important;
+  animation-delay: calc(var(--form-item-index, 0) * 0.05s) !important;
+}
+
+.ant-form-item-explain-error {
+  background: #fff2f0;
+  border: 1px solid #ffccc7;
+  border-radius: 6px;
+  padding: 8px 12px;
+  margin-top: 4px;
+  color: #cf1322;
+  font-weight: 500;
+  animation: fadeInUp 0.3s ease-out;
+}
+
+.ant-input-number {
+  width: 100% !important;
+  direction: rtl !important;
+}
+
+.ant-input-number-input {
+  text-align: right !important;
+}
+
+/* Container and layout utilities */
+.page-container {
+  width: 100% !important;
+  max-width: 100% !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  direction: rtl !important;
+}
+
+.content-wrapper {
+  width: 100% !important;
+  max-width: 1200px !important;
+  margin: 0 auto !important;
+  padding: 20px 24px 24px 24px !important;
+  direction: rtl !important;
+  min-height: calc(100vh - 84px) !important;
+}
+
+@media (max-width: 768px) {
+  .content-wrapper {
+    padding: 16px 16px 16px 16px !important;
+  }
+}
+
+/* Unified Component Styles */
+.hero-section {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 60px 24px;
+  border-radius: 20px;
+  margin-bottom: 40px;
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  direction: rtl;
+  animation: fadeInUp 0.6s ease-out both;
+}
+
+@media (max-width: 768px) {
+  .hero-section {
+    padding: 40px 20px;
+    margin: 0 0 40px 0;
+    border-radius: 16px;
+  }
+}
+
+.stats-card {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s ease;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  direction: rtl;
+  text-align: right;
+  animation: fadeInUp 0.5s ease-out both;
+}
+
+.stats-card:hover {
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+  animation: gentleFloat 1.5s ease-in-out infinite;
+}
+
+.feature-card {
+  background: white;
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s ease;
+  height: 100%;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  width: 100%;
+  direction: rtl;
+  text-align: right;
+  animation: fadeInUp 0.5s ease-out both;
+}
+
+@media (max-width: 768px) {
+  .feature-card {
+    padding: 24px;
+  }
+}
+
+.feature-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+  animation: gentleFloat 2s ease-in-out infinite;
+}
+
+.icon-wrapper {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-size: 24px;
+  animation: gentleBounce 0.6s ease-out both;
+}
+
+.icon-wrapper:hover {
+  animation: subtlePulse 0.6s ease-in-out infinite;
+}
+
+.testimonial-section {
+  background: rgba(102, 126, 234, 0.03);
+  border: 1px solid rgba(102, 126, 234, 0.1);
+  border-radius: 16px;
+  padding: 32px;
+  margin-top: 40px;
+  width: 100%;
+  direction: rtl;
+  text-align: right;
+  animation: fadeInUp 0.6s ease-out both;
+}
+
+@media (max-width: 768px) {
+  .testimonial-section {
+    padding: 24px;
+  }
+}
+
+.financial-summary-card {
+  border-radius: 16px;
+  padding: 24px;
+  height: 100%;
+  transition: all 0.2s ease;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  width: 100%;
+  direction: rtl;
+  text-align: right;
+  animation: fadeInUp 0.5s ease-out both;
+}
+
+.financial-summary-card:hover {
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  animation: gentleFloat 1.5s ease-in-out infinite;
+}
+
+.income-card {
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.expense-card {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.centered-layout {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 84px);
+  padding: 20px;
+  width: 100%;
+  direction: rtl;
+  animation: fadeInUp 0.5s ease-out both;
+}
+
+.login-form {
+  background: linear-gradient(145deg, #ffffff, #f8fafc);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+  width: 100%;
+  max-width: 500px;
+  direction: rtl;
+  text-align: right;
+  animation: gentleBounce 0.6s ease-out both;
+}
+
+@media (max-width: 768px) {
+  .login-form {
+    padding: 24px;
+    margin: 0;
+    border-radius: 16px;
+  }
+}
+
+.form-section {
+  background: white;
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  width: 100%;
+  direction: rtl;
+  text-align: right;
+  animation: fadeInUp 0.5s ease-out both;
+}
+
+@media (max-width: 768px) {
+  .form-section {
+    padding: 20px;
+    margin: 0;
+  }
+}
+
+/* Grid fixes for RTL */
+.ant-row {
+  width: 100% !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  direction: rtl !important;
+}
+
+.ant-col {
+  padding-left: 12px !important;
+  padding-right: 12px !important;
+  direction: rtl !important;
+  animation: fadeInUp 0.4s ease-out both !important;
+  animation-delay: calc(var(--col-index, 0) * 0.05s) !important;
+}
+
+@media (max-width: 768px) {
+  .ant-col {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+}
+
+/* Table responsive */
+.ant-table-wrapper {
+  width: 100% !important;
+  overflow-x: auto !important;
+  direction: rtl !important;
+  animation: fadeInUp 0.5s ease-out both !important;
+}
+
+.ant-table {
+  min-width: 800px !important;
+  direction: rtl !important;
+}
+
+.ant-table-thead > tr > th {
+  text-align: right !important;
+  font-weight: 600 !important;
+  background: #fafafa !important;
+}
+
+.ant-table-tbody > tr > td {
+  text-align: right !important;
+}
+
+.ant-table-tbody > tr {
+  transition: all 0.2s ease !important;
+}
+
+.ant-table-tbody > tr:hover {
+  transform: scale(1.005) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+}
+
+@media (max-width: 768px) {
+  .ant-table {
+    min-width: 600px !important;
+  }
+}
+
+/* Typography RTL */
+.ant-typography {
+  direction: rtl !important;
+  text-align: right !important;
+  font-family: "Assistant", "Rubik", "Heebo", sans-serif !important;
+}
+
+/* Space component RTL */
+.ant-space {
+  direction: rtl !important;
+}
+
+/* Upload component RTL */
+.ant-upload-drag {
+  direction: rtl !important;
+  text-align: center !important;
+  transition: all 0.2s ease !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+.ant-upload-drag:hover {
+  transform: scale(1.01) !important;
+  border-color: #667eea !important;
+}
+
+/* Progress RTL */
+.ant-progress {
+  direction: rtl !important;
+}
+
+/* Alert RTL */
+.ant-alert {
+  direction: rtl !important;
+  text-align: right !important;
+  animation: fadeInUp 0.4s ease-out both !important;
+  border-radius: 8px !important;
+}
+
+/* Statistic RTL */
+.ant-statistic {
+  direction: rtl !important;
+  text-align: right !important;
+}
+
+.ant-statistic-content {
+  direction: rtl !important;
+  text-align: right !important;
+}
+
+.ant-statistic-content-value {
+  animation: gentleBounce 0.6s ease-out both !important;
+}
+
+/* Loading animations */
+.ant-spin {
+  animation: fadeInUp 0.6s ease-out both !important;
+}
+
+/* Drawer animations */
+.ant-drawer-mask {
+  animation: fadeInUp 0.2s ease-out !important;
+}
+
+.ant-drawer-content {
+  animation: slideInRight 0.3s ease-out !important;
+}
+
+/* Responsive Design Improvements */
+@media (max-width: 1200px) {
+  .content-wrapper {
+    max-width: 100% !important;
+    padding: 16px !important;
+  }
+}
+
+@media (max-width: 992px) {
+  .hero-section {
+    padding: 40px 20px !important;
+  }
+
+  .feature-card,
+  .stats-card {
+    margin-bottom: 16px !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .ant-card-body {
+    padding: 16px !important;
+  }
+
+  .form-section {
+    padding: 16px !important;
+  }
+
+  .login-form {
+    padding: 20px !important;
+  }
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Focus styles for accessibility */
+.ant-btn:focus,
+.ant-input:focus,
+.ant-select:focus {
+  outline: 2px solid #667eea !important;
+  outline-offset: 2px !important;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .ant-card {
+    border: 2px solid #000 !important;
+  }
+
+  .ant-btn-primary {
+    background: #000 !important;
+    color: #fff !important;
+  }
+}
 //Brurya
 "use client"
 
@@ -396,6 +1278,10 @@ const transactionTypes = [
   { key: "LiabilityDecrease", label: "הקטנת התחייבויות" },
   { key: "EquityIncrease", label: "הגדלת הון עצמי" },
   { key: "EquityDecrease", label: "הקטנת הון עצמי" },
+  { key: "Revenue", label: "הכנסות נוספות" },
+  { key: "CostOfGoodsSold", label: "עלות סחורה" },
+  { key: "OtherIncome", label: "הכנסה אחרת" },
+  { key: "OtherExpense", label: "הוצאה אחרת" },
 ]
 
 const AccountTransactions: React.FC = () => {
@@ -423,9 +1309,6 @@ const AccountTransactions: React.FC = () => {
         `${url}/api/Invoice/totals/${user.businessId}`,
         { withCredentials: true }
       )
-      console.log("Fetched totals:", data);
-      
-
       setTotals({ debit: data.totalDebit, credit: data.totalCredit })
     } catch (err) {
       console.error("Failed to fetch totals:", err)
@@ -441,30 +1324,15 @@ const AccountTransactions: React.FC = () => {
     setSuccess(false)
     setError(null)
 
-    let amountCredit = 0
-    let amountDebit = 0
-
-    switch (values.transactionType) {
-      case "Income":
-      case "LiabilityIncrease":
-      case "EquityIncrease":
-      case "AssetDecrease":
-        amountCredit = values.amount
-        break
-      case "Expense":
-      case "AssetIncrease":
-      case "LiabilityDecrease":
-      case "EquityDecrease":
-        amountDebit = values.amount
-        break
-      default:
-        break
+    if (!values.amount || values.amount <= 0) {
+      setError("נא להזין סכום תקין הגדול מאפס")
+      setLoading(false)
+      return
     }
 
     const invoiceToSend = {
       id: 0,
-      amountCredit,
-      amountDebit,
+      amount: values.amount, // שולחים סכום אחד בלבד
       invoiceDate: new Date().toISOString(),
       status: 1,
       notes: values.description ?? "",
@@ -478,7 +1346,7 @@ const AccountTransactions: React.FC = () => {
       type: values.transactionType,
     }
 
-    try {    
+    try {
       await axios.post(`${url}/api/Invoice`, invoiceToSend, {
         withCredentials: true,
       })
@@ -492,7 +1360,6 @@ const AccountTransactions: React.FC = () => {
       setLoading(false)
     }
   }
-
 
   return (
     <div dir="rtl" style={{ maxWidth: 800, margin: "auto" }}>
@@ -545,7 +1412,14 @@ const AccountTransactions: React.FC = () => {
         <Form.Item
           name="amount"
           label="סכום"
-          rules={[{ required: true, message: "נא להזין סכום" }]}
+          rules={[
+            { required: true, message: "נא להזין סכום" },
+            {
+              type: "number",
+              min: 0.01,
+              message: "הסכום חייב להיות גדול מאפס",
+            },
+          ]}
         >
           <InputNumber<number>
             placeholder="₪"
@@ -589,7 +1463,7 @@ const { Title, Text, Link } = Typography
 
 const AdminLogin = () => {
   const nav = useNavigate()
-  const [admin, setAdmin] = useState<Admin>({ email: "c@c", password: "1" })
+  const [admin, setAdmin] = useState<Admin>({ email: "a@a", password: "1" })
   const [errors, setErrors] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
   const url = import.meta.env.VITE_API_URL
@@ -603,21 +1477,34 @@ const AdminLogin = () => {
       setErrors([])
 
       if (valid) {
-        const { data } = await axios.post<any>(`${url}/Auth/admin-login`, admin, { withCredentials: true })
-        globalContextDetails.setUser(data.user)
-        globalContextDetails.setIsAdmin(true)
-
+        let data: any;
         try {
-          const res = await axios.get<BusinessDto>(`${url}/api/Business/${data.user.businessId}`, { withCredentials: true })
-          globalContextDetails.setBusinessGlobal(res.data)
-          globalContextDetails.setUserCount(res.data.usersCount)
+          const response = await axios.post<any>(`${url}/Auth/admin-login`, admin, { withCredentials: true });
+          data = response.data;
+          globalContextDetails.setUser(data.user);
+          globalContextDetails.setIsAdmin(true);
         }
         catch (e) {
-          setErrors(e instanceof Error ? [e.message] : ["שגיאה בטעינת העסק, נא לנסות שוב מאוחר יותר"])
+          if (axios.isAxiosError(e) && e.response?.status === 400) {
+            setErrors(["משתמש לא נמצא, נא לבדוק את האימייל והסיסמה"]);
+            return;
+          }
+          setErrors(e instanceof Error ? [e.message] : ["שגיאה בכניסה, נא לנסות שוב מאוחר יותר"]);
+          return;
+        }
+
+        try {
+          const res = await axios.get<BusinessDto>(`${url}/api/Business/${data.user.businessId}`, { withCredentials: true });
+          globalContextDetails.setBusinessGlobal(res.data);
+          globalContextDetails.setUserCount(res.data.usersCount);
+        }
+        catch (e) {
+          setErrors(e instanceof Error ? [e.message] : ["שגיאה בטעינת העסק, נא לנסות שוב מאוחר יותר"]);
         }
         nav("/")
       } else {
-        setErrors(["נא למלא את כל השדות הנדרשים"])
+        const validationErrors = await validationSchema.validate(admin).catch((err) => err.errors);
+        setErrors(validationErrors || []);
       }
     } catch (e) {
       setErrors(e instanceof Error ? [e.message] : ["שגיאה לא צפויה, נא לנסות שוב מאוחר יותר"])
@@ -738,7 +1625,7 @@ import { useContext, useState } from "react"
 import * as Yup from "yup"
 import axios from "axios"
 import type { UserPostModel } from "../models/UserPostModel"
-import { validationSchemaUserRegister } from "../utils/validationSchema"
+import { validationSchemaAdminLogin } from "../utils/validationSchema"
 import { globalContext } from "../context/GlobalContext"
 import type { UserDto } from "../models/UserDto"
 import { converFromUserDto } from "../utils/convertFromUserDto"
@@ -754,7 +1641,6 @@ import {
   Avatar,
   Divider,
   ConfigProvider,
-  InputNumber,
 } from "antd"
 import {
   UserOutlined,
@@ -762,7 +1648,6 @@ import {
   PhoneOutlined,
   IdcardOutlined,
   LockOutlined,
-  TeamOutlined,
   UserAddOutlined,
   CrownOutlined,
 } from "@ant-design/icons"
@@ -770,7 +1655,7 @@ import {
 const { Title, Text } = Typography
 
 const AdminRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => {
-  const validationSchema = validationSchemaUserRegister
+  const validationSchema = validationSchemaAdminLogin
   const [myAdmin, setMyAdmin] = useState<UserPostModel>({
     firstName: "יוסי",
     lastName: "כהן",
@@ -787,50 +1672,46 @@ const AdminRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) =>
 
   const handleSubmit = (adminRegister: UserPostModel) => async () => {
     setLoading(true)
-
-    validationSchema
-      .isValid(adminRegister)
-      .then(async (valid) => {
-        setErrors([])
-        if (valid) {
-          try {
-            const { data } = await axios.post<UserDto>(`${url}/Auth/admin-register`, adminRegister, {
-              withCredentials: true,
-            })
-            globalContextDetails.setUser(converFromUserDto(data))
-            if (data.role == 1) {
-              globalContextDetails.setIsAdmin(true)
-            }
-            if (onSubmitSuccess) onSubmitSuccess()
-          } catch (e) {
-            setErrors(["שגיאה ברישום"])
-          }
-        } else {
-          setErrors(["נא למלא את כל השדות הנדרשים"])
+  
+    try {
+      // נוודא שכל השדות נבדקים לפי הסכמה, כולל הודעות שגיאה
+      await validationSchema.validate(adminRegister, { abortEarly: false })
+  
+      // אם עבר ולידציה, נמשיך לנסות לשלוח לשרת
+      try {
+        const { data } = await axios.post<UserDto>(
+          `${url}/Auth/admin-register`,
+          adminRegister,
+          { withCredentials: true }
+        )
+  
+        globalContextDetails.setUser(converFromUserDto(data))
+        if (data.role == 1) {
+          globalContextDetails.setIsAdmin(true)
         }
-      })
-      .catch((err) => {
-        if (err instanceof Yup.ValidationError) {
-          setErrors(err.errors)
-        }
-      })
-      .finally(() => {
-        setLoading(false)
-      })
+  
+        if (onSubmitSuccess) onSubmitSuccess()
+        setErrors([]) // ננקה שגיאות אם הכל עבר
+      } catch (e) {
+        setErrors(["שגיאה ברישום"])
+      }
+    } catch (err) {
+      // נציג את כל שגיאות ה־Yup
+      if (err instanceof Yup.ValidationError) {
+        setErrors(err.errors)
+      } else {
+        setErrors(["שגיאה כללית בוולידציה"])
+      }
+    } finally {
+      setLoading(false)
+    }
   }
-
+  
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const { name, value, type } = event.target
     setMyAdmin((prevUser) => ({
       ...prevUser,
       [name]: type === "number" ? Number(value) : value,
-    }))
-  }
-
-  const handleNumberChange = (field: string, value: number | null) => {
-    setMyAdmin((prevUser) => ({
-      ...prevUser,
-      [field]: value || 0,
     }))
   }
 
@@ -946,18 +1827,6 @@ const AdminRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) =>
               </Form.Item>
             </Col>
             <Col xs={24} md={12}>
-              <Form.Item label="תפקיד" required>
-                <InputNumber
-                  prefix={<TeamOutlined style={{ color: "#667eea" }} />}
-                  placeholder="הזן קוד תפקיד (1 = מנהל)"
-                  size="large"
-                  style={{ width: "100%", height: 48 }}
-                  value={myAdmin.role}
-                  onChange={(value) => handleNumberChange("role", value)}
-                  min={1}
-                  max={3}
-                />
-              </Form.Item>
             </Col>
           </Row>
 
@@ -4072,41 +4941,45 @@ const UserLogin = () => {
   const [userLogin, setUserLogin] = useState<AdminRegister>({ email: "", password: "" })
   const [errors, setErrors] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
-  const [showModal, setShowModal] = useState(false)
   const url = import.meta.env.VITE_API_URL
   const globalContextDetails = useContext(globalContext)
 
   const handleSubmit = async () => {
     setLoading(true)
-    setShowModal(true) // Show modal overlay
-
     try {
-      // Validate form
-      await validationSchema.validate(userLogin, { abortEarly: false })
+      const valid = await validationSchema.isValid(userLogin)
       setErrors([])
 
-      const { data } = await axios.post<any>(`${url}/Auth/user-login`, userLogin, { withCredentials: true })
-      globalContextDetails.setUserCount(data.user.businessUsersCount)
-      globalContextDetails.setUser(data.user)
+      if (valid) {
 
-      // Success - navigate after short delay
-      setTimeout(() => {
-        setShowModal(false)
-        nav("/")
-      }, 1000)
-    } catch (err: any) {
-      setShowModal(false)
-
-      if (err.name === "ValidationError") {
-        setErrors(err.errors || ["נא למלא את כל השדות הנדרשים בצורה תקינה"])
-      } else if (axios.isAxiosError(err)) {
-        const errorMessage =
-          err.response?.data?.message || err.response?.data || "שגיאה בהתחברות. אנא בדוק את פרטי ההתחברות."
-        setErrors([errorMessage])
-      } else {
-        setErrors(["שגיאה לא צפויה. אנא נסה שוב מאוחר יותר."])
+        try {
+          const { data } = await axios.post<any>(`${url}/Auth/user-login`, userLogin, { withCredentials: true })
+          globalContextDetails.setUserCount(data.user.businessUsersCount)
+          globalContextDetails.setUser(data.user)
+          nav("/")
+        }
+        catch (e) {
+          if (axios.isAxiosError(e) && e.response?.status === 400) {
+            setErrors(["משתמש לא נמצא, נא לבדוק את האימייל והסיסמה"]);
+            return;
+          }
+          setErrors(e instanceof Error ? [e.message] : ["שגיאה בכניסה, נא לנסות שוב מאוחר יותר"]);
+          return;
+        }
       }
-    } finally {
+      else {
+        const validationErrors = await validationSchema.validate(userLogin).catch((err) => err.errors);
+        setErrors(validationErrors || []);
+      }
+    } catch (e) {
+      if (axios.isAxiosError(e) && e.response?.status === 400) {
+        setErrors(["משתמש לא נמצא, נא לבדוק את האימייל והסיסמה"]);
+        return;
+      }
+      setErrors(e instanceof Error ? [e.message] : ["שגיאה בכניסה, נא לנסות שוב מאוחר יותר"]);
+      return;
+    }
+    finally {
       setLoading(false)
     }
   }
@@ -4119,71 +4992,9 @@ const UserLogin = () => {
     }
   }
 
-  const validateField = (field: string, value: string) => {
-    const fieldErrors: string[] = []
-
-    if (field === "email") {
-      if (!value) {
-        fieldErrors.push("שדה האימייל הוא חובה")
-      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-        fieldErrors.push("כתובת האימייל אינה תקינה")
-      }
-    }
-
-    if (field === "password") {
-      if (!value) {
-        fieldErrors.push("שדה הסיסמה הוא חובה")
-      } else if (value.length < 1) {
-        fieldErrors.push("הסיסמה חייבת להכיל לפחות תו אחד")
-      }
-    }
-
-    return fieldErrors
-  }
 
   return (
     <ConfigProvider direction="rtl">
-      {/* Modal Overlay */}
-      {showModal && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <Card className="login-form" style={{ maxWidth: 500, width: "100%" }}>
-              <div style={{ textAlign: "center", marginBottom: 32 }}>
-                <Avatar
-                  size={80}
-                  style={{
-                    background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                    marginBottom: 16,
-                    boxShadow: "0 4px 14px rgba(102, 126, 234, 0.3)",
-                  }}
-                >
-                  <UserOutlined style={{ fontSize: 40 }} />
-                </Avatar>
-
-                <Title level={2} style={{ marginBottom: 8, color: "#2d3748", textAlign: "center" }}>
-                  מתחבר למערכת...
-                </Title>
-
-                <Text type="secondary" style={{ fontSize: 16 }}>
-                  אנא המתן בזמן שאנו מאמתים את פרטיך
-                </Text>
-              </div>
-
-              <div style={{ textAlign: "center", padding: "20px 0" }}>
-                <div className="ant-spin ant-spin-spinning">
-                  <span className="ant-spin-dot ant-spin-dot-spin">
-                    <i className="ant-spin-dot-item"></i>
-                    <i className="ant-spin-dot-item"></i>
-                    <i className="ant-spin-dot-item"></i>
-                    <i className="ant-spin-dot-item"></i>
-                  </span>
-                </div>
-              </div>
-            </Card>
-          </div>
-        </div>
-      )}
-
       <div style={{ marginTop: "50vh" }}></div>
       <div className="centered-layout">
         <Card className="login-form" style={{ maxWidth: 500, width: "100%" }}>
@@ -4213,15 +5024,6 @@ const UserLogin = () => {
               label="אימייל"
               required
               style={{ marginBottom: 20 }}
-              validateStatus={validateField("email", userLogin.email).length > 0 ? "error" : ""}
-              help={
-                validateField("email", userLogin.email).length > 0 && (
-                  <div className="error-message">
-                    <ExclamationCircleOutlined />
-                    {validateField("email", userLogin.email)[0]}
-                  </div>
-                )
-              }
             >
               <Input
                 prefix={<MailOutlined style={{ color: "#667eea" }} />}
@@ -4237,15 +5039,6 @@ const UserLogin = () => {
               label="סיסמא"
               required
               style={{ marginBottom: 24 }}
-              validateStatus={validateField("password", userLogin.password).length > 0 ? "error" : ""}
-              help={
-                validateField("password", userLogin.password).length > 0 && (
-                  <div className="error-message">
-                    <ExclamationCircleOutlined />
-                    {validateField("password", userLogin.password)[0]}
-                  </div>
-                )
-              }
             >
               <Input.Password
                 prefix={<LockOutlined style={{ color: "#667eea" }} />}
@@ -4822,14 +5615,21 @@ const UserRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => 
         await axios.post<UserPostModel>(`${url}/Auth/user-register`, myUser, { withCredentials: true })
         globalContextDetails.setUserCount(globalContextDetails.usersCount + 1)
         if (onSubmitSuccess) onSubmitSuccess()
-        nav(-1) // Go back to the previous page
+        nav(-1)
       } catch (e) {
         setErrors(["שגיאה ברישום המשתמש"])
       }
 
     } catch (e) {
-      setErrors(e instanceof Error ? [e.message] : ["שגיאה ברישום המשתמש, נא לנסות שוב מאוחר יותר"])
-    } finally {
+      if (e instanceof Error && 'inner' in e) {
+        const validationErrors = (e as any).inner.map((err: any) => err.message)
+        setErrors(validationErrors)
+      } else {
+        setErrors(["שגיאה ברישום המשתמש, נא לנסות שוב מאוחר יותר"])
+      }
+    }
+
+    finally {
       setLoading(false)
     }
   }
@@ -4853,11 +5653,6 @@ const UserRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => 
             <Title level={2} style={{ marginBottom: 8, color: "#2d3748", textAlign: "center" }}>
               הרשמת משתמש חדש
             </Title>
-
-            <Text type="secondary" style={{ fontSize: 16 }}>
-              נא למלא את כל הפרטים הנדרשים
-            </Text>
-
             <Divider />
           </div>
 
@@ -5010,544 +5805,3 @@ const UserRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => 
 }
 
 export default UserRegister
-import { createContext, ReactElement, useState } from "react"
-import { User } from "../models/User"
-import { defaultBusiness, defaultUser } from "../models/DefaultObjects"
-import { BusinessDto } from "../models/BusinessDto"
-
-type GlobalContextType = {
-    business_global: BusinessDto,
-    setBusinessGlobal: (business: BusinessDto) => void
-    user: User,
-    setUser: (user: User) => void
-    isAdmin: boolean
-    setIsAdmin: (isAdmin: boolean) => void
-    usersCount: number,
-    setUserCount: (count: number) => void
-}
-
-export const globalContext = createContext<GlobalContextType>({
-    user: defaultUser,
-    setUser: (_: User) => { },
-    business_global: defaultBusiness,
-    setBusinessGlobal: (_: BusinessDto) => { },
-    isAdmin: false,
-    setIsAdmin: (_: boolean) => { },
-    usersCount: 0,
-    setUserCount: (_: number) => { }
-})
-
-const GlobalContext = ({ children }: { children: ReactElement }) => {
-    const [business_global, setBusinessGlobal] = useState<BusinessDto>(defaultBusiness)
-    const [user, setUser] = useState<User>(defaultUser)
-    const [isAdmin, setIsAdmin] = useState<boolean>(false)
-    const [usersCount, setUserCount] = useState<number>(0)
-
-    return <globalContext.Provider value={{ user, setUser, isAdmin, setIsAdmin , business_global, setBusinessGlobal, usersCount, setUserCount }}>
-        {children}
-    </globalContext.Provider>
-}
-
-export default GlobalContext
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.css'
-import App from './App.tsx'
-
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-)
-export interface Admin{
-    email: string;
-    password: string;
-}
-import { User } from "./User";
-
-export interface AdminLoginResponse {
-    token: string;
-    user: User;
-  }
-export interface AdminRegister {
-    email: string,
-    password: string
-}
-import { Invoice } from "./Invoices";
-import { User } from "./User";
-
-export interface Business {
-    usersCount: number;
-    id: number; // מזהה ייחודי
-    businessId: number; // מזהה ייחודי לעסק
-    name: string; // שם העסק
-    address: string; // כתובת העסק
-    email: string; // אימייל של העסק
-    businessType: string; // סוג העסק
-    equity?: number; // הון עצמי של העסק (אופציונלי)
-    income: number; // הכנסות העסק
-    expenses: number; // הוצאות העסק
-    cashFlow: number; // תזרים מזומנים של העסק
-    totalAssets: number; // סך הנכסים של העסק
-    totalLiabilities: number; // סך ההתחייבויות של העסק
-    netWorth: number; // שווי נקי
-    revenueGrowthRate?: number; // שיעור צמיחת ההכנסות
-    profitMargin?: number; // שיעור הרווח
-    currentRatio?: number; // יחס נוכחי
-    quickRatio?: number; // יחס מהיר
-    createdAt?: Date; // תאריך יצירה
-    createdBy?: string; // נוצר על ידי
-    updatedAt?: Date; // תאריך עדכון
-    updatedBy?: string; // עודכן על ידי
-    users?: User[]; // רשימת משתמשים
-    invoices?: Invoice[]; // רשימת חשבוניות
-}
-
-export class BusinessImpl implements Business {
-    id: number;
-    businessId: number;
-    name: string;
-    address: string;
-    email: string;
-    businessType: string;
-    income: number;
-    expenses: number;
-    cashFlow: number;
-    totalAssets: number;
-    totalLiabilities: number;
-    netWorth: number;
-    revenueGrowthRate?: number;
-    profitMargin?: number;
-    currentRatio?: number;
-    quickRatio?: number;
-    createdAt?: Date;
-    createdBy?: string;
-    updatedAt?: Date;
-    updatedBy?: string;
-    users?: User[];
-    invoices?: Invoice[];
-
-    constructor(
-        id: number,
-        businessId: number,
-        name: string,
-        address: string,
-        email: string,
-        businessType: string,
-        income: number,
-        expenses: number,
-        cashFlow: number,
-        totalAssets: number,
-        totalLiabilities: number,
-        netWorth: number,
-        revenueGrowthRate?: number,
-        profitMargin?: number,
-        currentRatio?: number,
-        quickRatio?: number,
-        createdAt?: Date,
-        createdBy?: string,
-        updatedAt?: Date,
-        updatedBy?: string,
-        users?: User[],
-        invoices?: Invoice[]
-    ) {
-        this.id = id;
-        this.businessId = businessId;
-        this.name = name;
-        this.address = address;
-        this.email = email;
-        this.businessType = businessType;
-        this.income = income;
-        this.expenses = expenses;
-        this.cashFlow = cashFlow;
-        this.totalAssets = totalAssets;
-        this.totalLiabilities = totalLiabilities;
-        this.netWorth = netWorth;
-        this.revenueGrowthRate = revenueGrowthRate;
-        this.profitMargin = profitMargin;
-        this.currentRatio = currentRatio;
-        this.quickRatio = quickRatio;
-        this.createdAt = createdAt;
-        this.createdBy = createdBy;
-        this.updatedAt = updatedAt;
-        this.updatedBy = updatedBy;
-        this.users = users;
-        this.invoices = invoices;
-    }
-    usersCount!: number;
-}
-export interface BusinessDto {
-    id: number; // מזהה ייחודי
-    businessId: number; // מזהה ייחודי לעסק
-    name: string; // שם העסק
-    address: string; // כתובת העסק
-    email: string; // אימייל של העסק
-    businessType: string; // סוג העסק
-    equity?: number; // הון עצמי של העסק (אופציונלי)
-    income: number; // הכנסות העסק
-    expenses: number; // הוצאות העסק
-    cashFlow: number; // תזרים מזומנים של העסק
-    totalAssets: number; // סך הנכסים של העסק
-    totalLiabilities: number; // סך ההתחייבויות של העסק
-    netWorth: number; // שווי נקי
-    revenueGrowthRate: number; // שיעור צמיחת ההכנסות
-    profitMargin: number; // שיעור הרווח
-    currentRatio: number; // יחס נוכחי
-    quickRatio: number; // יחס מהיר
-    createdAt: string; // תאריך יצירה
-    createdBy: string; // נוצר על ידי
-    updatedAt: string; // תאריך עדכון
-    updatedBy: string; // עודכן על ידי
-    usersCount: number; // מספר המשתמשים בעסק
-}
-export interface BusinessPostModel {
-    id: number,
-    businessId: number; // מזהה ייחודי לעסק
-    name: string; // שם העסק
-    address: string; // כתובת העסק
-    email: string; // אימייל של העסק
-    businessType: string; // סוג העסק
-    income: number; // הכנסות העסק
-    expenses: number; // הוצאות העסק
-    cashFlow: number; // תזרים מזומנים של העסק
-    totalAssets: number; // סך הנכסים של העסק
-    totalLiabilities: number; // סך ההתחייבויות של העסק
-}
-export interface BusinessResponsePutModel {
-    id: number; // מזהה ייחודי
-    businessId: number; // מזהה ייחודי לעסק
-    name: string; // שם העסק
-    address: string; // כתובת העסק
-    email: string; // אימייל של העסק
-    businessType: string; // סוג העסק
-    income: number; // הכנסות העסק
-    expenses: number; // הוצאות העסק
-    cashFlow: number; // תזרים מזומנים של העסק
-    totalAssets: number; // סך הנכסים של העסק
-    totalLiabilities: number; // סך ההתחייבויות של העסק
-    netWorth: number; // שווי נקי
-    revenueGrowthRate?: number; // שיעור צמיחת ההכנסות
-    profitMargin?: number; // שיעור הרווח
-    currentRatio?: number; // יחס נוכחי
-    quickRatio?: number; // יחס מהיר
-    createdAt?: Date; // תאריך יצירה
-    createdBy?: string; // נוצר על ידי
-    updatedAt?: Date; // תאריך עדכון
-    updatedBy?: string; // עודכן על ידי
-}
-import { BusinessDto } from "./BusinessDto";
-import { User } from "./User";
-
-export const defaultBusiness: BusinessDto = {
-  id: 0,
-  businessId: 0,
-  name: '',
-  address: '',
-  email: '',
-  businessType: '',
-  income: 0,
-  expenses: 0,
-  cashFlow: 0,
-  totalAssets: 0,
-  totalLiabilities: 0,
-  netWorth: 0,
-  revenueGrowthRate: 0,
-  profitMargin: 0,
-  currentRatio: 0,
-  quickRatio: 0,
-  createdBy: '',
-  updatedBy: '',
-  usersCount: 0,
-  createdAt: "",
-  updatedAt: ""
-};
-
-export const defaultUser: User = {
-    id: 0,
-    firstName: '',
-    lastName: '',
-    email: '',
-    password: '',
-    phone: '',
-    role: 0,
-    idNumber: '',
-    status: 'inactive',
-    lastLogin: new Date(),
-    createdAt: new Date(),
-    createdBy: '',
-    updatedAt: new Date(),
-    updatedBy: '',
-    businessId: null,
-    business: null,
-    invoices: [],
-  };
-export interface FileItem {
-  id: number;
-  invoicePath: string;  
-  fileName: string;
-  fileContent: string;
-  filePath: string;
-  size: number;
-  userId: number;
-  uploadDate: string;
-  businessId: number;
-}
-import { InvoiceType } from "./Invoices";
-
-export interface InvoiceDto {
-    id: number;                // מזהה ייחודי
-    amountDebit: number;      // סכום חובה
-    amountCredit: number;     // סכום זכות
-    invoiceDate: Date;        // תאריך החשבונית
-    status: number;           // סטטוס החשבונית
-    notes: string;            // הערות
-    createdAt: Date;          // תאריך יצירה
-    createdBy: string;        // נוצר על ידי
-    updatedAt: Date;          // תאריך עדכון
-    updatedBy: string;        // עודכן על ידי
-    invoicePath: string;      // נתיב החשבונית
-    type: InvoiceType;        // סוג העסקה
-
-    userId?: number;          // מזהה המשתמש
-    businessId?: number;      // מזהה העסק
-}
-import { Business } from "./Business";
-import { User } from "./User";
-
-export enum InvoiceType {
-    Income = 0,
-    Expense = 1,
-    AssetIncrease = 2,
-    AssetDecrease = 3,
-    LiabilityIncrease = 4,
-    LiabilityDecrease = 5,
-    EquityIncrease = 6,
-    EquityDecrease = 7
-}
-
-export interface Invoice {
-    id: number;                // מזהה ייחודי
-    amountDebit: number;      // סכום חובה
-    amountCredit: number;     // סכום זכות
-    invoiceDate: Date;        // תאריך החשבונית
-    status: number;           // סטטוס החשבונית
-    notes?: string;           // הערות
-    createdAt?: Date;         // תאריך יצירה
-    createdBy?: string;       // נוצר על ידי
-    updatedAt?: Date;         // תאריך עדכון
-    updatedBy?: string;       // עודכן על ידי
-    business?: Business;      // אובייקט עסק
-    user?: User;              // אובייקט משתמש
-    userId?: number;          // מזהה המשתמש (קשר לטבלת Users)
-    businessId?: number;      // מזהה ייחודי לעסק
-    type: InvoiceType;        // סוג העסקה (Income, Expense וכו')
-}
-export interface ProdactionReportData {
-    businessName: string,
-    totalIncome: number,
-    totalExpenses: number,
-    netProfit: number,
-    cashFlow: number,
-    invoiceCount: number,
-    totalDebit: number,
-    totalCredit: number,
-    reportDate: string
-}
-
-export interface ProdactionReportMonthlyData {
-    currentMonthIncome: number,
-    previousMonthIncome: number,
-    incomeChangePercent: number,
-    currentMonthExpenses: number,
-    previousMonthExpenses: number,
-    expensesChangePercent: number,
-    currentMonthNetProfit: number,
-    previousMonthNetProfit: number,
-    netProfitChangePercent: number
-}
-import { Business } from "./Business";
-import { Invoice } from "./Invoices";
-
-export interface User {
-    id: number; // מזהה ייחודי
-    firstName: string; // שם פרטי
-    lastName: string; // שם משפחה
-    email: string; // אימייל
-    password: string; // סיסמה (מוצפנת)
-    phone: string; // מספר פלאפון
-    role: number; // תפקיד עובד (admin / user)
-    idNumber: string; // תעודת זהות
-    status: string; // מצב המשתמש (active/inactive)
-    lastLogin: Date; // תאריך כניסה אחרונה
-    createdAt: Date; // תאריך יצירה
-    createdBy: string; // נוצר על ידי
-    updatedAt: Date; // תאריך עדכון
-    updatedBy: string; // עודכן על ידי
-    businessId: number | null; // מזהה ייחודי לעסק
-    business?: Business | null; // אובייקט עסק
-    invoices?: Invoice[]; // רשימת חשבוניות
-    // TODO: יכול להיות בעיות עם שדות של תאריך
-}
-export interface UserDto {
-    id: number,
-    firstName: string; // שם פרטי
-    lastName: string; // שם משפחה
-    email: string; // אימייל
-    phone: string; // מספר פלאפון
-    role: number; // תפקיד עובד (admin / user) // 1 = admin, 2 = user, 3 = bookkeeper
-    password: string; // סיסמא
-    idNumber: string; // תעודת זהות
-    status: string; // מצב המשתמש (active/inactive)
-    lastLogin: Date; // תאריך כניסה אחרונה
-    createdAt: Date; // תאריך יצירה
-    updateAt: Date; // תאריך עדכון
-    businessId: number | null; // מזהה ייחודי לעסק 
-}
-export interface UserPostModel {
-    firstName: string; // שם פרטי
-    lastName: string; // שם משפחה
-    email: string; // אימייל
-    password: string; // סיסמה (מוצפנת)
-    phone: string; // מספר פלאפון
-    role: number; // תפקיד עובד (admin / user) // 1 = admin, 2 = user, 3 = bookkeeper
-    idNumber: string; // תעודת זהות
-}
-
-import { User } from "../models/User";
-import { UserDto } from "../models/UserDto";
-
-export const converFromUserDto = (userRegister: UserDto): User => {
-    return {
-        id: userRegister.id, 
-        firstName: userRegister.firstName,
-        lastName: userRegister.lastName,
-        email: userRegister.email,
-        password: userRegister.password, // סיסמה לא מוצפנת, יש להוסיף הצפנה אם נדרש
-        phone: userRegister.phone,
-        role: userRegister.role,
-        idNumber: userRegister.idNumber,
-        status: "active", // מצב ברירת מחדל
-        createdBy: '', // תוכל להוסיף את המידע הזה אם יש לך
-        updatedBy: '', // תוכל להוסיף את המידע הזה אם יש לך
-        businessId: null, // או מזהה עסק אם יש לך
-        business: undefined, // או אובייקט עסק אם יש לך
-        invoices: [], // רשימת חשבוניות ריקה או מלאה
-        lastLogin: new Date(), // זמן התחברות אחרון, ערך ברירת מחדל
-        createdAt: new Date(), // תאריך יצירה
-        updatedAt: new Date() // תאריך עדכון
-    };
-};
-import { User } from "../models/User";
-import { UserPostModel } from "../models/UserPostModel";
-
-export const convertToUser = (userRegister: UserPostModel): User => {
-    return {
-        id: 0, 
-        firstName: userRegister.firstName,
-        lastName: userRegister.lastName,
-        email: userRegister.email,
-        password: userRegister.password, // יש לוודא שהסיסמה מוצפנת
-        phone: userRegister.phone,
-        role: userRegister.role,
-        idNumber: userRegister.idNumber,
-        status: "active", // מצב ברירת מחדל
-        createdBy: '', // תוכל להוסיף את המידע הזה אם יש לך
-        updatedBy: '', // תוכל להוסיף את המידע הזה אם יש לך
-        businessId: 0, // או מזהה עסק אם יש לך
-        business: undefined, // או אובייקט עסק אם יש לך
-        invoices: [], // רשימת חשבוניות ריקה או מלאה
-        lastLogin: new Date(), // זמן התחברות אחרון, ערך ברירת מחדל
-        createdAt: new Date(), // תאריך יצירה
-        updatedAt: new Date() // תאריך עדכון
-    };
-};
-import { Business } from "../models/Business";
-import { BusinessDto } from "../models/BusinessDto";
-import { BusinessPostModel } from "../models/BusinessPostModel";
-
-export const convertToBusiness = (businessPost: BusinessPostModel): Business => {
-    return {
-        id: businessPost.id, 
-        netWorth:  businessPost.expenses - businessPost.income, // חישוב שווי נקי
-        businessId: businessPost.businessId,
-        name: businessPost.name,
-        address: businessPost.address,
-        email: businessPost.email,
-        businessType: businessPost.businessType,
-        income: businessPost.income,
-        expenses: businessPost.expenses,
-        cashFlow: businessPost.cashFlow,
-        totalAssets: businessPost.totalAssets,
-        totalLiabilities: businessPost.totalLiabilities,
-        revenueGrowthRate: undefined, // או חישוב אם יש לך ערך
-        profitMargin: undefined, // או חישוב אם יש לך ערך
-        currentRatio: undefined, // או חישוב אם יש לך ערך
-        quickRatio: undefined, // או חישוב אם יש לך ערך
-        createdAt: new Date(), // תאריך יצירה נוכחי
-        createdBy: '', // תוכל להוסיף את המידע הזה אם יש לך
-        updatedAt: new Date(), // תאריך עדכון נוכחי
-        updatedBy: '', // תוכל להוסיף את המידע הזה אם יש לך
-        users: [], // רשימת משתמשים ריקה או מלאה
-        invoices: [], // רשימת חשבוניות ריקה או מלאה
-        usersCount: 0 // מספר משתמשים התחלתי
-    };
-};
-
-export const convertToBusinessDto = (data: Business): BusinessDto => ({
-    id: data.id,
-    businessId: data.businessId,
-    name: data.name,
-    address: data.address,
-    email: data.email,
-    businessType: data.businessType,
-    income: data.income,
-    expenses: data.expenses,
-    cashFlow: data.cashFlow,
-    totalAssets: data.totalAssets,
-    totalLiabilities: data.totalLiabilities,
-    usersCount: data.usersCount,
-    netWorth: 0,
-    revenueGrowthRate: 0,
-    profitMargin: 0,
-    currentRatio: 0,
-    quickRatio: 0,
-    createdAt: typeof data.createdAt === "string" ? data.createdAt : data.createdAt?.toISOString() || "",
-    createdBy: data.createdBy || "",
-    updatedAt: typeof data.updatedAt === "string" ? data.updatedAt : data.updatedAt?.toISOString() || "",
-    updatedBy: data.updatedBy || "",
-})
-import * as Yup from 'yup';
-
-export const validationSchemaBusinessRegister = Yup.object().shape({
-  businessId: Yup.number().required('מזהה ייחודי לעסק הוא שדה חובה'),
-  name: Yup.string().required('שם העסק הוא שדה חובה'),
-  address: Yup.string().required('כתובת העסק היא שדה חובה'),
-  email: Yup.string().email('אימייל לא תקין').required('אימייל של העסק הוא שדה חובה'),
-  businessType: Yup.string().required('סוג העסק הוא שדה חובה'),
-  income: Yup.number().required('הכנסות העסק הן שדה חובה').min(0, 'הכנסות חייבות להיות חיוביות'),
-  expenses: Yup.number().required('הוצאות העסק הן שדה חובה').min(0, 'הוצאות חייבות להיות חיוביות'),
-  cashFlow: Yup.number().required('תזרים מזומנים של העסק הוא שדה חובה').min(0, 'תזרים חייב להיות חיובי'),
-  totalAssets: Yup.number().required('סך הנכסים של העסק הוא שדה חובה').min(0, 'סך הנכסים חייב להיות חיובי'),
-  totalLiabilities: Yup.number().required('סך ההתחייבויות של העסק הוא שדה חובה').min(0, 'סך ההתחייבויות חייב להיות חיובי'),
-  revenueGrowthRate: Yup.number().nullable().min(0, 'שיעור צמיחת ההכנסות חייב להיות חיובי'),
-  profitMargin: Yup.number().nullable().min(0, 'שיעור הרווח חייב להיות חיובי'),
-  currentRatio: Yup.number().nullable().min(0, 'יחס נוכחי חייב להיות חיובי'),
-  quickRatio: Yup.number().nullable().min(0, 'יחס מהיר חייב להיות חיובי'),
-});
-
-export const validationSchemaAdminLogin = Yup.object().shape({
-  email: Yup.string().email('אימייל לא חוקי').required('אימייל הוא שדה חובה'),
-  password: Yup.string().required('סיסמא היא שדה חובה').min(1, 'סיסמא חייבת להיות לפחות 3 תווים')
-})
-
-export const validationSchemaUserLogin = Yup.object().shape({
-  email: Yup.string().email('אימייל לא חוקי').required('אימייל הוא שדה חובה'),
-  password: Yup.string().required('סיסמא היא שדה חובה').min(1, 'סיסמא חייבת להיות לפחות 3 תווים')
-})
-
-export const validationSchemaUserRegister = Yup.object().shape({
-  email: Yup.string().email('אימייל לא חוקי').required('אימייל הוא שדה חובה'),
-  password: Yup.string().required('סיסמא היא שדה חובה').min(1, 'סיסמא חייבת להיות לפחות 3 תווים'),
-  role: Yup.number().required('תפקיד הוא שדה חובה').min(2, 'תפקיד חייב להיות מעל 1').max(3, 'תפקיד חייב להיות בין 2 ל-3'),
-})
-/// <reference types="vite/client" />
