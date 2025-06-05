@@ -113,7 +113,6 @@ const AccountTransactions: React.FC = () => {
   return (
     <div dir="rtl" style={{ maxWidth: 800, margin: "auto" }}>
       <h2>רישום פקודת יומן</h2>
-
       <Card style={{ marginBottom: 20 }}>
         <Text strong>סכומים נוכחיים בעסק:</Text>
         <Row gutter={16} style={{ marginTop: 10 }}>

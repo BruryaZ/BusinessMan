@@ -67,7 +67,7 @@ const navItems = [
 ]
 
 function ResponsiveDrawer() {
-  const [collapsed, setCollapsed] = useState(false)
+  const [collapsed] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const location = useLocation()
   const isMobile = useMediaQuery({ maxWidth: 768 })
@@ -102,10 +102,6 @@ function ResponsiveDrawer() {
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen)
-  }
-
-  const handleCollapse = () => {
-    setCollapsed(!collapsed)
   }
 
   const menuItems = navItems.map((item) => ({
@@ -167,6 +163,7 @@ function ResponsiveDrawer() {
           flex: 1,
           padding: "8px",
           direction: "rtl",
+          backgroundColor: '#7354af0f'
         }}
         items={menuItems}
         onClick={(e) => {
@@ -311,7 +308,6 @@ function ResponsiveDrawer() {
               </Space>
             </Space>
           </Header>
-
 
           <Content
             style={{

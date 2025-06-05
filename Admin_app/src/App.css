@@ -13,7 +13,8 @@ body {
   height: 100%;
   direction: rtl;
   font-family: "Assistant", "Rubik", "Heebo", sans-serif;
-  background: linear-gradient(135deg, #f5f7ff 0%, #ffffff 100%);
+  background-color: #fff;
+  /* background: linear-gradient(135deg, #f5f7ff 0%, #ffffff 100%); */
   overflow-x: hidden;
 }
 
@@ -27,6 +28,14 @@ body {
   min-height: 100vh;
 }
 
+:root {
+  background-color: #f7f5fa !important;
+}
+
+.ant-card-body {
+  position: absolute;
+}
+
 a {
   text-decoration: none;
   color: inherit;
@@ -38,6 +47,7 @@ a {
     opacity: 0;
     transform: translateY(15px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -49,6 +59,7 @@ a {
     opacity: 0;
     transform: translateX(20px);
   }
+
   to {
     opacity: 1;
     transform: translateX(0);
@@ -60,6 +71,7 @@ a {
     opacity: 0;
     transform: translateX(-20px);
   }
+
   to {
     opacity: 1;
     transform: translateX(0);
@@ -71,10 +83,12 @@ a {
     opacity: 0;
     transform: scale(0.95);
   }
+
   50% {
     opacity: 1;
     transform: scale(1.01);
   }
+
   100% {
     opacity: 1;
     transform: scale(1);
@@ -85,29 +99,35 @@ a {
   0% {
     transform: scale(1);
   }
+
   50% {
     transform: scale(1.02);
   }
+
   100% {
     transform: scale(1);
   }
 }
 
 @keyframes gentleFloat {
+
   0%,
   100% {
     transform: translateY(0px);
   }
+
   50% {
     transform: translateY(-3px);
   }
 }
 
 @keyframes softGlow {
+
   0%,
   100% {
     box-shadow: 0 0 3px rgba(102, 126, 234, 0.3);
   }
+
   50% {
     box-shadow: 0 0 8px rgba(102, 126, 234, 0.5);
   }
@@ -177,7 +197,7 @@ a {
 
 .nav-btn:hover {
   transform: translateY(-1px);
-  animation: subtlePulse 0.4s ease-in-out;
+  /* animation: subtlePulse 0.4s ease-in-out; */
 }
 
 .menu-toggle-btn {
@@ -185,7 +205,7 @@ a {
 }
 
 .menu-toggle-btn:hover {
-  animation: subtlePulse 0.4s ease-in-out;
+  /* animation: subtlePulse 0.4s ease-in-out; */
 }
 
 .desktop-sider {
@@ -249,19 +269,22 @@ body:lang(he) {
 .ant-layout-content {
   width: 100% !important;
   margin: 0 !important;
-  background: transparent !important;
+  /* background: transparent !important; */
   direction: rtl !important;
 }
 
 /* RTL Sider positioning */
 .ant-layout-sider {
-  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.05) !important;
   position: fixed !important;
   height: 100vh !important;
   right: 0 !important;
   top: 0 !important;
   z-index: 1001 !important;
   background: #fff !important;
+}
+
+header {
+  box-shadow: none !important;
 }
 
 /* Content area adjustments for RTL */
@@ -279,6 +302,7 @@ body:lang(he) {
 
 /* Mobile responsive */
 @media (max-width: 768px) {
+
   .main-layout,
   .main-layout.collapsed {
     margin-right: 0 !important;
@@ -315,7 +339,7 @@ body:lang(he) {
 
 .ant-menu-item:hover {
   transform: translateX(-2px) !important;
-  animation: softGlow 0.4s ease-in-out !important;
+  /* animation: softGlow 0.4s ease-in-out !important; */
 }
 
 .ant-menu-item-selected {
@@ -346,7 +370,7 @@ body:lang(he) {
 .ant-card:hover {
   transform: translateY(-2px) !important;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12) !important;
-  animation: gentleFloat 2s ease-in-out infinite !important;
+  /* animation: gentleFloat 2s ease-in-out infinite !important; */
 }
 
 .ant-card-body {
@@ -371,7 +395,7 @@ body:lang(he) {
 
 .ant-btn:hover {
   transform: translateY(-1px) !important;
-  animation: subtlePulse 0.4s ease-in-out !important;
+  /* animation: subtlePulse 0.4s ease-in-out !important; */
 }
 
 .ant-btn-primary {
@@ -383,7 +407,7 @@ body:lang(he) {
 .ant-btn-primary:hover {
   background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%) !important;
   box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5) !important;
-  animation: softGlow 0.4s ease-in-out !important;
+  /* animation: softGlow 0.4s ease-in-out !important; */
 }
 
 /* Unified Input Styles */
@@ -446,7 +470,7 @@ body:lang(he) {
 }
 
 /* Form Styles */
-.ant-form-item-label > label {
+.ant-form-item-label>label {
   font-weight: 600 !important;
   color: #2d3748 !important;
   text-align: right !important;
@@ -544,7 +568,7 @@ body:lang(he) {
 .stats-card:hover {
   transform: translateY(-2px) scale(1.01);
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
-  animation: gentleFloat 1.5s ease-in-out infinite;
+  /* animation: gentleFloat 1.5s ease-in-out infinite; */
 }
 
 .feature-card {
@@ -570,7 +594,7 @@ body:lang(he) {
 .feature-card:hover {
   transform: translateY(-3px);
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
-  animation: gentleFloat 2s ease-in-out infinite;
+  /* animation: gentleFloat 2s ease-in-out infinite; */
 }
 
 .icon-wrapper {
@@ -588,7 +612,7 @@ body:lang(he) {
 }
 
 .icon-wrapper:hover {
-  animation: subtlePulse 0.6s ease-in-out infinite;
+  /* animation: subtlePulse 0.6s ease-in-out infinite; */
 }
 
 .testimonial-section {
@@ -624,7 +648,7 @@ body:lang(he) {
 .financial-summary-card:hover {
   transform: translateY(-2px) scale(1.01);
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-  animation: gentleFloat 1.5s ease-in-out infinite;
+  /* animation: gentleFloat 1.5s ease-in-out infinite; */
 }
 
 .income-card {
@@ -653,7 +677,7 @@ body:lang(he) {
   border: 1px solid rgba(0, 0, 0, 0.05);
   border-radius: 20px;
   padding: 40px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+  box-shadow: none !important;
   width: 100%;
   max-width: 500px;
   direction: rtl;
@@ -724,21 +748,21 @@ body:lang(he) {
   direction: rtl !important;
 }
 
-.ant-table-thead > tr > th {
+.ant-table-thead>tr>th {
   text-align: right !important;
   font-weight: 600 !important;
   background: #fafafa !important;
 }
 
-.ant-table-tbody > tr > td {
+.ant-table-tbody>tr>td {
   text-align: right !important;
 }
 
-.ant-table-tbody > tr {
+.ant-table-tbody>tr {
   transition: all 0.2s ease !important;
 }
 
-.ant-table-tbody > tr:hover {
+.ant-table-tbody>tr:hover {
   transform: scale(1.005) !important;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
 }
@@ -852,6 +876,7 @@ body:lang(he) {
 
 /* Accessibility improvements */
 @media (prefers-reduced-motion: reduce) {
+
   *,
   *::before,
   *::after {

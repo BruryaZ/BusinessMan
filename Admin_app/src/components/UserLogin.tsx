@@ -70,7 +70,6 @@ const UserLogin = () => {
 
   return (
     <ConfigProvider direction="rtl">
-      <div style={{ marginTop: "50vh" }}></div>
       <div className="centered-layout">
         <Card className="login-form" style={{ maxWidth: 500, width: "100%" }}>
           <div style={{ textAlign: "center", marginBottom: 32 }}>
