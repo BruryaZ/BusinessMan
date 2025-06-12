@@ -11,6 +11,4 @@ const CenteredLayout = ({ children }: { children: React.ReactNode }) => {
   )
 }
 
-// כאן אמור להיות פתרון לצבע הרק וגבהי הקומפוננטות
-
 export default CenteredLayout

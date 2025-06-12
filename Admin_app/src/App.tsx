@@ -97,7 +97,7 @@ function ResponsiveDrawer() {
       setPageTitle(routeTitles[location.pathname] || "עמוד לא מזוהה")
     }
 
-    setClientName(globalContextDetails.user.firstName + " " + globalContextDetails.user.lastName)
+    setClientName("שלום, " + globalContextDetails.user.firstName)
   }, [location.pathname])
 
   const handleDrawerToggle = () => {
@@ -266,13 +266,16 @@ function ResponsiveDrawer() {
               display: "flex",
               alignItems: "center",
               justifyContent: "space-between",
-              flexDirection: "row-reverse", // כבר מוגדר
-              position: "sticky",
+              flexDirection: "row-reverse",
+              position: "fixed",
               top: 0,
               zIndex: 100,
               height: "64px",
+              width: isMobile ? "100%" : collapsed ? "calc(100% - 80px)" : "calc(100% - 280px)",
+              right: isMobile ? 0 : collapsed ? 80 : 280,
             }}
           >
+
             <Space
               size="middle"
               style={{ alignItems: "center", flexDirection: "row-reverse", flex: 1, justifyContent: "space-between" }}
@@ -287,12 +290,13 @@ function ResponsiveDrawer() {
               <Space size="middle" style={{ alignItems: "center", flexDirection: "row-reverse" }}>
                 {!isMobile && (
                   <Avatar
-                    size={32}
                     style={{
+                      height: "40px",
+                      width: "100px",
                       background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
                       borderRadius: "10px",
-                      width: "62px",
-                      height: "32px",
+                      padding: "0 8px",
+                      fontSize: "22px",
                     }}
                   >
                     {clientName ? clientName : "אורח"}
@@ -308,11 +312,11 @@ function ResponsiveDrawer() {
               </Space>
             </Space>
           </Header>
-
           <Content
             style={{
               margin: "24px 24px 24px 24px",
-              padding: 24,
+              // padding: 24,
+              paddingTop: 99, // הוספה: גובה ה־Header + מרווח
               background: "#fff",
               minHeight: 280,
               direction: "rtl",

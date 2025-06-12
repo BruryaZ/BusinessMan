@@ -33,7 +33,7 @@ body {
 }
 
 .ant-card-body {
-  position: absolute;
+  /* position: absolute; */
 }
 
 a {
@@ -574,7 +574,7 @@ header {
 .feature-card {
   background: white;
   border-radius: 16px;
-  padding: 32px;
+  /* padding: 15px; */
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   transition: all 0.2s ease;
   height: 100%;
@@ -670,6 +670,7 @@ header {
   width: 100%;
   direction: rtl;
   animation: fadeInUp 0.5s ease-out both;
+  background: #fcfdfe;
 }
 
 .login-form {
@@ -776,7 +777,7 @@ header {
 /* Typography RTL */
 .ant-typography {
   direction: rtl !important;
-  text-align: right !important;
+  /* text-align: right !important; */
   font-family: "Assistant", "Rubik", "Heebo", sans-serif !important;
 }
 
@@ -862,7 +863,7 @@ header {
 
 @media (max-width: 576px) {
   .ant-card-body {
-    padding: 16px !important;
+    padding: 19px !important;
   }
 
   .form-section {

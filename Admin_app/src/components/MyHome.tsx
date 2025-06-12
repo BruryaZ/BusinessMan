@@ -197,13 +197,17 @@ const MyHome = () => {
         variants={containerVariants}
         initial="hidden"
         animate="show"
-        style={{position:'absolute', padding:'0 30px'}}
+        style={{
+          position: 'absolute',
+          padding: '0 30px',
+          // width: '100%',
+        }}
       >
         {/* Hero Section */}
         <motion.div
           className="hero-section"
           variants={itemVariants}
-          style={{ position: "relative", zIndex: 1, marginTop: 64 }}
+          style={{ position: "relative", zIndex: 1 }}
         >
           <Row gutter={[32, 32]} align="middle">
             <Col xs={24} lg={14}>
@@ -287,48 +291,57 @@ const MyHome = () => {
               <Col xs={24} sm={12} lg={6} key={index}>
                 <motion.div variants={itemVariants}>
                   <Card className="stats-card">
-                    <div style={{ display: "flex", alignItems: "center", marginBottom: 16 }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        textAlign: "center",
+                        height: "100%",
+                      }}
+                    >
                       <Avatar
                         size={48}
                         style={{
                           background: `${stat.color}20`,
                           color: stat.color,
-                          marginLeft: 12,
+                          marginBottom: 12,
                         }}
                       >
                         {stat.icon}
                       </Avatar>
-                    </div>
-                    <Statistic
-                      title={stat.title}
-                      value={stat.value}
-                      prefix={stat.prefix}
-                      suffix={stat.suffix}
-                      valueStyle={{
-                        color: stat.color,
-                        fontSize: "2rem",
-                        fontWeight: "bold",
-                      }}
-                    />
-                    <div style={{ display: "flex", alignItems: "center", marginTop: 12 }}>
-                      {stat.trend > 0 ? (
-                        <RiseOutlined style={{ color: "#52c41a", marginLeft: 4 }} />
-                      ) : (
-                        <FallOutlined style={{ color: "#ff4d4f", marginLeft: 4 }} />
-                      )}
-                      <Text
-                        style={{
-                          color: stat.trend > 0 ? "#52c41a" : "#ff4d4f",
-                          fontWeight: 600,
-                          marginLeft: 8,
+                      <Statistic
+                        title={stat.title}
+                        value={stat.value}
+                        prefix={stat.prefix}
+                        suffix={stat.suffix}
+                        valueStyle={{
+                          color: stat.color,
+                          fontSize: "2rem",
+                          fontWeight: "bold",
                         }}
-                      >
-                        {stat.trend > 0 ? "+" : ""}
-                        {stat.trend}%
-                      </Text>
-                      <Text type="secondary">מהחודש הקודם</Text>
+                      />
+                      <div style={{ display: "flex", alignItems: "center", marginTop: 12 }}>
+                        {stat.trend > 0 ? (
+                          <RiseOutlined style={{ color: "#52c41a", marginLeft: 4 }} />
+                        ) : (
+                          <FallOutlined style={{ color: "#ff4d4f", marginLeft: 4 }} />
+                        )}
+                        <Text
+                          style={{
+                            color: stat.trend > 0 ? "#52c41a" : "#ff4d4f",
+                            fontWeight: 600,
+                            marginLeft: 8,
+                          }}
+                        >
+                          {stat.trend > 0 ? "+" : ""}
+                          {stat.trend}%
+                        </Text>
+                      </div>
                     </div>
                   </Card>
+
                 </motion.div>
               </Col>
             ))}
