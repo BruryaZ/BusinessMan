@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom"
 import { validationSchemaUserLogin } from "../utils/validationSchema"
 import { globalContext } from "../context/GlobalContext"
 import { Form, Input, Button, Typography, Card, Alert, Space, Avatar, Divider, ConfigProvider } from "antd"
-import { MailOutlined, LockOutlined, UserOutlined, LoginOutlined, ExclamationCircleOutlined, CrownOutlined } from "@ant-design/icons"
+import { MailOutlined, LockOutlined, LoginOutlined, ExclamationCircleOutlined, CrownOutlined } from "@ant-design/icons"
 import CenteredLayout from "./CenteredLayout"
 
 const { Title, Text, Link } = Typography
