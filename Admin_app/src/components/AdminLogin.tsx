@@ -3,7 +3,7 @@ import { useContext, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import axios from "axios"
 import { Form, Input, Button, Typography, Card, Alert, Space, Avatar, Divider, ConfigProvider } from "antd"
-import { MailOutlined, LockOutlined, CrownOutlined, LoginOutlined } from "@ant-design/icons"
+import { MailOutlined, LockOutlined, CrownOutlined, LoginOutlined, ExclamationCircleOutlined } from "@ant-design/icons"
 
 import type { Admin } from "../models/Admin"
 import { validationSchemaAdminLogin } from "../utils/validationSchema"
@@ -64,7 +64,6 @@ const AdminLogin = () => {
       setLoading(false)
     }
   }
-
   return (
     <ConfigProvider direction="rtl">
       <CenteredLayout>
@@ -79,7 +78,14 @@ const AdminLogin = () => {
             border: "none",
           }}
         >
-          <div style={{ textAlign: "center", marginBottom: 32 }}>
+          <div style={{
+            textAlign: "center",
+            marginBottom: 32,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexDirection: "column"
+          }}>
             <Avatar
               size={80}
               style={{
@@ -90,14 +96,22 @@ const AdminLogin = () => {
               icon={<CrownOutlined style={{ fontSize: 40 }} />}
             />
 
-            <Title level={2} style={{ margin: 0, color: "#2d3748", textAlign: "center", width: "100%" }}>
+
+            <Title level={2} style={{ marginBottom: 8, color: "#2d3748", textAlign: "center" }}>
               כניסת מנהל
             </Title>
-            <Text type="secondary">ברוכים הבאים למערכת הניהול</Text>
+
+            <Text type="secondary" style={{ fontSize: 16 }}>
+              ברוכים הבאים למערכת ניהול העסק
+            </Text>
           </div>
 
           <Form layout="vertical" onFinish={handleSubmit}>
-            <Form.Item label="אימייל" required>
+            <Form.Item
+              label="אימייל"
+              required
+              style={{ marginBottom: 20 }}
+            >
               <Input
                 prefix={<MailOutlined style={{ color: "#667eea" }} />}
                 placeholder="הזן את האימייל שלך"
@@ -108,7 +122,11 @@ const AdminLogin = () => {
               />
             </Form.Item>
 
-            <Form.Item label="סיסמא" required>
+            <Form.Item
+              label="סיסמא"
+              required
+              style={{ marginBottom: 24 }}
+            >
               <Input.Password
                 prefix={<LockOutlined style={{ color: "#667eea" }} />}
                 placeholder="הזן את הסיסמה שלך"
@@ -124,6 +142,7 @@ const AdminLogin = () => {
               htmlType="submit"
               size="large"
               loading={loading}
+              disabled={loading}
               icon={<LoginOutlined />}
               block
               style={{
@@ -134,7 +153,7 @@ const AdminLogin = () => {
                 marginBottom: 16,
               }}
             >
-              התחבר
+              {loading ? "מתחבר..." : "התחבר"}
             </Button>
 
             <Divider><Text type="secondary">או</Text></Divider>
@@ -149,14 +168,21 @@ const AdminLogin = () => {
             </div>
 
             {errors.length > 0 && (
-              <div style={{ marginTop: 24 }}>
-                {errors.map((error, idx) => (
+              <div style={{ marginTop: 16 }}>
+                {errors.map((error, index) => (
                   <Alert
-                    key={idx}
-                    message={error}
+                    key={index}
+                    message="שגיאה בהתחברות"
+                    description={error}
                     type="error"
                     showIcon
-                    style={{ marginBottom: 8, borderRadius: 8 }}
+                    icon={<ExclamationCircleOutlined />}
+                    style={{
+                      marginBottom: 8,
+                      borderRadius: 8,
+                      background: "linear-gradient(135deg, #fff2f0 0%, #ffebe8 100%)",
+                      border: "1px solid #ffccc7",
+                    }}
                   />
                 ))}
               </div>

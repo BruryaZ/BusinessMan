@@ -184,9 +184,15 @@ const UploadFiles = () => {
         </div>
       )}
 
-      <div className="upload-container" style={{ maxWidth: 900, margin: "0 auto", marginTop: "45vh" }}>
+      <div className="upload-container" style={{ maxWidth: 900, margin: "0 auto" }}>
         <Card className="form-section">
-          <div style={{ textAlign: "center", marginBottom: 32 }}>
+          <div style={{
+            textAlign: "center", marginBottom: 32,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexDirection: "column"
+          }}>
             <Avatar
               size={80}
               className="upload-avatar"

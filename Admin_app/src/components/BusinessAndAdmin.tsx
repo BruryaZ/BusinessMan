@@ -138,7 +138,13 @@ const BusinessAndAdmin = () => {
           marginTop: "30vh",
         }}
       >        <Card className="form-section">
-          <div style={{ textAlign: "center", marginBottom: 32 }}>
+          <div style={{
+            textAlign: "center", marginBottom: 32,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexDirection: "column"
+          }}>
             <Avatar
               size={80}
               style={{

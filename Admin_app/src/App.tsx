@@ -1,17 +1,10 @@
 "use client"
 
+import type React from "react"
+
 import { useState, useEffect, useContext } from "react"
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from "react-router-dom"
-import {
-  Layout,
-  Menu,
-  Typography,
-  Avatar,
-  Space,
-  Drawer,
-  ConfigProvider,
-  theme as antTheme,
-} from "antd"
+import { Layout, Menu, Typography, Avatar, Space, Drawer, ConfigProvider, theme as antTheme } from "antd"
 import {
   MenuOutlined,
   UserAddOutlined,
@@ -57,7 +50,12 @@ const navItems = [
   { key: "/view-data", label: "צפייה בנתונים", icon: <EyeOutlined />, path: "/view-data" },
   { key: "/user-management", label: "משתמשים", icon: <TeamOutlined />, path: "/user-management" },
   { key: "/production-reports", label: 'דו"ח ייצור', icon: <BarChartOutlined />, path: "/production-reports" },
-  { key: "/account-transactions", label: "הוספת תנועה בחשבון", icon: <DollarOutlined />, path: "/account-transactions" },
+  {
+    key: "/account-transactions",
+    label: "הוספת תנועה בחשבון",
+    icon: <DollarOutlined />,
+    path: "/account-transactions",
+  },
   {
     key: "/register-admin&business",
     label: "רישום עסק ומנהל חדש",
@@ -74,7 +72,7 @@ function ResponsiveDrawer() {
   const globalContextDetails = useContext(globalContext)
 
   const [pageTitle, setPageTitle] = useState("")
-  const [clientName, setClientName] = useState('אורח')
+  const [clientName, setClientName] = useState("אורח")
 
   useEffect(() => {
     const routeTitles: { [key: string]: string } = {
@@ -97,14 +95,14 @@ function ResponsiveDrawer() {
       setPageTitle(routeTitles[location.pathname] || "עמוד לא מזוהה")
     }
 
-    setClientName("שלום, " + globalContextDetails.user.firstName)
-  }, [location.pathname])
+    setClientName(globalContextDetails.user?.firstName ? `שלום, ${globalContextDetails.user.firstName}` : "אורח")
+  }, [location.pathname, globalContextDetails.user])
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen)
   }
 
-  const menuItems = navItems.map((item) => ({
+  const menuItems = navItems.map((item, index) => ({
     key: item.key,
     icon: item.icon,
     label: (
@@ -112,6 +110,7 @@ function ResponsiveDrawer() {
         {item.label}
       </Link>
     ),
+    style: { "--item-index": index } as React.CSSProperties,
   }))
 
   const siderContent = (
@@ -163,7 +162,7 @@ function ResponsiveDrawer() {
           flex: 1,
           padding: "8px",
           direction: "rtl",
-          backgroundColor: '#7354af0f'
+          backgroundColor: "#7354af0f",
         }}
         items={menuItems}
         onClick={(e) => {
@@ -256,9 +255,11 @@ function ResponsiveDrawer() {
             width: isMobile ? "100%" : collapsed ? "calc(100% - 80px)" : "calc(100% - 280px)",
             minHeight: "100vh",
             direction: "rtl",
+            transition: "all 0.2s ease",
           }}
         >
           <Header
+            className="main-header"
             style={{
               background: "#fff",
               padding: "0 24px",
@@ -273,16 +274,16 @@ function ResponsiveDrawer() {
               height: "64px",
               width: isMobile ? "100%" : collapsed ? "calc(100% - 80px)" : "calc(100% - 280px)",
               right: isMobile ? 0 : collapsed ? 80 : 280,
+              transition: "all 0.2s ease",
             }}
           >
-
             <Space
               size="middle"
               style={{ alignItems: "center", flexDirection: "row-reverse", flex: 1, justifyContent: "space-between" }}
             >
               {/* pageTitle מוצג בצד ימין */}
               {!isMobile && (
-                <Title level={5} style={{ margin: 0, color: "#444" }}>
+                <Title level={5} className="header-title" style={{ margin: 0, color: "#444" }}>
                   {pageTitle}
                 </Title>
               )}
@@ -290,21 +291,27 @@ function ResponsiveDrawer() {
               <Space size="middle" style={{ alignItems: "center", flexDirection: "row-reverse" }}>
                 {!isMobile && (
                   <Avatar
+                    className="header-icon"
                     style={{
                       height: "40px",
-                      width: "100px",
+                      width: "auto",
+                      minWidth: "100px",
                       background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
                       borderRadius: "10px",
-                      padding: "0 8px",
-                      fontSize: "22px",
+                      padding: "0 12px",
+                      fontSize: "16px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
                     }}
                   >
-                    {clientName ? clientName : "אורח"}
+                    {clientName}
                   </Avatar>
                 )}
 
                 {isMobile && (
                   <MenuOutlined
+                    className="menu-toggle-btn"
                     style={{ fontSize: "20px", cursor: "pointer", color: "#667eea" }}
                     onClick={handleDrawerToggle}
                   />
@@ -313,30 +320,32 @@ function ResponsiveDrawer() {
             </Space>
           </Header>
           <Content
+            className="main-content"
             style={{
-              margin: "24px 24px 24px 24px",
-              // padding: 24,
-              paddingTop: 99, // הוספה: גובה ה־Header + מרווח
-              background: "#fff",
+              margin: isMobile ? "16px" : "24px",
+              paddingTop: 74, // הוספה: גובה ה־Header + מרווח
+              background: "transparent",
               minHeight: 280,
               direction: "rtl",
               overflow: "auto",
             }}
           >
-            <Routes>
-              <Route path="/" element={<MyHome />} />
-              <Route path="/register-user" element={<UserRegister />} />
-              <Route path="/user-login" element={<UserLogin />} />
-              <Route path="/admin-login" element={<AdminLogin />} />
-              <Route path="/business-files" element={<BusinessFiles />} />
-              <Route path="/upload-file" element={<UploadFiles />} />
-              <Route path="/view-data" element={<DataViewing />} />
-              <Route path="/user-management" element={<UserManagement />} />
-              <Route path="/production-reports" element={<ProductionReports />} />
-              <Route path="/account-transactions" element={<AccountTransactions />} />
-              <Route path="/register-admin&business" element={<BusinessAndAdmin />} />
-              <Route path="/edit-user/:id" element={<EditUserPage />} />
-            </Routes>
+            <div className="content-wrapper">
+              <Routes>
+                <Route path="/" element={<MyHome />} />
+                <Route path="/register-user" element={<UserRegister />} />
+                <Route path="/user-login" element={<UserLogin />} />
+                <Route path="/admin-login" element={<AdminLogin />} />
+                <Route path="/business-files" element={<BusinessFiles />} />
+                <Route path="/upload-file" element={<UploadFiles />} />
+                <Route path="/view-data" element={<DataViewing />} />
+                <Route path="/user-management" element={<UserManagement />} />
+                <Route path="/production-reports" element={<ProductionReports />} />
+                <Route path="/account-transactions" element={<AccountTransactions />} />
+                <Route path="/register-admin&business" element={<BusinessAndAdmin />} />
+                <Route path="/edit-user/:id" element={<EditUserPage />} />
+              </Routes>
+            </div>
           </Content>
         </Layout>
       </Layout>

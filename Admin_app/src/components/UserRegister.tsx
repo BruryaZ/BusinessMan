@@ -85,9 +85,24 @@ const UserRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => 
 
   return (
     <ConfigProvider direction="rtl">
-      <div style={{ padding: "40px 20px", maxWidth: 800, margin: "0 auto", marginTop: "70vh" }}>
+      <div style={{
+        textAlign: "center",
+        marginBottom: 32,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        flexDirection: "column",
+        marginTop: 200,
+      }}>
+
         <Card className="form-section">
-          <div style={{ textAlign: "center", marginBottom: 32 }}>
+          <div style={{
+            textAlign: "center", marginBottom: 32,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexDirection: "column"
+          }}>
             <Avatar
               size={80}
               style={{

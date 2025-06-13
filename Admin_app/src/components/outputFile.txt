@@ -1,1254 +1,5 @@
-//Brurya"
-app.css:
-/* Import Hebrew fonts */
-@import url("https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;500;600;700&family=Heebo:wght@300;400;500;600;700&family=Rubik:wght@300;400;500;600;700&display=swap");
-
-* {
-  box-sizing: border-box;
-}
-
-html,
-body {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  height: 100%;
-  direction: rtl;
-  font-family: "Assistant", "Rubik", "Heebo", sans-serif;
-  background: linear-gradient(135deg, #f5f7ff 0%, #ffffff 100%);
-  overflow-x: hidden;
-}
-
-::selection {
-  background-color: #d1cff2;
-  color: inherit;
-}
-
-#root {
-  width: 100%;
-  min-height: 100vh;
-}
-
-a {
-  text-decoration: none;
-  color: inherit;
-}
-
-/* Subtle Animations - Less dramatic */
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(15px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes slideInRight {
-  from {
-    opacity: 0;
-    transform: translateX(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes slideInLeft {
-  from {
-    opacity: 0;
-    transform: translateX(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes gentleBounce {
-  0% {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1.01);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-@keyframes subtlePulse {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.02);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-
-@keyframes gentleFloat {
-  0%,
-  100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-3px);
-  }
-}
-
-@keyframes softGlow {
-  0%,
-  100% {
-    box-shadow: 0 0 3px rgba(102, 126, 234, 0.3);
-  }
-  50% {
-    box-shadow: 0 0 8px rgba(102, 126, 234, 0.5);
-  }
-}
-
-/* Modal Overlay Styles */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(8px);
-  z-index: 9999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  animation: fadeInUp 0.3s ease-out;
-}
-
-.modal-content {
-  position: relative;
-  z-index: 10000;
-  animation: gentleBounce 0.4s ease-out;
-}
-
-/* Component Animations - Subtle */
-.logo-section {
-  animation: slideInRight 0.5s ease-out;
-}
-
-.logo-avatar {
-  animation: gentleBounce 0.6s ease-out 0.2s both;
-}
-
-.logo-title {
-  animation: fadeInUp 0.5s ease-out 0.3s both;
-}
-
-.sidebar-menu {
-  animation: slideInRight 0.5s ease-out 0.1s both;
-}
-
-.sidebar-menu .ant-menu-item {
-  animation: fadeInUp 0.4s ease-out both;
-  animation-delay: calc(var(--item-index, 0) * 0.05s);
-}
-
-.main-header {
-  animation: slideInLeft 0.5s ease-out;
-}
-
-.header-icon {
-  animation: fadeInUp 0.6s ease-out 0.3s both;
-}
-
-.header-title {
-  animation: fadeInUp 0.5s ease-out 0.2s both;
-}
-
-.nav-btn {
-  animation: fadeInUp 0.4s ease-out both;
-  animation-delay: calc(var(--btn-index, 0) * 0.05s);
-  transition: all 0.2s ease;
-}
-
-.nav-btn:hover {
-  transform: translateY(-1px);
-  animation: subtlePulse 0.4s ease-in-out;
-}
-
-.menu-toggle-btn {
-  transition: all 0.2s ease;
-}
-
-.menu-toggle-btn:hover {
-  animation: subtlePulse 0.4s ease-in-out;
-}
-
-.desktop-sider {
-  animation: slideInRight 0.6s ease-out;
-}
-
-.mobile-drawer .ant-drawer-content {
-  animation: slideInRight 0.3s ease-out;
-}
-
-.main-content {
-  animation: fadeInUp 0.5s ease-out 0.2s both;
-}
-
-.content-wrapper {
-  animation: fadeInUp 0.6s ease-out 0.3s both;
-}
-
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 4px;
-  animation: softGlow 2s ease-in-out infinite alternate;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
-}
-
-html:lang(he),
-body:lang(he) {
-  direction: rtl;
-  text-align: right;
-}
-
-.ltr {
-  direction: ltr !important;
-}
-
-.rtl {
-  direction: rtl !important;
-}
-
-/* Ant Design Layout Fixes for RTL */
-.ant-layout {
-  min-height: 100vh !important;
-  width: 100% !important;
-  direction: rtl !important;
-}
-
-.ant-layout-content {
-  width: 100% !important;
-  margin: 0 !important;
-  background: transparent !important;
-  direction: rtl !important;
-}
-
-/* RTL Sider positioning */
-.ant-layout-sider {
-  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.05) !important;
-  position: fixed !important;
-  height: 100vh !important;
-  right: 0 !important;
-  top: 0 !important;
-  z-index: 1001 !important;
-  background: #fff !important;
-}
-
-/* Content area adjustments for RTL */
-.main-layout {
-  margin-right: 280px !important;
-  width: calc(100% - 280px) !important;
-  transition: all 0.2s ease !important;
-  min-height: 100vh !important;
-}
-
-.main-layout.collapsed {
-  margin-right: 80px !important;
-  width: calc(100% - 80px) !important;
-}
-
-/* Mobile responsive */
-@media (max-width: 768px) {
-  .main-layout,
-  .main-layout.collapsed {
-    margin-right: 0 !important;
-    width: 100% !important;
-  }
-
-  .ant-layout-sider {
-    transform: translateX(100%) !important;
-  }
-}
-
-/* Drawer RTL fix */
-.ant-drawer-content-wrapper {
-  right: 0 !important;
-  left: auto !important;
-}
-
-.ant-drawer-body {
-  padding: 0 !important;
-  direction: rtl !important;
-}
-
-/* Menu RTL fixes */
-.ant-menu {
-  direction: rtl !important;
-}
-
-.ant-menu-item {
-  border-radius: 8px !important;
-  margin: 4px 8px !important;
-  text-align: right !important;
-  transition: all 0.2s ease !important;
-}
-
-.ant-menu-item:hover {
-  transform: translateX(-2px) !important;
-  animation: softGlow 0.4s ease-in-out !important;
-}
-
-.ant-menu-item-selected {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-  color: white !important;
-}
-
-.ant-menu-item-selected .anticon {
-  color: white !important;
-}
-
-.ant-menu-item .ant-menu-title-content {
-  margin-right: 12px !important;
-  margin-left: 0 !important;
-}
-
-/* Unified Card Styles */
-.ant-card {
-  border-radius: 16px !important;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08) !important;
-  transition: all 0.2s ease !important;
-  width: 100% !important;
-  direction: rtl !important;
-  animation: fadeInUp 0.5s ease-out both !important;
-  border: 1px solid rgba(0, 0, 0, 0.06) !important;
-}
-
-.ant-card:hover {
-  transform: translateY(-2px) !important;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12) !important;
-  animation: gentleFloat 2s ease-in-out infinite !important;
-}
-
-.ant-card-body {
-  direction: rtl !important;
-  text-align: right !important;
-  padding: 24px !important;
-}
-
-/* Unified Button Styles */
-.ant-btn {
-  border-radius: 10px !important;
-  font-weight: 600 !important;
-  height: auto !important;
-  padding: 10px 20px !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  direction: rtl !important;
-  transition: all 0.2s ease !important;
-  font-family: "Assistant", "Rubik", "Heebo", sans-serif !important;
-}
-
-.ant-btn:hover {
-  transform: translateY(-1px) !important;
-  animation: subtlePulse 0.4s ease-in-out !important;
-}
-
-.ant-btn-primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-  border: none !important;
-  box-shadow: 0 4px 14px rgba(102, 126, 234, 0.4) !important;
-}
-
-.ant-btn-primary:hover {
-  background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%) !important;
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5) !important;
-  animation: softGlow 0.4s ease-in-out !important;
-}
-
-/* Unified Input Styles */
-.ant-input,
-.ant-input-number,
-.ant-select-selector {
-  border-radius: 10px !important;
-  padding: 12px 16px !important;
-  border: 2px solid #e1e5e9 !important;
-  transition: all 0.2s ease !important;
-  direction: rtl !important;
-  text-align: right !important;
-  font-family: "Assistant", "Rubik", "Heebo", sans-serif !important;
-}
-
-.ant-input:focus,
-.ant-input-number:focus,
-.ant-select-focused .ant-select-selector {
-  border-color: #667eea !important;
-  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2) !important;
-  animation: softGlow 0.4s ease-in-out !important;
-}
-
-/* Error Display Styles */
-.error-message {
-  background: linear-gradient(135deg, #fff2f0 0%, #ffebe8 100%);
-  border: 1px solid #ffccc7;
-  border-radius: 8px;
-  padding: 12px 16px;
-  margin: 8px 0;
-  color: #cf1322;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  animation: fadeInUp 0.3s ease-out;
-}
-
-.error-message .anticon {
-  color: #cf1322;
-}
-
-/* Success Message Styles */
-.success-message {
-  background: linear-gradient(135deg, #f6ffed 0%, #e6f7d2 100%);
-  border: 1px solid #b7eb8f;
-  border-radius: 8px;
-  padding: 12px 16px;
-  margin: 8px 0;
-  color: #389e0d;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  animation: fadeInUp 0.3s ease-out;
-}
-
-.success-message .anticon {
-  color: #389e0d;
-}
-
-/* Form Styles */
-.ant-form-item-label > label {
-  font-weight: 600 !important;
-  color: #2d3748 !important;
-  text-align: right !important;
-  font-family: "Assistant", "Rubik", "Heebo", sans-serif !important;
-}
-
-.ant-form-item {
-  direction: rtl !important;
-  animation: fadeInUp 0.4s ease-out both !important;
-  animation-delay: calc(var(--form-item-index, 0) * 0.05s) !important;
-}
-
-.ant-form-item-explain-error {
-  background: #fff2f0;
-  border: 1px solid #ffccc7;
-  border-radius: 6px;
-  padding: 8px 12px;
-  margin-top: 4px;
-  color: #cf1322;
-  font-weight: 500;
-  animation: fadeInUp 0.3s ease-out;
-}
-
-.ant-input-number {
-  width: 100% !important;
-  direction: rtl !important;
-}
-
-.ant-input-number-input {
-  text-align: right !important;
-}
-
-/* Container and layout utilities */
-.page-container {
-  width: 100% !important;
-  max-width: 100% !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  direction: rtl !important;
-}
-
-.content-wrapper {
-  width: 100% !important;
-  max-width: 1200px !important;
-  margin: 0 auto !important;
-  padding: 20px 24px 24px 24px !important;
-  direction: rtl !important;
-  min-height: calc(100vh - 84px) !important;
-}
-
-@media (max-width: 768px) {
-  .content-wrapper {
-    padding: 16px 16px 16px 16px !important;
-  }
-}
-
-/* Unified Component Styles */
-.hero-section {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  padding: 60px 24px;
-  border-radius: 20px;
-  margin-bottom: 40px;
-  position: relative;
-  overflow: hidden;
-  width: 100%;
-  direction: rtl;
-  animation: fadeInUp 0.6s ease-out both;
-}
-
-@media (max-width: 768px) {
-  .hero-section {
-    padding: 40px 20px;
-    margin: 0 0 40px 0;
-    border-radius: 16px;
-  }
-}
-
-.stats-card {
-  background: white;
-  border-radius: 16px;
-  padding: 24px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  transition: all 0.2s ease;
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  position: relative;
-  overflow: hidden;
-  width: 100%;
-  height: 100%;
-  direction: rtl;
-  text-align: right;
-  animation: fadeInUp 0.5s ease-out both;
-}
-
-.stats-card:hover {
-  transform: translateY(-2px) scale(1.01);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
-  animation: gentleFloat 1.5s ease-in-out infinite;
-}
-
-.feature-card {
-  background: white;
-  border-radius: 16px;
-  padding: 32px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  transition: all 0.2s ease;
-  height: 100%;
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  width: 100%;
-  direction: rtl;
-  text-align: right;
-  animation: fadeInUp 0.5s ease-out both;
-}
-
-@media (max-width: 768px) {
-  .feature-card {
-    padding: 24px;
-  }
-}
-
-.feature-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
-  animation: gentleFloat 2s ease-in-out infinite;
-}
-
-.icon-wrapper {
-  width: 64px;
-  height: 64px;
-  border-radius: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 16px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  font-size: 24px;
-  animation: gentleBounce 0.6s ease-out both;
-}
-
-.icon-wrapper:hover {
-  animation: subtlePulse 0.6s ease-in-out infinite;
-}
-
-.testimonial-section {
-  background: rgba(102, 126, 234, 0.03);
-  border: 1px solid rgba(102, 126, 234, 0.1);
-  border-radius: 16px;
-  padding: 32px;
-  margin-top: 40px;
-  width: 100%;
-  direction: rtl;
-  text-align: right;
-  animation: fadeInUp 0.6s ease-out both;
-}
-
-@media (max-width: 768px) {
-  .testimonial-section {
-    padding: 24px;
-  }
-}
-
-.financial-summary-card {
-  border-radius: 16px;
-  padding: 24px;
-  height: 100%;
-  transition: all 0.2s ease;
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  width: 100%;
-  direction: rtl;
-  text-align: right;
-  animation: fadeInUp 0.5s ease-out both;
-}
-
-.financial-summary-card:hover {
-  transform: translateY(-2px) scale(1.01);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-  animation: gentleFloat 1.5s ease-in-out infinite;
-}
-
-.income-card {
-  background: rgba(16, 185, 129, 0.1);
-  border: 1px solid rgba(16, 185, 129, 0.2);
-}
-
-.expense-card {
-  background: rgba(239, 68, 68, 0.1);
-  border: 1px solid rgba(239, 68, 68, 0.2);
-}
-
-.centered-layout {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: calc(100vh - 84px);
-  padding: 20px;
-  width: 100%;
-  direction: rtl;
-  animation: fadeInUp 0.5s ease-out both;
-}
-
-.login-form {
-  background: linear-gradient(145deg, #ffffff, #f8fafc);
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  border-radius: 20px;
-  padding: 40px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
-  width: 100%;
-  max-width: 500px;
-  direction: rtl;
-  text-align: right;
-  animation: gentleBounce 0.6s ease-out both;
-}
-
-@media (max-width: 768px) {
-  .login-form {
-    padding: 24px;
-    margin: 0;
-    border-radius: 16px;
-  }
-}
-
-.form-section {
-  background: white;
-  border-radius: 16px;
-  padding: 32px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  width: 100%;
-  direction: rtl;
-  text-align: right;
-  animation: fadeInUp 0.5s ease-out both;
-}
-
-@media (max-width: 768px) {
-  .form-section {
-    padding: 20px;
-    margin: 0;
-  }
-}
-
-/* Grid fixes for RTL */
-.ant-row {
-  width: 100% !important;
-  margin-left: 0 !important;
-  margin-right: 0 !important;
-  direction: rtl !important;
-}
-
-.ant-col {
-  padding-left: 12px !important;
-  padding-right: 12px !important;
-  direction: rtl !important;
-  animation: fadeInUp 0.4s ease-out both !important;
-  animation-delay: calc(var(--col-index, 0) * 0.05s) !important;
-}
-
-@media (max-width: 768px) {
-  .ant-col {
-    padding-left: 8px !important;
-    padding-right: 8px !important;
-  }
-}
-
-/* Table responsive */
-.ant-table-wrapper {
-  width: 100% !important;
-  overflow-x: auto !important;
-  direction: rtl !important;
-  animation: fadeInUp 0.5s ease-out both !important;
-}
-
-.ant-table {
-  min-width: 800px !important;
-  direction: rtl !important;
-}
-
-.ant-table-thead > tr > th {
-  text-align: right !important;
-  font-weight: 600 !important;
-  background: #fafafa !important;
-}
-
-.ant-table-tbody > tr > td {
-  text-align: right !important;
-}
-
-.ant-table-tbody > tr {
-  transition: all 0.2s ease !important;
-}
-
-.ant-table-tbody > tr:hover {
-  transform: scale(1.005) !important;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
-}
-
-@media (max-width: 768px) {
-  .ant-table {
-    min-width: 600px !important;
-  }
-}
-
-/* Typography RTL */
-.ant-typography {
-  direction: rtl !important;
-  text-align: right !important;
-  font-family: "Assistant", "Rubik", "Heebo", sans-serif !important;
-}
-
-/* Space component RTL */
-.ant-space {
-  direction: rtl !important;
-}
-
-/* Upload component RTL */
-.ant-upload-drag {
-  direction: rtl !important;
-  text-align: center !important;
-  transition: all 0.2s ease !important;
-  position: relative !important;
-  overflow: hidden !important;
-}
-
-.ant-upload-drag:hover {
-  transform: scale(1.01) !important;
-  border-color: #667eea !important;
-}
-
-/* Progress RTL */
-.ant-progress {
-  direction: rtl !important;
-}
-
-/* Alert RTL */
-.ant-alert {
-  direction: rtl !important;
-  text-align: right !important;
-  animation: fadeInUp 0.4s ease-out both !important;
-  border-radius: 8px !important;
-}
-
-/* Statistic RTL */
-.ant-statistic {
-  direction: rtl !important;
-  text-align: right !important;
-}
-
-.ant-statistic-content {
-  direction: rtl !important;
-  text-align: right !important;
-}
-
-.ant-statistic-content-value {
-  animation: gentleBounce 0.6s ease-out both !important;
-}
-
-/* Loading animations */
-.ant-spin {
-  animation: fadeInUp 0.6s ease-out both !important;
-}
-
-/* Drawer animations */
-.ant-drawer-mask {
-  animation: fadeInUp 0.2s ease-out !important;
-}
-
-.ant-drawer-content {
-  animation: slideInRight 0.3s ease-out !important;
-}
-
-/* Responsive Design Improvements */
-@media (max-width: 1200px) {
-  .content-wrapper {
-    max-width: 100% !important;
-    padding: 16px !important;
-  }
-}
-
-@media (max-width: 992px) {
-  .hero-section {
-    padding: 40px 20px !important;
-  }
-
-  .feature-card,
-  .stats-card {
-    margin-bottom: 16px !important;
-  }
-}
-
-@media (max-width: 576px) {
-  .ant-card-body {
-    padding: 16px !important;
-  }
-
-  .form-section {
-    padding: 16px !important;
-  }
-
-  .login-form {
-    padding: 20px !important;
-  }
-}
-
-/* Accessibility improvements */
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-}
-
-/* Focus styles for accessibility */
-.ant-btn:focus,
-.ant-input:focus,
-.ant-select:focus {
-  outline: 2px solid #667eea !important;
-  outline-offset: 2px !important;
-}
-
-/* High contrast mode support */
-@media (prefers-contrast: high) {
-  .ant-card {
-    border: 2px solid #000 !important;
-  }
-
-  .ant-btn-primary {
-    background: #000 !important;
-    color: #fff !important;
-  }
-}
 //Brurya
-"use client"
 
-import { useState } from "react"
-import { BrowserRouter as Router, Routes, Route, Link, useLocation } from "react-router-dom"
-import { Layout, Menu, Button, Typography, Avatar, Space, Drawer, ConfigProvider, theme as antTheme } from "antd"
-import { MenuOutlined, UserAddOutlined, MenuFoldOutlined, MenuUnfoldOutlined, BuildOutlined, BankOutlined, BarChartOutlined, CrownOutlined, DollarOutlined, EyeOutlined, LoginOutlined, TeamOutlined, UploadOutlined, CloudDownloadOutlined } from "@ant-design/icons"
-import { useMediaQuery } from "react-responsive"
-import "./App.css"
-import AdminLogin from "./components/AdminLogin"
-import BusinessAndAdmin from "./components/BusinessAndAdmin"
-import DataViewing from "./components/DataViweing"
-import ProductionReports from "./components/ProductionReports"
-import RegisterBusinessData from "./components/RegisterBusinessData"
-import UploadFiles from "./components/UploadFiles"
-import UserLogin from "./components/UserLogin"
-import UserManagemet from "./components/UserManagemet"
-import UserRegister from "./components/UserRegister"
-import GlobalContext from "./context/GlobalContext"
-import AdminRoute from "./components/AdminRoute"
-import { Home } from "@mui/icons-material"
-import MyHome from "./components/MyHome"
-import EditUserPage from "./components/EditUserPage"
-import BusinessFiles from "./components/BusinessFiles"
-import AccountTransactions from "./components/AccountTransactions"
-// Components
-
-const { Header, Sider, Content } = Layout
-const { Title } = Typography
-
-// Navigation items with icons
-const navItems = [
-  { key: "/", label: "בית", icon: <Home />, path: "/" },
-  { key: "/register-user", label: "רישום משתמש", icon: <UserAddOutlined />, path: "/register-user" },
-  { key: "/user-login", label: "כניסת משתמש", icon: <LoginOutlined />, path: "/user-login" },
-  { key: "/admin-login", label: "כניסת מנהל", icon: <CrownOutlined />, path: "/admin-login" },
-  { key: "/business-files", label: "קבצי העסק", icon: <CloudDownloadOutlined />, path: "/business-files" },
-  { key: "/upload-file", label: "העלאת קבצים", icon: <UploadOutlined />, path: "/upload-file" },
-  { key: "/view-data", label: "צפייה בנתונים", icon: <EyeOutlined />, path: "/view-data" },
-  { key: "/user-management", label: "משתמשים", icon: <TeamOutlined />, path: "/user-management" },
-  { key: "/production-reports", label: 'דו"ח ייצור', icon: <BarChartOutlined />, path: "/production-reports" },
-  { key: "/account-transactions", label: "הוספת תנועה בחשבון", icon: <DollarOutlined />, path: "/account-transactions" },
-  {
-    key: "/register-admin&business",
-    label: "רישום עסק ומנהל חדש",
-    icon: <BankOutlined />,
-    path: "/register-admin&business",
-  },
-]
-
-// Responsive drawer component
-function ResponsiveDrawer() {
-  const [collapsed, setCollapsed] = useState(false)
-  const [mobileOpen, setMobileOpen] = useState(false)
-  const location = useLocation()
-  const isMobile = useMediaQuery({ maxWidth: 768 })
-  const isSmallScreen = useMediaQuery({ maxWidth: 1024 })
-
-  const handleDrawerToggle = () => {
-    setMobileOpen(!mobileOpen)
-  }
-
-  const handleCollapse = () => {
-    setCollapsed(!collapsed)
-  }
-
-  const menuItems = navItems.map((item) => ({
-    key: item.key,
-    icon: item.icon,
-    label: (
-      <Link to={item.path} onClick={(e) => e.stopPropagation()}>
-        {item.label}
-      </Link>
-    ),
-  }))
-
-  const siderContent = (
-    <div style={{ height: "100%", display: "flex", flexDirection: "column", direction: "rtl", width: "100%" }}>
-      <div
-        className="logo-section"
-        style={{
-          padding: "24px 16px",
-          borderBottom: "1px solid #f0f0f0",
-          textAlign: "center",
-          direction: "rtl",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          flexDirection: "column",
-        }}
-      >
-        <Avatar
-          size={collapsed ? 32 : 48}
-          className="logo-avatar"
-          style={{
-            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-            marginBottom: collapsed ? 0 : 8,
-          }}
-        >
-          <BuildOutlined />
-        </Avatar>
-        {!collapsed && (
-          <Title level={4} className="logo-title" style={{ margin: "8px 0 0 0", color: "#667eea" }}>
-            BusinessMan
-          </Title>
-        )}
-      </div>
-
-      <Menu
-        mode="inline"
-        selectedKeys={[location.pathname]}
-        className="sidebar-menu"
-        style={{
-          border: "none",
-          flex: 1,
-          padding: "8px",
-          direction: "rtl",
-        }}
-        items={menuItems}
-        onClick={(e) => {
-          e.domEvent.stopPropagation()
-          if (isMobile) setMobileOpen(false)
-        }}
-      />
-
-      <div
-        style={{
-          padding: "16px",
-          borderTop: "1px solid #f0f0f0",
-          textAlign: "center",
-          direction: "rtl",
-        }}
-      >
-        <Typography.Text type="secondary" style={{ fontSize: "12px" }}>
-          © 2025 BusinessMan
-        </Typography.Text>
-      </div>
-    </div>
-  )
-
-  return (
-    <ConfigProvider
-      direction="rtl"
-      theme={{
-        algorithm: antTheme.defaultAlgorithm,
-        token: {
-          colorPrimary: "#667eea",
-          borderRadius: 10,
-          fontFamily: '"Assistant", "Rubik", "Heebo", sans-serif',
-        },
-      }}
-    >
-      <Layout style={{ minHeight: "100vh", width: "100%", direction: "rtl" }}>
-        {/* Desktop Sider */}
-        {!isMobile && (
-          <Sider
-            trigger={null}
-            collapsible
-            collapsed={collapsed}
-            width={280}
-            collapsedWidth={80}
-            className="desktop-sider"
-            style={{
-              background: "#fff",
-              position: "fixed",
-              height: "100vh",
-              right: 0,
-              top: 0,
-              zIndex: 1001,
-              boxShadow: "-2px 0 8px rgba(0, 0, 0, 0.05)",
-            }}
-          >
-            {siderContent}
-          </Sider>
-        )}
-
-        {/* Mobile Drawer */}
-        {isMobile && (
-          <Drawer
-            title={
-              <Space style={{ direction: "rtl" }}>
-                <Avatar style={{ background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)" }}>
-                  <BuildOutlined />
-                </Avatar>
-                <span>BusinessMan</span>
-              </Space>
-            }
-            placement="right"
-            onClose={handleDrawerToggle}
-            open={mobileOpen}
-            width={280}
-            className="mobile-drawer"
-            style={{ padding: 0, direction: "rtl" }}
-          >
-            <Menu
-              mode="inline"
-              selectedKeys={[location.pathname]}
-              style={{ border: "none", direction: "rtl" }}
-              items={menuItems}
-              onClick={handleDrawerToggle}
-            />
-          </Drawer>
-        )}
-
-        <Layout
-          className={`main-layout ${collapsed ? "collapsed" : ""}`}
-          style={{
-            marginRight: isMobile ? 0 : collapsed ? 80 : 280,
-            width: isMobile ? "100%" : collapsed ? "calc(100% - 80px)" : "calc(100% - 280px)",
-            minHeight: "100vh",
-            direction: "rtl",
-          }}
-        >
-          <Header
-            className="main-header"
-            style={{
-              background: "#fff",
-              padding: "0 24px",
-              boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              position: "sticky",
-              top: 0,
-              zIndex: 100,
-              width: "100%",
-              direction: "rtl",
-              height: "64px",
-            }}
-          >
-            <Space style={{ direction: "rtl" }}>
-              <Button
-                type="text"
-                className="menu-toggle-btn"
-                icon={isMobile ? <MenuOutlined /> : collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-                onClick={isMobile ? handleDrawerToggle : handleCollapse}
-                style={{ fontSize: "16px" }}
-              />
-              <Space style={{ direction: "rtl" }}>
-                <BuildOutlined className="header-icon" style={{ color: "#667eea", fontSize: "20px" }} />
-                <Title level={4} className="header-title" style={{ margin: 0, color: "#2d3748" }}>
-                  מערכת לניהול עסק
-                </Title>
-              </Space>
-            </Space>
-
-            {!isSmallScreen && (
-              <Space className="header-nav" style={{ direction: "rtl" }}>
-                {navItems.slice(0, 4).map((item) => (
-                  <Button
-                    key={item.key}
-                    type={location.pathname === item.path ? "primary" : "text"}
-                    icon={item.icon}
-                    className="nav-btn"
-                    style={{
-                      borderRadius: "8px",
-                      fontWeight: location.pathname === item.path ? 600 : 400,
-                    }}
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <Link to={item.path} onClick={(e) => e.stopPropagation()}>
-                      {item.label}
-                    </Link>
-                  </Button>
-                ))}
-              </Space>
-            )}
-          </Header>
-
-          <Content
-            className="main-content"
-            style={{
-              padding: "0",
-              background: "transparent",
-              minHeight: "calc(100vh - 64px)",
-              width: "100%",
-              overflow: "auto",
-              direction: "rtl",
-              paddingTop: "20px",
-            }}
-          >
-            <div
-              className="content-wrapper"
-              style={{
-                minHeight: "calc(100vh - 84px)",
-                padding: "20px 24px 24px 24px",
-              }}
-            >
-              <Routes>
-                <Route path="/" element={<MyHome />} />
-                <Route path="/register-user" element={<UserRegister />} />
-                <Route path="/user-login" element={<UserLogin />} />
-                <Route path="/admin-login" element={<AdminLogin />} />
-                <Route path="/upload-file" element={<UploadFiles />} />
-                <Route path="/register-admin&business" element={<BusinessAndAdmin />} />
-                <Route path="/edit-user/:id" element={<EditUserPage />} />
-
-                <Route
-                  path="/production-reports"
-                  element={
-                    <AdminRoute>
-                      <ProductionReports />
-                    </AdminRoute>
-                  }
-                />
-                <Route
-                  path="/business-files"
-                  element={
-                    <AdminRoute>
-                      <BusinessFiles />
-                    </AdminRoute>
-                  }
-                />
-                <Route
-                  path="/view-data"
-                  element={
-                    <AdminRoute>
-                      <DataViewing />
-                    </AdminRoute>
-                  }
-                />
-                <Route
-                  path="/user-management"
-                  element={
-                    <AdminRoute>
-                      <UserManagemet />
-                    </AdminRoute>
-                  }
-                />
-                <Route
-                  path="/business-register"
-                  element={
-                    <AdminRoute>
-                      <RegisterBusinessData />
-                    </AdminRoute>
-                  }
-                />
-                <Route
-                  path="/account-transactions"
-                  element={
-                    <AdminRoute>
-                      <AccountTransactions />
-                    </AdminRoute>
-                  }
-                />
-              </Routes>
-            </div>
-          </Content>
-        </Layout>
-      </Layout>
-    </ConfigProvider>
-  )
-}
-
-function App() {
-  return (
-    <div style={{ width: "100%", minHeight: "100vh", direction: "rtl" }}>
-      <GlobalContext>
-        <Router>
-          <ResponsiveDrawer />
-        </Router>
-      </GlobalContext>
-    </div>
-  )
-}
-
-export default App
 import React, { useState, useEffect, useContext } from "react"
 import {
   Form,
@@ -1364,7 +115,6 @@ const AccountTransactions: React.FC = () => {
   return (
     <div dir="rtl" style={{ maxWidth: 800, margin: "auto" }}>
       <h2>רישום פקודת יומן</h2>
-
       <Card style={{ marginBottom: 20 }}>
         <Text strong>סכומים נוכחיים בעסק:</Text>
         <Row gutter={16} style={{ marginTop: 10 }}>
@@ -1449,13 +199,14 @@ const AccountTransactions: React.FC = () => {
 export default AccountTransactions
 "use client"
 import { useContext, useState } from "react"
-import type { Admin } from "../models/Admin"
-import axios from "axios"
 import { useNavigate } from "react-router-dom"
-import { validationSchemaAdminLogin } from "../utils/validationSchema"
-import { globalContext } from "../context/GlobalContext"
+import axios from "axios"
 import { Form, Input, Button, Typography, Card, Alert, Space, Avatar, Divider, ConfigProvider } from "antd"
 import { MailOutlined, LockOutlined, CrownOutlined, LoginOutlined } from "@ant-design/icons"
+
+import type { Admin } from "../models/Admin"
+import { validationSchemaAdminLogin } from "../utils/validationSchema"
+import { globalContext } from "../context/GlobalContext"
 import CenteredLayout from "./CenteredLayout"
 import { BusinessDto } from "../models/BusinessDto"
 
@@ -1463,105 +214,106 @@ const { Title, Text, Link } = Typography
 
 const AdminLogin = () => {
   const nav = useNavigate()
-  const [admin, setAdmin] = useState<Admin>({ email: "a@a", password: "1" })
+  const [admin, setAdmin] = useState<Admin>({ email: "", password: "" })
   const [errors, setErrors] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
+
   const url = import.meta.env.VITE_API_URL
   const validationSchema = validationSchemaAdminLogin
   const globalContextDetails = useContext(globalContext)
 
   const handleSubmit = async () => {
     setLoading(true)
+    setErrors([])
     try {
       const valid = await validationSchema.isValid(admin)
-      setErrors([])
-
-      if (valid) {
-        let data: any;
-        try {
-          const response = await axios.post<any>(`${url}/Auth/admin-login`, admin, { withCredentials: true });
-          data = response.data;
-          globalContextDetails.setUser(data.user);
-          globalContextDetails.setIsAdmin(true);
-        }
-        catch (e) {
-          if (axios.isAxiosError(e) && e.response?.status === 400) {
-            setErrors(["משתמש לא נמצא, נא לבדוק את האימייל והסיסמה"]);
-            return;
-          }
-          setErrors(e instanceof Error ? [e.message] : ["שגיאה בכניסה, נא לנסות שוב מאוחר יותר"]);
-          return;
-        }
-
-        try {
-          const res = await axios.get<BusinessDto>(`${url}/api/Business/${data.user.businessId}`, { withCredentials: true });
-          globalContextDetails.setBusinessGlobal(res.data);
-          globalContextDetails.setUserCount(res.data.usersCount);
-        }
-        catch (e) {
-          setErrors(e instanceof Error ? [e.message] : ["שגיאה בטעינת העסק, נא לנסות שוב מאוחר יותר"]);
-        }
-        nav("/")
-      } else {
-        const validationErrors = await validationSchema.validate(admin).catch((err) => err.errors);
-        setErrors(validationErrors || []);
+      if (!valid) {
+        const validationErrors = await validationSchema.validate(admin).catch((err) => err.errors)
+        setErrors(validationErrors || [])
+        return
       }
+
+      let data: any
+      try {
+        const response = await axios.post(`${url}/Auth/admin-login`, admin, { withCredentials: true })
+        data = response.data
+        globalContextDetails.setUser(data.user)
+        globalContextDetails.setIsAdmin(true)
+      } catch (e) {
+        if (axios.isAxiosError(e) && e.response?.status === 400) {
+          setErrors(["משתמש לא נמצא, נא לבדוק את האימייל והסיסמה"])
+        } else {
+          setErrors([e instanceof Error ? e.message : "שגיאה בכניסה, נא לנסות שוב מאוחר יותר"])
+        }
+        return
+      }
+
+      try {
+        const res = await axios.get<BusinessDto>(`${url}/api/Business/${data.user.businessId}`, { withCredentials: true })
+        globalContextDetails.setBusinessGlobal(res.data)
+        globalContextDetails.setUserCount(res.data.usersCount)
+      } catch (e) {
+        setErrors([e instanceof Error ? e.message : "שגיאה בטעינת העסק, נא לנסות שוב מאוחר יותר"])
+      }
+
+      nav("/")
     } catch (e) {
-      setErrors(e instanceof Error ? [e.message] : ["שגיאה לא צפויה, נא לנסות שוב מאוחר יותר"])
+      setErrors([e instanceof Error ? e.message : "שגיאה לא צפויה, נא לנסות שוב מאוחר יותר"])
     } finally {
       setLoading(false)
     }
   }
 
-  const handleChange = (field: string, value: string) => {
-    setAdmin((prev) => ({ ...prev, [field]: value }))
-  }
-
   return (
-    <ConfigProvider direction="rtl" >
-      <div style={{ marginTop: "35vh" }}></div>
+    <ConfigProvider direction="rtl">
       <CenteredLayout>
-        <Card className="login-form" style={{ maxWidth: 500, width: "100%" }}>
+        <Card
+          className="login-form"
+          style={{
+            maxWidth: 500,
+            width: "100%",
+            padding: 24,
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+            borderRadius: 12,
+            border: "none",
+          }}
+        >
           <div style={{ textAlign: "center", marginBottom: 32 }}>
             <Avatar
               size={80}
               style={{
                 background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
                 marginBottom: 16,
-                boxShadow: "0 4px 14px rgba(102, 126, 234, 0.3)",
+                boxShadow: "0 4px 14px rgba(102, 126, 234, 0.4)",
               }}
-            >
-              <CrownOutlined style={{ fontSize: 40 }} />
-            </Avatar>
+              icon={<CrownOutlined style={{ fontSize: 40 }} />}
+            />
 
-            <Title level={2} style={{ marginBottom: 8, color: "#2d3748", textAlign: "center" }}>
+            <Title level={2} style={{ margin: 0, color: "#2d3748", textAlign: "center", width: "100%" }}>
               כניסת מנהל
             </Title>
-
-            <Text type="secondary" style={{ fontSize: 16 }}>
-              ברוכים הבאים למערכת הניהול
-            </Text>
+            <Text type="secondary">ברוכים הבאים למערכת הניהול</Text>
           </div>
 
           <Form layout="vertical" onFinish={handleSubmit}>
-            <Form.Item label="אימייל" required style={{ marginBottom: 20 }}>
+            <Form.Item label="אימייל" required>
               <Input
                 prefix={<MailOutlined style={{ color: "#667eea" }} />}
                 placeholder="הזן את האימייל שלך"
                 size="large"
                 value={admin.email}
-                onChange={(e) => handleChange("email", e.target.value)}
+                onChange={(e) => setAdmin((prev) => ({ ...prev, email: e.target.value }))}
                 style={{ borderRadius: 10 }}
               />
             </Form.Item>
 
-            <Form.Item label="סיסמא" required style={{ marginBottom: 24 }}>
+            <Form.Item label="סיסמא" required>
               <Input.Password
                 prefix={<LockOutlined style={{ color: "#667eea" }} />}
                 placeholder="הזן את הסיסמה שלך"
                 size="large"
                 value={admin.password}
-                onChange={(e) => handleChange("password", e.target.value)}
+                onChange={(e) => setAdmin((prev) => ({ ...prev, password: e.target.value }))}
                 style={{ borderRadius: 10 }}
               />
             </Form.Item>
@@ -1584,9 +336,7 @@ const AdminLogin = () => {
               התחבר
             </Button>
 
-            <Divider>
-              <Text type="secondary">או</Text>
-            </Divider>
+            <Divider><Text type="secondary">או</Text></Divider>
 
             <div style={{ textAlign: "center" }}>
               <Space>
@@ -1598,10 +348,10 @@ const AdminLogin = () => {
             </div>
 
             {errors.length > 0 && (
-              <div style={{ marginTop: 16 }}>
-                {errors.map((error, index) => (
+              <div style={{ marginTop: 24 }}>
+                {errors.map((error, idx) => (
                   <Alert
-                    key={index}
+                    key={idx}
                     message={error}
                     type="error"
                     showIcon
@@ -2456,7 +1206,7 @@ const CenteredLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <ConfigProvider direction="rtl">
       <div className="centered-layout">
-        <div style={{ width: "100%", maxWidth: 600 }}>{children}</div>
+        <div style={{ width: "100%", maxWidth: 600, background: '#ffffff' }}>{children}</div>
       </div>
     </ConfigProvider>
   )
@@ -3302,6 +2052,7 @@ import {
   FallOutlined,
   BuildOutlined,
 } from "@ant-design/icons"
+import { motion } from "framer-motion"
 import { useNavigate } from "react-router-dom"
 import { globalContext } from "../context/GlobalContext"
 import axios from "axios"
@@ -3455,160 +2206,220 @@ const MyHome = () => {
     }
   }, [globalContextDetails.business_global?.id])
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.2,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 30 },
+    show: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.6,
+        ease: "easeOut",
+      },
+    },
+  };
+
   return (
     <ConfigProvider direction="rtl">
-      <div>
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        animate="show"
+        style={{
+          position: 'absolute',
+          padding: '0 30px',
+          // width: '100%',
+        }}
+      >
         {/* Hero Section */}
-        <div className="hero-section" style={{ position: "relative", zIndex: 1, marginTop: "1300px" }}>
+        <motion.div
+          className="hero-section"
+          variants={itemVariants}
+          style={{ position: "relative", zIndex: 1 }}
+        >
           <Row gutter={[32, 32]} align="middle">
             <Col xs={24} lg={14}>
-              <Title level={1} style={{ color: "white", marginBottom: 16, fontSize: "2.5rem" }}>
-                שלום, {globalContextDetails.user?.firstName || "אורח"} {globalContextDetails.user?.lastName || ""}
-              </Title>
-              <Title level={3} style={{ color: "rgba(255,255,255,0.9)", marginBottom: 24, fontWeight: 400 }}>
-                ברוכים הבאים למערכת BusinessMan - הדרך החכמה לנהל את העסק שלך
-              </Title>
-              <Paragraph style={{ color: "rgba(255,255,255,0.8)", fontSize: 16, marginBottom: 32 }}>
-                נהל את העסק שלך בקלות ויעילות עם כלים מתקדמים לניהול הכנסות, הוצאות, משתמשים ודוחות.
-              </Paragraph>
-              <Space size="large" wrap>
-                <Button
-                  type="primary"
-                  size="large"
-                  onClick={() => navigate("/view-data")}
-                  style={{
-                    height: 48,
-                    padding: "0 32px",
-                    background: "#fa8c16",
-                    borderColor: "#fa8c16",
-                    fontWeight: 600,
-                    fontSize: 16,
-                  }}
-                >
-                  צפה בנתוני העסק
-                </Button>
-                <Button
-                  size="large"
-                  onClick={() => navigate("/account-transactions")}
-                  style={{
-                    height: 48,
-                    padding: "0 32px",
-                    background: "rgba(255,255,255,0.1)",
-                    borderColor: "rgba(255,255,255,0.3)",
-                    color: "white",
-                    fontWeight: 600,
-                    fontSize: 16,
-                  }}
-                >
-                  נהל תנועות בעסק
-                </Button>
-              </Space>
+              <motion.div variants={itemVariants}>
+                <Title level={1} style={{ color: "white", marginBottom: 16, fontSize: "2.5rem" }}>
+                  שלום, {globalContextDetails.user?.firstName || "אורח"} {globalContextDetails.user?.lastName || ""}
+                </Title>
+              </motion.div>
+              <motion.div variants={itemVariants}>
+                <Title level={3} style={{ color: "rgba(255,255,255,0.9)", marginBottom: 24, fontWeight: 400 }}>
+                  ברוכים הבאים למערכת BusinessMan - הדרך החכמה לנהל את העסק שלך
+                </Title>
+              </motion.div>
+              <motion.div variants={itemVariants}>
+                <Paragraph style={{ color: "rgba(255,255,255,0.8)", fontSize: 16, marginBottom: 32 }}>
+                  נהל את העסק שלך בקלות ויעילות עם כלים מתקדמים לניהול הכנסות, הוצאות, משתמשים ודוחות.
+                </Paragraph>
+              </motion.div>
+              <motion.div variants={itemVariants}>
+                <Space size="large" wrap>
+                  <Button
+                    type="primary"
+                    size="large"
+                    onClick={() => navigate("/view-data")}
+                    style={{
+                      height: 48,
+                      padding: "0 32px",
+                      background: "#fa8c16",
+                      borderColor: "#fa8c16",
+                      fontWeight: 600,
+                      fontSize: 16,
+                    }}
+                  >
+                    צפה בנתוני העסק
+                  </Button>
+                  <Button
+                    size="large"
+                    onClick={() => navigate("/account-transactions")}
+                    style={{
+                      height: 48,
+                      padding: "0 32px",
+                      background: "rgba(255,255,255,0.1)",
+                      borderColor: "rgba(255,255,255,0.3)",
+                      color: "white",
+                      fontWeight: 600,
+                      fontSize: 16,
+                    }}
+                  >
+                    נהל תנועות בעסק
+                  </Button>
+                </Space>
+              </motion.div>
             </Col>
             <Col xs={0} lg={10} style={{ textAlign: "center" }}>
-              <div
-                style={{
-                  width: "100%",
-                  maxWidth: 400,
-                  height: 300,
-                  background: "rgba(255,255,255,0.1)",
-                  borderRadius: 20,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  backdropFilter: "blur(10px)",
-                  border: "1px solid rgba(255,255,255,0.2)",
-                }}
-              >
-                <BuildOutlined style={{ fontSize: 120, color: "rgba(255,255,255,0.8)" }} />
-              </div>
+              <motion.div variants={itemVariants}>
+                <div
+                  style={{
+                    width: "100%",
+                    maxWidth: 400,
+                    height: 300,
+                    background: "rgba(255,255,255,0.1)",
+                    borderRadius: 20,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    backdropFilter: "blur(10px)",
+                    border: "1px solid rgba(255,255,255,0.2)",
+                  }}
+                >
+                  <BuildOutlined style={{ fontSize: 120, color: "rgba(255,255,255,0.8)" }} />
+                </div>
+              </motion.div>
             </Col>
           </Row>
-        </div>
+        </motion.div>
 
         {/* Stats Section */}
-        <Row gutter={[24, 24]} style={{ marginBottom: 48 }}>
-          {statsData.map((stat, index) => (
-            <Col xs={24} sm={12} lg={6} key={index}>
-              <Card className="stats-card">
-                <div style={{ display: "flex", alignItems: "center", marginBottom: 16 }}>
-                  <Avatar
-                    size={48}
-                    style={{
-                      background: `${stat.color}20`,
-                      color: stat.color,
-                      marginLeft: 12,
-                    }}
-                  >
-                    {stat.icon}
-                  </Avatar>
-                </div>
-                <Statistic
-                  title={stat.title}
-                  value={stat.value}
-                  prefix={stat.prefix}
-                  suffix={stat.suffix}
-                  valueStyle={{
-                    color: stat.color,
-                    fontSize: "2rem",
-                    fontWeight: "bold",
-                  }}
-                />
-                <div style={{ display: "flex", alignItems: "center", marginTop: 12 }}>
-                  {stat.trend > 0 ? (
-                    <RiseOutlined style={{ color: "#52c41a", marginLeft: 4 }} />
-                  ) : (
-                    <FallOutlined style={{ color: "#ff4d4f", marginLeft: 4 }} />
-                  )}
-                  <Text
-                    style={{
-                      color: stat.trend > 0 ? "#52c41a" : "#ff4d4f",
-                      fontWeight: 600,
-                      marginLeft: 8,
-                    }}
-                  >
-                    {stat.trend > 0 ? "+" : ""}
-                    {stat.trend}%
-                  </Text>
-                  <Text type="secondary">מהחודש הקודם</Text>
-                </div>
-              </Card>
-            </Col>
-          ))}
-        </Row>
+        <motion.div variants={itemVariants}>
+          <Row gutter={[24, 24]} style={{ marginBottom: 48 }}>
+            {statsData.map((stat, index) => (
+              <Col xs={24} sm={12} lg={6} key={index}>
+                <motion.div variants={itemVariants}>
+                  <Card className="stats-card">
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        textAlign: "center",
+                        height: "100%",
+                      }}
+                    >
+                      <Avatar
+                        size={48}
+                        style={{
+                          background: `${stat.color}20`,
+                          color: stat.color,
+                          marginBottom: 12,
+                        }}
+                      >
+                        {stat.icon}
+                      </Avatar>
+                      <Statistic
+                        title={stat.title}
+                        value={stat.value}
+                        prefix={stat.prefix}
+                        suffix={stat.suffix}
+                        valueStyle={{
+                          color: stat.color,
+                          fontSize: "2rem",
+                          fontWeight: "bold",
+                        }}
+                      />
+                      <div style={{ display: "flex", alignItems: "center", marginTop: 12 }}>
+                        {stat.trend > 0 ? (
+                          <RiseOutlined style={{ color: "#52c41a", marginLeft: 4 }} />
+                        ) : (
+                          <FallOutlined style={{ color: "#ff4d4f", marginLeft: 4 }} />
+                        )}
+                        <Text
+                          style={{
+                            color: stat.trend > 0 ? "#52c41a" : "#ff4d4f",
+                            fontWeight: 600,
+                            marginLeft: 8,
+                          }}
+                        >
+                          {stat.trend > 0 ? "+" : ""}
+                          {stat.trend}%
+                        </Text>
+                      </div>
+                    </div>
+                  </Card>
+
+                </motion.div>
+              </Col>
+            ))}
+          </Row>
+        </motion.div>
 
         {/* Quick Actions */}
-        <div style={{ marginBottom: 48 }}>
+        <motion.div variants={itemVariants} style={{ marginBottom: 48 }}>
           <Title level={3} style={{ textAlign: "center", marginBottom: 24 }}>
             פעולות מהירות
           </Title>
           <Row gutter={[16, 16]}>
             {quickActions.map((action, index) => (
               <Col xs={24} sm={8} key={index}>
-                <Button
-                  type="default"
-                  size="large"
-                  icon={action.icon}
-                  onClick={() => navigate(action.path)}
-                  block
-                  style={{
-                    height: 56,
-                    borderRadius: 12,
-                    borderWidth: 2,
-                    fontWeight: 600,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  {action.title}
-                </Button>
+                <motion.div variants={itemVariants}>
+                  <Button
+                    type="default"
+                    size="large"
+                    icon={action.icon}
+                    onClick={() => navigate(action.path)}
+                    block
+                    style={{
+                      height: 56,
+                      borderRadius: 12,
+                      borderWidth: 2,
+                      fontWeight: 600,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    {action.title}
+                  </Button>
+                </motion.div>
               </Col>
             ))}
           </Row>
-        </div>
+        </motion.div>
 
         {/* Main Menu Cards */}
-        <div style={{ marginBottom: 48 }}>
+        <motion.div variants={itemVariants} style={{ marginBottom: 48 }}>
           <div style={{ textAlign: "center", marginBottom: 32 }}>
             <Title level={3} style={{ marginBottom: 8 }}>
               ניהול העסק שלך
@@ -3621,69 +2432,73 @@ const MyHome = () => {
           <Row gutter={[24, 24]}>
             {menuItems.map((item, index) => (
               <Col xs={24} sm={12} lg={6} key={index}>
-                <Card className="feature-card" hoverable style={{ height: "100%" }} bodyStyle={{ padding: 32 }}>
-                  <div className="icon-wrapper" style={{ background: `${item.color}20`, color: item.color }}>
-                    {item.icon}
-                  </div>
-                  <Title level={4} style={{ marginBottom: 12, color: "#2d3748" }}>
-                    {item.title}
-                  </Title>
-                  <Paragraph type="secondary" style={{ marginBottom: 24, minHeight: 48 }}>
-                    {item.description}
-                  </Paragraph>
-                  <Button
-                    type="text"
-                    icon={<ArrowRightOutlined />}
-                    onClick={() => navigate(item.path)}
-                    style={{
-                      padding: 0,
-                      height: "auto",
-                      color: item.color,
-                      fontWeight: 600,
-                    }}
-                  >
-                    כניסה
-                  </Button>
-                </Card>
+                <motion.div variants={itemVariants}>
+                  <Card className="feature-card" hoverable style={{ height: "100%" }} bodyStyle={{ padding: 32 }}>
+                    <div className="icon-wrapper" style={{ background: `${item.color}20`, color: item.color }}>
+                      {item.icon}
+                    </div>
+                    <Title level={4} style={{ marginBottom: 12, color: "#2d3748" }}>
+                      {item.title}
+                    </Title>
+                    <Paragraph type="secondary" style={{ marginBottom: 24, minHeight: 48 }}>
+                      {item.description}
+                    </Paragraph>
+                    <Button
+                      type="text"
+                      icon={<ArrowRightOutlined />}
+                      onClick={() => navigate(item.path)}
+                      style={{
+                        padding: 0,
+                        height: "auto",
+                        color: item.color,
+                        fontWeight: 600,
+                      }}
+                    >
+                      כניסה
+                    </Button>
+                  </Card>
+                </motion.div>
               </Col>
             ))}
           </Row>
-        </div>
+        </motion.div>
 
         {/* Testimonial */}
-        <Card className="testimonial-section">
-          <Row gutter={[32, 32]} align="middle">
-            <Col xs={24} lg={16}>
-              <Title level={4} style={{ color: "#667eea", marginBottom: 16 }}>
-                "מערכת BusinessMan שינתה את הדרך שבה אני מנהל את העסק שלי. הכל נגיש ויעיל."
-              </Title>
-              <Text type="secondary">יוסי כהן, בעלים של "טכנולוגיות מתקדמות" בע״מ</Text>
-            </Col>
-            <Col xs={24} lg={8} style={{ textAlign: "center" }}>
-              <Button
-                type="primary"
-                size="large"
-                onClick={() => navigate("/register-user")}
-                style={{
-                  height: 48,
-                  padding: "0 32px",
-                  fontWeight: 600,
-                  marginBottom: 8,
-                }}
-              >
-                הצטרף עכשיו
-              </Button>
-              <div>
-                <Text type="secondary" style={{ fontSize: 12 }}>
-                  הצטרפו למאות עסקים שכבר משתמשים במערכת
-                </Text>
-              </div>
-            </Col>
-          </Row>
-        </Card>
+        <motion.div variants={itemVariants}>
+          <Card className="testimonial-section">
+            <Row gutter={[32, 32]} align="middle">
+              <Col xs={24} lg={16}>
+                <Title level={4} style={{ color: "#667eea", marginBottom: 16 }}>
+                  "מערכת BusinessMan שינתה את הדרך שבה אני מנהל את העסק שלי. הכל נגיש ויעיל."
+                </Title>
+                <Text type="secondary">יוסי כהן, בעלים של "טכנולוגיות מתקדמות" בע״מ</Text>
+              </Col>
+              <Col xs={24} lg={8} style={{ textAlign: "center" }}>
+                <Button
+                  type="primary"
+                  size="large"
+                  onClick={() => navigate("/register-user")}
+                  style={{
+                    height: 48,
+                    padding: "0 32px",
+                    fontWeight: 600,
+                    marginBottom: 8,
+                  }}
+                >
+                  הצטרף עכשיו
+                </Button>
+                <div>
+                  <Text type="secondary" style={{ fontSize: 12 }}>
+                    הצטרפו למאות עסקים שכבר משתמשים במערכת
+                  </Text>
+                </div>
+              </Col>
+            </Row>
+          </Card>
+        </motion.div>
 
         {/* Footer */}
-        <div style={{ marginTop: 64, paddingTop: 32, borderTop: "1px solid #f0f0f0" }}>
+        <motion.div variants={itemVariants} style={{ marginTop: 64, paddingTop: 32, borderTop: "1px solid #f0f0f0" }}>
           <Row justify="space-between" align="middle">
             <Col>
               <Space>
@@ -3714,10 +2529,10 @@ const MyHome = () => {
               </Space>
             </Col>
           </Row>
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     </ConfigProvider>
-  )
+  );
 }
 
 export default MyHome
@@ -4931,7 +3746,8 @@ import { useNavigate } from "react-router-dom"
 import { validationSchemaUserLogin } from "../utils/validationSchema"
 import { globalContext } from "../context/GlobalContext"
 import { Form, Input, Button, Typography, Card, Alert, Space, Avatar, Divider, ConfigProvider } from "antd"
-import { MailOutlined, LockOutlined, UserOutlined, LoginOutlined, ExclamationCircleOutlined } from "@ant-design/icons"
+import { MailOutlined, LockOutlined, UserOutlined, LoginOutlined, ExclamationCircleOutlined, CrownOutlined } from "@ant-design/icons"
+import CenteredLayout from "./CenteredLayout"
 
 const { Title, Text, Link } = Typography
 
@@ -4992,23 +3808,32 @@ const UserLogin = () => {
     }
   }
 
-
   return (
     <ConfigProvider direction="rtl">
-      <div style={{ marginTop: "50vh" }}></div>
-      <div className="centered-layout">
-        <Card className="login-form" style={{ maxWidth: 500, width: "100%" }}>
+      <CenteredLayout>
+        <Card
+          className="login-form"
+          style={{
+            maxWidth: 500,
+            width: "100%",
+            padding: 34,
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+            borderRadius: 12,
+            border: "none",
+            paddingTop: 100,
+          }}
+        >
           <div style={{ textAlign: "center", marginBottom: 32 }}>
             <Avatar
               size={80}
               style={{
                 background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
                 marginBottom: 16,
-                boxShadow: "0 4px 14px rgba(102, 126, 234, 0.3)",
+                boxShadow: "0 4px 14px rgba(102, 126, 234, 0.4)",
               }}
-            >
-              <UserOutlined style={{ fontSize: 40 }} />
-            </Avatar>
+              icon={<CrownOutlined style={{ fontSize: 40 }} />}
+            />
+
 
             <Title level={2} style={{ marginBottom: 8, color: "#2d3748", textAlign: "center" }}>
               כניסת משתמש
@@ -5120,7 +3945,7 @@ const UserLogin = () => {
             )}
           </Form>
         </Card>
-      </div>
+      </CenteredLayout>
     </ConfigProvider>
   )
 }
@@ -5805,3 +4630,1268 @@ const UserRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => 
 }
 
 export default UserRegister
+
+app.CSS
+/* Import Hebrew fonts */
+@import url("https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;500;600;700&family=Heebo:wght@300;400;500;600;700&family=Rubik:wght@300;400;500;600;700&display=swap");
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  direction: rtl;
+  font-family: "Assistant", "Rubik", "Heebo", sans-serif;
+  background-color: #fff;
+  /* background: linear-gradient(135deg, #f5f7ff 0%, #ffffff 100%); */
+  overflow-x: hidden;
+}
+
+::selection {
+  background-color: #d1cff2;
+  color: inherit;
+}
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+}
+
+:root {
+  background-color: #f7f5fa !important;
+}
+
+.ant-card-body {
+  /* position: absolute; */
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Subtle Animations - Less dramatic */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes gentleBounce {
+  0% {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.01);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes subtlePulse {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.02);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes gentleFloat {
+
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes softGlow {
+
+  0%,
+  100% {
+    box-shadow: 0 0 3px rgba(102, 126, 234, 0.3);
+  }
+
+  50% {
+    box-shadow: 0 0 8px rgba(102, 126, 234, 0.5);
+  }
+}
+
+/* Modal Overlay Styles */
+/* .modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeInUp 0.3s ease-out;
+} */
+
+/* .modal-content {
+  position: relative;
+  z-index: 10000;
+  animation: gentleBounce 0.4s ease-out;
+} */
+
+/* Component Animations - Subtle */
+.logo-section {
+  animation: slideInRight 0.5s ease-out;
+}
+
+.logo-avatar {
+  animation: gentleBounce 0.6s ease-out 0.2s both;
+}
+
+.logo-title {
+  animation: fadeInUp 0.5s ease-out 0.3s both;
+}
+
+.sidebar-menu {
+  animation: slideInRight 0.5s ease-out 0.1s both;
+}
+
+.sidebar-menu .ant-menu-item {
+  animation: fadeInUp 0.4s ease-out both;
+  animation-delay: calc(var(--item-index, 0) * 0.05s);
+}
+
+.main-header {
+  animation: slideInLeft 0.5s ease-out;
+}
+
+.header-icon {
+  animation: fadeInUp 0.6s ease-out 0.3s both;
+}
+
+.header-title {
+  animation: fadeInUp 0.5s ease-out 0.2s both;
+}
+
+.nav-btn {
+  animation: fadeInUp 0.4s ease-out both;
+  animation-delay: calc(var(--btn-index, 0) * 0.05s);
+  transition: all 0.2s ease;
+}
+
+.nav-btn:hover {
+  transform: translateY(-1px);
+  /* animation: subtlePulse 0.4s ease-in-out; */
+}
+
+.menu-toggle-btn {
+  transition: all 0.2s ease;
+}
+
+.menu-toggle-btn:hover {
+  /* animation: subtlePulse 0.4s ease-in-out; */
+}
+
+.desktop-sider {
+  animation: slideInRight 0.6s ease-out;
+}
+
+.mobile-drawer .ant-drawer-content {
+  animation: slideInRight 0.3s ease-out;
+}
+
+.main-content {
+  animation: fadeInUp 0.5s ease-out 0.2s both;
+}
+
+.content-wrapper {
+  animation: fadeInUp 0.6s ease-out 0.3s both;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 4px;
+  animation: softGlow 2s ease-in-out infinite alternate;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+}
+
+html:lang(he),
+body:lang(he) {
+  direction: rtl;
+  text-align: right;
+}
+
+.ltr {
+  direction: ltr !important;
+}
+
+.rtl {
+  direction: rtl !important;
+}
+
+/* Ant Design Layout Fixes for RTL */
+.ant-layout {
+  /* min-height: 100vh !important;
+  width: 100% !important;
+  direction: rtl !important; */
+}
+
+.ant-layout-content {
+  /* width: 100% !important; */
+  /* margin: 0 !important; */
+  /* background: transparent !important; */
+  direction: rtl !important;
+}
+
+/* RTL Sider positioning */
+.ant-layout-sider {
+  /* position: fixed !important;
+  height: 100vh !important;
+  right: 0 !important;
+  top: 0 !important;
+  z-index: 1001 !important; */
+  /* background: #fff !important; */
+}
+
+header {
+  box-shadow: none !important;
+}
+
+/* Content area adjustments for RTL */
+.main-layout {
+  /* margin-right: 280px !important;
+  width: calc(100% - 280px) !important;
+  transition: all 0.2s ease !important;
+  min-height: 100vh !important; */
+}
+
+.main-layout.collapsed {
+  /* margin-right: 80px !important;
+  width: calc(100% - 80px) !important; */
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+
+  .main-layout,
+  .main-layout.collapsed {
+    margin-right: 0 !important;
+    width: 100% !important;
+  }
+
+  .ant-layout-sider {
+    transform: translateX(100%) !important;
+  }
+}
+
+/* Drawer RTL fix */
+.ant-drawer-content-wrapper {
+  /* right: 0 !important;
+  left: auto !important; */
+}
+
+.ant-drawer-body {
+  /* padding: 0 !important;
+  direction: rtl !important; */
+}
+
+/* Menu RTL fixes */
+.ant-menu {
+  direction: rtl !important;
+}
+
+.ant-menu-item {
+  /* border-radius: 8px !important;
+  margin: 4px 8px !important;
+  text-align: right !important;
+  transition: all 0.2s ease !important; */
+}
+
+.ant-menu-item:hover {
+  transform: translateX(-2px) !important;
+  /* animation: softGlow 0.4s ease-in-out !important; */
+}
+
+.ant-menu-item-selected {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  color: white !important;
+}
+
+.ant-menu-item-selected .anticon {
+  color: white !important;
+}
+
+.ant-menu-item .ant-menu-title-content {
+  margin-right: 12px !important;
+  margin-left: 0 !important;
+}
+
+/* Unified Card Styles */
+.ant-card {
+  /* border-radius: 16px !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08) !important;
+  transition: all 0.2s ease !important;
+  width: 100% !important;
+  direction: rtl !important;
+  animation: fadeInUp 0.5s ease-out both !important;
+  border: 1px solid rgba(0, 0, 0, 0.06) !important; */
+}
+
+.ant-card:hover {
+  /* transform: translateY(-2px) !important;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12) !important;
+  animation: gentleFloat 2s ease-in-out infinite !important; */
+}
+
+.ant-card-body {
+  direction: rtl !important;
+  text-align: right !important;
+  /* padding: 24px !important; */
+}
+
+/* Unified Button Styles */
+.ant-btn {
+  border-radius: 10px !important;
+  font-weight: 600 !important;
+  height: auto !important;
+  padding: 10px 20px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  direction: rtl !important;
+  transition: all 0.2s ease !important;
+  font-family: "Assistant", "Rubik", "Heebo", sans-serif !important;
+}
+
+.ant-btn:hover {
+  transform: translateY(-1px) !important;
+  animation: subtlePulse 0.4s ease-in-out !important;
+}
+
+.ant-btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  border: none !important;
+  box-shadow: 0 4px 14px rgba(102, 126, 234, 0.4) !important;
+}
+
+.ant-btn-primary:hover {
+  background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%) !important;
+  /* box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5) !important; */
+  /* animation: softGlow 0.4s ease-in-out !important; */
+}
+
+/* Unified Input Styles */
+.ant-input,
+.ant-input-number,
+.ant-select-selector {
+  border-radius: 10px !important;
+  padding: 12px 16px !important;
+  border: 2px solid #e1e5e9 !important;
+  transition: all 0.2s ease !important;
+  direction: rtl !important;
+  text-align: right !important;
+  font-family: "Assistant", "Rubik", "Heebo", sans-serif !important;
+}
+
+.ant-input:focus,
+.ant-input-number:focus,
+.ant-select-focused .ant-select-selector {
+  border-color: #667eea !important;
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2) !important;
+  animation: softGlow 0.4s ease-in-out !important;
+}
+
+/* Error Display Styles */
+.error-message {
+  background: linear-gradient(135deg, #fff2f0 0%, #ffebe8 100%);
+  border: 1px solid #ffccc7;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin: 8px 0;
+  color: #cf1322;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: fadeInUp 0.3s ease-out;
+}
+
+.error-message .anticon {
+  color: #cf1322;
+}
+
+/* Success Message Styles */
+.success-message {
+  background: linear-gradient(135deg, #f6ffed 0%, #e6f7d2 100%);
+  border: 1px solid #b7eb8f;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin: 8px 0;
+  color: #389e0d;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: fadeInUp 0.3s ease-out;
+}
+
+.success-message .anticon {
+  color: #389e0d;
+}
+
+/* Form Styles */
+.ant-form-item-label>label {
+  font-weight: 600 !important;
+  color: #2d3748 !important;
+  text-align: right !important;
+  font-family: "Assistant", "Rubik", "Heebo", sans-serif !important;
+}
+
+.ant-form-item {
+  direction: rtl !important;
+  animation: fadeInUp 0.4s ease-out both !important;
+  animation-delay: calc(var(--form-item-index, 0) * 0.05s) !important;
+}
+
+.ant-form-item-explain-error {
+  background: #fff2f0;
+  border: 1px solid #ffccc7;
+  border-radius: 6px;
+  padding: 8px 12px;
+  margin-top: 4px;
+  color: #cf1322;
+  font-weight: 500;
+  animation: fadeInUp 0.3s ease-out;
+}
+
+.ant-input-number {
+  width: 100% !important;
+  direction: rtl !important;
+}
+
+.ant-input-number-input {
+  text-align: right !important;
+}
+
+/* Container and layout utilities */
+.page-container {
+  width: 100% !important;
+  max-width: 100% !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  direction: rtl !important;
+}
+
+.content-wrapper {
+  width: 100% !important;
+  max-width: 1200px !important;
+  margin: 0 auto !important;
+  padding: 20px 24px 24px 24px !important;
+  direction: rtl !important;
+  min-height: calc(100vh - 84px) !important;
+}
+
+@media (max-width: 768px) {
+  .content-wrapper {
+    padding: 16px 16px 16px 16px !important;
+  }
+}
+
+/* Unified Component Styles */
+.hero-section {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 60px 24px;
+  border-radius: 20px;
+  margin-bottom: 40px;
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  direction: rtl;
+  animation: fadeInUp 0.6s ease-out both;
+}
+
+@media (max-width: 768px) {
+  .hero-section {
+    padding: 40px 20px;
+    margin: 0 0 40px 0;
+    border-radius: 16px;
+  }
+}
+
+.stats-card {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s ease;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  direction: rtl;
+  text-align: right;
+  animation: fadeInUp 0.5s ease-out both;
+}
+
+.stats-card:hover {
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+  /* animation: gentleFloat 1.5s ease-in-out infinite; */
+}
+
+.feature-card {
+  background: white;
+  border-radius: 16px;
+  /* padding: 15px; */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s ease;
+  height: 100%;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  width: 100%;
+  direction: rtl;
+  text-align: right;
+  animation: fadeInUp 0.5s ease-out both;
+}
+
+@media (max-width: 768px) {
+  .feature-card {
+    padding: 24px;
+  }
+}
+
+.feature-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+  /* animation: gentleFloat 2s ease-in-out infinite; */
+}
+
+.icon-wrapper {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-size: 24px;
+  animation: gentleBounce 0.6s ease-out both;
+}
+
+.icon-wrapper:hover {
+  /* animation: subtlePulse 0.6s ease-in-out infinite; */
+}
+
+.testimonial-section {
+  background: rgba(102, 126, 234, 0.03);
+  border: 1px solid rgba(102, 126, 234, 0.1);
+  border-radius: 16px;
+  padding: 32px;
+  margin-top: 40px;
+  width: 100%;
+  direction: rtl;
+  text-align: right;
+  animation: fadeInUp 0.6s ease-out both;
+}
+
+@media (max-width: 768px) {
+  .testimonial-section {
+    padding: 24px;
+  }
+}
+
+.financial-summary-card {
+  border-radius: 16px;
+  padding: 24px;
+  height: 100%;
+  transition: all 0.2s ease;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  width: 100%;
+  direction: rtl;
+  text-align: right;
+  animation: fadeInUp 0.5s ease-out both;
+}
+
+.financial-summary-card:hover {
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  /* animation: gentleFloat 1.5s ease-in-out infinite; */
+}
+
+.income-card {
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.expense-card {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.centered-layout {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 84px);
+  padding: 20px;
+  width: 100%;
+  direction: rtl;
+  animation: fadeInUp 0.5s ease-out both;
+  background: #fcfdfe;
+}
+
+.login-form {
+  background: linear-gradient(145deg, #ffffff, #f8fafc);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: none !important;
+  width: 100%;
+  max-width: 500px;
+  direction: rtl;
+  text-align: right;
+  animation: gentleBounce 0.6s ease-out both;
+}
+
+@media (max-width: 768px) {
+  .login-form {
+    padding: 24px;
+    margin: 0;
+    border-radius: 16px;
+  }
+}
+
+.form-section {
+  background: white;
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  width: 100%;
+  direction: rtl;
+  text-align: right;
+  animation: fadeInUp 0.5s ease-out both;
+}
+
+@media (max-width: 768px) {
+  .form-section {
+    padding: 20px;
+    margin: 0;
+  }
+}
+
+/* Grid fixes for RTL */
+.ant-row {
+  width: 100% !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  direction: rtl !important;
+}
+
+.ant-col {
+  padding-left: 12px !important;
+  padding-right: 12px !important;
+  direction: rtl !important;
+  animation: fadeInUp 0.4s ease-out both !important;
+  animation-delay: calc(var(--col-index, 0) * 0.05s) !important;
+}
+
+@media (max-width: 768px) {
+  .ant-col {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+}
+
+/* Table responsive */
+.ant-table-wrapper {
+  width: 100% !important;
+  overflow-x: auto !important;
+  direction: rtl !important;
+  animation: fadeInUp 0.5s ease-out both !important;
+}
+
+.ant-table {
+  min-width: 800px !important;
+  direction: rtl !important;
+}
+
+.ant-table-thead>tr>th {
+  text-align: right !important;
+  font-weight: 600 !important;
+  background: #fafafa !important;
+}
+
+.ant-table-tbody>tr>td {
+  text-align: right !important;
+}
+
+.ant-table-tbody>tr {
+  transition: all 0.2s ease !important;
+}
+
+.ant-table-tbody>tr:hover {
+  transform: scale(1.005) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+}
+
+@media (max-width: 768px) {
+  .ant-table {
+    min-width: 600px !important;
+  }
+}
+
+/* Typography RTL */
+.ant-typography {
+  direction: rtl !important;
+  /* text-align: right !important; */
+  font-family: "Assistant", "Rubik", "Heebo", sans-serif !important;
+}
+
+/* Space component RTL */
+.ant-space {
+  direction: rtl !important;
+}
+
+/* Upload component RTL */
+.ant-upload-drag {
+  direction: rtl !important;
+  text-align: center !important;
+  transition: all 0.2s ease !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+.ant-upload-drag:hover {
+  transform: scale(1.01) !important;
+  border-color: #667eea !important;
+}
+
+/* Progress RTL */
+.ant-progress {
+  direction: rtl !important;
+}
+
+/* Alert RTL */
+.ant-alert {
+  direction: rtl !important;
+  text-align: right !important;
+  animation: fadeInUp 0.4s ease-out both !important;
+  border-radius: 8px !important;
+}
+
+/* Statistic RTL */
+.ant-statistic {
+  direction: rtl !important;
+  text-align: right !important;
+}
+
+.ant-statistic-content {
+  direction: rtl !important;
+  text-align: right !important;
+}
+
+.ant-statistic-content-value {
+  animation: gentleBounce 0.6s ease-out both !important;
+}
+
+/* Loading animations */
+.ant-spin {
+  animation: fadeInUp 0.6s ease-out both !important;
+}
+
+/* Drawer animations */
+.ant-drawer-mask {
+  animation: fadeInUp 0.2s ease-out !important;
+}
+
+.ant-drawer-content {
+  animation: slideInRight 0.3s ease-out !important;
+}
+
+/* Responsive Design Improvements */
+@media (max-width: 1200px) {
+  .content-wrapper {
+    max-width: 100% !important;
+    padding: 16px !important;
+  }
+}
+
+@media (max-width: 992px) {
+  .hero-section {
+    padding: 40px 20px !important;
+  }
+
+  .feature-card,
+  .stats-card {
+    margin-bottom: 16px !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .ant-card-body {
+    padding: 19px !important;
+  }
+
+  .form-section {
+    padding: 16px !important;
+  }
+
+  .login-form {
+    padding: 20px !important;
+  }
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Focus styles for accessibility */
+.ant-btn:focus,
+.ant-input:focus,
+.ant-select:focus {
+  outline: 2px solid #667eea !important;
+  outline-offset: 2px !important;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .ant-card {
+    border: 2px solid #000 !important;
+  }
+
+  .ant-btn-primary {
+    background: #000 !important;
+    color: #fff !important;
+  }
+}
+"use client"
+
+import { useState, useEffect, useContext } from "react"
+import { BrowserRouter as Router, Routes, Route, Link, useLocation } from "react-router-dom"
+import {
+  Layout,
+  Menu,
+  Typography,
+  Avatar,
+  Space,
+  Drawer,
+  ConfigProvider,
+  theme as antTheme,
+} from "antd"
+import {
+  MenuOutlined,
+  UserAddOutlined,
+  BuildOutlined,
+  BankOutlined,
+  BarChartOutlined,
+  CrownOutlined,
+  DollarOutlined,
+  EyeOutlined,
+  LoginOutlined,
+  TeamOutlined,
+  UploadOutlined,
+  CloudDownloadOutlined,
+} from "@ant-design/icons"
+import { useMediaQuery } from "react-responsive"
+import "./App.css"
+
+import AdminLogin from "./components/AdminLogin"
+import BusinessAndAdmin from "./components/BusinessAndAdmin"
+import ProductionReports from "./components/ProductionReports"
+import UploadFiles from "./components/UploadFiles"
+import UserLogin from "./components/UserLogin"
+import UserRegister from "./components/UserRegister"
+import GlobalContext, { globalContext } from "./context/GlobalContext"
+import { Home } from "@mui/icons-material"
+import MyHome from "./components/MyHome"
+import EditUserPage from "./components/EditUserPage"
+import BusinessFiles from "./components/BusinessFiles"
+import AccountTransactions from "./components/AccountTransactions"
+import DataViewing from "./components/DataViweing"
+import UserManagement from "./components/UserManagemet"
+
+const { Header, Sider, Content } = Layout
+const { Title } = Typography
+
+const navItems = [
+  { key: "/", label: "בית", icon: <Home />, path: "/" },
+  { key: "/register-user", label: "רישום משתמש", icon: <UserAddOutlined />, path: "/register-user" },
+  { key: "/user-login", label: "כניסת משתמש", icon: <LoginOutlined />, path: "/user-login" },
+  { key: "/admin-login", label: "כניסת מנהל", icon: <CrownOutlined />, path: "/admin-login" },
+  { key: "/business-files", label: "קבצי העסק", icon: <CloudDownloadOutlined />, path: "/business-files" },
+  { key: "/upload-file", label: "העלאת קבצים", icon: <UploadOutlined />, path: "/upload-file" },
+  { key: "/view-data", label: "צפייה בנתונים", icon: <EyeOutlined />, path: "/view-data" },
+  { key: "/user-management", label: "משתמשים", icon: <TeamOutlined />, path: "/user-management" },
+  { key: "/production-reports", label: 'דו"ח ייצור', icon: <BarChartOutlined />, path: "/production-reports" },
+  { key: "/account-transactions", label: "הוספת תנועה בחשבון", icon: <DollarOutlined />, path: "/account-transactions" },
+  {
+    key: "/register-admin&business",
+    label: "רישום עסק ומנהל חדש",
+    icon: <BankOutlined />,
+    path: "/register-admin&business",
+  },
+]
+
+function ResponsiveDrawer() {
+  const [collapsed] = useState(false)
+  const [mobileOpen, setMobileOpen] = useState(false)
+  const location = useLocation()
+  const isMobile = useMediaQuery({ maxWidth: 768 })
+  const globalContextDetails = useContext(globalContext)
+
+  const [pageTitle, setPageTitle] = useState("")
+  const [clientName, setClientName] = useState('אורח')
+
+  useEffect(() => {
+    const routeTitles: { [key: string]: string } = {
+      "/": "דף הבית",
+      "/register-user": "רישום משתמש",
+      "/user-login": "כניסת משתמש",
+      "/admin-login": "כניסת מנהל",
+      "/business-files": "קבצי העסק",
+      "/upload-file": "העלאת קבצים",
+      "/view-data": "צפייה בנתונים",
+      "/user-management": "ניהול משתמשים",
+      "/production-reports": 'דו"ח ייצור',
+      "/account-transactions": "תנועות חשבון",
+      "/register-admin&business": "רישום עסק ומנהל",
+    }
+
+    if (location.pathname.startsWith("/edit-user/")) {
+      setPageTitle("עריכת משתמש")
+    } else {
+      setPageTitle(routeTitles[location.pathname] || "עמוד לא מזוהה")
+    }
+
+    setClientName("שלום, " + globalContextDetails.user.firstName)
+  }, [location.pathname])
+
+  const handleDrawerToggle = () => {
+    setMobileOpen(!mobileOpen)
+  }
+
+  const menuItems = navItems.map((item) => ({
+    key: item.key,
+    icon: item.icon,
+    label: (
+      <Link to={item.path} onClick={(e) => e.stopPropagation()}>
+        {item.label}
+      </Link>
+    ),
+  }))
+
+  const siderContent = (
+    <div
+      style={{
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        direction: "rtl",
+        width: "100%",
+      }}
+    >
+      <div
+        className="logo-section"
+        style={{
+          padding: "24px 16px",
+          borderBottom: "1px solid #f0f0f0",
+          textAlign: "center",
+          direction: "rtl",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexDirection: "column",
+        }}
+      >
+        <Avatar
+          size={collapsed ? 32 : 48}
+          className="logo-avatar"
+          style={{
+            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+            marginBottom: collapsed ? 0 : 8,
+          }}
+        >
+          <BuildOutlined />
+        </Avatar>
+        {!collapsed && (
+          <Title level={4} className="logo-title" style={{ margin: "8px 0 0 0", color: "#667eea" }}>
+            BusinessMan
+          </Title>
+        )}
+      </div>
+
+      <Menu
+        mode="inline"
+        selectedKeys={[location.pathname]}
+        className="sidebar-menu"
+        style={{
+          border: "none",
+          flex: 1,
+          padding: "8px",
+          direction: "rtl",
+          backgroundColor: '#7354af0f'
+        }}
+        items={menuItems}
+        onClick={(e) => {
+          e.domEvent.stopPropagation()
+          if (isMobile) setMobileOpen(false)
+        }}
+      />
+
+      <div
+        style={{
+          padding: "16px",
+          borderTop: "1px solid #f0f0f0",
+          textAlign: "center",
+          direction: "rtl",
+        }}
+      >
+        <Typography.Text type="secondary" style={{ fontSize: "12px" }}>
+          © 2025 BusinessMan
+        </Typography.Text>
+      </div>
+    </div>
+  )
+
+  return (
+    <ConfigProvider
+      direction="rtl"
+      theme={{
+        algorithm: antTheme.defaultAlgorithm,
+        token: {
+          colorPrimary: "#667eea",
+          borderRadius: 10,
+          fontFamily: '"Assistant", "Rubik", "Heebo", sans-serif',
+        },
+      }}
+    >
+      <Layout style={{ minHeight: "100vh", width: "100%", direction: "rtl" }}>
+        {!isMobile && (
+          <Sider
+            trigger={null}
+            collapsible
+            collapsed={collapsed}
+            width={280}
+            collapsedWidth={80}
+            className="desktop-sider"
+            style={{
+              background: "#fff",
+              position: "fixed",
+              height: "100vh",
+              right: 0,
+              top: 0,
+              zIndex: 1001,
+              boxShadow: "-2px 0 8px rgba(0, 0, 0, 0.05)",
+            }}
+          >
+            {siderContent}
+          </Sider>
+        )}
+
+        {isMobile && (
+          <Drawer
+            title={
+              <Space style={{ direction: "rtl" }}>
+                <Avatar style={{ background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)" }}>
+                  <BuildOutlined />
+                </Avatar>
+                <span>BusinessMan</span>
+              </Space>
+            }
+            placement="right"
+            onClose={handleDrawerToggle}
+            open={mobileOpen}
+            width={280}
+            className="mobile-drawer"
+            style={{ padding: 0, direction: "rtl" }}
+          >
+            <Menu
+              mode="inline"
+              selectedKeys={[location.pathname]}
+              style={{ border: "none", direction: "rtl" }}
+              items={menuItems}
+              onClick={handleDrawerToggle}
+            />
+          </Drawer>
+        )}
+
+        <Layout
+          className={`main-layout ${collapsed ? "collapsed" : ""}`}
+          style={{
+            marginRight: isMobile ? 0 : collapsed ? 80 : 280,
+            width: isMobile ? "100%" : collapsed ? "calc(100% - 80px)" : "calc(100% - 280px)",
+            minHeight: "100vh",
+            direction: "rtl",
+          }}
+        >
+          <Header
+            style={{
+              background: "#fff",
+              padding: "0 24px",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              flexDirection: "row-reverse",
+              position: "fixed",
+              top: 0,
+              zIndex: 100,
+              height: "64px",
+              width: isMobile ? "100%" : collapsed ? "calc(100% - 80px)" : "calc(100% - 280px)",
+              right: isMobile ? 0 : collapsed ? 80 : 280,
+            }}
+          >
+
+            <Space
+              size="middle"
+              style={{ alignItems: "center", flexDirection: "row-reverse", flex: 1, justifyContent: "space-between" }}
+            >
+              {/* pageTitle מוצג בצד ימין */}
+              {!isMobile && (
+                <Title level={5} style={{ margin: 0, color: "#444" }}>
+                  {pageTitle}
+                </Title>
+              )}
+
+              <Space size="middle" style={{ alignItems: "center", flexDirection: "row-reverse" }}>
+                {!isMobile && (
+                  <Avatar
+                    style={{
+                      height: "40px",
+                      width: "100px",
+                      background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                      borderRadius: "10px",
+                      padding: "0 8px",
+                      fontSize: "22px",
+                    }}
+                  >
+                    {clientName ? clientName : "אורח"}
+                  </Avatar>
+                )}
+
+                {isMobile && (
+                  <MenuOutlined
+                    style={{ fontSize: "20px", cursor: "pointer", color: "#667eea" }}
+                    onClick={handleDrawerToggle}
+                  />
+                )}
+              </Space>
+            </Space>
+          </Header>
+          <Content
+            style={{
+              margin: "24px 24px 24px 24px",
+              // padding: 24,
+              paddingTop: 99, // הוספה: גובה ה־Header + מרווח
+              background: "#fff",
+              minHeight: 280,
+              direction: "rtl",
+              overflow: "auto",
+            }}
+          >
+            <Routes>
+              <Route path="/" element={<MyHome />} />
+              <Route path="/register-user" element={<UserRegister />} />
+              <Route path="/user-login" element={<UserLogin />} />
+              <Route path="/admin-login" element={<AdminLogin />} />
+              <Route path="/business-files" element={<BusinessFiles />} />
+              <Route path="/upload-file" element={<UploadFiles />} />
+              <Route path="/view-data" element={<DataViewing />} />
+              <Route path="/user-management" element={<UserManagement />} />
+              <Route path="/production-reports" element={<ProductionReports />} />
+              <Route path="/account-transactions" element={<AccountTransactions />} />
+              <Route path="/register-admin&business" element={<BusinessAndAdmin />} />
+              <Route path="/edit-user/:id" element={<EditUserPage />} />
+            </Routes>
+          </Content>
+        </Layout>
+      </Layout>
+    </ConfigProvider>
+  )
+}
+
+export default function App() {
+  return (
+    <Router>
+      <GlobalContext>
+        <ResponsiveDrawer />
+      </GlobalContext>
+    </Router>
+  )
+}

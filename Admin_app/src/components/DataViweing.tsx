@@ -245,11 +245,15 @@ function DataViewing() {
 
   return (
     <ConfigProvider direction="rtl">
-      <div style={{ marginTop: "100vh" }}></div>
-
       <div className="business-data-container" style={{ maxWidth: 1400, margin: "0 auto" }}>
         <Card className="form-section">
-          <div style={{ textAlign: "center", marginBottom: 32 }}>
+          <div style={{
+            textAlign: "center", marginBottom: 32,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexDirection: "column"
+          }}>
             <Avatar
               size={80}
               style={{

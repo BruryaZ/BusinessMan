@@ -6,7 +6,8 @@ import { useNavigate } from "react-router-dom"
 import { validationSchemaUserLogin } from "../utils/validationSchema"
 import { globalContext } from "../context/GlobalContext"
 import { Form, Input, Button, Typography, Card, Alert, Space, Avatar, Divider, ConfigProvider } from "antd"
-import { MailOutlined, LockOutlined, UserOutlined, LoginOutlined, ExclamationCircleOutlined } from "@ant-design/icons"
+import { MailOutlined, LockOutlined, UserOutlined, LoginOutlined, ExclamationCircleOutlined, CrownOutlined } from "@ant-design/icons"
+import CenteredLayout from "./CenteredLayout"
 
 const { Title, Text, Link } = Typography
 
@@ -67,22 +68,38 @@ const UserLogin = () => {
     }
   }
 
-
   return (
     <ConfigProvider direction="rtl">
-      <div className="centered-layout">
-        <Card className="login-form" style={{ maxWidth: 500, width: "100%" }}>
-          <div style={{ textAlign: "center", marginBottom: 32 }}>
+      <CenteredLayout>
+        <Card
+          className="login-form"
+          style={{
+            maxWidth: 500,
+            width: "100%",
+            padding: 24,
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+            borderRadius: 12,
+            border: "none",
+          }}
+        >
+          <div style={{
+            textAlign: "center", 
+            marginBottom: 32,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexDirection: "column"
+          }}>
             <Avatar
               size={80}
               style={{
                 background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
                 marginBottom: 16,
-                boxShadow: "0 4px 14px rgba(102, 126, 234, 0.3)",
+                boxShadow: "0 4px 14px rgba(102, 126, 234, 0.4)",
               }}
-            >
-              <UserOutlined style={{ fontSize: 40 }} />
-            </Avatar>
+              icon={<CrownOutlined style={{ fontSize: 40 }} />}
+            />
+
 
             <Title level={2} style={{ marginBottom: 8, color: "#2d3748", textAlign: "center" }}>
               כניסת משתמש
@@ -194,7 +211,7 @@ const UserLogin = () => {
             )}
           </Form>
         </Card>
-      </div>
+      </CenteredLayout>
     </ConfigProvider>
   )
 }
