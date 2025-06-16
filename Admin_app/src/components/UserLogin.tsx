@@ -226,9 +226,8 @@ const UserLogin = () => {
   const [loading, setLoading] = useState(false)
   const url = import.meta.env.VITE_API_URL
   const globalContextDetails = useContext(globalContext)
-  
+
   const isMobile = useMediaQuery({ maxWidth: 768 })
-  const isTablet = useMediaQuery({ maxWidth: 1024, minWidth: 769 })
 
   const handleSubmit = async () => {
     setLoading(true)
@@ -278,7 +277,7 @@ const UserLogin = () => {
 
   return (
     <ConfigProvider direction="rtl">
-      <div 
+      <div
         className="centered-layout"
         style={{
           minHeight: "calc(100vh - 64px)",
@@ -286,17 +285,14 @@ const UserLogin = () => {
           alignItems: "center",
           justifyContent: "center",
           padding: isMobile ? "16px" : "24px",
-          background: "linear-gradient(135deg, #f7f9fc 0%, #eef2f7 100%)",
+          // background: "linear-gradient(135deg, #f7f9fc 0%, #eef2f7 100%)",
         }}
       >
-        <Card 
-          className="login-form" 
-          style={{ 
-            maxWidth: 500, 
+        <Card
+          className="login-form"
+          style={{
+            maxWidth: 500,
             width: "100%",
-            borderRadius: "20px",
-            boxShadow: "0 8px 32px rgba(0, 0, 0, 0.1)",
-            border: "1px solid #e8ecf0",
           }}
           bodyStyle={{
             padding: isMobile ? "24px" : "40px",
@@ -314,11 +310,11 @@ const UserLogin = () => {
               <UserOutlined style={{ fontSize: isMobile ? 28 : 40 }} />
             </Avatar>
 
-            <Title 
-              level={2} 
-              style={{ 
-                marginBottom: 8, 
-                color: "#2d3748", 
+            <Title
+              level={2}
+              style={{
+                marginBottom: 8,
+                color: "#2d3748",
                 textAlign: "center",
                 fontSize: isMobile ? "1.5rem" : "2rem",
               }}
@@ -326,9 +322,9 @@ const UserLogin = () => {
               כניסת משתמש
             </Title>
 
-            <Text 
-              type="secondary" 
-              style={{ 
+            <Text
+              type="secondary"
+              style={{
                 fontSize: isMobile ? 14 : 16,
                 display: "block",
               }}
@@ -349,7 +345,7 @@ const UserLogin = () => {
                 size={isMobile ? "middle" : "large"}
                 value={userLogin.email}
                 onChange={(e) => handleChange("email", e.target.value)}
-                style={{ 
+                style={{
                   borderRadius: 10,
                   height: isMobile ? "40px" : "48px",
                 }}
@@ -367,7 +363,7 @@ const UserLogin = () => {
                 size={isMobile ? "middle" : "large"}
                 value={userLogin.password}
                 onChange={(e) => handleChange("password", e.target.value)}
-                style={{ 
+                style={{
                   borderRadius: 10,
                   height: isMobile ? "40px" : "48px",
                 }}
@@ -417,9 +413,9 @@ const UserLogin = () => {
             <div style={{ textAlign: "center" }}>
               <Space>
                 <Text type="secondary" style={{ fontSize: isMobile ? 12 : 14 }}>מנהל?</Text>
-                <Link 
-                  href="/admin-login" 
-                  style={{ 
+                <Link
+                  href="/admin-login"
+                  style={{
                     fontWeight: 600,
                     fontSize: isMobile ? 12 : 14,
                   }}

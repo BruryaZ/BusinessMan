@@ -148,7 +148,7 @@
 //           <BuildOutlined />
 //         </Avatar>
 //         {!collapsed && (
-//           <Title level={4} className="logo-title" style={{ margin: "8px 0 0 0", color: "#667eea" }}>
+//           <Title level={4} className="logo-title" style={{ margin: "8px 0 0 0", color: blue }}>
 //             BusinessMan
 //           </Title>
 //         )}
@@ -193,7 +193,7 @@
 //       theme={{
 //         algorithm: antTheme.defaultAlgorithm,
 //         token: {
-//           colorPrimary: "#667eea",
+//           colorPrimary: blue,
 //           borderRadius: 10,
 //           fontFamily: '"Assistant", "Rubik", "Heebo", sans-serif',
 //         },
@@ -305,7 +305,7 @@
 
 //                 {isMobile && (
 //                   <MenuOutlined
-//                     style={{ fontSize: "20px", cursor: "pointer", color: "#667eea" }}
+//                     style={{ fontSize: "20px", cursor: "pointer", color: blue }}
 //                     onClick={handleDrawerToggle}
 //                   />
 //                 )}
@@ -401,7 +401,9 @@ import EditUserPage from "./components/EditUserPage"
 import BusinessFiles from "./components/BusinessFiles"
 import AccountTransactions from "./components/AccountTransactions"
 import DataViewing from "./components/DataViweing"
-import UserManagement from "./components/UserManagemet"
+import AdminRoute from "./components/AdminRoute"
+import RegisterBusinessData from "./components/RegisterBusinessData"
+import UserManagemet from "./components/UserManagemet"
 
 const { Header, Sider, Content } = Layout
 const { Title } = Typography
@@ -425,6 +427,12 @@ const navItems = [
   },
 ]
 
+// Global colors:
+export const orange = "#fa8c16"
+export const blue = "#1677ff"
+export const green = "#52c41a"
+export const purple = "#722ed1"
+
 function ResponsiveDrawer() {
   const [collapsed, setCollapsed] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -434,7 +442,6 @@ function ResponsiveDrawer() {
   const globalContextDetails = useContext(globalContext)
 
   const [pageTitle, setPageTitle] = useState("")
-  const [clientName, setClientName] = useState('אורח')
 
   // התאמה דינמית לגודל מסך
   useEffect(() => {
@@ -468,7 +475,6 @@ function ResponsiveDrawer() {
       setPageTitle(routeTitles[location.pathname] || "עמוד לא מזוהה")
     }
 
-    setClientName("שלום, " + globalContextDetails.user.firstName)
   }, [location.pathname, globalContextDetails.user.firstName])
 
   const handleDrawerToggle = () => {
@@ -520,7 +526,7 @@ function ResponsiveDrawer() {
           <BuildOutlined />
         </Avatar>
         {!collapsed && (
-          <Title level={4} className="logo-title" style={{ margin: "8px 0 0 0", color: "#667eea" }}>
+          <Title level={4} className="logo-title" style={{ margin: "8px 0 0 0", color: blue }}>
             BusinessMan
           </Title>
         )}
@@ -572,7 +578,7 @@ function ResponsiveDrawer() {
       theme={{
         algorithm: antTheme.defaultAlgorithm,
         token: {
-          colorPrimary: "#667eea",
+          colorPrimary: blue,
           borderRadius: 10,
           fontFamily: '"Assistant", "Rubik", "Heebo", sans-serif',
         },
@@ -588,7 +594,7 @@ function ResponsiveDrawer() {
             collapsedWidth={80}
             className="desktop-sider"
             style={{
-              background: "#fff",
+              background: "#ffffff",
               position: "fixed",
               height: "100vh",
               right: 0,
@@ -680,15 +686,12 @@ function ResponsiveDrawer() {
                   style={{
                     fontSize: "18px",
                     cursor: "pointer",
-                    color: "#667eea",
+                    color: blue,
                     marginLeft: "16px",
                   }}
                   onClick={() => setCollapsed(!collapsed)}
                 />
               )}
-
-
-              {/* פרטי המשתמש ותפריט מובייל */}
 
             </Space>
           </Header>
@@ -697,7 +700,7 @@ function ResponsiveDrawer() {
             style={{
               margin: 0,
               padding: isMobile ? "80px 16px 16px 16px" : "88px 24px 24px 24px",
-              background: "#fff",
+              background: "#ffffff",
               height: "100vh",
               direction: "rtl",
               // overflowY: "auto",
@@ -709,14 +712,58 @@ function ResponsiveDrawer() {
               <Route path="/register-user" element={<UserRegister />} />
               <Route path="/user-login" element={<UserLogin />} />
               <Route path="/admin-login" element={<AdminLogin />} />
-              <Route path="/business-files" element={<BusinessFiles />} />
               <Route path="/upload-file" element={<UploadFiles />} />
-              <Route path="/view-data" element={<DataViewing />} />
-              <Route path="/user-management" element={<UserManagement />} />
-              <Route path="/production-reports" element={<ProductionReports />} />
-              <Route path="/account-transactions" element={<AccountTransactions />} />
               <Route path="/register-admin&business" element={<BusinessAndAdmin />} />
               <Route path="/edit-user/:id" element={<EditUserPage />} />
+
+              <Route
+                path="/production-reports"
+                element={
+                  <AdminRoute>
+                    <ProductionReports />
+                  </AdminRoute>
+                }
+              />
+              <Route
+                path="/business-files"
+                element={
+                  <AdminRoute>
+                    <BusinessFiles />
+                  </AdminRoute>
+                }
+              />
+              <Route
+                path="/view-data"
+                element={
+                  <AdminRoute>
+                    <DataViewing />
+                  </AdminRoute>
+                }
+              />
+              <Route
+                path="/user-management"
+                element={
+                  <AdminRoute>
+                    <UserManagemet />
+                  </AdminRoute>
+                }
+              />
+              <Route
+                path="/business-register"
+                element={
+                  <AdminRoute>
+                    <RegisterBusinessData />
+                  </AdminRoute>
+                }
+              />
+              <Route
+                path="/account-transactions"
+                element={
+                  <AdminRoute>
+                    <AccountTransactions />
+                  </AdminRoute>
+                }
+              />
             </Routes>
           </Content>
         </Layout>

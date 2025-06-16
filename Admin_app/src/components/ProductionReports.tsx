@@ -276,7 +276,6 @@ const ProductionReports = () => {
           padding: "40px 20px",
           maxWidth: 1400,
           margin: "0 auto",
-          marginTop: "115vh",
         }}
       >
         <Card className="form-section">

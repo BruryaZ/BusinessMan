@@ -223,8 +223,6 @@ const UserManagement: React.FC = () => {
 
   return (
     <ConfigProvider direction="rtl">
-      <div style={{ marginTop: "50vh" }}></div>
-
       <div style={{ padding: "40px 20px", maxWidth: 1400, margin: "0 auto" }}>
         <Card className="form-section">
           <div style={{ textAlign: "center", marginBottom: 32 }}>
@@ -233,7 +231,6 @@ const UserManagement: React.FC = () => {
               style={{
                 background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
                 marginBottom: 16,
-                boxShadow: "0 4px 14px rgba(102, 126, 234, 0.3)",
               }}
             >
               <TeamOutlined style={{ fontSize: 40 }} />

@@ -28,14 +28,6 @@ body {
   min-height: 100vh;
 }
 
-:root {
-  background-color: #f7f5fa !important;
-}
-
-.ant-card-body {
-  /* position: absolute; */
-}
-
 a {
   text-decoration: none;
   color: inherit;
@@ -204,10 +196,6 @@ a {
   transition: all 0.2s ease;
 }
 
-.menu-toggle-btn:hover {
-  /* animation: subtlePulse 0.4s ease-in-out; */
-}
-
 .desktop-sider {
   animation: slideInRight 0.6s ease-out;
 }
@@ -358,19 +346,13 @@ header {
 
 /* Unified Card Styles */
 .ant-card {
-  border-radius: 16px !important;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08) !important;
-  transition: all 0.2s ease !important;
-  width: 100% !important;
-  direction: rtl !important;
-  animation: fadeInUp 0.5s ease-out both !important;
-  border: 1px solid rgba(0, 0, 0, 0.06) !important;
+  width: 100% ;
+  direction: rtl ;
+  border: none !important;
 }
 
-.ant-card:hover {
-  transform: translateY(-2px) !important;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12) !important;
-  /* animation: gentleFloat 2s ease-in-out infinite !important; */
+.ant-card{
+  border: "none" !important;
 }
 
 .ant-card-body {
@@ -529,7 +511,6 @@ header {
 
 /* Unified Component Styles */
 .hero-section {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   padding: 60px 24px;
   border-radius: 20px;
@@ -611,10 +592,6 @@ header {
   animation: gentleBounce 0.6s ease-out both;
 }
 
-.icon-wrapper:hover {
-  /* animation: subtlePulse 0.6s ease-in-out infinite; */
-}
-
 .testimonial-section {
   background: rgba(102, 126, 234, 0.03);
   border: 1px solid rgba(102, 126, 234, 0.1);
@@ -670,20 +647,16 @@ header {
   width: 100%;
   direction: rtl;
   animation: fadeInUp 0.5s ease-out both;
-  background: #fcfdfe;
+  /* background: #fcfdfe; */
 }
 
 .login-form {
   background: linear-gradient(145deg, #ffffff, #f8fafc);
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  border-radius: 20px;
   padding: 40px;
-  box-shadow: none !important;
   width: 100%;
   max-width: 500px;
   direction: rtl;
   text-align: right;
-  animation: gentleBounce 0.6s ease-out both;
 }
 
 @media (max-width: 768px) {
@@ -696,14 +669,10 @@ header {
 
 .form-section {
   background: white;
-  border-radius: 16px;
   padding: 32px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(0, 0, 0, 0.05);
   width: 100%;
   direction: rtl;
   text-align: right;
-  animation: fadeInUp 0.5s ease-out both;
 }
 
 @media (max-width: 768px) {
@@ -739,7 +708,6 @@ header {
 /* Table responsive */
 .ant-table-wrapper {
   width: 100% !important;
-  overflow-x: auto !important;
   direction: rtl !important;
   animation: fadeInUp 0.5s ease-out both !important;
 }
@@ -897,10 +865,6 @@ header {
 
 /* High contrast mode support */
 @media (prefers-contrast: high) {
-  .ant-card {
-    border: 2px solid #000 !important;
-  }
-
   .ant-btn-primary {
     background: #000 !important;
     color: #fff !important;
@@ -933,7 +897,6 @@ html, body {
 }
 
 .ant-layout-content {
-  overflow-y: auto !important;
   overflow-x: hidden !important;
   height: calc(100vh - 64px) !important;
   padding-top: 64px !important;
@@ -954,7 +917,7 @@ html, body {
   position: fixed !important;
   height: 100vh !important;
   z-index: 1001 !important;
-  overflow-y: auto !important;
+  /* overflow-y: auto !important; */
   overflow-x: hidden !important;
 }
 
@@ -969,13 +932,12 @@ html, body {
 
 /* Hero Section תיקונים */
 .hero-section {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-  padding: 60px 30px !important;
-  margin: -24px -24px 48px -24px !important;
-  border-radius: 0 0 20px 20px !important;
-  min-height: 400px !important;
-  display: flex !important;
-  align-items: center !important;
+  padding: 60px 30px ;
+  margin: -24px -24px 48px -24px ;
+  border-radius: 0 0 20px 20px ;
+  min-height: 400px ;
+  display: flex ;
+  align-items: center ;
 }
 
 /* Cards תיקונים */
@@ -1050,15 +1012,12 @@ html, body {
   align-items: center !important;
   justify-content: center !important;
   padding: 24px !important;
-  background: linear-gradient(135deg, #f7f9fc 0%, #eef2f7 100%) !important;
+  /* background: linear-gradient(135deg, #f7f9fc 0%, #eef2f7 100%) !important; */
 }
 
 .login-form {
   width: 100% !important;
   max-width: 500px !important;
-  border-radius: 20px !important;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
-  border: 1px solid #e8ecf0 !important;
 }
 
 .login-form .ant-card-body {
@@ -1212,17 +1171,10 @@ html, body {
   background: #a8a8a8;
 }
 
-/* תיקונים נוספים לאנימציות */
-.feature-card,
-.stats-card,
-.login-form {
-  will-change: transform !important;
-}
-
 /* תיקון עבור טקסטים ארוכים */
 .ant-typography {
   word-wrap: break-word !important;
-  overflow-wrap: break-word !important;
+  /* overflow-wrap: break-word !important; */
 }
 
 /* תיקון עבור כפתורים */

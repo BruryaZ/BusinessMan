@@ -8,8 +8,8 @@ import { MailOutlined, LockOutlined, CrownOutlined, LoginOutlined } from "@ant-d
 import type { Admin } from "../models/Admin"
 import { validationSchemaAdminLogin } from "../utils/validationSchema"
 import { globalContext } from "../context/GlobalContext"
-import CenteredLayout from "./CenteredLayout"
 import { BusinessDto } from "../models/BusinessDto"
+import { useMediaQuery } from "react-responsive"
 
 const { Title, Text, Link } = Typography
 
@@ -18,10 +18,10 @@ const AdminLogin = () => {
   const [admin, setAdmin] = useState<Admin>({ email: "", password: "" })
   const [errors, setErrors] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
-
   const url = import.meta.env.VITE_API_URL
   const validationSchema = validationSchemaAdminLogin
   const globalContextDetails = useContext(globalContext)
+  const isMobile = useMediaQuery({ maxWidth: 768 })
 
   const handleSubmit = async () => {
     setLoading(true)
@@ -67,33 +67,59 @@ const AdminLogin = () => {
 
   return (
     <ConfigProvider direction="rtl">
-      <CenteredLayout>
+      <div
+        className="centered-layout"
+        style={{
+          minHeight: "calc(100vh - 64px)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: isMobile ? "16px" : "24px",
+          // background: "linear-gradient(135deg, #f7f9fc 0%, #eef2f7 100%)",
+        }}
+      >
         <Card
           className="login-form"
           style={{
             maxWidth: 500,
             width: "100%",
-            padding: 24,
-            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-            borderRadius: 12,
-            border: "none",
+          }}
+          bodyStyle={{
+            padding: isMobile ? "24px" : "40px",
           }}
         >
-          <div style={{ textAlign: "center", marginBottom: 32 }}>
+          <div style={{ textAlign: "center", marginBottom: isMobile ? 24 : 32 }}>
             <Avatar
-              size={80}
+              size={isMobile ? 64 : 80}
               style={{
                 background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
                 marginBottom: 16,
-                boxShadow: "0 4px 14px rgba(102, 126, 234, 0.4)",
+                boxShadow: "0 4px 14px rgba(102, 126, 234, 0.3)",
               }}
-              icon={<CrownOutlined style={{ fontSize: 40 }} />}
-            />
+            >
+              <CrownOutlined style={{ fontSize: isMobile ? 28 : 40 }} />
+            </Avatar>
 
-            <Title level={2} style={{ margin: 0, color: "#2d3748", textAlign: "center", width: "100%" }}>
+            <Title
+              level={2}
+              style={{
+                marginBottom: 8,
+                color: "#2d3748",
+                textAlign: "center",
+                fontSize: isMobile ? "1.5rem" : "2rem",
+              }}
+            >
               כניסת מנהל
             </Title>
-            <Text type="secondary">ברוכים הבאים למערכת הניהול</Text>
+            <Text
+              type="secondary"
+              style={{
+                fontSize: isMobile ? 14 : 16,
+                display: "block",
+              }}
+            >
+              ברוכים הבאים למערכת ניהול העסק
+            </Text>
           </div>
 
           <Form layout="vertical" onFinish={handleSubmit}>
@@ -163,7 +189,7 @@ const AdminLogin = () => {
             )}
           </Form>
         </Card>
-      </CenteredLayout>
+      </div>
     </ConfigProvider>
   )
 }
