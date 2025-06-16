@@ -125,7 +125,7 @@ const AdminRoute = ({ children }: { children: JSX.Element }) => {
                   </Button>
                   <Button
                     size="large"
-                    onClick={() => navigate("/contact")}
+                    onClick={() => navigate("/concat-us")}
                     style={{
                       height: 48,
                       padding: "0 32px",
