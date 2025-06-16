@@ -1,7 +1,7 @@
 export interface UserDto {
     id: number,
-    firstName: string; // שם פרטי
-    lastName: string; // שם משפחה
+    firstName?: string; // שם פרטי
+    lastName?: string; // שם משפחה
     email: string; // אימייל
     phone: string; // מספר פלאפון
     role: number; // תפקיד עובד (admin / user) // 1 = admin, 2 = user, 3 = bookkeeper

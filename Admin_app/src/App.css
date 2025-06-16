@@ -346,12 +346,12 @@ header {
 
 /* Unified Card Styles */
 .ant-card {
-  width: 100% ;
-  direction: rtl ;
+  width: 100%;
+  direction: rtl;
   border: none !important;
 }
 
-.ant-card{
+.ant-card {
   border: "none" !important;
 }
 
@@ -877,17 +877,23 @@ header {
   box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
   height: 100%;
   margin: 0;
   padding: 0;
   font-family: "Assistant", "Rubik", "Heebo", sans-serif;
   direction: rtl;
+  scroll-behavior: auto;
+  overflow: visible;
+}
+
+html, body, #root {
+  scroll-behavior: auto;
 }
 
 #root {
   height: 100vh;
-  overflow: hidden;
 }
 
 /* Layout בסיסי */
@@ -932,12 +938,12 @@ html, body {
 
 /* Hero Section תיקונים */
 .hero-section {
-  padding: 60px 30px ;
-  margin: -24px -24px 48px -24px ;
-  border-radius: 0 0 20px 20px ;
-  min-height: 400px ;
-  display: flex ;
-  align-items: center ;
+  padding: 60px 30px;
+  margin: -24px -24px 48px -24px;
+  border-radius: 0 0 20px 20px;
+  min-height: 400px;
+  display: flex;
+  align-items: center;
 }
 
 /* Cards תיקונים */
@@ -1030,15 +1036,15 @@ html, body {
     padding: 40px 24px !important;
     min-height: 350px !important;
   }
-  
+
   .feature-card .ant-card-body {
     padding: 24px !important;
   }
-  
+
   .testimonial-section {
     padding: 32px !important;
   }
-  
+
   .login-form .ant-card-body {
     padding: 32px !important;
   }
@@ -1049,63 +1055,63 @@ html, body {
   .ant-layout-content {
     padding: 80px 16px 16px 16px !important;
   }
-  
+
   .hero-section {
     padding: 32px 16px !important;
     margin: -16px -16px 32px -16px !important;
     min-height: 300px !important;
     text-align: center !important;
   }
-  
+
   .hero-section h1 {
     font-size: 1.8rem !important;
   }
-  
+
   .hero-section h3 {
     font-size: 1.2rem !important;
   }
-  
+
   .feature-card .ant-card-body {
     padding: 20px !important;
   }
-  
+
   .stats-card {
     height: 160px !important;
   }
-  
+
   .stats-card .ant-card-body {
     padding: 16px !important;
   }
-  
+
   .icon-wrapper {
     width: 48px !important;
     height: 48px !important;
     font-size: 24px !important;
     margin-bottom: 16px !important;
   }
-  
+
   .testimonial-section {
     padding: 24px !important;
   }
-  
+
   .login-form {
     margin: 16px !important;
   }
-  
+
   .login-form .ant-card-body {
     padding: 24px !important;
   }
-  
+
   /* תיקון עבור מובייל - Header */
   .ant-layout-header {
     padding: 0 16px !important;
   }
-  
+
   /* תיקון עבור מובייל - Drawer */
   .mobile-drawer .ant-drawer-body {
     padding: 0 !important;
   }
-  
+
   /* תיקון עבור מובייל - Buttons */
   .ant-btn-lg {
     height: 44px !important;
@@ -1119,35 +1125,35 @@ html, body {
     padding: 24px 12px !important;
     min-height: 250px !important;
   }
-  
+
   .hero-section h1 {
     font-size: 1.5rem !important;
   }
-  
+
   .hero-section h3 {
     font-size: 1rem !important;
   }
-  
+
   .feature-card .ant-card-body {
     padding: 16px !important;
   }
-  
+
   .stats-card {
     height: 140px !important;
   }
-  
+
   .login-form {
     margin: 8px !important;
   }
-  
+
   .login-form .ant-card-body {
     padding: 20px !important;
   }
-  
+
   .ant-layout-content {
     padding: 72px 8px 8px 8px !important;
   }
-  
+
   .testimonial-section {
     padding: 20px !important;
   }
@@ -1185,8 +1191,8 @@ html, body {
 }
 
 /* תיקון עבור Ant Design RTL */
-.ant-layout-has-sider > .ant-layout,
-.ant-layout-has-sider > .ant-layout-content {
+.ant-layout-has-sider>.ant-layout,
+.ant-layout-has-sider>.ant-layout-content {
   overflow-x: hidden !important;
 }
 

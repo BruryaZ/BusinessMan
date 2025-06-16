@@ -102,8 +102,8 @@ const UserManagement: React.FC = () => {
     if (searchText) {
       filtered = filtered.filter(
         (user) =>
-          user.firstName.toLowerCase().includes(searchText.toLowerCase()) ||
-          user.lastName.toLowerCase().includes(searchText.toLowerCase()) ||
+          (user.firstName ?? "").toLowerCase().includes(searchText.toLowerCase()) ||
+          (user.lastName ?? "").toLowerCase().includes(searchText.toLowerCase()) ||
           user.email.toLowerCase().includes(searchText.toLowerCase()) ||
           user.idNumber.includes(searchText),
       )

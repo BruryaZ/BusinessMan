@@ -211,7 +211,7 @@ const UserRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => 
                   type="default"
                   size="large"
                   icon={<ArrowLeftOutlined />}
-                  onClick={() => nav("/user-login")}
+                  onClick={() => nav(-1)}
                   block
                   style={{
                     height: 48,
@@ -219,7 +219,7 @@ const UserRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => 
                     borderWidth: 2,
                   }}
                 >
-                  חזרה לכניסה
+                  חזרה 
                 </Button>
               </Col>
             </Row>

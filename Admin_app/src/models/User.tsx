@@ -3,8 +3,8 @@ import { Invoice } from "./Invoices";
 
 export interface User {
     id: number; // מזהה ייחודי
-    firstName: string; // שם פרטי
-    lastName: string; // שם משפחה
+    firstName?: string; // שם פרטי
+    lastName?: string; // שם משפחה
     email: string; // אימייל
     password: string; // סיסמה (מוצפנת)
     phone: string; // מספר פלאפון

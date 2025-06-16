@@ -13,8 +13,8 @@ namespace BusinessMan.Core.BasicModels
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; } // מזהה ייחודי
-        public string FirstName { get; set; } // שם פרטי
-        public string LastName { get; set; } // שם משפחה
+        public string? FirstName { get; set; } // שם פרטי
+        public string? LastName { get; set; } // שם משפחה
         public string Email { get; set; } // אימייל
         public string Password { get; set; } // סיסמה (מוצפנת)
         public string Phone { get; set; } // מספר פלאפון
