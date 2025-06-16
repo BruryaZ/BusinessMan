@@ -11,12 +11,16 @@ import {
   Tag,
   Space,
   Avatar,
-  Divider,
   Row,
   Col,
   Modal,
   message,
   Popconfirm,
+  Drawer,
+  Statistic,
+  Tooltip,
+  Input,
+  Select,
 } from "antd"
 import {
   UserOutlined,
@@ -28,33 +32,61 @@ import {
   MailOutlined,
   PhoneOutlined,
   DollarOutlined,
+  SearchOutlined,
+  EyeOutlined,
 } from "@ant-design/icons"
 import axios from "axios"
 import { useNavigate } from "react-router-dom"
 import type { ColumnsType } from "antd/es/table"
 import { globalContext } from "../context/GlobalContext"
-import { User } from "../models/User"
+import type { User } from "../models/User"
 
 const { Title, Text } = Typography
+const { Search } = Input
+const { Option } = Select
 const url = import.meta.env.VITE_API_URL
 
 const UserManagement: React.FC = () => {
   const [users, setUsers] = useState<User[]>([])
+  const [filteredUsers, setFilteredUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
   const [modalVisible, setModalVisible] = useState(false)
-  const globalContextDetails = useContext(globalContext)
+  const [drawerVisible, setDrawerVisible] = useState(false)
+  const [searchText, setSearchText] = useState("")
+  const [roleFilter, setRoleFilter] = useState<number | undefined>(undefined)
+  const [statusFilter, setStatusFilter] = useState<string | undefined>(undefined)
+  const [isMobile, setIsMobile] = useState(false)
 
+  const globalContextDetails = useContext(globalContext)
   const nav = useNavigate()
+
+  // Check if mobile
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+
+    checkMobile()
+    window.addEventListener("resize", checkMobile)
+    return () => window.removeEventListener("resize", checkMobile)
+  }, [])
 
   useEffect(() => {
     fetchUsers()
   }, [])
 
+  useEffect(() => {
+    filterUsers()
+  }, [users, searchText, roleFilter, statusFilter])
+
   const fetchUsers = async () => {
     try {
       setLoading(true)
-      const { data } = await axios.get<User[]>(`${url}/api/User/users-by-business/${globalContextDetails.business_global.id}`, { withCredentials: true })
+      const { data } = await axios.get<User[]>(
+        `${url}/api/User/users-by-business/${globalContextDetails.business_global.id}`,
+        { withCredentials: true },
+      )
       setUsers(data)
     } catch (err) {
       console.error("שגיאה בטעינת משתמשים:", err)
@@ -62,6 +94,30 @@ const UserManagement: React.FC = () => {
     } finally {
       setLoading(false)
     }
+  }
+
+  const filterUsers = () => {
+    let filtered = users
+
+    if (searchText) {
+      filtered = filtered.filter(
+        (user) =>
+          user.firstName.toLowerCase().includes(searchText.toLowerCase()) ||
+          user.lastName.toLowerCase().includes(searchText.toLowerCase()) ||
+          user.email.toLowerCase().includes(searchText.toLowerCase()) ||
+          user.idNumber.includes(searchText),
+      )
+    }
+
+    if (roleFilter !== undefined) {
+      filtered = filtered.filter((user) => user.role === roleFilter)
+    }
+
+    if (statusFilter) {
+      filtered = filtered.filter((user) => user.status === statusFilter)
+    }
+
+    setFilteredUsers(filtered)
   }
 
   const handleDelete = async (id: number) => {
@@ -84,34 +140,121 @@ const UserManagement: React.FC = () => {
 
   const handleViewDetails = (user: User) => {
     setSelectedUser(user)
-    setModalVisible(true)
+    if (isMobile) {
+      setDrawerVisible(true)
+    } else {
+      setModalVisible(true)
+    }
+  }
+
+  const getRoleInfo = (role: number) => {
+    switch (role) {
+      case 1:
+        return { color: "purple", icon: <CrownOutlined />, text: "מנהל", bg: "#722ed1" }
+      case 3:
+        return { color: "orange", icon: <DollarOutlined />, text: "מנהל חשבונות", bg: "#faad14" }
+      default:
+        return { color: "blue", icon: <UserOutlined />, text: "משתמש רגיל", bg: "#1890ff" }
+    }
+  }
+
+  const UserCard: React.FC<{ user: User }> = ({ user }) => {
+    const roleInfo = getRoleInfo(user.role)
+
+    return (
+      <Card
+        hoverable
+        style={{
+          borderRadius: 16,
+          marginBottom: 16,
+          boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+        }}
+        bodyStyle={{ padding: "16px" }}
+      >
+        <Row align="middle" gutter={[16, 16]}>
+          <Col flex="none">
+            <Avatar size={48} style={{ background: roleInfo.bg }}>
+              {roleInfo.icon}
+            </Avatar>
+          </Col>
+
+          <Col flex="auto">
+            <div>
+              <Title level={5} style={{ margin: 0, marginBottom: 4 }}>
+                {user.firstName} {user.lastName}
+              </Title>
+              <Space wrap size="small">
+                <Tag color={roleInfo.color}>
+                  {roleInfo.text}
+                </Tag>
+                <Text type="secondary" style={{ fontSize: 12 }}>
+                  ת.ז: {user.idNumber}
+                </Text>
+              </Space>
+              <div style={{ marginTop: 8 }}>
+                <Space direction="vertical" size={2}>
+                  <Space size="small">
+                    <MailOutlined style={{ color: "#1890ff", fontSize: 12 }} />
+                    <Text style={{ fontSize: 12 }}>{user.email}</Text>
+                  </Space>
+                  <Space size="small">
+                    <PhoneOutlined style={{ color: "#52c41a", fontSize: 12 }} />
+                    <Text style={{ fontSize: 12 }}>{user.phone}</Text>
+                  </Space>
+                </Space>
+              </div>
+            </div>
+          </Col>
+
+          <Col flex="none">
+            <Space direction="vertical" size="small">
+              <Button
+                type="text"
+                icon={<EyeOutlined />}
+                onClick={() => handleViewDetails(user)}
+                style={{ color: "#1890ff" }}
+                size="small"
+              >
+                צפה
+              </Button>
+              <Button
+                type="text"
+                icon={<EditOutlined />}
+                onClick={() => handleEdit(user.id)}
+                style={{ color: "#fa8c16" }}
+                size="small"
+              >
+                ערוך
+              </Button>
+              <Popconfirm
+                title="מחיקת משתמש"
+                description="האם אתה בטוח שברצונך למחוק את המשתמש?"
+                onConfirm={() => handleDelete(user.id)}
+                okText="כן"
+                cancelText="לא"
+                placement="topRight"
+              >
+                <Button type="text" icon={<DeleteOutlined />} danger size="small">
+                  מחק
+                </Button>
+              </Popconfirm>
+            </Space>
+          </Col>
+        </Row>
+      </Card>
+    )
   }
 
   const columns: ColumnsType<User> = [
     {
-      title: "ת.ז",
-      dataIndex: "idNumber",
-      key: "idNumber",
-      width: 80,
-      align: "center",
-    },
-    {
-      title: "שם מלא",
-      key: "fullName",
+      title: "משתמש",
+      key: "user",
       render: (_, record) => {
-        let avatarBg = "#1890ff"
-        let icon = <UserOutlined />
-        if (record.role === 1) {
-          avatarBg = "#722ed1"
-          icon = <CrownOutlined />
-        } else if (record.role === 3) {
-          avatarBg = "#faad14" // כתום זהוב למנהל חשבונות
-          icon = <DollarOutlined />
-        }
+        const roleInfo = getRoleInfo(record.role)
         return (
           <Space>
-            <Avatar size={32} style={{ background: avatarBg }}>
-              {icon}
+            <Avatar size={40} style={{ background: roleInfo.bg }}>
+              {roleInfo.icon}
             </Avatar>
             <div>
               <div style={{ fontWeight: 600 }}>
@@ -128,6 +271,7 @@ const UserManagement: React.FC = () => {
     {
       title: "פרטי קשר",
       key: "contact",
+      responsive: ["md"],
       render: (_, record) => (
         <Space direction="vertical" size="small">
           <Space size="small">
@@ -147,25 +291,12 @@ const UserManagement: React.FC = () => {
       key: "role",
       align: "center",
       render: (role: number) => {
-        if (role === 1)
-          return (
-            <Tag color="purple" icon={<CrownOutlined />}>
-              מנהל
-            </Tag>
-          )
-        if (role === 2)
-          return (
-            <Tag color="blue" icon={<UserOutlined />}>
-              משתמש רגיל
-            </Tag>
-          )
-        if (role === 3)
-          return (
-            <Tag color="orange" icon={<DollarOutlined />}>
-              מנהל חשבונות
-            </Tag>
-          )
-        return <Tag>לא ידוע</Tag>
+        const roleInfo = getRoleInfo(role)
+        return (
+          <Tag color={roleInfo.color} icon={roleInfo.icon}>
+            {roleInfo.text}
+          </Tag>
+        )
       },
     },
     {
@@ -173,6 +304,7 @@ const UserManagement: React.FC = () => {
       dataIndex: "status",
       key: "status",
       align: "center",
+      responsive: ["lg"],
       render: (status: string) => (
         <Tag color={status === "active" ? "success" : "default"}>{status === "active" ? "פעיל" : "לא פעיל"}</Tag>
       ),
@@ -181,30 +313,34 @@ const UserManagement: React.FC = () => {
       title: "כניסה אחרונה",
       dataIndex: "lastLogin",
       key: "lastLogin",
+      responsive: ["xl"],
       render: (date: Date) => <Text type="secondary">{new Date(date).toLocaleDateString("he-IL")}</Text>,
     },
     {
       title: "פעולות",
       key: "actions",
       align: "center",
+      width: 120,
       render: (_, record) => (
-        <Space>
-          <Button
-            type="text"
-            icon={<UserOutlined />}
-            onClick={() => handleViewDetails(record)}
-            style={{ color: "#1890ff" }}
-          >
-            צפה
-          </Button>
-          <Button
-            type="text"
-            icon={<EditOutlined />}
-            onClick={() => handleEdit(record.id)}
-            style={{ color: "#fa8c16" }}
-          >
-            ערוך
-          </Button>
+        <Space size="small">
+          <Tooltip title="צפה בפרטים">
+            <Button
+              type="text"
+              icon={<EyeOutlined />}
+              onClick={() => handleViewDetails(record)}
+              style={{ color: "#1890ff" }}
+              size="small"
+            />
+          </Tooltip>
+          <Tooltip title="ערוך">
+            <Button
+              type="text"
+              icon={<EditOutlined />}
+              onClick={() => handleEdit(record.id)}
+              style={{ color: "#fa8c16" }}
+              size="small"
+            />
+          </Tooltip>
           <Popconfirm
             title="מחיקת משתמש"
             description="האם אתה בטוח שברצונך למחוק את המשתמש?"
@@ -212,73 +348,270 @@ const UserManagement: React.FC = () => {
             okText="כן"
             cancelText="לא"
           >
-            <Button type="text" icon={<DeleteOutlined />} danger>
-              מחק
-            </Button>
+            <Tooltip title="מחק">
+              <Button type="text" icon={<DeleteOutlined />} danger size="small" />
+            </Tooltip>
           </Popconfirm>
         </Space>
       ),
     },
   ]
 
-  return (
-    <ConfigProvider direction="rtl">
-      <div style={{ padding: "40px 20px", maxWidth: 1400, margin: "0 auto" }}>
-        <Card className="form-section">
-          <div style={{ textAlign: "center", marginBottom: 32 }}>
+  const UserDetailsContent = () => (
+    <div style={{ padding: isMobile ? "8px 0" : "16px 0" }}>
+      <Row gutter={[16, 16]}>
+        <Col span={24}>
+          <div style={{ textAlign: "center", marginBottom: 24 }}>
             <Avatar
-              size={80}
+              size={isMobile ? 56 : 64}
               style={{
-                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                marginBottom: 16,
+                background: selectedUser ? getRoleInfo(selectedUser.role).bg : "#1890ff",
+                marginBottom: 8,
               }}
             >
-              <TeamOutlined style={{ fontSize: 40 }} />
+              {selectedUser ? getRoleInfo(selectedUser.role).icon : <UserOutlined />}
             </Avatar>
-
-            <Title level={2} style={{ marginBottom: 8, color: "#2d3748", textAlign: "center" }}>
-              ניהול משתמשים
-            </Title>
-
-            <Text type="secondary" style={{ fontSize: 16 }}>
-              צפה, הוסף, ערוך או מחק משתמשים במערכת
-            </Text>
-
-            <Divider />
+            <div>
+              <Title level={4} style={{ margin: 0 }}>
+                {selectedUser?.firstName} {selectedUser?.lastName}
+              </Title>
+              <Tag color={selectedUser ? getRoleInfo(selectedUser.role).color : "blue"} style={{ marginTop: 8 }}>
+                {selectedUser ? getRoleInfo(selectedUser.role).text : ""}
+              </Tag>
+            </div>
           </div>
+        </Col>
 
-          <Row justify="space-between" align="middle" style={{ marginBottom: 24 }}>
-            <Col>
-              <Space>
-                <Text strong style={{ fontSize: 16 }}>
-                  סה״כ משתמשים: {users.length}
-                </Text>
-                <Tag color="purple">מנהלים: {users.filter((u) => u.role === 1).length}</Tag>
-                <Tag color="blue">משתמשים: {users.filter((u) => u.role === 2).length}</Tag>
-                <Tag color="orange">מנהלי חשבונות: {users.filter((u) => u.role === 3).length}</Tag>
+        <Col xs={24} sm={12}>
+          <Space direction="vertical" size="small" style={{ width: "100%" }}>
+            <Text strong>אימייל:</Text>
+            <Text copyable>{selectedUser?.email}</Text>
+          </Space>
+        </Col>
+
+        <Col xs={24} sm={12}>
+          <Space direction="vertical" size="small" style={{ width: "100%" }}>
+            <Text strong>טלפון:</Text>
+            <Text copyable>{selectedUser?.phone}</Text>
+          </Space>
+        </Col>
+
+        <Col xs={24} sm={12}>
+          <Space direction="vertical" size="small" style={{ width: "100%" }}>
+            <Text strong>תעודת זהות:</Text>
+            <Text>{selectedUser?.idNumber}</Text>
+          </Space>
+        </Col>
+
+        <Col xs={24} sm={12}>
+          <Space direction="vertical" size="small" style={{ width: "100%" }}>
+            <Text strong>סטטוס:</Text>
+            <Tag color={selectedUser?.status === "active" ? "success" : "default"}>
+              {selectedUser?.status === "active" ? "פעיל" : "לא פעיל"}
+            </Tag>
+          </Space>
+        </Col>
+
+        <Col xs={24} sm={12}>
+          <Space direction="vertical" size="small" style={{ width: "100%" }}>
+            <Text strong>כניסה אחרונה:</Text>
+            <Text>
+              {selectedUser?.lastLogin ? new Date(selectedUser.lastLogin).toLocaleDateString("he-IL") : "לא ידוע"}
+            </Text>
+          </Space>
+        </Col>
+
+        <Col xs={24} sm={12}>
+          <Space direction="vertical" size="small" style={{ width: "100%" }}>
+            <Text strong>תאריך הצטרפות:</Text>
+            <Text>
+              {selectedUser?.createdAt ? new Date(selectedUser.createdAt).toLocaleDateString("he-IL") : "לא ידוע"}
+            </Text>
+          </Space>
+        </Col>
+      </Row>
+    </div>
+  )
+
+  return (
+    <ConfigProvider direction="rtl">
+      <div
+        style={{
+          padding: isMobile ? "16px" : "40px 20px",
+          maxWidth: 1400,
+          margin: "0 auto",
+          minHeight: "100vh",
+          background: "#f5f5f5",
+        }}
+      >
+        {/* Header Card */}
+        <Card
+          style={{
+            marginBottom: 24,
+            borderRadius: 16,
+            boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+          }}
+        >
+          <Row align="middle" gutter={[16, 16]}>
+            <Col xs={24} md={16}>
+              <Space direction={isMobile ? "vertical" : "horizontal"} size="middle">
+                <Avatar
+                  size={isMobile ? 56 : 64}
+                  style={{
+                    background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                  }}
+                >
+                  <TeamOutlined style={{ fontSize: isMobile ? 28 : 32 }} />
+                </Avatar>
+                <div style={{ textAlign: isMobile ? "center" : "right" }}>
+                  <Title level={isMobile ? 3 : 2} style={{ margin: 0, color: "#2d3748" }}>
+                    ניהול משתמשים
+                  </Title>
+                  <Text type="secondary" style={{ fontSize: isMobile ? 14 : 16 }}>
+                    צפה, הוסף, ערוך או מחק משתמשים במערכת
+                  </Text>
+                </div>
               </Space>
             </Col>
-            <Col>
+
+            <Col xs={24} md={8} style={{ textAlign: isMobile ? "center" : "left" }}>
               <Button
                 type="primary"
                 icon={<PlusOutlined />}
-                size="large"
+                size={isMobile ? "middle" : "large"}
                 onClick={() => nav("/register-user")}
                 style={{
-                  height: 48,
-                  padding: "0 24px",
+                  height: isMobile ? 40 : 48,
+                  padding: isMobile ? "0 16px" : "0 24px",
                   fontWeight: 600,
+                  borderRadius: 8,
                 }}
+                block={isMobile}
               >
                 הוסף משתמש חדש
               </Button>
             </Col>
           </Row>
+        </Card>
 
-          <Card style={{ borderRadius: 12, overflow: "hidden" }}>
+        {/* Statistics Cards */}
+        <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
+          <Col xs={12} sm={6}>
+            <Card style={{ borderRadius: 12, textAlign: "center" }}>
+              <Statistic
+                title="סה״כ משתמשים"
+                value={users.length}
+                valueStyle={{ color: "#1890ff", fontSize: isMobile ? 20 : 24 }}
+                prefix={<TeamOutlined />}
+              />
+            </Card>
+          </Col>
+
+          <Col xs={12} sm={6}>
+            <Card style={{ borderRadius: 12, textAlign: "center" }}>
+              <Statistic
+                title="מנהלים"
+                value={users.filter((u) => u.role === 1).length}
+                valueStyle={{ color: "#722ed1", fontSize: isMobile ? 20 : 24 }}
+                prefix={<CrownOutlined />}
+              />
+            </Card>
+          </Col>
+
+          <Col xs={12} sm={6}>
+            <Card style={{ borderRadius: 12, textAlign: "center" }}>
+              <Statistic
+                title="משתמשים רגילים"
+                value={users.filter((u) => u.role === 2).length}
+                valueStyle={{ color: "#1890ff", fontSize: isMobile ? 20 : 24 }}
+                prefix={<UserOutlined />}
+              />
+            </Card>
+          </Col>
+
+          <Col xs={12} sm={6}>
+            <Card style={{ borderRadius: 12, textAlign: "center" }}>
+              <Statistic
+                title="מנהלי חשבונות"
+                value={users.filter((u) => u.role === 3).length}
+                valueStyle={{ color: "#faad14", fontSize: isMobile ? 20 : 24 }}
+                prefix={<DollarOutlined />}
+              />
+            </Card>
+          </Col>
+        </Row>
+
+        {/* Filters */}
+        <Card style={{ marginBottom: 24, borderRadius: 12 }}>
+          <Row gutter={[16, 16]} align="middle">
+            <Col xs={24} sm={12} md={8}>
+              <Search
+                placeholder="חפש לפי שם, אימייל או ת.ז"
+                allowClear
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+                style={{ width: "100%" }}
+                prefix={<SearchOutlined />}
+              />
+            </Col>
+
+            <Col xs={12} sm={6} md={4}>
+              <Select
+                placeholder="תפקיד"
+                allowClear
+                value={roleFilter}
+                onChange={setRoleFilter}
+                style={{ width: "100%" }}
+              >
+                <Option value={1}>מנהל</Option>
+                <Option value={2}>משתמש רגיל</Option>
+                <Option value={3}>מנהל חשבונות</Option>
+              </Select>
+            </Col>
+
+            <Col xs={12} sm={6} md={4}>
+              <Select
+                placeholder="סטטוס"
+                allowClear
+                value={statusFilter}
+                onChange={setStatusFilter}
+                style={{ width: "100%" }}
+              >
+                <Option value="active">פעיל</Option>
+                <Option value="inactive">לא פעיל</Option>
+              </Select>
+            </Col>
+
+            <Col xs={24} md={8}>
+              <Text type="secondary">
+                מציג {filteredUsers.length} מתוך {users.length} משתמשים
+              </Text>
+            </Col>
+          </Row>
+        </Card>
+
+        {/* Users Display */}
+        <Card style={{ borderRadius: 12, overflow: "hidden" }}>
+          {isMobile ? (
+            // Mobile Card View
+            <div>
+              {loading ? (
+                <div style={{ textAlign: "center", padding: "40px 0" }}>
+                  <Text>טוען משתמשים...</Text>
+                </div>
+              ) : filteredUsers.length === 0 ? (
+                <div style={{ textAlign: "center", padding: "40px 0" }}>
+                  <Text type="secondary">לא נמצאו משתמשים</Text>
+                </div>
+              ) : (
+                filteredUsers.map((user) => <UserCard key={user.id} user={user} />)
+              )}
+            </div>
+          ) : (
+            // Desktop Table View
             <Table
               columns={columns}
-              dataSource={users}
+              dataSource={filteredUsers}
               rowKey="id"
               loading={loading}
               pagination={{
@@ -286,132 +619,79 @@ const UserManagement: React.FC = () => {
                 showSizeChanger: true,
                 showQuickJumper: true,
                 showTotal: (total, range) => `${range[0]}-${range[1]} מתוך ${total} משתמשים`,
+                responsive: true,
               }}
               scroll={{ x: 800 }}
               style={{ direction: "rtl" }}
             />
-          </Card>
+          )}
+        </Card>
 
-          <Modal
-            title={
-              <Space>
-                <UserOutlined />
-                <span>פרטי משתמש</span>
-              </Space>
-            }
-            open={modalVisible}
-            onCancel={() => setModalVisible(false)}
-            footer={[
-              <Button key="close" onClick={() => setModalVisible(false)}>
-                סגור
-              </Button>,
+        {/* Desktop Modal */}
+        <Modal
+          title={
+            <Space>
+              <UserOutlined />
+              <span>פרטי משתמש</span>
+            </Space>
+          }
+          open={modalVisible && !isMobile}
+          onCancel={() => setModalVisible(false)}
+          footer={[
+            <Button key="close" onClick={() => setModalVisible(false)}>
+              סגור
+            </Button>,
+            <Button
+              key="edit"
+              type="primary"
+              icon={<EditOutlined />}
+              onClick={() => {
+                if (selectedUser) {
+                  handleEdit(selectedUser.id)
+                  setModalVisible(false)
+                }
+              }}
+            >
+              ערוך משתמש
+            </Button>,
+          ]}
+          width={600}
+        >
+          <UserDetailsContent />
+        </Modal>
+
+        {/* Mobile Drawer */}
+        <Drawer
+          title={
+            <Space>
+              <UserOutlined />
+              <span>פרטי משתמש</span>
+            </Space>
+          }
+          placement="bottom"
+          height="80%"
+          open={drawerVisible && isMobile}
+          onClose={() => setDrawerVisible(false)}
+          extra={
+            <Space>
               <Button
-                key="edit"
                 type="primary"
                 icon={<EditOutlined />}
                 onClick={() => {
                   if (selectedUser) {
                     handleEdit(selectedUser.id)
-                    setModalVisible(false)
+                    setDrawerVisible(false)
                   }
                 }}
+                size="small"
               >
-                ערוך משתמש
-              </Button>,
-            ]}
-            width={600}
-          >
-            {selectedUser && (
-              <div style={{ padding: "16px 0" }}>
-                <Row gutter={[16, 16]}>
-                  <Col span={24}>
-                    <div style={{ textAlign: "center", marginBottom: 24 }}>
-                      <Avatar
-                        size={64}
-                        style={{
-                          background:
-                            selectedUser.role === 1
-                              ? "#722ed1"
-                              : selectedUser.role === 3
-                              ? "#faad14"
-                              : "#1890ff",
-                          marginBottom: 8,
-                        }}
-                      >
-                        {selectedUser.role === 1 ? (
-                          <CrownOutlined />
-                        ) : selectedUser.role === 3 ? (
-                          <DollarOutlined />
-                        ) : (
-                          <UserOutlined />
-                        )}
-                      </Avatar>
-                      <div>
-                        <Title level={4} style={{ margin: 0 }}>
-                          {selectedUser.firstName} {selectedUser.lastName}
-                        </Title>
-                        <Tag
-                          color={
-                            selectedUser.role === 1
-                              ? "purple"
-                              : selectedUser.role === 3
-                              ? "orange"
-                              : "blue"
-                          }
-                          style={{ marginTop: 8 }}
-                        >
-                          {selectedUser.role === 1
-                            ? "מנהל"
-                            : selectedUser.role === 3
-                            ? "מנהל חשבונות"
-                            : "משתמש רגיל"}
-                        </Tag>
-                      </div>
-                    </div>
-                  </Col>
-                  <Col span={12}>
-                    <Space direction="vertical" size="small">
-                      <Text strong>אימייל:</Text>
-                      <Text>{selectedUser.email}</Text>
-                    </Space>
-                  </Col>
-                  <Col span={12}>
-                    <Space direction="vertical" size="small">
-                      <Text strong>טלפון:</Text>
-                      <Text>{selectedUser.phone}</Text>
-                    </Space>
-                  </Col>
-                  <Col span={12}>
-                    <Space direction="vertical" size="small">
-                      <Text strong>תעודת זהות:</Text>
-                      <Text>{selectedUser.idNumber}</Text>
-                    </Space>
-                  </Col>
-                  <Col span={12}>
-                    <Space direction="vertical" size="small">
-                      <Text strong>סטטוס:</Text>
-                      <Tag color={selectedUser.status === "active" ? "success" : "default"}>
-                        {selectedUser.status === "active" ? "פעיל" : "לא פעיל"}
-                      </Tag>
-                    </Space>
-                  </Col>
-                  <Col span={12}>
-                    <Space direction="vertical" size="small">
-                      <Text strong>כניסה אחרונה:</Text>
-                      <Text>{new Date(selectedUser.lastLogin).toLocaleDateString("he-IL")}</Text>
-                    </Space>
-                  </Col>
-                  <Col span={12}>
-                    <Space direction="vertical" size="small">
-                      <Text strong>תאריך הצטרפות:</Text>
-                      <Text>{new Date(selectedUser.createdAt).toLocaleDateString("he-IL")}</Text>
-                    </Space>
-                  </Col>
-                </Row>
-              </div>
-            )}
-          </Modal>
-        </Card>
+                ערוך
+              </Button>
+            </Space>
+          }
+        >
+          <UserDetailsContent />
+        </Drawer>
       </div>
     </ConfigProvider>
   )

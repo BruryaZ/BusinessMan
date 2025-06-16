@@ -404,6 +404,9 @@ import DataViewing from "./components/DataViweing"
 import AdminRoute from "./components/AdminRoute"
 import RegisterBusinessData from "./components/RegisterBusinessData"
 import UserManagemet from "./components/UserManagemet"
+import ContactUs from "./components/ContactUs"
+import TermsOfService from "./components/TermsOfService"
+import PrivacyPolicy from "./components/PrivacyPolicy"
 
 const { Header, Sider, Content } = Layout
 const { Title } = Typography
@@ -418,7 +421,7 @@ const navItems = [
   { key: "/view-data", label: "צפייה בנתונים", icon: <EyeOutlined />, path: "/view-data" },
   { key: "/user-management", label: "משתמשים", icon: <TeamOutlined />, path: "/user-management" },
   { key: "/production-reports", label: 'דו"ח ייצור', icon: <BarChartOutlined />, path: "/production-reports" },
-  { key: "/account-transactions", label: "הוספת תנועה בחשבון", icon: <DollarOutlined />, path: "/account-transactions" },
+  { key: "/account-transactions", label: "תנועות בחשבון", icon: <DollarOutlined />, path: "/account-transactions" },
   {
     key: "/register-admin&business",
     label: "רישום עסק ומנהל חדש",
@@ -467,6 +470,9 @@ function ResponsiveDrawer() {
       "/production-reports": 'דו"ח ייצור',
       "/account-transactions": "תנועות חשבון",
       "/register-admin&business": "רישום עסק ומנהל",
+      "/concat-us": "צור קשר",
+      "/private-policy": "פרטיות",
+      "/term-of-service":"תנאי שימוש"
     }
 
     if (location.pathname.startsWith("/edit-user/")) {
@@ -715,6 +721,9 @@ function ResponsiveDrawer() {
               <Route path="/upload-file" element={<UploadFiles />} />
               <Route path="/register-admin&business" element={<BusinessAndAdmin />} />
               <Route path="/edit-user/:id" element={<EditUserPage />} />
+              <Route path="/concat-us" element={<ContactUs />} />
+              <Route path="/term-of-service" element={<TermsOfService/>}/>
+              <Route path="/private-policy" element={<PrivacyPolicy/>}/>
 
               <Route
                 path="/production-reports"

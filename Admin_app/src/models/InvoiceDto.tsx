@@ -2,6 +2,7 @@ import { InvoiceType } from "./Invoices";
 
 export interface InvoiceDto {
     id: number;                // מזהה ייחודי
+    amount: number;           // סכום כולל
     amountDebit: number;      // סכום חובה
     amountCredit: number;     // סכום זכות
     invoiceDate: Date;        // תאריך החשבונית

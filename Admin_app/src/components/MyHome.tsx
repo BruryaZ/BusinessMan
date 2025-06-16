@@ -28,6 +28,7 @@ const { Title, Text, Paragraph } = Typography
 
 const MyHome = () => {
   const globalContextDetails = useContext(globalContext)
+  const nav = useNavigate()
   const [incomes, setIcomes] = useState<number>(0)
   const [incomesPrecent, setIcomesPrecent] = useState<number>(0)
   const [expenses, setExpenses] = useState<number>(0)
@@ -770,13 +771,13 @@ const MyHome = () => {
                 </Col>
                 <Col xs={24} sm={12}>
                   <Space style={{ width: "100%", justifyContent: isMobile ? "center" : "flex-end" }}>
-                    <Button type="text" size="large" style={{ fontSize: 16 }}>
+                    <Button onClick={() => {nav("/term-of-service")}} type="text" size="large" style={{ fontSize: 16 }}>
                       תנאי שימוש
                     </Button>
-                    <Button type="text" size="large" style={{ fontSize: 16 }}>
+                    <Button onClick={() => {nav("/private-policy")}} type="text" size="large" style={{ fontSize: 16 }}>
                       פרטיות
                     </Button>
-                    <Button type="text" size="large" style={{ fontSize: 16 }}>
+                    <Button onClick={() => {nav('/concat-us')}} type="text" size="large" style={{ fontSize: 16 }}>
                       צור קשר
                     </Button>
                   </Space>
