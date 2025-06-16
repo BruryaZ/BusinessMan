@@ -249,26 +249,26 @@ const ProductionReports = () => {
   const handleDownload = () => {
     const input = document.getElementById("report-to-print");
     if (!input) return;
-
+  
     // הוספת פילטר שמגדיל קונטרסט
     input.style.filter = "contrast(1.3) brightness(0.9)";
-
+  
     setTimeout(() => {
       html2canvas(input, { scale: 2 }).then((canvas) => {
         const imgData = canvas.toDataURL("image/png");
         const pdf = new jsPDF("p", "mm", "a4");
         const pdfWidth = pdf.internal.pageSize.getWidth();
         const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-
+  
         pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
         pdf.save(`דוח_ייצור_${new Date().toLocaleDateString("he-IL")}.pdf`);
-
+  
         // הסרת הפילטר אחרי הצילום
         input.style.filter = "";
       });
     }, 300);
   };
-
+  
   return (
     <ConfigProvider direction="rtl">
       <div
@@ -276,15 +276,11 @@ const ProductionReports = () => {
           padding: "40px 20px",
           maxWidth: 1400,
           margin: "0 auto",
+          marginTop: "115vh",
         }}
       >
         <Card className="form-section">
-          <div style={{
-            textAlign: "center", marginBottom: 32, display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            flexDirection: "column"
-          }}>
+          <div style={{ textAlign: "center", marginBottom: 32 }}>
             <Avatar
               size={80}
               style={{

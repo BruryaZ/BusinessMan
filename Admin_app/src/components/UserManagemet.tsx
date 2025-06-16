@@ -223,16 +223,11 @@ const UserManagement: React.FC = () => {
 
   return (
     <ConfigProvider direction="rtl">
-      <div style={{
-        padding: "40px 20px", maxWidth: 1400, margin: "0 auto",
-      }}>
+      <div style={{ marginTop: "50vh" }}></div>
+
+      <div style={{ padding: "40px 20px", maxWidth: 1400, margin: "0 auto" }}>
         <Card className="form-section">
-          <div style={{
-            textAlign: "center", marginBottom: 32, display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            flexDirection: "column"
-          }}>
+          <div style={{ textAlign: "center", marginBottom: 32 }}>
             <Avatar
               size={80}
               style={{
@@ -341,8 +336,8 @@ const UserManagement: React.FC = () => {
                             selectedUser.role === 1
                               ? "#722ed1"
                               : selectedUser.role === 3
-                                ? "#faad14"
-                                : "#1890ff",
+                              ? "#faad14"
+                              : "#1890ff",
                           marginBottom: 8,
                         }}
                       >
@@ -363,16 +358,16 @@ const UserManagement: React.FC = () => {
                             selectedUser.role === 1
                               ? "purple"
                               : selectedUser.role === 3
-                                ? "orange"
-                                : "blue"
+                              ? "orange"
+                              : "blue"
                           }
                           style={{ marginTop: 8 }}
                         >
                           {selectedUser.role === 1
                             ? "מנהל"
                             : selectedUser.role === 3
-                              ? "מנהל חשבונות"
-                              : "משתמש רגיל"}
+                            ? "מנהל חשבונות"
+                            : "משתמש רגיל"}
                         </Tag>
                       </div>
                     </div>
