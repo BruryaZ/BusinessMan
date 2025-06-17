@@ -41,8 +41,6 @@ const AdminLogin = () => {
         const response = await axios.post(`${url}/Auth/admin-login`, admin, { withCredentials: true })
         data = response.data
         globalContextDetails.setUser(data.user)
-        console.log("User after set-user !!!!!!!!!!!!!!: ", globalContextDetails.user);
-
         globalContextDetails.setIsAdmin(true)
       } catch (e) {
         if (axios.isAxiosError(e) && e.response?.status === 400) {
@@ -65,6 +63,7 @@ const AdminLogin = () => {
     } catch (e) {
       setErrors([e instanceof Error ? e.message : "שגיאה לא צפויה, נא לנסות שוב מאוחר יותר"])
     } finally {
+      console.log("User after set-user !!!!!!!!!!!!!!: ", globalContextDetails.user);
       setLoading(false)
     }
   }
