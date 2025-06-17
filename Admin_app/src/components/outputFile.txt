@@ -2,16 +2,7 @@
 
 import { useState, useEffect, useContext } from "react"
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from "react-router-dom"
-import {
-  Layout,
-  Menu,
-  Typography,
-  Avatar,
-  Space,
-  Drawer,
-  ConfigProvider,
-  theme as antTheme,
-} from "antd"
+import { Layout, Menu, Typography, Avatar, Space, Drawer, ConfigProvider, theme as antTheme, Button } from "antd"
 import {
   MenuOutlined,
   UserAddOutlined,
@@ -25,6 +16,7 @@ import {
   TeamOutlined,
   UploadOutlined,
   CloudDownloadOutlined,
+  CloseOutlined,
 } from "@ant-design/icons"
 import { useMediaQuery } from "react-responsive"
 import "./App.css"
@@ -81,22 +73,27 @@ function ResponsiveDrawer() {
   const [collapsed, setCollapsed] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const location = useLocation()
-  const isMobile = useMediaQuery({ maxWidth: 768 })
-  const isTablet = useMediaQuery({ maxWidth: 1024, minWidth: 769 })
-  const globalContextDetails = useContext(globalContext)
 
+  // רספונסיביות מתקדמת
+  const isMobile = useMediaQuery({ maxWidth: 767 })
+  const isTablet = useMediaQuery({ minWidth: 768, maxWidth: 1023 })
+  const isDesktop = useMediaQuery({ minWidth: 1024 })
+  const isSmallMobile = useMediaQuery({ maxWidth: 479 })
+  const isLargeMobile = useMediaQuery({ minWidth: 480, maxWidth: 767 })
+
+  const globalContextDetails = useContext(globalContext)
   const [pageTitle, setPageTitle] = useState("")
 
-  // התאמה דינמית לגודל מסך
+  // התאמה דינמית לגודל מסך עם עדיפויות ברורות
   useEffect(() => {
     if (isMobile) {
       setCollapsed(true)
     } else if (isTablet) {
-      setCollapsed(true)
-    } else {
+      setCollapsed(false)
+    } else if (isDesktop) {
       setCollapsed(false)
     }
-  }, [isMobile, isTablet])
+  }, [isMobile, isTablet, isDesktop])
 
   useEffect(() => {
     const routeTitles: { [key: string]: string } = {
@@ -113,7 +110,7 @@ function ResponsiveDrawer() {
       "/register-admin&business": "רישום עסק ומנהל",
       "/concat-us": "צור קשר",
       "/private-policy": "פרטיות",
-      "/term-of-service": "תנאי שימוש"
+      "/term-of-service": "תנאי שימוש",
     }
 
     if (location.pathname.startsWith("/edit-user/")) {
@@ -121,7 +118,6 @@ function ResponsiveDrawer() {
     } else {
       setPageTitle(routeTitles[location.pathname] || "עמוד לא מזוהה")
     }
-
   }, [location.pathname, globalContextDetails.user.firstName])
 
   const handleDrawerToggle = () => {
@@ -138,6 +134,16 @@ function ResponsiveDrawer() {
     ),
   }))
 
+  // מחשוב רוחב דינמי מתקדם
+  const getSiderWidth = () => {
+    if (isMobile) return 0
+    if (isTablet) return collapsed ? 60 : 220
+    return collapsed ? 80 : 280
+  }
+
+  const siderWidth = getSiderWidth()
+  const headerHeight = isMobile ? 56 : isTablet ? 60 : 64
+
   const siderContent = (
     <div
       style={{
@@ -151,7 +157,8 @@ function ResponsiveDrawer() {
       <div
         className="logo-section"
         style={{
-          padding: collapsed ? "16px 8px" : "24px 16px",
+          padding:
+            collapsed || isMobile ? (isSmallMobile ? "8px 4px" : "12px 8px") : isTablet ? "16px 12px" : "24px 16px",
           borderBottom: "1px solid #f0f0f0",
           textAlign: "center",
           direction: "rtl",
@@ -159,21 +166,29 @@ function ResponsiveDrawer() {
           alignItems: "center",
           justifyContent: "center",
           flexDirection: "column",
-          minHeight: collapsed ? 64 : 88,
+          minHeight: collapsed || isMobile ? (isSmallMobile ? 48 : 56) : isTablet ? 72 : 88,
         }}
       >
         <Avatar
-          size={collapsed ? 32 : 48}
+          size={collapsed || isMobile ? (isSmallMobile ? 24 : 28) : isTablet ? 40 : 48}
           className="logo-avatar"
           style={{
             background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-            marginBottom: collapsed ? 0 : 8,
+            marginBottom: collapsed || isMobile ? 0 : isTablet ? 6 : 8,
           }}
         >
           <BuildOutlined />
         </Avatar>
-        {!collapsed && (
-          <Title level={4} className="logo-title" style={{ margin: "8px 0 0 0", color: blue }}>
+        {!collapsed && !isMobile && (
+          <Title
+            level={isTablet ? 5 : 4}
+            className="logo-title"
+            style={{
+              margin: `${isTablet ? 6 : 8}px 0 0 0`,
+              color: blue,
+              fontSize: isTablet ? "14px" : "16px",
+            }}
+          >
             BusinessMan
           </Title>
         )}
@@ -186,35 +201,39 @@ function ResponsiveDrawer() {
         style={{
           border: "none",
           flex: 1,
-          padding: "8px",
+          padding: isMobile ? "4px" : isTablet ? "6px" : "8px",
           direction: "rtl",
-          backgroundColor: '#7354af0f',
-          // overflowY: "auto",
+          backgroundColor: "#7354af0f",
+          fontSize: isSmallMobile ? "12px" : isMobile ? "13px" : isTablet ? "14px" : "15px",
         }}
         items={menuItems}
         onClick={(e) => {
           e.domEvent.stopPropagation()
           if (isMobile) setMobileOpen(false)
         }}
+        inlineCollapsed={collapsed && !isMobile}
       />
 
       <div
         style={{
-          padding: collapsed ? "8px" : "16px",
+          padding: collapsed || isMobile ? (isSmallMobile ? "6px" : "8px") : isTablet ? "12px" : "16px",
           borderTop: "1px solid #f0f0f0",
           textAlign: "center",
           direction: "rtl",
         }}
       >
-        <Typography.Text type="secondary" style={{ fontSize: collapsed ? "10px" : "12px" }}>
+        <Typography.Text
+          type="secondary"
+          style={{
+            fontSize: collapsed || isMobile ? (isSmallMobile ? "8px" : "10px") : isTablet ? "11px" : "12px",
+          }}
+        >
           © 2025 BusinessMan
         </Typography.Text>
       </div>
     </div>
   )
 
-  // חישוב רוחב דינמי
-  const siderWidth = collapsed ? 80 : 280
   const headerWidth = isMobile ? "100%" : `calc(100% - ${siderWidth}px)`
   const contentWidth = isMobile ? "100%" : `calc(100% - ${siderWidth}px)`
   const marginRight = isMobile ? 0 : siderWidth
@@ -226,19 +245,28 @@ function ResponsiveDrawer() {
         algorithm: antTheme.defaultAlgorithm,
         token: {
           colorPrimary: blue,
-          borderRadius: 10,
+          borderRadius: isMobile ? 6 : isTablet ? 8 : 10,
           fontFamily: '"Assistant", "Rubik", "Heebo", sans-serif',
+          fontSize: isSmallMobile ? 12 : isMobile ? 13 : isTablet ? 14 : 16,
         },
       }}
     >
-      <Layout style={{ minHeight: "100vh", height: "100vh", width: "100%", direction: "rtl"}}>
+      <Layout
+        style={{
+          minHeight: "100vh",
+          height: "100vh",
+          width: "100%",
+          direction: "rtl",
+          overflow: "hidden",
+        }}
+      >
         {!isMobile && (
           <Sider
             trigger={null}
             collapsible
             collapsed={collapsed}
-            width={280}
-            collapsedWidth={80}
+            width={isTablet ? 220 : 280}
+            collapsedWidth={isTablet ? 60 : 80}
             className="desktop-sider"
             style={{
               background: "#ffffff",
@@ -259,24 +287,41 @@ function ResponsiveDrawer() {
         {isMobile && (
           <Drawer
             title={
-              <Space style={{ direction: "rtl" }}>
-                <Avatar style={{ background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)" }}>
-                  <BuildOutlined />
-                </Avatar>
-                <span>BusinessMan</span>
-              </Space>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
+                <Space style={{ direction: "rtl" }}>
+                  <Avatar
+                    size={isSmallMobile ? 32 : 36}
+                    style={{ background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)" }}
+                  >
+                    <BuildOutlined />
+                  </Avatar>
+                  <span style={{ fontSize: isSmallMobile ? "14px" : "16px" }}>BusinessMan</span>
+                </Space>
+                <Button
+                  type="text"
+                  icon={<CloseOutlined />}
+                  onClick={handleDrawerToggle}
+                  size={isSmallMobile ? "small" : "middle"}
+                  style={{ marginLeft: "8px" }}
+                />
+              </div>
             }
             placement="right"
             onClose={handleDrawerToggle}
             open={mobileOpen}
-            width={280}
+            width={isSmallMobile ? "85%" : isLargeMobile ? "50%" : 280}
             className="mobile-drawer"
             style={{ padding: 0, direction: "rtl" }}
+            closable={false}
           >
             <Menu
               mode="inline"
               selectedKeys={[location.pathname]}
-              style={{ border: "none", direction: "rtl" }}
+              style={{
+                border: "none",
+                direction: "rtl",
+                fontSize: isSmallMobile ? "13px" : "14px",
+              }}
               items={menuItems}
               onClick={handleDrawerToggle}
             />
@@ -290,13 +335,12 @@ function ResponsiveDrawer() {
             width: contentWidth,
             height: "100vh",
             direction: "rtl",
-            // overflow: "hidden",
           }}
         >
           <Header
             style={{
               background: "#fff",
-              padding: isMobile ? "0 16px" : "0 24px",
+              padding: isMobile ? (isSmallMobile ? "0 8px" : "0 12px") : isTablet ? "0 16px" : "0 24px",
               boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
               display: "flex",
               alignItems: "center",
@@ -305,7 +349,7 @@ function ResponsiveDrawer() {
               position: "fixed",
               top: 0,
               zIndex: 1000,
-              height: "64px",
+              height: `${headerHeight}px`,
               width: headerWidth,
               right: marginRight,
             }}
@@ -321,37 +365,53 @@ function ResponsiveDrawer() {
               }}
             >
               {/* כותרת העמוד */}
-              {!isMobile && (
-                <Title level={5} style={{ margin: 0, color: "#444", flex: 1, textAlign: "center" }}>
-                  {pageTitle}
-                </Title>
-              )}
+              <Title
+                level={isMobile ? 5 : isTablet ? 5 : 5}
+                style={{
+                  margin: 0,
+                  color: "#444",
+                  flex: 1,
+                  textAlign: isMobile ? "right" : "center",
+                  fontSize: isSmallMobile ? "12px" : isMobile ? "14px" : isTablet ? "16px" : "18px",
+                }}
+              >
+                {isMobile && pageTitle.length > 15 ? `${pageTitle.substring(0, 12)}...` : pageTitle}
+              </Title>
 
-              {/* כפתור כניסה/יציאה מהתפריט הצידי */}
-              {!isMobile && (
-                <MenuOutlined
-                  style={{
-                    fontSize: "18px",
-                    cursor: "pointer",
-                    color: blue,
-                    marginLeft: "16px",
-                  }}
-                  onClick={() => setCollapsed(!collapsed)}
-                />
-              )}
-
+              {/* כפתור תפריט */}
+              <Button
+                type="text"
+                icon={<MenuOutlined />}
+                onClick={isMobile ? handleDrawerToggle : () => setCollapsed(!collapsed)}
+                style={{
+                  fontSize: isSmallMobile ? "14px" : isMobile ? "16px" : "18px",
+                  color: blue,
+                  padding: isMobile ? "4px" : "8px",
+                  height: isSmallMobile ? "32px" : isMobile ? "36px" : "40px",
+                  width: isSmallMobile ? "42px" : isMobile ? "36px" : "40px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              />
             </Space>
           </Header>
 
           <Content
             style={{
               margin: 0,
-              padding: isMobile ? "80px 16px 16px 16px" : "88px 24px 24px 24px",
+              padding: isMobile
+                ? isSmallMobile
+                  ? `${headerHeight + 12}px 8px 8px 8px`
+                  : `${headerHeight + 16}px 12px 12px 12px`
+                : isTablet
+                  ? `${headerHeight + 16}px 16px 16px 16px`
+                  : `${headerHeight + 24}px 24px 24px 24px`,
               background: "#ffffff",
               minHeight: "100vh",
               direction: "rtl",
-              // overflowY: "auto",
-              // overflowX: "hidden",
+              overflowY: "auto",
+              overflowX: "hidden",
             }}
           >
             <Routes>
@@ -423,8 +483,6 @@ function ResponsiveDrawer() {
 }
 
 export default function App() {
-
-
   return (
     <Router>
       <GlobalContext>
@@ -432,6 +490,1234 @@ export default function App() {
       </GlobalContext>
     </Router>
   )
+}
+app.css
+/* Import Hebrew fonts */
+@import url("https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;500;600;700&family=Heebo:wght@300;400;500;600;700&family=Rubik:wght@300;400;500;600;700&display=swap");
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  direction: rtl;
+  font-family: "Assistant", "Rubik", "Heebo", sans-serif;
+  background-color: #fff;
+  /* background: linear-gradient(135deg, #f5f7ff 0%, #ffffff 100%); */
+  overflow-x: hidden;
+}
+
+::selection {
+  background-color: #d1cff2;
+  color: inherit;
+}
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Subtle Animations - Less dramatic */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes gentleBounce {
+  0% {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.01);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes subtlePulse {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.02);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes gentleFloat {
+
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes softGlow {
+
+  0%,
+  100% {
+    box-shadow: 0 0 3px rgba(102, 126, 234, 0.3);
+  }
+
+  50% {
+    box-shadow: 0 0 8px rgba(102, 126, 234, 0.5);
+  }
+}
+
+/* Modal Overlay Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeInUp 0.3s ease-out;
+}
+
+.modal-content {
+  position: relative;
+  z-index: 10000;
+  animation: gentleBounce 0.4s ease-out;
+}
+
+/* Component Animations - Subtle */
+.logo-section {
+  animation: slideInRight 0.5s ease-out;
+}
+
+.logo-avatar {
+  animation: gentleBounce 0.6s ease-out 0.2s both;
+}
+
+.logo-title {
+  animation: fadeInUp 0.5s ease-out 0.3s both;
+}
+
+.sidebar-menu {
+  animation: slideInRight 0.5s ease-out 0.1s both;
+}
+
+.sidebar-menu .ant-menu-item {
+  animation: fadeInUp 0.4s ease-out both;
+  animation-delay: calc(var(--item-index, 0) * 0.05s);
+}
+
+.main-header {
+  animation: slideInLeft 0.5s ease-out;
+}
+
+.header-icon {
+  animation: fadeInUp 0.6s ease-out 0.3s both;
+}
+
+.header-title {
+  animation: fadeInUp 0.5s ease-out 0.2s both;
+}
+
+.nav-btn {
+  animation: fadeInUp 0.4s ease-out both;
+  animation-delay: calc(var(--btn-index, 0) * 0.05s);
+  transition: all 0.2s ease;
+}
+
+.nav-btn:hover {
+  transform: translateY(-1px);
+  /* animation: subtlePulse 0.4s ease-in-out; */
+}
+
+.menu-toggle-btn {
+  transition: all 0.2s ease;
+}
+
+.desktop-sider {
+  animation: slideInRight 0.6s ease-out;
+}
+
+.mobile-drawer .ant-drawer-content {
+  animation: slideInRight 0.3s ease-out;
+}
+
+.main-content {
+  animation: fadeInUp 0.5s ease-out 0.2s both;
+}
+
+.content-wrapper {
+  animation: fadeInUp 0.6s ease-out 0.3s both;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 4px;
+  animation: softGlow 2s ease-in-out infinite alternate;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+}
+
+html:lang(he),
+body:lang(he) {
+  direction: rtl;
+  text-align: right;
+}
+
+.ltr {
+  direction: ltr !important;
+}
+
+.rtl {
+  direction: rtl !important;
+}
+
+/* Ant Design Layout Fixes for RTL */
+.ant-layout {
+  min-height: 100vh !important;
+  width: 100% !important;
+  direction: rtl !important;
+}
+
+.ant-layout-content {
+  width: 100% !important;
+  margin: 0 !important;
+  /* background: transparent !important; */
+  direction: rtl !important;
+}
+
+/* RTL Sider positioning */
+.ant-layout-sider {
+  position: fixed !important;
+  height: 100vh !important;
+  right: 0 !important;
+  top: 0 !important;
+  z-index: 1001 !important;
+  background: #fff !important;
+}
+
+header {
+  box-shadow: none !important;
+}
+
+/* Content area adjustments for RTL */
+.main-layout {
+  margin-right: 280px !important;
+  width: calc(100% - 280px) !important;
+  transition: all 0.2s ease !important;
+  min-height: 100vh !important;
+}
+
+.main-layout.collapsed {
+  margin-right: 80px !important;
+  width: calc(100% - 80px) !important;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+
+  .main-layout,
+  .main-layout.collapsed {
+    margin-right: 0 !important;
+    width: 100% !important;
+  }
+
+  .ant-layout-sider {
+    transform: translateX(100%) !important;
+  }
+}
+
+/* Drawer RTL fix */
+.ant-drawer-content-wrapper {
+  right: 0 !important;
+  left: auto !important;
+}
+
+.ant-drawer-body {
+  padding: 0 !important;
+  direction: rtl !important;
+}
+
+/* Menu RTL fixes */
+.ant-menu {
+  direction: rtl !important;
+}
+
+.ant-menu-item {
+  border-radius: 8px !important;
+  margin: 4px 8px !important;
+  text-align: right !important;
+  transition: all 0.2s ease !important;
+}
+
+.ant-menu-item:hover {
+  transform: translateX(-2px) !important;
+  /* animation: softGlow 0.4s ease-in-out !important; */
+}
+
+.ant-menu-item-selected {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  color: white !important;
+}
+
+.ant-menu-item-selected .anticon {
+  color: white !important;
+}
+
+.ant-menu-item .ant-menu-title-content {
+  margin-right: 12px !important;
+  margin-left: 0 !important;
+}
+
+/* Unified Card Styles */
+.ant-card {
+  width: 100%;
+  direction: rtl;
+  border: none !important;
+}
+
+.ant-card {
+  border: "none" !important;
+}
+
+.ant-card-body {
+  direction: rtl !important;
+  text-align: right !important;
+  padding: 24px !important;
+}
+
+/* Unified Button Styles */
+.ant-btn {
+  border-radius: 10px !important;
+  font-weight: 600 !important;
+  height: auto !important;
+  padding: 10px 20px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  direction: rtl !important;
+  transition: all 0.2s ease !important;
+  font-family: "Assistant", "Rubik", "Heebo", sans-serif !important;
+}
+
+.ant-btn:hover {
+  transform: translateY(-1px) !important;
+  /* animation: subtlePulse 0.4s ease-in-out !important; */
+}
+
+.ant-btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  border: none !important;
+  box-shadow: 0 4px 14px rgba(102, 126, 234, 0.4) !important;
+}
+
+.ant-btn-primary:hover {
+  background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%) !important;
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5) !important;
+  /* animation: softGlow 0.4s ease-in-out !important; */
+}
+
+/* Unified Input Styles */
+.ant-input,
+.ant-input-number,
+.ant-select-selector {
+  border-radius: 10px !important;
+  padding: 12px 16px !important;
+  border: 2px solid #e1e5e9 !important;
+  transition: all 0.2s ease !important;
+  direction: rtl !important;
+  text-align: right !important;
+  font-family: "Assistant", "Rubik", "Heebo", sans-serif !important;
+}
+
+.ant-input:focus,
+.ant-input-number:focus,
+.ant-select-focused .ant-select-selector {
+  border-color: #667eea !important;
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2) !important;
+  animation: softGlow 0.4s ease-in-out !important;
+}
+
+/* Error Display Styles */
+.error-message {
+  background: linear-gradient(135deg, #fff2f0 0%, #ffebe8 100%);
+  border: 1px solid #ffccc7;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin: 8px 0;
+  color: #cf1322;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: fadeInUp 0.3s ease-out;
+}
+
+.error-message .anticon {
+  color: #cf1322;
+}
+
+/* Success Message Styles */
+.success-message {
+  background: linear-gradient(135deg, #f6ffed 0%, #e6f7d2 100%);
+  border: 1px solid #b7eb8f;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin: 8px 0;
+  color: #389e0d;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: fadeInUp 0.3s ease-out;
+}
+
+.success-message .anticon {
+  color: #389e0d;
+}
+
+/* Form Styles */
+.ant-form-item-label>label {
+  font-weight: 600 !important;
+  color: #2d3748 !important;
+  text-align: right !important;
+  font-family: "Assistant", "Rubik", "Heebo", sans-serif !important;
+}
+
+.ant-form-item {
+  direction: rtl !important;
+  animation: fadeInUp 0.4s ease-out both !important;
+  animation-delay: calc(var(--form-item-index, 0) * 0.05s) !important;
+}
+
+.ant-form-item-explain-error {
+  background: #fff2f0;
+  border: 1px solid #ffccc7;
+  border-radius: 6px;
+  padding: 8px 12px;
+  margin-top: 4px;
+  color: #cf1322;
+  font-weight: 500;
+  animation: fadeInUp 0.3s ease-out;
+}
+
+.ant-input-number {
+  width: 100% !important;
+  direction: rtl !important;
+}
+
+.ant-input-number-input {
+  text-align: right !important;
+}
+
+/* Container and layout utilities */
+.page-container {
+  width: 100% !important;
+  max-width: 100% !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  direction: rtl !important;
+}
+
+.content-wrapper {
+  width: 100% !important;
+  max-width: 1200px !important;
+  margin: 0 auto !important;
+  padding: 20px 24px 24px 24px !important;
+  direction: rtl !important;
+  min-height: calc(100vh - 84px) !important;
+}
+
+@media (max-width: 768px) {
+  .content-wrapper {
+    padding: 16px 16px 16px 16px !important;
+  }
+}
+
+/* Unified Component Styles */
+.hero-section {
+  color: white;
+  padding: 60px 24px;
+  border-radius: 20px;
+  margin-bottom: 40px;
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  direction: rtl;
+  animation: fadeInUp 0.6s ease-out both;
+}
+
+@media (max-width: 768px) {
+  .hero-section {
+    padding: 40px 20px;
+    margin: 0 0 40px 0;
+    border-radius: 16px;
+  }
+}
+
+.stats-card {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s ease;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  direction: rtl;
+  text-align: right;
+  animation: fadeInUp 0.5s ease-out both;
+}
+
+.stats-card:hover {
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+  /* animation: gentleFloat 1.5s ease-in-out infinite; */
+}
+
+.feature-card {
+  background: white;
+  border-radius: 16px;
+  /* padding: 15px; */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s ease;
+  height: 100%;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  width: 100%;
+  direction: rtl;
+  text-align: right;
+  animation: fadeInUp 0.5s ease-out both;
+}
+
+@media (max-width: 768px) {
+  .feature-card {
+    padding: 24px;
+  }
+}
+
+.feature-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+  /* animation: gentleFloat 2s ease-in-out infinite; */
+}
+
+.icon-wrapper {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-size: 24px;
+  animation: gentleBounce 0.6s ease-out both;
+}
+
+.testimonial-section {
+  background: rgba(102, 126, 234, 0.03);
+  border: 1px solid rgba(102, 126, 234, 0.1);
+  border-radius: 16px;
+  padding: 32px;
+  margin-top: 40px;
+  width: 100%;
+  direction: rtl;
+  text-align: right;
+  animation: fadeInUp 0.6s ease-out both;
+}
+
+@media (max-width: 768px) {
+  .testimonial-section {
+    padding: 24px;
+  }
+}
+
+.financial-summary-card {
+  border-radius: 16px;
+  padding: 24px;
+  height: 100%;
+  transition: all 0.2s ease;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  width: 100%;
+  direction: rtl;
+  text-align: right;
+  animation: fadeInUp 0.5s ease-out both;
+}
+
+.financial-summary-card:hover {
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  /* animation: gentleFloat 1.5s ease-in-out infinite; */
+}
+
+.income-card {
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.expense-card {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.centered-layout {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 84px);
+  padding: 20px;
+  width: 100%;
+  direction: rtl;
+  animation: fadeInUp 0.5s ease-out both;
+  /* background: #fcfdfe; */
+}
+
+.login-form {
+  background: linear-gradient(145deg, #ffffff, #f8fafc);
+  padding: 40px;
+  width: 100%;
+  max-width: 500px;
+  direction: rtl;
+  text-align: right;
+}
+
+@media (max-width: 768px) {
+  .login-form {
+    padding: 24px;
+    margin: 0;
+    border-radius: 16px;
+  }
+}
+
+.form-section {
+  background: white;
+  padding: 32px;
+  width: 100%;
+  direction: rtl;
+  text-align: right;
+}
+
+@media (max-width: 768px) {
+  .form-section {
+    padding: 20px;
+    margin: 0;
+  }
+}
+
+/* Grid fixes for RTL */
+.ant-row {
+  width: 100% !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  direction: rtl !important;
+}
+
+.ant-col {
+  padding-left: 12px !important;
+  padding-right: 12px !important;
+  direction: rtl !important;
+  animation: fadeInUp 0.4s ease-out both !important;
+  animation-delay: calc(var(--col-index, 0) * 0.05s) !important;
+}
+
+@media (max-width: 768px) {
+  .ant-col {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+}
+
+/* Table responsive */
+.ant-table-wrapper {
+  width: 100% !important;
+  direction: rtl !important;
+  animation: fadeInUp 0.5s ease-out both !important;
+}
+
+.ant-table {
+  min-width: 800px !important;
+  direction: rtl !important;
+}
+
+.ant-table-thead>tr>th {
+  text-align: right !important;
+  font-weight: 600 !important;
+  background: #fafafa !important;
+}
+
+.ant-table-tbody>tr>td {
+  text-align: right !important;
+}
+
+.ant-table-tbody>tr {
+  transition: all 0.2s ease !important;
+}
+
+.ant-table-tbody>tr:hover {
+  transform: scale(1.005) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+}
+
+@media (max-width: 768px) {
+  .ant-table {
+    min-width: 600px !important;
+  }
+}
+
+/* Typography RTL */
+.ant-typography {
+  direction: rtl !important;
+  /* text-align: right !important; */
+  font-family: "Assistant", "Rubik", "Heebo", sans-serif !important;
+}
+
+/* Space component RTL */
+.ant-space {
+  direction: rtl !important;
+}
+
+/* Upload component RTL */
+.ant-upload-drag {
+  direction: rtl !important;
+  text-align: center !important;
+  transition: all 0.2s ease !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+.ant-upload-drag:hover {
+  transform: scale(1.01) !important;
+  border-color: #667eea !important;
+}
+
+/* Progress RTL */
+.ant-progress {
+  direction: rtl !important;
+}
+
+/* Alert RTL */
+.ant-alert {
+  direction: rtl !important;
+  text-align: right !important;
+  animation: fadeInUp 0.4s ease-out both !important;
+  border-radius: 8px !important;
+}
+
+/* Statistic RTL */
+.ant-statistic {
+  direction: rtl !important;
+  text-align: right !important;
+}
+
+.ant-statistic-content {
+  direction: rtl !important;
+  text-align: right !important;
+}
+
+.ant-statistic-content-value {
+  animation: gentleBounce 0.6s ease-out both !important;
+}
+
+/* Loading animations */
+.ant-spin {
+  animation: fadeInUp 0.6s ease-out both !important;
+}
+
+/* Drawer animations */
+.ant-drawer-mask {
+  animation: fadeInUp 0.2s ease-out !important;
+}
+
+.ant-drawer-content {
+  animation: slideInRight 0.3s ease-out !important;
+}
+
+/* Responsive Design Improvements */
+@media (max-width: 1200px) {
+  .content-wrapper {
+    max-width: 100% !important;
+    padding: 16px !important;
+  }
+}
+
+@media (max-width: 992px) {
+  .hero-section {
+    padding: 40px 20px !important;
+  }
+
+  .feature-card,
+  .stats-card {
+    margin-bottom: 16px !important;
+  }
+}
+
+@media (max-width: 576px) {
+  .ant-card-body {
+    padding: 19px !important;
+  }
+
+  .form-section {
+    padding: 16px !important;
+  }
+
+  .login-form {
+    padding: 20px !important;
+  }
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Focus styles for accessibility */
+.ant-btn:focus,
+.ant-input:focus,
+.ant-select:focus {
+  outline: 2px solid #667eea !important;
+  outline-offset: 2px !important;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .ant-btn-primary {
+    background: #000 !important;
+    color: #fff !important;
+  }
+}
+
+/*  */
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: "Assistant", "Rubik", "Heebo", sans-serif;
+  direction: rtl;
+  scroll-behavior: auto;
+  overflow: visible;
+}
+
+html, body, #root {
+  scroll-behavior: auto;
+}
+
+#root {
+  height: 100vh;
+}
+
+/* Layout בסיסי */
+.ant-layout {
+  min-height: 100vh !important;
+  height: 100vh !important;
+}
+
+.ant-layout-content {
+  overflow-x: hidden !important;
+  height: calc(100vh - 64px) !important;
+  padding-top: 64px !important;
+}
+
+/* Header תיקונים */
+.ant-layout-header {
+  position: fixed !important;
+  top: 0 !important;
+  z-index: 1000 !important;
+  height: 64px !important;
+  line-height: 64px !important;
+  padding: 0 24px !important;
+}
+
+/* Sider תיקונים */
+.ant-layout-sider {
+  position: fixed !important;
+  height: 100vh !important;
+  z-index: 1001 !important;
+  /* overflow-y: auto !important; */
+  overflow-x: hidden !important;
+}
+
+.desktop-sider {
+  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* תיקון עבור המרווח של הקונטנט ממיקום הצד */
+.main-layout {
+  transition: margin-right 0.2s ease-in-out !important;
+}
+
+/* Hero Section תיקונים */
+.hero-section {
+  padding: 60px 30px;
+  margin: -24px -24px 48px -24px;
+  border-radius: 0 0 20px 20px;
+  min-height: 400px;
+  display: flex;
+  align-items: center;
+}
+
+/* Cards תיקונים */
+.feature-card {
+  height: 100% !important;
+  border-radius: 16px !important;
+  border: 1px solid #f0f0f0 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
+  transition: all 0.3s ease !important;
+  overflow: hidden !important;
+}
+
+.feature-card:hover {
+  transform: translateY(-4px) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
+  border-color: #667eea !important;
+}
+
+.feature-card .ant-card-body {
+  padding: 32px !important;
+  height: 100% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+}
+
+.icon-wrapper {
+  width: 64px !important;
+  height: 64px !important;
+  border-radius: 16px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin-bottom: 20px !important;
+  font-size: 32px !important;
+}
+
+/* Stats Cards תיקונים */
+.stats-card {
+  height: 180px !important;
+  border-radius: 16px !important;
+  border: 1px solid #f0f0f0 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
+  transition: all 0.3s ease !important;
+}
+
+.stats-card:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
+}
+
+.stats-card .ant-card-body {
+  padding: 24px !important;
+  height: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Testimonial Section */
+.testimonial-section {
+  background: linear-gradient(135deg, #f7f9fc 0%, #eef2f7 100%) !important;
+  border: 1px solid #e8ecf0 !important;
+  border-radius: 20px !important;
+  padding: 40px !important;
+}
+
+/* Login Form */
+.centered-layout {
+  min-height: calc(100vh - 64px) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 24px !important;
+  /* background: linear-gradient(135deg, #f7f9fc 0%, #eef2f7 100%) !important; */
+}
+
+.login-form {
+  width: 100% !important;
+  max-width: 500px !important;
+}
+
+.login-form .ant-card-body {
+  padding: 40px !important;
+}
+
+/* רספונסיביות - טאבלט */
+@media (max-width: 1024px) {
+  .hero-section {
+    padding: 40px 24px !important;
+    min-height: 350px !important;
+  }
+
+  .feature-card .ant-card-body {
+    padding: 24px !important;
+  }
+
+  .testimonial-section {
+    padding: 32px !important;
+  }
+
+  .login-form .ant-card-body {
+    padding: 32px !important;
+  }
+}
+
+/* רספונסיביות - מובייל */
+@media (max-width: 768px) {
+  .ant-layout-content {
+    padding: 80px 16px 16px 16px !important;
+  }
+
+  .hero-section {
+    padding: 32px 16px !important;
+    margin: -16px -16px 32px -16px !important;
+    min-height: 300px !important;
+    text-align: center !important;
+  }
+
+  .hero-section h1 {
+    font-size: 1.8rem !important;
+  }
+
+  .hero-section h3 {
+    font-size: 1.2rem !important;
+  }
+
+  .feature-card .ant-card-body {
+    padding: 20px !important;
+  }
+
+  .stats-card {
+    height: 160px !important;
+  }
+
+  .stats-card .ant-card-body {
+    padding: 16px !important;
+  }
+
+  .icon-wrapper {
+    width: 48px !important;
+    height: 48px !important;
+    font-size: 24px !important;
+    margin-bottom: 16px !important;
+  }
+
+  .testimonial-section {
+    padding: 24px !important;
+  }
+
+  .login-form {
+    margin: 16px !important;
+  }
+
+  .login-form .ant-card-body {
+    padding: 24px !important;
+  }
+
+  /* תיקון עבור מובייל - Header */
+  .ant-layout-header {
+    padding: 0 16px !important;
+  }
+
+  /* תיקון עבור מובייל - Drawer */
+  .mobile-drawer .ant-drawer-body {
+    padding: 0 !important;
+  }
+
+  /* תיקון עבור מובייל - Buttons */
+  .ant-btn-lg {
+    height: 44px !important;
+    font-size: 15px !important;
+  }
+}
+
+/* רספונסיביות - מובייל קטן */
+@media (max-width: 480px) {
+  .hero-section {
+    padding: 24px 12px !important;
+    min-height: 250px !important;
+  }
+
+  .hero-section h1 {
+    font-size: 1.5rem !important;
+  }
+
+  .hero-section h3 {
+    font-size: 1rem !important;
+  }
+
+  .feature-card .ant-card-body {
+    padding: 16px !important;
+  }
+
+  .stats-card {
+    height: 140px !important;
+  }
+
+  .login-form {
+    margin: 8px !important;
+  }
+
+  .login-form .ant-card-body {
+    padding: 20px !important;
+  }
+
+  .ant-layout-content {
+    padding: 72px 8px 8px 8px !important;
+  }
+
+  .testimonial-section {
+    padding: 20px !important;
+  }
+}
+
+/* תיקוני גלילה */
+.ant-layout-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.ant-layout-content::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.ant-layout-content::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.ant-layout-content::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* תיקון עבור טקסטים ארוכים */
+.ant-typography {
+  word-wrap: break-word !important;
+  /* overflow-wrap: break-word !important; */
+}
+
+/* תיקון עבור כפתורים */
+.ant-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* תיקון עבור Ant Design RTL */
+.ant-layout-has-sider>.ant-layout,
+.ant-layout-has-sider>.ant-layout-content {
+  overflow-x: hidden !important;
+}
+
+/* תיקון עבור Grid */
+.ant-row {
+  margin-right: 0 !important;
+  margin-left: 0 !important;
+}
+
+.ant-col {
+  padding-right: 12px !important;
+  padding-left: 12px !important;
+}
+
+/* תיקונים עבור Form */
+.ant-form-item {
+  margin-bottom: 16px !important;
+}
+
+.ant-form-item-label {
+  text-align: right !important;
+}
+
+/* תיקון עבור Alert */
+.ant-alert {
+  border-radius: 8px !important;
+  margin-bottom: 8px !important;
+}
+
+.ant-drawer-close{
+  display: none;
 }
 
 import React, { useState, useEffect, useContext } from "react"
@@ -3461,7 +4747,7 @@ const EditUserPage = () => {
 
   return (
     <ConfigProvider direction="rtl">
-      <div style={{ padding: "40px 20px", maxWidth: 800, margin: "0 auto", marginTop: "70vh" }}>
+      <div style={{ padding: "40px 20px", maxWidth: 800, margin: "0 auto" }}>
         <Card className="form-section">
           <div style={{ textAlign: "center", marginBottom: 32 }}>
             <Avatar
@@ -3658,7 +4944,43 @@ const MyHome = () => {
   const [monthlyReport, setMonthlyReport] = useState<number | null>(null)
 
   const navigate = useNavigate()
-  const isMobile = useMediaQuery({ maxWidth: 768 })
+  
+  // רספונסיביות מתקדמת
+  const isSmallMobile = useMediaQuery({ maxWidth: 479 })
+  const isMobile = useMediaQuery({ maxWidth: 767 })
+  const isTablet = useMediaQuery({ minWidth: 768, maxWidth: 1023 })
+  const isDesktop = useMediaQuery({ minWidth: 1024, maxWidth: 1439 })
+
+  // פונקציות עזר לגדלים
+  const getContainerPadding = () => {
+    if (isSmallMobile) return "20px 12px"
+    if (isMobile) return "30px 16px"
+    if (isTablet) return "40px 24px"
+    if (isDesktop) return "50px 32px"
+    return "60px 40px"
+  }
+
+  const getHeroFontSize = () => {
+    if (isSmallMobile) return { h1: "2rem", h2: "1.2rem", p: 14 }
+    if (isMobile) return { h1: "2.5rem", h2: "1.5rem", p: 16 }
+    if (isTablet) return { h1: "3rem", h2: "1.8rem", p: 18 }
+    if (isDesktop) return { h1: "3.5rem", h2: "2.2rem", p: 20 }
+    return { h1: "4rem", h2: "2.4rem", p: 22 }
+  }
+
+  const getButtonSize = () => {
+    if (isSmallMobile) return { height: 48, padding: "0 24px", fontSize: 14 }
+    if (isMobile) return { height: 56, padding: "0 32px", fontSize: 16 }
+    if (isTablet) return { height: 64, padding: "0 40px", fontSize: 18 }
+    return { height: 70, padding: "0 50px", fontSize: 20 }
+  }
+
+  const getHeroImageSize = () => {
+    if (isSmallMobile) return { width: "100%", maxWidth: 300, height: 250 }
+    if (isMobile) return { width: "100%", maxWidth: 400, height: 300 }
+    if (isTablet) return { width: "100%", maxWidth: 500, height: 400 }
+    return { width: "100%", maxWidth: 600, height: 500 }
+  }
 
   const menuItems = [
     {
@@ -3804,6 +5126,10 @@ const MyHome = () => {
     },
   }
 
+  const fonts = getHeroFontSize()
+  const buttonConfig = getButtonSize()
+  const heroImage = getHeroImageSize()
+
   return (
     <ConfigProvider direction="rtl">
       <motion.div
@@ -3828,8 +5154,9 @@ const MyHome = () => {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            padding: "60px 40px",
+            padding: getContainerPadding(),
             position: "relative",
+            width: "100%",
           }}
         >
           <div
@@ -3844,15 +5171,26 @@ const MyHome = () => {
               opacity: 0.3,
             }}
           />
-          <Row gutter={[48, 48]} align="middle" style={{ width: "100%", maxWidth: "1400px", zIndex: 1 }}>
-            <Col xs={24} lg={12}>
+          <Row 
+            gutter={[
+              isSmallMobile ? 16 : isMobile ? 24 : isTablet ? 32 : 48, 
+              isSmallMobile ? 16 : isMobile ? 24 : isTablet ? 32 : 48
+            ]} 
+            align="middle" 
+            style={{ 
+              width: "100%", 
+              maxWidth: isSmallMobile ? "100%" : isMobile ? "100%" : isTablet ? "1000px" : "1400px", 
+              zIndex: 1 
+            }}
+          >
+            <Col xs={24} lg={isMobile ? 24 : 12}>
               <motion.div variants={containerVariants} style={{ textAlign: "center" }}>
                 <Title
                   level={1}
                   style={{
                     color: "white",
-                    marginBottom: 32,
-                    fontSize: isMobile ? "3rem" : "4rem",
+                    marginBottom: isSmallMobile ? 16 : isMobile ? 24 : 32,
+                    fontSize: fonts.h1,
                     fontWeight: 700,
                     lineHeight: 1.2,
                     textShadow: "0 4px 20px rgba(0,0,0,0.3)",
@@ -3864,9 +5202,9 @@ const MyHome = () => {
                   level={2}
                   style={{
                     color: "rgba(255,255,255,0.95)",
-                    marginBottom: 40,
+                    marginBottom: isSmallMobile ? 20 : isMobile ? 30 : 40,
                     fontWeight: 300,
-                    fontSize: isMobile ? "1.8rem" : "2.4rem",
+                    fontSize: fonts.h2,
                     lineHeight: 1.4,
                   }}
                 >
@@ -3875,31 +5213,37 @@ const MyHome = () => {
                 <Paragraph
                   style={{
                     color: "rgba(255,255,255,0.85)",
-                    fontSize: isMobile ? 18 : 22,
-                    marginBottom: 60,
+                    fontSize: fonts.p,
+                    marginBottom: isSmallMobile ? 32 : isMobile ? 40 : 60,
                     lineHeight: 1.7,
-                    maxWidth: "600px",
-                    margin: "0 auto 60px auto",
+                    maxWidth: isSmallMobile ? "280px" : isMobile ? "400px" : "600px",
+                    margin: `0 auto ${isSmallMobile ? 32 : isMobile ? 40 : 60}px auto`,
                   }}
                 >
                   הדרך החכמה לנהל את העסק שלך - כלים מתקדמים לניהול הכנסות, הוצאות ודוחות
                 </Paragraph>
-                <Space size="large" wrap style={{ justifyContent: "center" }}>
+                <Space 
+                  size={isMobile ? "middle" : "large"} 
+                  wrap 
+                  style={{ justifyContent: "center" }}
+                  direction={isSmallMobile ? "vertical" : "horizontal"}
+                >
                   <Button
                     type="primary"
                     size="large"
                     onClick={() => navigate("/view-data")}
                     style={{
-                      height: 70,
-                      padding: "0 50px",
+                      height: buttonConfig.height,
+                      padding: buttonConfig.padding,
                       background: "rgba(255,255,255,0.2)",
                       borderColor: "rgba(255,255,255,0.4)",
                       color: "white",
                       fontWeight: 600,
-                      fontSize: 20,
-                      borderRadius: 35,
+                      fontSize: buttonConfig.fontSize,
+                      borderRadius: buttonConfig.height / 2,
                       backdropFilter: "blur(10px)",
                       boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
+                      minWidth: isSmallMobile ? "200px" : "auto",
                     }}
                   >
                     צפה בנתוני העסק
@@ -3908,15 +5252,16 @@ const MyHome = () => {
                     size="large"
                     onClick={() => navigate("/account-transactions")}
                     style={{
-                      height: 70,
-                      padding: "0 50px",
+                      height: buttonConfig.height,
+                      padding: buttonConfig.padding,
                       background: orange,
                       borderColor: orange,
                       color: "white",
                       fontWeight: 600,
-                      fontSize: 20,
-                      borderRadius: 35,
+                      fontSize: buttonConfig.fontSize,
+                      borderRadius: buttonConfig.height / 2,
                       boxShadow: "0 8px 32px rgba(250,140,22,0.3)",
+                      minWidth: isSmallMobile ? "200px" : "auto",
                     }}
                   >
                     נהל תנועות בעסק
@@ -3924,28 +5269,33 @@ const MyHome = () => {
                 </Space>
               </motion.div>
             </Col>
-            <Col xs={24} lg={12} style={{ textAlign: "center" }}>
-              <motion.div variants={containerVariants}>
-                <div
-                  style={{
-                    width: "100%",
-                    maxWidth: 600,
-                    height: 500,
-                    background: "rgba(255,255,255,0.15)",
-                    borderRadius: 40,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    backdropFilter: "blur(20px)",
-                    border: "2px solid rgba(255,255,255,0.3)",
-                    margin: "0 auto",
-                    boxShadow: "0 20px 60px rgba(0,0,0,0.2)",
-                  }}
-                >
-                  <BuildOutlined style={{ fontSize: 200, color: "rgba(255,255,255,0.9)" }} />
-                </div>
-              </motion.div>
-            </Col>
+            {!isMobile && (
+              <Col xs={24} lg={12} style={{ textAlign: "center" }}>
+                <motion.div variants={containerVariants}>
+                  <div
+                    style={{
+                      width: "100%",
+                      maxWidth: heroImage.maxWidth,
+                      height: heroImage.height,
+                      background: "rgba(255,255,255,0.15)",
+                      borderRadius: isTablet ? 30 : 40,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      backdropFilter: "blur(20px)",
+                      border: "2px solid rgba(255,255,255,0.3)",
+                      margin: "0 auto",
+                      boxShadow: "0 20px 60px rgba(0,0,0,0.2)",
+                    }}
+                  >
+                    <BuildOutlined style={{ 
+                      fontSize: isTablet ? 120 : isDesktop ? 160 : 200, 
+                      color: "rgba(255,255,255,0.9)" 
+                    }} />
+                  </div>
+                </motion.div>
+              </Col>
+            )}
           </Row>
         </motion.div>
 
@@ -3957,19 +5307,19 @@ const MyHome = () => {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            padding: "80px 40px",
+            padding: getContainerPadding(),
             background: "linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%)",
             position: "relative",
             width: "100%",
           }}
         >
-          <div style={{ width: "100%", maxWidth: "1400px" }}>
-            <div style={{ textAlign: "center", marginBottom: 80 }}>
+          <div style={{ width: "100%", maxWidth: isTablet ? "900px" : "1400px" }}>
+            <div style={{ textAlign: "center", marginBottom: isSmallMobile ? 40 : isMobile ? 60 : 80 }}>
               <Title
                 level={1}
                 style={{
-                  marginBottom: 24,
-                  fontSize: isMobile ? "2.5rem" : "3.5rem",
+                  marginBottom: isSmallMobile ? 16 : 24,
+                  fontSize: isSmallMobile ? "2rem" : isMobile ? "2.5rem" : isTablet ? "3rem" : "3.5rem",
                   color: "#1a202c",
                   fontWeight: 700,
                 }}
@@ -3978,7 +5328,7 @@ const MyHome = () => {
               </Title>
               <Text
                 style={{
-                  fontSize: 20,
+                  fontSize: isSmallMobile ? 16 : isMobile ? 18 : 20,
                   color: "#4a5568",
                   display: "block",
                   maxWidth: "600px",
@@ -3989,19 +5339,32 @@ const MyHome = () => {
                 מבט כללי על ביצועי העסק שלך החודש
               </Text>
             </div>
-            <Row gutter={[40, 40]} justify="center">
+            <Row gutter={[
+              isSmallMobile ? 12 : isMobile ? 16 : isTablet ? 24 : 40, 
+              isSmallMobile ? 12 : isMobile ? 16 : isTablet ? 24 : 40
+            ]} justify="center">
               {statsData.map((stat, index) => (
                 <Col xs={24} sm={12} lg={6} key={index}>
                   <motion.div variants={containerVariants}>
                     <Card
                       style={{
-                        // height: "280px",
-                        borderRadius: "32px",
+                        borderRadius: isSmallMobile ? "20px" : isMobile ? "24px" : "32px",
                         border: "none",
                         boxShadow: "0 20px 60px rgba(0, 0, 0, 0.08)",
                         background: "white",
                         overflow: "hidden",
                         position: "relative",
+                        height: "100%",
+                        minHeight: isSmallMobile ? "180px" : isMobile ? "220px" : "280px",
+                      }}
+                      bodyStyle={{
+                        padding: isSmallMobile ? "20px 16px" : isMobile ? "30px 20px" : "40px 24px",
+                        height: "100%",
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        textAlign: "center",
                       }}
                     >
                       <div
@@ -4014,69 +5377,66 @@ const MyHome = () => {
                           background: `linear-gradient(90deg, ${stat.color}, ${stat.color}80)`,
                         }}
                       />
-                      <div
+                      <Avatar
+                        size={isSmallMobile ? 60 : isMobile ? 80 : 100}
                         style={{
-                          display: "flex",
-                          flexDirection: "column",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          textAlign: "center",
-                          height: "100%",
-                          // padding: "40px 24px",
+                          background: `${stat.color}15`,
+                          color: stat.color,
+                          marginBottom: isSmallMobile ? 16 : isMobile ? 24 : 32,
+                          border: `3px solid ${stat.color}30`,
                         }}
                       >
-                        <Avatar
-                          size={100}
+                        <div style={{ fontSize: isSmallMobile ? 24 : isMobile ? 32 : 40 }}>{stat.icon}</div>
+                      </Avatar>
+                      <Title
+                        level={isSmallMobile ? 5 : 4}
+                        style={{
+                          color: "#2d3748",
+                          marginBottom: isSmallMobile ? 8 : 16,
+                          fontSize: isSmallMobile ? 12 : isMobile ? 14 : 16,
+                          fontWeight: 500,
+                          textAlign: "center",
+                        }}
+                      >
+                        {stat.title}
+                      </Title>
+                      <div
+                        style={{
+                          color: stat.color,
+                          fontSize: isSmallMobile ? "1.8rem" : isMobile ? "2.2rem" : "2.8rem",
+                          fontWeight: "bold",
+                          marginBottom: isSmallMobile ? 8 : 16,
+                          lineHeight: 1,
+                        }}
+                      >
+                        {stat.prefix}
+                        {stat.value}
+                        {stat.suffix}
+                      </div>
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+                        {stat.trend > 0 ? (
+                          <RiseOutlined style={{ 
+                            color: "#48bb78", 
+                            marginLeft: 8, 
+                            fontSize: isSmallMobile ? 16 : 20 
+                          }} />
+                        ) : (
+                          <FallOutlined style={{ 
+                            color: "#f56565", 
+                            marginLeft: 8, 
+                            fontSize: isSmallMobile ? 16 : 20 
+                          }} />
+                        )}
+                        <Text
                           style={{
-                            background: `${stat.color}15`,
-                            color: stat.color,
-                            marginBottom: 32,
-                            border: `3px solid ${stat.color}30`,
+                            color: stat.trend > 0 ? "#48bb78" : "#f56565",
+                            fontWeight: 600,
+                            fontSize: isSmallMobile ? 14 : isMobile ? 16 : 18,
                           }}
                         >
-                          <div style={{ fontSize: 40 }}>{stat.icon}</div>
-                        </Avatar>
-                        <Title
-                          level={4}
-                          style={{
-                            color: "#2d3748",
-                            marginBottom: 16,
-                            fontSize: 16,
-                            fontWeight: 500,
-                          }}
-                        >
-                          {stat.title}
-                        </Title>
-                        <div
-                          style={{
-                            color: stat.color,
-                            fontSize: "2.8rem",
-                            fontWeight: "bold",
-                            marginBottom: 16,
-                            lineHeight: 1,
-                          }}
-                        >
-                          {stat.prefix}
-                          {stat.value}
-                          {stat.suffix}
-                        </div>
-                        <div style={{ display: "flex", alignItems: "center" }}>
-                          {stat.trend > 0 ? (
-                            <RiseOutlined style={{ color: "#48bb78", marginLeft: 8, fontSize: 20 }} />
-                          ) : (
-                            <FallOutlined style={{ color: "#f56565", marginLeft: 8, fontSize: 20 }} />
-                          )}
-                          <Text
-                            style={{
-                              color: stat.trend > 0 ? "#48bb78" : "#f56565",
-                              fontWeight: 600,
-                              fontSize: 18,
-                            }}
-                          >
-                            {stat.trend > 0 ? "+" : ""}
-                            {stat.trend}%
-                          </Text>
-                        </div>
+                          {stat.trend > 0 ? "+" : ""}
+                          {stat.trend}%
+                        </Text>
                       </div>
                     </Card>
                   </motion.div>
@@ -4094,27 +5454,30 @@ const MyHome = () => {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            padding: "0 30px",
+            padding: getContainerPadding(),
             background: "white",
             position: "relative",
             width: "100%",
           }}
         >
-          <div style={{ width: "100%", maxWidth: "800px" }}>
+          <div style={{ width: "100%", maxWidth: isSmallMobile ? "100%" : isMobile ? "600px" : "800px" }}>
             <Title
               level={2}
               style={{
                 textAlign: "center",
-                marginBottom: 60,
-                fontSize: isMobile ? "2rem" : "2.5rem",
+                marginBottom: isSmallMobile ? 40 : isMobile ? 50 : 60,
+                fontSize: isSmallMobile ? "1.5rem" : isMobile ? "2rem" : "2.5rem",
                 color: "#2d3748",
               }}
             >
               פעולות מהירות
             </Title>
-            <Row gutter={[24, 24]}>
+            <Row gutter={[
+              isSmallMobile ? 12 : isMobile ? 16 : 24, 
+              isSmallMobile ? 12 : isMobile ? 16 : 24
+            ]}>
               {quickActions.map((action, index) => (
-                <Col xs={24} sm={8} key={index}>
+                <Col xs={24} sm={isSmallMobile ? 24 : 8} key={index}>
                   <motion.div variants={containerVariants}>
                     <Button
                       type="default"
@@ -4123,19 +5486,19 @@ const MyHome = () => {
                       onClick={() => navigate(action.path)}
                       block
                       style={{
-                        height: "120px",
-                        borderRadius: 20,
+                        height: isSmallMobile ? "80px" : isMobile ? "100px" : "120px",
+                        borderRadius: isSmallMobile ? 16 : 20,
                         borderWidth: 2,
                         fontWeight: 600,
                         display: "flex",
                         flexDirection: "column",
                         alignItems: "center",
                         justifyContent: "center",
-                        fontSize: 18,
-                        gap: 12,
+                        fontSize: isSmallMobile ? 14 : isMobile ? 16 : 18,
+                        gap: isSmallMobile ? 8 : 12,
                       }}
                     >
-                      <div style={{ fontSize: 32 }}>{action.icon}</div>
+                      <div style={{ fontSize: isSmallMobile ? 24 : isMobile ? 28 : 32 }}>{action.icon}</div>
                       {action.title}
                     </Button>
                   </motion.div>
@@ -4153,19 +5516,19 @@ const MyHome = () => {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            padding: "0 30px",
+            padding: getContainerPadding(),
             background: "#f8fafc",
             position: "relative",
             width: "100%",
           }}
         >
-          <div style={{ width: "100%", maxWidth: "1200px" , height: "100%" }}>
-            <div style={{ textAlign: "center", marginBottom: 60 }}>
+          <div style={{ width: "100%", maxWidth: isTablet ? "900px" : "1200px", height: "100%" }}>
+            <div style={{ textAlign: "center", marginBottom: isSmallMobile ? 40 : isMobile ? 50 : 60 }}>
               <Title
                 level={2}
                 style={{
                   marginBottom: 16,
-                  fontSize: isMobile ? "2rem" : "2.5rem",
+                  fontSize: isSmallMobile ? "1.5rem" : isMobile ? "2rem" : "2.5rem",
                   color: "#2d3748",
                 }}
               >
@@ -4174,7 +5537,7 @@ const MyHome = () => {
               <Text
                 type="secondary"
                 style={{
-                  fontSize: 18,
+                  fontSize: isSmallMobile ? 14 : isMobile ? 16 : 18,
                   display: "block",
                   maxWidth: "600px",
                   margin: "0 auto",
@@ -4185,16 +5548,20 @@ const MyHome = () => {
               </Text>
             </div>
 
-            <Row gutter={[32, 32]} >
+            <Row gutter={[
+              isSmallMobile ? 16 : isMobile ? 20 : isTablet ? 24 : 32, 
+              isSmallMobile ? 16 : isMobile ? 20 : isTablet ? 24 : 32
+            ]}>
               {menuItems.map((item, index) => (
-                <Col xs={24} sm={12} lg={6} key={index}>
+                <Col xs={24} sm={isSmallMobile ? 24 : 12} lg={isTablet ? 12 : 6} key={index}>
                   <motion.div variants={containerVariants} style={{ height: "100%" }}>
                     <Card
                       className="feature-card"
                       hoverable
                       style={{
                         height: "100%",
-                        borderRadius: "24px",
+                        minHeight: isSmallMobile ? "200px" : isMobile ? "240px" : "280px",
+                        borderRadius: isSmallMobile ? "16px" : "24px",
                         border: "none",
                         boxShadow: "0 10px 30px rgba(0, 0, 0, 0.1)",
                         background: "white",
@@ -4204,6 +5571,7 @@ const MyHome = () => {
                         display: "flex",
                         flexDirection: "column",
                         justifyContent: "space-between",
+                        padding: isSmallMobile ? "16px" : isMobile ? "20px" : "24px",
                       }}
                     >
                       <div>
@@ -4212,24 +5580,24 @@ const MyHome = () => {
                           style={{
                             background: `${item.color}20`,
                             color: item.color,
-                            width: "80px",
-                            height: "80px",
-                            borderRadius: "20px",
+                            width: isSmallMobile ? "60px" : isMobile ? "70px" : "80px",
+                            height: isSmallMobile ? "60px" : isMobile ? "70px" : "80px",
+                            borderRadius: isSmallMobile ? "16px" : "20px",
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
-                            marginBottom: "24px",
-                            fontSize: "40px",
+                            marginBottom: isSmallMobile ? "16px" : "24px",
+                            fontSize: isSmallMobile ? "30px" : isMobile ? "35px" : "40px",
                           }}
                         >
                           {item.icon}
                         </div>
                         <Title
-                          level={3}
+                          level={isSmallMobile ? 5 : 4}
                           style={{
-                            marginBottom: 16,
+                            marginBottom: isSmallMobile ? 12 : 16,
                             color: "#2d3748",
-                            fontSize: "1.5rem",
+                            fontSize: isSmallMobile ? "16px" : isMobile ? "18px" : "20px",
                           }}
                         >
                           {item.title}
@@ -4237,8 +5605,8 @@ const MyHome = () => {
                         <Paragraph
                           type="secondary"
                           style={{
-                            marginBottom: 32,
-                            fontSize: 16,
+                            marginBottom: isSmallMobile ? 16 : isMobile ? 24 : 32,
+                            fontSize: isSmallMobile ? 13 : isMobile ? 14 : 16,
                             lineHeight: 1.5,
                           }}
                         >
@@ -4250,11 +5618,11 @@ const MyHome = () => {
                         icon={<ArrowRightOutlined />}
                         onClick={() => navigate(item.path)}
                         style={{
-                          height: 50,
+                          height: isSmallMobile ? 40 : 50,
                           background: item.color,
                           borderColor: item.color,
                           fontWeight: 600,
-                          fontSize: 16,
+                          fontSize: isSmallMobile ? 14 : 16,
                         }}
                         block
                       >
@@ -4277,7 +5645,7 @@ const MyHome = () => {
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
-            padding: "0 30px",
+            padding: getContainerPadding(),
             background: "white",
             position: "relative",
             width: "100%",
@@ -4286,7 +5654,7 @@ const MyHome = () => {
           <div
             style={{
               width: "100%",
-              maxWidth: "1000px",
+              maxWidth: isTablet ? "800px" : "1000px",
               flex: 1,
               display: "flex",
               flexDirection: "column",
@@ -4298,22 +5666,25 @@ const MyHome = () => {
               style={{
                 background: "linear-gradient(135deg, #f7f9fc 0%, #eef2f7 100%)",
                 border: "none",
-                borderRadius: "30px",
-                marginBottom: 60,
+                borderRadius: isSmallMobile ? "20px" : "30px",
+                marginBottom: isSmallMobile ? 40 : 60,
                 boxShadow: "0 10px 30px rgba(0, 0, 0, 0.1)",
               }}
               bodyStyle={{
-                padding: "60px",
+                padding: isSmallMobile ? "30px 20px" : isMobile ? "40px 30px" : "60px",
               }}
             >
-              <Row gutter={[32, 32]} align="middle">
-                <Col xs={24} lg={16}>
+              <Row gutter={[
+                isSmallMobile ? 16 : 32, 
+                isSmallMobile ? 16 : 32
+              ]} align="middle">
+                <Col xs={24} lg={isSmallMobile ? 24 : 16}>
                   <Title
                     level={3}
                     style={{
                       color: "#667eea",
-                      marginBottom: 24,
-                      fontSize: isMobile ? "1.5rem" : "2rem",
+                      marginBottom: isSmallMobile ? 16 : 24,
+                      fontSize: isSmallMobile ? "1.2rem" : isMobile ? "1.5rem" : "2rem",
                       textAlign: isMobile ? "center" : "right",
                       lineHeight: 1.4,
                     }}
@@ -4323,7 +5694,7 @@ const MyHome = () => {
                   <Text
                     type="secondary"
                     style={{
-                      fontSize: 16,
+                      fontSize: isSmallMobile ? 14 : 16,
                       display: "block",
                       textAlign: isMobile ? "center" : "right",
                     }}
@@ -4331,18 +5702,19 @@ const MyHome = () => {
                     יוסי כהן, בעלים של "טכנולוגיות מתקדמות" בע״מ
                   </Text>
                 </Col>
-                <Col xs={24} lg={8} style={{ textAlign: "center" }}>
+                <Col xs={24} lg={isSmallMobile ? 24 : 8} style={{ textAlign: "center" }}>
                   <Button
                     type="primary"
                     size="large"
                     onClick={() => navigate("/register-user")}
                     style={{
-                      height: 60,
-                      padding: "0 40px",
+                      height: isSmallMobile ? 48 : 60,
+                      padding: isSmallMobile ? "0 24px" : "0 40px",
                       fontWeight: 600,
                       marginBottom: 16,
-                      fontSize: 18,
+                      fontSize: isSmallMobile ? 16 : 18,
                     }}
+                    block={isMobile}
                   >
                     הצטרף עכשיו
                   </Button>
@@ -4350,7 +5722,7 @@ const MyHome = () => {
                     <Text
                       type="secondary"
                       style={{
-                        fontSize: 14,
+                        fontSize: isSmallMobile ? 12 : 14,
                         display: "block",
                       }}
                     >
@@ -4362,11 +5734,15 @@ const MyHome = () => {
             </Card>
 
             {/* Footer */}
-            <div style={{ borderTop: "1px solid #f0f0f0", paddingTop: 40 }}>
+            <div style={{ borderTop: "1px solid #f0f0f0", paddingTop: isSmallMobile ? 30 : 40 }}>
               <Row justify="space-between" align="middle" gutter={[16, 16]}>
-                <Col xs={24} sm={12}>
-                  <Space style={{ width: "100%", justifyContent: isMobile ? "center" : "flex-start" }}>
-                    <Avatar size={48} style={{ background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)" }}>
+                <Col xs={24} sm={isMobile ? 24 : 12}>
+                  <Space style={{ 
+                    width: "100%", 
+                    justifyContent: isMobile ? "center" : "flex-start",
+                    flexDirection: isSmallMobile ? "column" : "row"
+                  }}>
+                    <Avatar size={isSmallMobile ? 40 : 48} style={{ background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)" }}>
                       <DashboardOutlined />
                     </Avatar>
                     <div style={{ textAlign: isMobile ? "center" : "right" }}>
@@ -4375,7 +5751,7 @@ const MyHome = () => {
                         style={{
                           margin: 0,
                           color: "#667eea",
-                          fontSize: "1.5rem",
+                          fontSize: isSmallMobile ? "1.2rem" : "1.5rem",
                         }}
                       >
                         BusinessMan
@@ -4383,7 +5759,7 @@ const MyHome = () => {
                       <Text
                         type="secondary"
                         style={{
-                          fontSize: 14,
+                          fontSize: isSmallMobile ? 12 : 14,
                         }}
                       >
                         © 2025 BusinessMan. כל הזכויות שמורות.
@@ -4391,15 +5767,34 @@ const MyHome = () => {
                     </div>
                   </Space>
                 </Col>
-                <Col xs={24} sm={12}>
-                  <Space style={{ width: "100%", justifyContent: isMobile ? "center" : "flex-end" }}>
-                    <Button onClick={() => {nav("/term-of-service")}} type="text" size="large" style={{ fontSize: 16 }}>
+                <Col xs={24} sm={isMobile ? 24 : 12}>
+                  <Space style={{ 
+                    width: "100%", 
+                    justifyContent: isMobile ? "center" : "flex-end",
+                    flexWrap: "wrap"
+                  }}>
+                    <Button 
+                      onClick={() => {nav("/term-of-service")}} 
+                      type="text" 
+                      size={isSmallMobile ? "middle" : "large"} 
+                      style={{ fontSize: isSmallMobile ? 14 : 16 }}
+                    >
                       תנאי שימוש
                     </Button>
-                    <Button onClick={() => {nav("/private-policy")}} type="text" size="large" style={{ fontSize: 16 }}>
+                    <Button 
+                      onClick={() => {nav("/private-policy")}} 
+                      type="text" 
+                      size={isSmallMobile ? "middle" : "large"} 
+                      style={{ fontSize: isSmallMobile ? 14 : 16 }}
+                    >
                       פרטיות
                     </Button>
-                    <Button onClick={() => {nav('/concat-us')}} type="text" size="large" style={{ fontSize: 16 }}>
+                    <Button 
+                      onClick={() => {nav('/concat-us')}} 
+                      type="text" 
+                      size={isSmallMobile ? "middle" : "large"} 
+                      style={{ fontSize: isSmallMobile ? 14 : 16 }}
+                    >
                       צור קשר
                     </Button>
                   </Space>

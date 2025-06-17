@@ -15,7 +15,7 @@ import {
   FallOutlined,
   BuildOutlined,
 } from "@ant-design/icons"
-import { motion } from "framer-motion"
+import { motion, Variants } from "framer-motion"
 import { useNavigate } from "react-router-dom"
 import { useMediaQuery } from "react-responsive"
 import { globalContext } from "../context/GlobalContext"
@@ -39,13 +39,12 @@ const MyHome = () => {
   const [monthlyReport, setMonthlyReport] = useState<number | null>(null)
 
   const navigate = useNavigate()
-  
+
   // רספונסיביות מתקדמת
   const isSmallMobile = useMediaQuery({ maxWidth: 479 })
   const isMobile = useMediaQuery({ maxWidth: 767 })
   const isTablet = useMediaQuery({ minWidth: 768, maxWidth: 1023 })
   const isDesktop = useMediaQuery({ minWidth: 1024, maxWidth: 1439 })
-  const isLargeDesktop = useMediaQuery({ minWidth: 1440 })
 
   // פונקציות עזר לגדלים
   const getContainerPadding = () => {
@@ -186,15 +185,13 @@ const MyHome = () => {
 
   useEffect(() => {
     const fetchMonthlyReport = async () => {
-      console.log(globalContextDetails.user);
-      
+      console.log(globalContextDetails.user)
+
       try {
         const businessId = globalContextDetails.business_global.id
         const year = new Date().getFullYear()
         const month = new Date().getMonth() + 1
-        const res = await axios.get(
-          `${url}/api/Reports/monthly?businessId=${businessId}&year=${year}&month=${month}`,
-        )
+        const res = await axios.get(`${url}/api/Reports/monthly?businessId=${businessId}&year=${year}&month=${month}`)
         setMonthlyReport(res.data?.monthlyMetric ?? 0)
         setIcomes(res.data?.currentMonthIncome ?? 0)
         setIcomesPrecent(res.data?.incomeChangePercent ?? 0)
@@ -217,7 +214,66 @@ const MyHome = () => {
     show: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.2,
+        staggerChildren: 0.15,
+        delayChildren: 0.1,
+      },
+    },
+  }
+
+  const itemVariants = {
+    hidden: {
+      opacity: 0,
+      y: 30,
+      scale: 0.95,
+    },
+    show: {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      transition: {
+        stiffness: 100,
+        damping: 15,
+        duration: 0.6,
+      },
+    },
+  }
+
+  const cardHoverVariants = {
+    rest: {
+      scale: 1,
+      boxShadow: "0 10px 30px rgba(0, 0, 0, 0.1)",
+    },
+    hover: {
+      scale: 1.05,
+      boxShadow: "0 20px 60px rgba(0, 0, 0, 0.15)",
+      transition: {
+        type: "spring",
+        stiffness: 300,
+        damping: 20,
+      },
+    },
+  }
+
+  const buttonHoverVariants: Variants = {
+    rest: { scale: 1 },
+    hover: {
+      scale: 1.05,
+      transition: {
+        type: "spring" as const,
+        stiffness: 400,
+        damping: 10,
+      },
+    },
+    tap: { scale: 0.95 },
+  }
+
+  const floatingVariants = {
+    animate: {
+      y: [-10, 10, -10],
+      transition: {
+        duration: 4,
+        repeat: Number.POSITIVE_INFINITY,
+        ease: [0.42, 0, 0.58, 1], // Cubic Bezier easing equivalent to easeInOut
       },
     },
   }
@@ -244,6 +300,8 @@ const MyHome = () => {
         <motion.div
           className="hero-section"
           variants={containerVariants}
+          initial="hidden"
+          animate="show"
           style={{
             minHeight: "100vh",
             background: "linear-gradient(135deg,purple 0%,#6878e2  100%) ",
@@ -267,107 +325,154 @@ const MyHome = () => {
               opacity: 0.3,
             }}
           />
-          <Row 
+          <Row
             gutter={[
-              isSmallMobile ? 16 : isMobile ? 24 : isTablet ? 32 : 48, 
-              isSmallMobile ? 16 : isMobile ? 24 : isTablet ? 32 : 48
-            ]} 
-            align="middle" 
-            style={{ 
-              width: "100%", 
-              maxWidth: isSmallMobile ? "100%" : isMobile ? "100%" : isTablet ? "1000px" : "1400px", 
-              zIndex: 1 
+              isSmallMobile ? 16 : isMobile ? 24 : isTablet ? 32 : 48,
+              isSmallMobile ? 16 : isMobile ? 24 : isTablet ? 32 : 48,
+            ]}
+            align="middle"
+            style={{
+              width: "100%",
+              maxWidth: isSmallMobile ? "100%" : isMobile ? "100%" : isTablet ? "1000px" : "1400px",
+              zIndex: 1,
             }}
           >
             <Col xs={24} lg={isMobile ? 24 : 12}>
-              <motion.div variants={containerVariants} style={{ textAlign: "center" }}>
-                <Title
-                  level={1}
-                  style={{
-                    color: "white",
-                    marginBottom: isSmallMobile ? 16 : isMobile ? 24 : 32,
-                    fontSize: fonts.h1,
-                    fontWeight: 700,
-                    lineHeight: 1.2,
-                    textShadow: "0 4px 20px rgba(0,0,0,0.3)",
-                  }}
+              <motion.div variants={itemVariants} style={{ textAlign: "center" }}>
+                <motion.div
+                  initial={{ opacity: 0, y: -50 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2, duration: 0.8, type: "spring" }}
                 >
-                  שלום, {globalContextDetails.user?.firstName || "אורח"}
-                </Title>
-                <Title
-                  level={2}
-                  style={{
-                    color: "rgba(255,255,255,0.95)",
-                    marginBottom: isSmallMobile ? 20 : isMobile ? 30 : 40,
-                    fontWeight: 300,
-                    fontSize: fonts.h2,
-                    lineHeight: 1.4,
-                  }}
-                >
-                  ברוכים הבאים למערכת BusinessMan
-                </Title>
-                <Paragraph
-                  style={{
-                    color: "rgba(255,255,255,0.85)",
-                    fontSize: fonts.p,
-                    marginBottom: isSmallMobile ? 32 : isMobile ? 40 : 60,
-                    lineHeight: 1.7,
-                    maxWidth: isSmallMobile ? "280px" : isMobile ? "400px" : "600px",
-                    margin: `0 auto ${isSmallMobile ? 32 : isMobile ? 40 : 60}px auto`,
-                  }}
-                >
-                  הדרך החכמה לנהל את העסק שלך - כלים מתקדמים לניהול הכנסות, הוצאות ודוחות
-                </Paragraph>
-                <Space 
-                  size={isMobile ? "middle" : "large"} 
-                  wrap 
-                  style={{ justifyContent: "center" }}
-                  direction={isSmallMobile ? "vertical" : "horizontal"}
-                >
-                  <Button
-                    type="primary"
-                    size="large"
-                    onClick={() => navigate("/view-data")}
+                  <Title
+                    level={1}
                     style={{
-                      height: buttonConfig.height,
-                      padding: buttonConfig.padding,
-                      background: "rgba(255,255,255,0.2)",
-                      borderColor: "rgba(255,255,255,0.4)",
                       color: "white",
-                      fontWeight: 600,
-                      fontSize: buttonConfig.fontSize,
-                      borderRadius: buttonConfig.height / 2,
-                      backdropFilter: "blur(10px)",
-                      boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
-                      minWidth: isSmallMobile ? "200px" : "auto",
+                      marginBottom: isSmallMobile ? 16 : isMobile ? 24 : 32,
+                      fontSize: fonts.h1,
+                      fontWeight: 700,
+                      lineHeight: 1.2,
+                      textShadow: "0 4px 20px rgba(0,0,0,0.3)",
                     }}
                   >
-                    צפה בנתוני העסק
-                  </Button>
-                  <Button
-                    size="large"
-                    onClick={() => navigate("/account-transactions")}
+                    שלום, {globalContextDetails.user?.firstName || "אורח"}
+                  </Title>
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, y: -30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4, duration: 0.8, type: "spring" }}
+                >
+                  <Title
+                    level={2}
                     style={{
-                      height: buttonConfig.height,
-                      padding: buttonConfig.padding,
-                      background: orange,
-                      borderColor: orange,
-                      color: "white",
-                      fontWeight: 600,
-                      fontSize: buttonConfig.fontSize,
-                      borderRadius: buttonConfig.height / 2,
-                      boxShadow: "0 8px 32px rgba(250,140,22,0.3)",
-                      minWidth: isSmallMobile ? "200px" : "auto",
+                      color: "rgba(255,255,255,0.95)",
+                      marginBottom: isSmallMobile ? 20 : isMobile ? 30 : 40,
+                      fontWeight: 300,
+                      fontSize: fonts.h2,
+                      lineHeight: 1.4,
                     }}
                   >
-                    נהל תנועות בעסק
-                  </Button>
-                </Space>
+                    ברוכים הבאים למערכת BusinessMan
+                  </Title>
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.6, duration: 0.8, type: "spring" }}
+                >
+                  <Paragraph
+                    style={{
+                      color: "rgba(255,255,255,0.85)",
+                      fontSize: fonts.p,
+                      marginBottom: isSmallMobile ? 32 : isMobile ? 40 : 60,
+                      lineHeight: 1.7,
+                      maxWidth: isSmallMobile ? "280px" : isMobile ? "400px" : "600px",
+                      margin: `0 auto ${isSmallMobile ? 32 : isMobile ? 40 : 60}px auto`,
+                    }}
+                  >
+                    הדרך החכמה לנהל את העסק שלך - כלים מתקדמים לניהול הכנסות, הוצאות ודוחות
+                  </Paragraph>
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.8, duration: 0.8, type: "spring" }}
+                >
+                  <Space
+                    size={isMobile ? "middle" : "large"}
+                    wrap
+                    style={{ justifyContent: "center" }}
+                    direction={isSmallMobile ? "vertical" : "horizontal"}
+                  >
+                    <motion.div
+                      variants={{
+                        rest: { scale: 1 },
+                        hover: {
+                          scale: 1.05,
+                          transition: {
+                            type: "spring", // Ensure this matches the expected type
+                            stiffness: 400,
+                            damping: 10,
+                          },
+                        },
+                        tap: { scale: 0.95 },
+                      }}
+                      initial="rest"
+                      whileHover="hover"
+                      whileTap="tap"
+                    >
+                      <Button
+                        type="primary"
+                        size="large"
+                        onClick={() => navigate("/view-data")}
+                        style={{
+                          height: buttonConfig.height,
+                          padding: buttonConfig.padding,
+                          background: "rgba(255,255,255,0.2)",
+                          borderColor: "rgba(255,255,255,0.4)",
+                          color: "white",
+                          fontWeight: 600,
+                          fontSize: buttonConfig.fontSize,
+                          borderRadius: buttonConfig.height / 2,
+                          backdropFilter: "blur(10px)",
+                          boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
+                          minWidth: isSmallMobile ? "200px" : "auto",
+                        }}
+                      >
+                        צפה בנתוני העסק
+                      </Button>
+                    </motion.div>
+                    <motion.div variants={buttonHoverVariants as Variants} initial="rest" whileHover="hover" whileTap="tap">
+                      <Button
+                        size="large"
+                        onClick={() => navigate("/account-transactions")}
+                        style={{
+                          height: buttonConfig.height,
+                          padding: buttonConfig.padding,
+                          background: orange,
+                          borderColor: orange,
+                          color: "white",
+                          fontWeight: 600,
+                          fontSize: buttonConfig.fontSize,
+                          borderRadius: buttonConfig.height / 2,
+                          boxShadow: "0 8px 32px rgba(250,140,22,0.3)",
+                          minWidth: isSmallMobile ? "200px" : "auto",
+                        }}
+                      >
+                        נהל תנועות בעסק
+                      </Button>
+                    </motion.div>
+                  </Space>
+                </motion.div>
               </motion.div>
             </Col>
             {!isMobile && (
               <Col xs={24} lg={12} style={{ textAlign: "center" }}>
-                <motion.div variants={containerVariants}>
+                <motion.div variants={floatingVariants} animate="animate">
                   <div
                     style={{
                       width: "100%",
@@ -384,10 +489,12 @@ const MyHome = () => {
                       boxShadow: "0 20px 60px rgba(0,0,0,0.2)",
                     }}
                   >
-                    <BuildOutlined style={{ 
-                      fontSize: isTablet ? 120 : isDesktop ? 160 : 200, 
-                      color: "rgba(255,255,255,0.9)" 
-                    }} />
+                    <BuildOutlined
+                      style={{
+                        fontSize: isTablet ? 120 : isDesktop ? 160 : 200,
+                        color: "rgba(255,255,255,0.9)",
+                      }}
+                    />
                   </div>
                 </motion.div>
               </Col>
@@ -435,106 +542,167 @@ const MyHome = () => {
                 מבט כללי על ביצועי העסק שלך החודש
               </Text>
             </div>
-            <Row gutter={[
-              isSmallMobile ? 12 : isMobile ? 16 : isTablet ? 24 : 40, 
-              isSmallMobile ? 12 : isMobile ? 16 : isTablet ? 24 : 40
-            ]} justify="center">
+            <Row
+              gutter={[
+                isSmallMobile ? 12 : isMobile ? 16 : isTablet ? 24 : 40,
+                isSmallMobile ? 12 : isMobile ? 16 : isTablet ? 24 : 40,
+              ]}
+              justify="center"
+            >
               {statsData.map((stat, index) => (
                 <Col xs={24} sm={12} lg={6} key={index}>
-                  <motion.div variants={containerVariants}>
-                    <Card
-                      style={{
-                        borderRadius: isSmallMobile ? "20px" : isMobile ? "24px" : "32px",
-                        border: "none",
-                        boxShadow: "0 20px 60px rgba(0, 0, 0, 0.08)",
-                        background: "white",
-                        overflow: "hidden",
-                        position: "relative",
-                        height: "100%",
-                        minHeight: isSmallMobile ? "180px" : isMobile ? "220px" : "280px",
+                  <motion.div
+                    variants={itemVariants}
+                    initial="hidden"
+                    whileInView="show"
+                    viewport={{ once: true, amount: 0.3 }}
+                  >
+                    <motion.div
+                      variants={{
+                        rest: {
+                          scale: 1,
+                          boxShadow: "0 10px 30px rgba(0, 0, 0, 0.1)",
+                        },
+                        hover: {
+                          scale: 1.05,
+                          boxShadow: "0 20px 60px rgba(0, 0, 0, 0.15)",
+                          transition: {
+                            type: 'spring',
+                            stiffness: 300,
+                            damping: 20,
+                          },
+                        },
                       }}
-                      bodyStyle={{
-                        padding: isSmallMobile ? "20px 16px" : isMobile ? "30px 20px" : "40px 24px",
-                        height: "100%",
-                        display: "flex",
-                        flexDirection: "column",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        textAlign: "center",
-                      }}
+                      initial="rest"
+                      whileHover="hover"
+                      whileTap={{ scale: 0.98 }}
                     >
-                      <div
+                      <Card
                         style={{
-                          position: "absolute",
-                          top: 0,
-                          left: 0,
-                          right: 0,
-                          height: "6px",
-                          background: `linear-gradient(90deg, ${stat.color}, ${stat.color}80)`,
+                          borderRadius: isSmallMobile ? "20px" : isMobile ? "24px" : "32px",
+                          border: "none",
+                          boxShadow: "0 20px 60px rgba(0, 0, 0, 0.08)",
+                          background: "white",
+                          overflow: "hidden",
+                          position: "relative",
+                          height: "100%",
+                          minHeight: isSmallMobile ? "180px" : isMobile ? "220px" : "280px",
                         }}
-                      />
-                      <Avatar
-                        size={isSmallMobile ? 60 : isMobile ? 80 : 100}
-                        style={{
-                          background: `${stat.color}15`,
-                          color: stat.color,
-                          marginBottom: isSmallMobile ? 16 : isMobile ? 24 : 32,
-                          border: `3px solid ${stat.color}30`,
-                        }}
-                      >
-                        <div style={{ fontSize: isSmallMobile ? 24 : isMobile ? 32 : 40 }}>{stat.icon}</div>
-                      </Avatar>
-                      <Title
-                        level={isSmallMobile ? 5 : 4}
-                        style={{
-                          color: "#2d3748",
-                          marginBottom: isSmallMobile ? 8 : 16,
-                          fontSize: isSmallMobile ? 12 : isMobile ? 14 : 16,
-                          fontWeight: 500,
+                        bodyStyle={{
+                          padding: isSmallMobile ? "20px 16px" : isMobile ? "30px 20px" : "40px 24px",
+                          height: "100%",
+                          display: "flex",
+                          flexDirection: "column",
+                          justifyContent: "center",
+                          alignItems: "center",
                           textAlign: "center",
                         }}
                       >
-                        {stat.title}
-                      </Title>
-                      <div
-                        style={{
-                          color: stat.color,
-                          fontSize: isSmallMobile ? "1.8rem" : isMobile ? "2.2rem" : "2.8rem",
-                          fontWeight: "bold",
-                          marginBottom: isSmallMobile ? 8 : 16,
-                          lineHeight: 1,
-                        }}
-                      >
-                        {stat.prefix}
-                        {stat.value}
-                        {stat.suffix}
-                      </div>
-                      <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
-                        {stat.trend > 0 ? (
-                          <RiseOutlined style={{ 
-                            color: "#48bb78", 
-                            marginLeft: 8, 
-                            fontSize: isSmallMobile ? 16 : 20 
-                          }} />
-                        ) : (
-                          <FallOutlined style={{ 
-                            color: "#f56565", 
-                            marginLeft: 8, 
-                            fontSize: isSmallMobile ? 16 : 20 
-                          }} />
-                        )}
-                        <Text
+                        <div
                           style={{
-                            color: stat.trend > 0 ? "#48bb78" : "#f56565",
-                            fontWeight: 600,
-                            fontSize: isSmallMobile ? 14 : isMobile ? 16 : 18,
+                            position: "absolute",
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            height: "6px",
+                            background: `linear-gradient(90deg, ${stat.color}, ${stat.color}80)`,
+                          }}
+                        />
+                        <motion.div
+                          initial={{ scale: 0 }}
+                          whileInView={{ scale: 1 }}
+                          transition={{ delay: index * 0.1, type: "spring", stiffness: 200 }}
+                          viewport={{ once: true }}
+                        >
+                          <Avatar
+                            size={isSmallMobile ? 60 : isMobile ? 80 : 100}
+                            style={{
+                              background: `${stat.color}15`,
+                              color: stat.color,
+                              marginBottom: isSmallMobile ? 16 : isMobile ? 24 : 32,
+                              border: `3px solid ${stat.color}30`,
+                            }}
+                          >
+                            <div style={{ fontSize: isSmallMobile ? 24 : isMobile ? 32 : 40 }}>{stat.icon}</div>
+                          </Avatar>
+                        </motion.div>
+
+                        <motion.div
+                          initial={{ opacity: 0 }}
+                          whileInView={{ opacity: 1 }}
+                          transition={{ delay: index * 0.1 + 0.2 }}
+                          viewport={{ once: true }}
+                        >
+                          <Title
+                            level={isSmallMobile ? 5 : 4}
+                            style={{
+                              color: "#2d3748",
+                              marginBottom: isSmallMobile ? 8 : 16,
+                              fontSize: isSmallMobile ? 12 : isMobile ? 14 : 16,
+                              fontWeight: 500,
+                              textAlign: "center",
+                            }}
+                          >
+                            {stat.title}
+                          </Title>
+                        </motion.div>
+
+                        <motion.div
+                          initial={{ scale: 0.5, opacity: 0 }}
+                          whileInView={{ scale: 1, opacity: 1 }}
+                          transition={{ delay: index * 0.1 + 0.4, type: "spring" }}
+                          viewport={{ once: true }}
+                          style={{
+                            color: stat.color,
+                            fontSize: isSmallMobile ? "1.8rem" : isMobile ? "2.2rem" : "2.8rem",
+                            fontWeight: "bold",
+                            marginBottom: isSmallMobile ? 8 : 16,
+                            lineHeight: 1,
                           }}
                         >
-                          {stat.trend > 0 ? "+" : ""}
-                          {stat.trend}%
-                        </Text>
-                      </div>
-                    </Card>
+                          {stat.prefix}
+                          {stat.value}
+                          {stat.suffix}
+                        </motion.div>
+
+                        <motion.div
+                          initial={{ x: -20, opacity: 0 }}
+                          whileInView={{ x: 0, opacity: 1 }}
+                          transition={{ delay: index * 0.1 + 0.6 }}
+                          viewport={{ once: true }}
+                        >
+                          <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+                            {stat.trend > 0 ? (
+                              <RiseOutlined
+                                style={{
+                                  color: "#48bb78",
+                                  marginLeft: 8,
+                                  fontSize: isSmallMobile ? 16 : 20,
+                                }}
+                              />
+                            ) : (
+                              <FallOutlined
+                                style={{
+                                  color: "#f56565",
+                                  marginLeft: 8,
+                                  fontSize: isSmallMobile ? 16 : 20,
+                                }}
+                              />
+                            )}
+                            <Text
+                              style={{
+                                color: stat.trend > 0 ? "#48bb78" : "#f56565",
+                                fontWeight: 600,
+                                fontSize: isSmallMobile ? 14 : isMobile ? 16 : 18,
+                              }}
+                            >
+                              {stat.trend > 0 ? "+" : ""}
+                              {stat.trend}%
+                            </Text>
+                          </div>
+                        </motion.div>
+                      </Card>
+                    </motion.div>
                   </motion.div>
                 </Col>
               ))}
@@ -568,35 +736,46 @@ const MyHome = () => {
             >
               פעולות מהירות
             </Title>
-            <Row gutter={[
-              isSmallMobile ? 12 : isMobile ? 16 : 24, 
-              isSmallMobile ? 12 : isMobile ? 16 : 24
-            ]}>
+            <Row gutter={[isSmallMobile ? 12 : isMobile ? 16 : 24, isSmallMobile ? 12 : isMobile ? 16 : 24]}>
               {quickActions.map((action, index) => (
                 <Col xs={24} sm={isSmallMobile ? 24 : 8} key={index}>
-                  <motion.div variants={containerVariants}>
-                    <Button
-                      type="default"
-                      size="large"
-                      icon={action.icon}
-                      onClick={() => navigate(action.path)}
-                      block
-                      style={{
-                        height: isSmallMobile ? "80px" : isMobile ? "100px" : "120px",
-                        borderRadius: isSmallMobile ? 16 : 20,
-                        borderWidth: 2,
-                        fontWeight: 600,
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        fontSize: isSmallMobile ? 14 : isMobile ? 16 : 18,
-                        gap: isSmallMobile ? 8 : 12,
-                      }}
-                    >
-                      <div style={{ fontSize: isSmallMobile ? 24 : isMobile ? 28 : 32 }}>{action.icon}</div>
-                      {action.title}
-                    </Button>
+                  <motion.div
+                    variants={itemVariants}
+                    initial="hidden"
+                    whileInView="show"
+                    viewport={{ once: true, amount: 0.5 }}
+                    transition={{ delay: index * 0.1 }}
+                  >
+                    <motion.div variants={buttonHoverVariants} initial="rest" whileHover="hover" whileTap="tap">
+                      <Button
+                        type="default"
+                        size="large"
+                        icon={action.icon}
+                        onClick={() => navigate(action.path)}
+                        block
+                        style={{
+                          height: isSmallMobile ? "80px" : isMobile ? "100px" : "120px",
+                          borderRadius: isSmallMobile ? 16 : 20,
+                          borderWidth: 2,
+                          fontWeight: 600,
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          fontSize: isSmallMobile ? 14 : isMobile ? 16 : 18,
+                          gap: isSmallMobile ? 8 : 12,
+                        }}
+                      >
+                        <motion.div
+                          initial={{ y: 5 }}
+                          whileHover={{ y: 0 }}
+                          transition={{ type: "spring", stiffness: 300 }}
+                        >
+                          <div style={{ fontSize: isSmallMobile ? 24 : isMobile ? 28 : 32 }}>{action.icon}</div>
+                          {action.title}
+                        </motion.div>
+                      </Button>
+                    </motion.div>
                   </motion.div>
                 </Col>
               ))}
@@ -645,86 +824,121 @@ const MyHome = () => {
             </div>
 
             <Row gutter={[
-              isSmallMobile ? 16 : isMobile ? 20 : isTablet ? 24 : 32, 
+              isSmallMobile ? 16 : isMobile ? 20 : isTablet ? 24 : 32,
               isSmallMobile ? 16 : isMobile ? 20 : isTablet ? 24 : 32
             ]}>
               {menuItems.map((item, index) => (
                 <Col xs={24} sm={isSmallMobile ? 24 : 12} lg={isTablet ? 12 : 6} key={index}>
-                  <motion.div variants={containerVariants} style={{ height: "100%" }}>
-                    <Card
-                      className="feature-card"
-                      hoverable
-                      style={{
-                        height: "100%",
-                        minHeight: isSmallMobile ? "200px" : isMobile ? "240px" : "280px",
-                        borderRadius: isSmallMobile ? "16px" : "24px",
-                        border: "none",
-                        boxShadow: "0 10px 30px rgba(0, 0, 0, 0.1)",
-                        background: "white",
+                  <motion.div
+                    variants={itemVariants}
+                    initial="hidden"
+                    whileInView="show"
+                    viewport={{ once: true, amount: 0.3 }}
+                    transition={{ delay: index * 0.15 }}
+                    style={{ height: "100%" }}
+                  >
+                    <motion.div
+                      variants={{
+                        rest: {
+                          scale: 1,
+                          boxShadow: "0 10px 30px rgba(0, 0, 0, 0.1)",
+                        },
+                        hover: {
+                          scale: 1.05,
+                          boxShadow: "0 20px 60px rgba(0, 0, 0, 0.15)",
+                          transition: {
+                            type: "spring",
+                            stiffness: 300,
+                            damping: 20,
+                          },
+                        },
                       }}
-                      bodyStyle={{
-                        height: "100%",
-                        display: "flex",
-                        flexDirection: "column",
-                        justifyContent: "space-between",
-                        padding: isSmallMobile ? "16px" : isMobile ? "20px" : "24px",
-                      }}
+                      initial="rest"
+                      whileHover="hover"
+                      style={{ height: "100%" }}
+                      whileTap={{ scale: 0.98 }}
                     >
-                      <div>
-                        <div
-                          className="icon-wrapper"
-                          style={{
-                            background: `${item.color}20`,
-                            color: item.color,
-                            width: isSmallMobile ? "60px" : isMobile ? "70px" : "80px",
-                            height: isSmallMobile ? "60px" : isMobile ? "70px" : "80px",
-                            borderRadius: isSmallMobile ? "16px" : "20px",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            marginBottom: isSmallMobile ? "16px" : "24px",
-                            fontSize: isSmallMobile ? "30px" : isMobile ? "35px" : "40px",
-                          }}
-                        >
-                          {item.icon}
-                        </div>
-                        <Title
-                          level={isSmallMobile ? 5 : 4}
-                          style={{
-                            marginBottom: isSmallMobile ? 12 : 16,
-                            color: "#2d3748",
-                            fontSize: isSmallMobile ? "16px" : isMobile ? "18px" : "20px",
-                          }}
-                        >
-                          {item.title}
-                        </Title>
-                        <Paragraph
-                          type="secondary"
-                          style={{
-                            marginBottom: isSmallMobile ? 16 : isMobile ? 24 : 32,
-                            fontSize: isSmallMobile ? 13 : isMobile ? 14 : 16,
-                            lineHeight: 1.5,
-                          }}
-                        >
-                          {item.description}
-                        </Paragraph>
-                      </div>
-                      <Button
-                        type="primary"
-                        icon={<ArrowRightOutlined />}
-                        onClick={() => navigate(item.path)}
+
+                      <Card
+                        className="feature-card"
+                        hoverable
                         style={{
-                          height: isSmallMobile ? 40 : 50,
-                          background: item.color,
-                          borderColor: item.color,
-                          fontWeight: 600,
-                          fontSize: isSmallMobile ? 14 : 16,
+                          height: "100%",
+                          minHeight: isSmallMobile ? "200px" : isMobile ? "240px" : "280px",
+                          borderRadius: isSmallMobile ? "16px" : "24px",
+                          border: "none",
+                          boxShadow: "0 10px 30px rgba(0, 0, 0, 0.1)",
+                          background: "white",
                         }}
-                        block
+                        bodyStyle={{
+                          height: "100%",
+                          display: "flex",
+                          flexDirection: "column",
+                          justifyContent: "space-between",
+                          padding: isSmallMobile ? "16px" : isMobile ? "20px" : "24px",
+                        }}
                       >
-                        כניסה
-                      </Button>
-                    </Card>
+                        <div>
+                          <motion.div
+                            className="icon-wrapper"
+                            whileHover={{
+                              rotate: [0, -10, 10, 0],
+                              transition: { duration: 0.5 },
+                            }}
+                            style={{
+                              background: `${item.color}20`,
+                              color: item.color,
+                              width: isSmallMobile ? "60px" : isMobile ? "70px" : "80px",
+                              height: isSmallMobile ? "60px" : isMobile ? "70px" : "80px",
+                              borderRadius: isSmallMobile ? "16px" : "20px",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              marginBottom: isSmallMobile ? "16px" : "24px",
+                              fontSize: isSmallMobile ? "30px" : isMobile ? "35px" : "40px",
+                            }}
+                          >
+                            {item.icon}
+                          </motion.div>
+
+                          <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            transition={{ delay: index * 0.1 + 0.2 }}
+                            viewport={{ once: true }}
+                          >
+                            <Title level={isSmallMobile ? 5 : 4}>{item.title}</Title>
+                          </motion.div>
+
+                          <motion.div
+                            initial={{ opacity: 0 }}
+                            whileInView={{ opacity: 1 }}
+                            transition={{ delay: index * 0.1 + 0.4 }}
+                            viewport={{ once: true }}
+                          >
+                            <Paragraph type="secondary">{item.description}</Paragraph>
+                          </motion.div>
+                        </div>
+
+                        <motion.div variants={buttonHoverVariants} initial="rest" whileHover="hover" whileTap="tap">
+                          <Button
+                            type="primary"
+                            icon={<ArrowRightOutlined />}
+                            onClick={() => navigate(item.path)}
+                            style={{
+                              height: isSmallMobile ? 40 : 50,
+                              background: item.color,
+                              borderColor: item.color,
+                              fontWeight: 600,
+                              fontSize: isSmallMobile ? 14 : 16,
+                            }}
+                            block
+                          >
+                            כניסה
+                          </Button>
+                        </motion.div>
+                      </Card>
+                    </motion.div>
                   </motion.div>
                 </Col>
               ))}
@@ -757,88 +971,113 @@ const MyHome = () => {
               justifyContent: "center",
             }}
           >
-            <Card
-              className="testimonial-section"
-              style={{
-                background: "linear-gradient(135deg, #f7f9fc 0%, #eef2f7 100%)",
-                border: "none",
-                borderRadius: isSmallMobile ? "20px" : "30px",
-                marginBottom: isSmallMobile ? 40 : 60,
-                boxShadow: "0 10px 30px rgba(0, 0, 0, 0.1)",
-              }}
-              bodyStyle={{
-                padding: isSmallMobile ? "30px 20px" : isMobile ? "40px 30px" : "60px",
-              }}
+            <motion.div
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, type: "spring" }}
+              viewport={{ once: true, amount: 0.3 }}
             >
-              <Row gutter={[
-                isSmallMobile ? 16 : 32, 
-                isSmallMobile ? 16 : 32
-              ]} align="middle">
-                <Col xs={24} lg={isSmallMobile ? 24 : 16}>
-                  <Title
-                    level={3}
-                    style={{
-                      color: "#667eea",
-                      marginBottom: isSmallMobile ? 16 : 24,
-                      fontSize: isSmallMobile ? "1.2rem" : isMobile ? "1.5rem" : "2rem",
-                      textAlign: isMobile ? "center" : "right",
-                      lineHeight: 1.4,
-                    }}
-                  >
-                    "מערכת BusinessMan שינתה את הדרך שבה אני מנהל את העסק שלי. הכל נגיש ויעיל."
-                  </Title>
-                  <Text
-                    type="secondary"
-                    style={{
-                      fontSize: isSmallMobile ? 14 : 16,
-                      display: "block",
-                      textAlign: isMobile ? "center" : "right",
-                    }}
-                  >
-                    יוסי כהן, בעלים של "טכנולוגיות מתקדמות" בע״מ
-                  </Text>
-                </Col>
-                <Col xs={24} lg={isSmallMobile ? 24 : 8} style={{ textAlign: "center" }}>
-                  <Button
-                    type="primary"
-                    size="large"
-                    onClick={() => navigate("/register-user")}
-                    style={{
-                      height: isSmallMobile ? 48 : 60,
-                      padding: isSmallMobile ? "0 24px" : "0 40px",
-                      fontWeight: 600,
-                      marginBottom: 16,
-                      fontSize: isSmallMobile ? 16 : 18,
-                    }}
-                    block={isMobile}
-                  >
-                    הצטרף עכשיו
-                  </Button>
-                  <div>
-                    <Text
-                      type="secondary"
-                      style={{
-                        fontSize: isSmallMobile ? 12 : 14,
-                        display: "block",
-                      }}
+              <Card
+                className="testimonial-section"
+                style={{
+                  background: "linear-gradient(135deg, #f7f9fc 0%, #eef2f7 100%)",
+                  border: "none",
+                  borderRadius: isSmallMobile ? "20px" : "30px",
+                  marginBottom: isSmallMobile ? 40 : 60,
+                  boxShadow: "0 10px 30px rgba(0, 0, 0, 0.1)",
+                }}
+                bodyStyle={{
+                  padding: isSmallMobile ? "30px 20px" : isMobile ? "40px 30px" : "60px",
+                }}
+              >
+                <Row gutter={[isSmallMobile ? 16 : 32, isSmallMobile ? 16 : 32]} align="middle">
+                  <Col xs={24} lg={isSmallMobile ? 24 : 16}>
+                    <motion.div
+                      initial={{ opacity: 0, x: -30 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.2, duration: 0.6 }}
+                      viewport={{ once: true }}
                     >
-                      הצטרפו למאות עסקים שכבר משתמשים במערכת
-                    </Text>
-                  </div>
-                </Col>
-              </Row>
-            </Card>
+                      <Title
+                        level={3}
+                        style={{
+                          color: "#667eea",
+                          marginBottom: isSmallMobile ? 16 : 24,
+                          fontSize: isSmallMobile ? "1.2rem" : isMobile ? "1.5rem" : "2rem",
+                          textAlign: isMobile ? "center" : "right",
+                          lineHeight: 1.4,
+                        }}
+                      >
+                        "מערכת BusinessMan שינתה את הדרך שבה אני מנהל את העסק שלי. הכל נגיש ויעיל."
+                      </Title>
+                      <Text
+                        type="secondary"
+                        style={{
+                          fontSize: isSmallMobile ? 14 : 16,
+                          display: "block",
+                          textAlign: isMobile ? "center" : "right",
+                        }}
+                      >
+                        יוסי כהן, בעלים של "טכנולוגיות מתקדמות" בע״מ
+                      </Text>
+                    </motion.div>
+                  </Col>
+                  <Col xs={24} lg={isSmallMobile ? 24 : 8} style={{ textAlign: "center" }}>
+                    <motion.div
+                      initial={{ opacity: 0, x: 30 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.4, duration: 0.6 }}
+                      viewport={{ once: true }}
+                    >
+                      <motion.div variants={buttonHoverVariants} initial="rest" whileHover="hover" whileTap="tap">
+                        <Button
+                          type="primary"
+                          size="large"
+                          onClick={() => navigate("/register-user")}
+                          style={{
+                            height: isSmallMobile ? 48 : 60,
+                            padding: isSmallMobile ? "0 24px" : "0 40px",
+                            fontWeight: 600,
+                            marginBottom: 16,
+                            fontSize: isSmallMobile ? 16 : 18,
+                          }}
+                          block={isMobile}
+                        >
+                          הצטרף עכשיו
+                        </Button>
+                      </motion.div>
+                    </motion.div>
+                    <div>
+                      <Text
+                        type="secondary"
+                        style={{
+                          fontSize: isSmallMobile ? 12 : 14,
+                          display: "block",
+                        }}
+                      >
+                        הצטרפו למאות עסקים שכבר משתמשים במערכת
+                      </Text>
+                    </div>
+                  </Col>
+                </Row>
+              </Card>
+            </motion.div>
 
             {/* Footer */}
             <div style={{ borderTop: "1px solid #f0f0f0", paddingTop: isSmallMobile ? 30 : 40 }}>
               <Row justify="space-between" align="middle" gutter={[16, 16]}>
                 <Col xs={24} sm={isMobile ? 24 : 12}>
-                  <Space style={{ 
-                    width: "100%", 
-                    justifyContent: isMobile ? "center" : "flex-start",
-                    flexDirection: isSmallMobile ? "column" : "row"
-                  }}>
-                    <Avatar size={isSmallMobile ? 40 : 48} style={{ background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)" }}>
+                  <Space
+                    style={{
+                      width: "100%",
+                      justifyContent: isMobile ? "center" : "flex-start",
+                      flexDirection: isSmallMobile ? "column" : "row",
+                    }}
+                  >
+                    <Avatar
+                      size={isSmallMobile ? 40 : 48}
+                      style={{ background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)" }}
+                    >
                       <DashboardOutlined />
                     </Avatar>
                     <div style={{ textAlign: isMobile ? "center" : "right" }}>
@@ -864,31 +1103,39 @@ const MyHome = () => {
                   </Space>
                 </Col>
                 <Col xs={24} sm={isMobile ? 24 : 12}>
-                  <Space style={{ 
-                    width: "100%", 
-                    justifyContent: isMobile ? "center" : "flex-end",
-                    flexWrap: "wrap"
-                  }}>
-                    <Button 
-                      onClick={() => {nav("/term-of-service")}} 
-                      type="text" 
-                      size={isSmallMobile ? "middle" : "large"} 
+                  <Space
+                    style={{
+                      width: "100%",
+                      justifyContent: isMobile ? "center" : "flex-end",
+                      flexWrap: "wrap",
+                    }}
+                  >
+                    <Button
+                      onClick={() => {
+                        nav("/term-of-service")
+                      }}
+                      type="text"
+                      size={isSmallMobile ? "middle" : "large"}
                       style={{ fontSize: isSmallMobile ? 14 : 16 }}
                     >
                       תנאי שימוש
                     </Button>
-                    <Button 
-                      onClick={() => {nav("/private-policy")}} 
-                      type="text" 
-                      size={isSmallMobile ? "middle" : "large"} 
+                    <Button
+                      onClick={() => {
+                        nav("/private-policy")
+                      }}
+                      type="text"
+                      size={isSmallMobile ? "middle" : "large"}
                       style={{ fontSize: isSmallMobile ? 14 : 16 }}
                     >
                       פרטיות
                     </Button>
-                    <Button 
-                      onClick={() => {nav('/concat-us')}} 
-                      type="text" 
-                      size={isSmallMobile ? "middle" : "large"} 
+                    <Button
+                      onClick={() => {
+                        nav("/concat-us")
+                      }}
+                      type="text"
+                      size={isSmallMobile ? "middle" : "large"}
                       style={{ fontSize: isSmallMobile ? 14 : 16 }}
                     >
                       צור קשר
@@ -899,9 +1146,8 @@ const MyHome = () => {
             </div>
           </div>
         </motion.div>
-
       </motion.div>
-    </ConfigProvider>
+    </ConfigProvider >
   )
 }
 

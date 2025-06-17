@@ -885,12 +885,29 @@ body {
   font-family: "Assistant", "Rubik", "Heebo", sans-serif;
   direction: rtl;
   scroll-behavior: auto;
-  overflow: visible;
 }
 
-html, body, #root {
-  scroll-behavior: auto;
+/* הוסף/שנה את זה ב-app.css */
+.ant-layout {
+  min-height: 100vh !important;
+  height: auto !important;
+  /* במקום 100vh */
+  overflow: visible !important;
+  /* במקום hidden */
 }
+
+.ant-layout-content {
+  height: auto !important;
+  min-height: calc(100vh - 64px) !important;
+  overflow-y: auto !important;
+}
+
+html,
+body {
+  scroll-behavior: auto !important;
+}
+
+/*  */
 
 #root {
   height: 100vh;
@@ -1222,6 +1239,31 @@ html, body, #root {
   margin-bottom: 8px !important;
 }
 
-.ant-drawer-close{
+.ant-drawer-close {
   display: none;
+}
+
+/* תיקון עבור מסכים בינוניים */
+@media (min-width: 768px) and (max-width: 1199px) {
+  .ant-layout-sider {
+    width: 280px !important;
+    min-width: 280px !important;
+    max-width: 280px !important;
+  }
+
+  .ant-layout-sider.ant-layout-sider-collapsed {
+    width: 80px !important;
+    min-width: 80px !important;
+    max-width: 80px !important;
+  }
+
+  .main-layout {
+    margin-right: 280px !important;
+    width: calc(100% - 280px) !important;
+  }
+
+  .main-layout.collapsed {
+    margin-right: 80px !important;
+    width: calc(100% - 80px) !important;
+  }
 }

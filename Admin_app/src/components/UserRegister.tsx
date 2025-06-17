@@ -219,7 +219,7 @@ const UserRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => 
                     borderWidth: 2,
                   }}
                 >
-                  חזרה 
+                  חזרה
                 </Button>
               </Col>
             </Row>

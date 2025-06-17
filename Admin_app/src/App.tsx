@@ -76,24 +76,32 @@ function ResponsiveDrawer() {
 
   // רספונסיביות מתקדמת
   const isMobile = useMediaQuery({ maxWidth: 767 })
-  const isTablet = useMediaQuery({ minWidth: 768, maxWidth: 1023 })
-  const isDesktop = useMediaQuery({ minWidth: 1024 })
+  const isTablet = useMediaQuery({ minWidth: 768, maxWidth: 1199 })
   const isSmallMobile = useMediaQuery({ maxWidth: 479 })
   const isLargeMobile = useMediaQuery({ minWidth: 480, maxWidth: 767 })
+  const isSmallDesktop = useMediaQuery({ minWidth: 1024, maxWidth: 1199 })
+  const isLargeDesktop = useMediaQuery({ minWidth: 1200 })
 
   const globalContextDetails = useContext(globalContext)
   const [pageTitle, setPageTitle] = useState("")
 
+  useEffect(() => {
+    const contentElement = document.querySelector('.ant-layout-content') as HTMLElement
+    if (contentElement) {
+      contentElement.scrollTo(0, 0)
+    }
+  }, [location.pathname])
+  
   // התאמה דינמית לגודל מסך עם עדיפויות ברורות
   useEffect(() => {
     if (isMobile) {
       setCollapsed(true)
-    } else if (isTablet) {
+    } else if (isTablet || isSmallDesktop) {
       setCollapsed(false)
-    } else if (isDesktop) {
+    } else if (isLargeDesktop) {
       setCollapsed(false)
     }
-  }, [isMobile, isTablet, isDesktop])
+  }, [isMobile, isTablet, isSmallDesktop, isLargeDesktop])
 
   useEffect(() => {
     const routeTitles: { [key: string]: string } = {
@@ -138,7 +146,8 @@ function ResponsiveDrawer() {
   const getSiderWidth = () => {
     if (isMobile) return 0
     if (isTablet) return collapsed ? 60 : 220
-    return collapsed ? 80 : 280
+    if (isSmallDesktop) return collapsed ? 70 : 240 // רוחב בינוני למסכים קטנים
+    return collapsed ? 80 : 280 // רוחב מלא למסכים גדולים
   }
 
   const siderWidth = getSiderWidth()
@@ -265,8 +274,8 @@ function ResponsiveDrawer() {
             trigger={null}
             collapsible
             collapsed={collapsed}
-            width={isTablet ? 220 : 280}
-            collapsedWidth={isTablet ? 60 : 80}
+            width={isTablet ? 220 : isSmallDesktop ? 240 : 280}
+            collapsedWidth={isTablet ? 60 : isSmallDesktop ? 70 : 80}
             className="desktop-sider"
             style={{
               background: "#ffffff",
