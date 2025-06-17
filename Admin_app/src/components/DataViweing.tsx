@@ -85,7 +85,7 @@ function DataViewing() {
 
         // קריאה לדוח העסק
         const businessReportResponse = await axios.get(
-          `https://localhost:7031/api/Reports/business-report/${globalContextDetails.user.businessId}`,
+          `${url}/api/Reports/business-report/${globalContextDetails.user.businessId}`,
           { withCredentials: true }
         );
 

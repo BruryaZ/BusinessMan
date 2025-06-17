@@ -28,6 +28,7 @@ const { Title, Text, Paragraph } = Typography
 
 const MyHome = () => {
   const globalContextDetails = useContext(globalContext)
+  const url = import.meta.env.VITE_API_URL
   const nav = useNavigate()
   const [incomes, setIcomes] = useState<number>(0)
   const [incomesPrecent, setIcomesPrecent] = useState<number>(0)
@@ -112,7 +113,7 @@ const MyHome = () => {
 
   const fetchUserGrowthPercent = async (businessId: number): Promise<number> => {
     try {
-      const response = await axios.get<UserDto[]>(`https://localhost:7031/api/User/users-by-business/${businessId}`)
+      const response = await axios.get<UserDto[]>(`${url}/api/User/users-by-business/${businessId}`)
       const users = response.data
 
       const now = dayjs()
@@ -155,7 +156,7 @@ const MyHome = () => {
         const year = new Date().getFullYear()
         const month = new Date().getMonth() + 1
         const res = await axios.get(
-          `https://localhost:7031/api/Reports/monthly?businessId=${businessId}&year=${year}&month=${month}`,
+          `${url}/api/Reports/monthly?businessId=${businessId}&year=${year}&month=${month}`,
         )
         setMonthlyReport(res.data?.monthlyMetric ?? 0)
         setIcomes(res.data?.currentMonthIncome ?? 0)
