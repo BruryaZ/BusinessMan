@@ -96,7 +96,7 @@ const EditUserPage = () => {
 
   return (
     <ConfigProvider direction="rtl">
-      <div style={{ padding: "40px 20px", maxWidth: 800, margin: "0 auto", marginTop: "70vh" }}>
+      <div style={{ padding: "40px 20px", maxWidth: 800, margin: "0 auto" }}>
         <Card className="form-section">
           <div style={{ textAlign: "center", marginBottom: 32 }}>
             <Avatar

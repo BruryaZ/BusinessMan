@@ -2,16 +2,7 @@
 
 import { useState, useEffect, useContext } from "react"
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from "react-router-dom"
-import {
-  Layout,
-  Menu,
-  Typography,
-  Avatar,
-  Space,
-  Drawer,
-  ConfigProvider,
-  theme as antTheme,
-} from "antd"
+import { Layout, Menu, Typography, Avatar, Space, Drawer, ConfigProvider, theme as antTheme, Button } from "antd"
 import {
   MenuOutlined,
   UserAddOutlined,
@@ -25,6 +16,7 @@ import {
   TeamOutlined,
   UploadOutlined,
   CloudDownloadOutlined,
+  CloseOutlined,
 } from "@ant-design/icons"
 import { useMediaQuery } from "react-responsive"
 import "./App.css"
@@ -81,22 +73,27 @@ function ResponsiveDrawer() {
   const [collapsed, setCollapsed] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const location = useLocation()
-  const isMobile = useMediaQuery({ maxWidth: 768 })
-  const isTablet = useMediaQuery({ maxWidth: 1024, minWidth: 769 })
-  const globalContextDetails = useContext(globalContext)
 
+  // רספונסיביות מתקדמת
+  const isMobile = useMediaQuery({ maxWidth: 767 })
+  const isTablet = useMediaQuery({ minWidth: 768, maxWidth: 1023 })
+  const isDesktop = useMediaQuery({ minWidth: 1024 })
+  const isSmallMobile = useMediaQuery({ maxWidth: 479 })
+  const isLargeMobile = useMediaQuery({ minWidth: 480, maxWidth: 767 })
+
+  const globalContextDetails = useContext(globalContext)
   const [pageTitle, setPageTitle] = useState("")
 
-  // התאמה דינמית לגודל מסך
+  // התאמה דינמית לגודל מסך עם עדיפויות ברורות
   useEffect(() => {
     if (isMobile) {
       setCollapsed(true)
     } else if (isTablet) {
-      setCollapsed(true)
-    } else {
+      setCollapsed(false)
+    } else if (isDesktop) {
       setCollapsed(false)
     }
-  }, [isMobile, isTablet])
+  }, [isMobile, isTablet, isDesktop])
 
   useEffect(() => {
     const routeTitles: { [key: string]: string } = {
@@ -113,7 +110,7 @@ function ResponsiveDrawer() {
       "/register-admin&business": "רישום עסק ומנהל",
       "/concat-us": "צור קשר",
       "/private-policy": "פרטיות",
-      "/term-of-service": "תנאי שימוש"
+      "/term-of-service": "תנאי שימוש",
     }
 
     if (location.pathname.startsWith("/edit-user/")) {
@@ -121,7 +118,6 @@ function ResponsiveDrawer() {
     } else {
       setPageTitle(routeTitles[location.pathname] || "עמוד לא מזוהה")
     }
-
   }, [location.pathname, globalContextDetails.user.firstName])
 
   const handleDrawerToggle = () => {
@@ -138,6 +134,16 @@ function ResponsiveDrawer() {
     ),
   }))
 
+  // מחשוב רוחב דינמי מתקדם
+  const getSiderWidth = () => {
+    if (isMobile) return 0
+    if (isTablet) return collapsed ? 60 : 220
+    return collapsed ? 80 : 280
+  }
+
+  const siderWidth = getSiderWidth()
+  const headerHeight = isMobile ? 56 : isTablet ? 60 : 64
+
   const siderContent = (
     <div
       style={{
@@ -151,7 +157,8 @@ function ResponsiveDrawer() {
       <div
         className="logo-section"
         style={{
-          padding: collapsed ? "16px 8px" : "24px 16px",
+          padding:
+            collapsed || isMobile ? (isSmallMobile ? "8px 4px" : "12px 8px") : isTablet ? "16px 12px" : "24px 16px",
           borderBottom: "1px solid #f0f0f0",
           textAlign: "center",
           direction: "rtl",
@@ -159,21 +166,29 @@ function ResponsiveDrawer() {
           alignItems: "center",
           justifyContent: "center",
           flexDirection: "column",
-          minHeight: collapsed ? 64 : 88,
+          minHeight: collapsed || isMobile ? (isSmallMobile ? 48 : 56) : isTablet ? 72 : 88,
         }}
       >
         <Avatar
-          size={collapsed ? 32 : 48}
+          size={collapsed || isMobile ? (isSmallMobile ? 24 : 28) : isTablet ? 40 : 48}
           className="logo-avatar"
           style={{
             background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-            marginBottom: collapsed ? 0 : 8,
+            marginBottom: collapsed || isMobile ? 0 : isTablet ? 6 : 8,
           }}
         >
           <BuildOutlined />
         </Avatar>
-        {!collapsed && (
-          <Title level={4} className="logo-title" style={{ margin: "8px 0 0 0", color: blue }}>
+        {!collapsed && !isMobile && (
+          <Title
+            level={isTablet ? 5 : 4}
+            className="logo-title"
+            style={{
+              margin: `${isTablet ? 6 : 8}px 0 0 0`,
+              color: blue,
+              fontSize: isTablet ? "14px" : "16px",
+            }}
+          >
             BusinessMan
           </Title>
         )}
@@ -186,35 +201,39 @@ function ResponsiveDrawer() {
         style={{
           border: "none",
           flex: 1,
-          padding: "8px",
+          padding: isMobile ? "4px" : isTablet ? "6px" : "8px",
           direction: "rtl",
-          backgroundColor: '#7354af0f',
-          // overflowY: "auto",
+          backgroundColor: "#7354af0f",
+          fontSize: isSmallMobile ? "12px" : isMobile ? "13px" : isTablet ? "14px" : "15px",
         }}
         items={menuItems}
         onClick={(e) => {
           e.domEvent.stopPropagation()
           if (isMobile) setMobileOpen(false)
         }}
+        inlineCollapsed={collapsed && !isMobile}
       />
 
       <div
         style={{
-          padding: collapsed ? "8px" : "16px",
+          padding: collapsed || isMobile ? (isSmallMobile ? "6px" : "8px") : isTablet ? "12px" : "16px",
           borderTop: "1px solid #f0f0f0",
           textAlign: "center",
           direction: "rtl",
         }}
       >
-        <Typography.Text type="secondary" style={{ fontSize: collapsed ? "10px" : "12px" }}>
+        <Typography.Text
+          type="secondary"
+          style={{
+            fontSize: collapsed || isMobile ? (isSmallMobile ? "8px" : "10px") : isTablet ? "11px" : "12px",
+          }}
+        >
           © 2025 BusinessMan
         </Typography.Text>
       </div>
     </div>
   )
 
-  // חישוב רוחב דינמי
-  const siderWidth = collapsed ? 80 : 280
   const headerWidth = isMobile ? "100%" : `calc(100% - ${siderWidth}px)`
   const contentWidth = isMobile ? "100%" : `calc(100% - ${siderWidth}px)`
   const marginRight = isMobile ? 0 : siderWidth
@@ -226,19 +245,28 @@ function ResponsiveDrawer() {
         algorithm: antTheme.defaultAlgorithm,
         token: {
           colorPrimary: blue,
-          borderRadius: 10,
+          borderRadius: isMobile ? 6 : isTablet ? 8 : 10,
           fontFamily: '"Assistant", "Rubik", "Heebo", sans-serif',
+          fontSize: isSmallMobile ? 12 : isMobile ? 13 : isTablet ? 14 : 16,
         },
       }}
     >
-      <Layout style={{ minHeight: "100vh", height: "100vh", width: "100%", direction: "rtl"}}>
+      <Layout
+        style={{
+          minHeight: "100vh",
+          height: "100vh",
+          width: "100%",
+          direction: "rtl",
+          overflow: "hidden",
+        }}
+      >
         {!isMobile && (
           <Sider
             trigger={null}
             collapsible
             collapsed={collapsed}
-            width={280}
-            collapsedWidth={80}
+            width={isTablet ? 220 : 280}
+            collapsedWidth={isTablet ? 60 : 80}
             className="desktop-sider"
             style={{
               background: "#ffffff",
@@ -259,24 +287,41 @@ function ResponsiveDrawer() {
         {isMobile && (
           <Drawer
             title={
-              <Space style={{ direction: "rtl" }}>
-                <Avatar style={{ background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)" }}>
-                  <BuildOutlined />
-                </Avatar>
-                <span>BusinessMan</span>
-              </Space>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
+                <Space style={{ direction: "rtl" }}>
+                  <Avatar
+                    size={isSmallMobile ? 32 : 36}
+                    style={{ background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)" }}
+                  >
+                    <BuildOutlined />
+                  </Avatar>
+                  <span style={{ fontSize: isSmallMobile ? "14px" : "16px" }}>BusinessMan</span>
+                </Space>
+                <Button
+                  type="text"
+                  icon={<CloseOutlined />}
+                  onClick={handleDrawerToggle}
+                  size={isSmallMobile ? "small" : "middle"}
+                  style={{ marginLeft: "8px" }}
+                />
+              </div>
             }
             placement="right"
             onClose={handleDrawerToggle}
             open={mobileOpen}
-            width={280}
+            width={isSmallMobile ? "85%" : isLargeMobile ? "50%" : 280}
             className="mobile-drawer"
             style={{ padding: 0, direction: "rtl" }}
+            closable={false}
           >
             <Menu
               mode="inline"
               selectedKeys={[location.pathname]}
-              style={{ border: "none", direction: "rtl" }}
+              style={{
+                border: "none",
+                direction: "rtl",
+                fontSize: isSmallMobile ? "13px" : "14px",
+              }}
               items={menuItems}
               onClick={handleDrawerToggle}
             />
@@ -290,13 +335,12 @@ function ResponsiveDrawer() {
             width: contentWidth,
             height: "100vh",
             direction: "rtl",
-            // overflow: "hidden",
           }}
         >
           <Header
             style={{
               background: "#fff",
-              padding: isMobile ? "0 16px" : "0 24px",
+              padding: isMobile ? (isSmallMobile ? "0 8px" : "0 12px") : isTablet ? "0 16px" : "0 24px",
               boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
               display: "flex",
               alignItems: "center",
@@ -305,7 +349,7 @@ function ResponsiveDrawer() {
               position: "fixed",
               top: 0,
               zIndex: 1000,
-              height: "64px",
+              height: `${headerHeight}px`,
               width: headerWidth,
               right: marginRight,
             }}
@@ -321,37 +365,53 @@ function ResponsiveDrawer() {
               }}
             >
               {/* כותרת העמוד */}
-              {!isMobile && (
-                <Title level={5} style={{ margin: 0, color: "#444", flex: 1, textAlign: "center" }}>
-                  {pageTitle}
-                </Title>
-              )}
+              <Title
+                level={isMobile ? 5 : isTablet ? 5 : 5}
+                style={{
+                  margin: 0,
+                  color: "#444",
+                  flex: 1,
+                  textAlign: isMobile ? "right" : "center",
+                  fontSize: isSmallMobile ? "12px" : isMobile ? "14px" : isTablet ? "16px" : "18px",
+                }}
+              >
+                {isMobile && pageTitle.length > 15 ? `${pageTitle.substring(0, 12)}...` : pageTitle}
+              </Title>
 
-              {/* כפתור כניסה/יציאה מהתפריט הצידי */}
-              {!isMobile && (
-                <MenuOutlined
-                  style={{
-                    fontSize: "18px",
-                    cursor: "pointer",
-                    color: blue,
-                    marginLeft: "16px",
-                  }}
-                  onClick={() => setCollapsed(!collapsed)}
-                />
-              )}
-
+              {/* כפתור תפריט */}
+              <Button
+                type="text"
+                icon={<MenuOutlined />}
+                onClick={isMobile ? handleDrawerToggle : () => setCollapsed(!collapsed)}
+                style={{
+                  fontSize: isSmallMobile ? "14px" : isMobile ? "16px" : "18px",
+                  color: blue,
+                  padding: isMobile ? "4px" : "8px",
+                  height: isSmallMobile ? "32px" : isMobile ? "36px" : "40px",
+                  width: isSmallMobile ? "42px" : isMobile ? "36px" : "40px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              />
             </Space>
           </Header>
 
           <Content
             style={{
               margin: 0,
-              padding: isMobile ? "80px 16px 16px 16px" : "88px 24px 24px 24px",
+              padding: isMobile
+                ? isSmallMobile
+                  ? `${headerHeight + 12}px 8px 8px 8px`
+                  : `${headerHeight + 16}px 12px 12px 12px`
+                : isTablet
+                  ? `${headerHeight + 16}px 16px 16px 16px`
+                  : `${headerHeight + 24}px 24px 24px 24px`,
               background: "#ffffff",
               minHeight: "100vh",
               direction: "rtl",
-              // overflowY: "auto",
-              // overflowX: "hidden",
+              overflowY: "auto",
+              overflowX: "hidden",
             }}
           >
             <Routes>
@@ -423,8 +483,6 @@ function ResponsiveDrawer() {
 }
 
 export default function App() {
-
-
   return (
     <Router>
       <GlobalContext>
