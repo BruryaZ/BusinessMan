@@ -24,6 +24,8 @@ const AdminLogin = () => {
   const isMobile = useMediaQuery({ maxWidth: 768 })
 
   const handleSubmit = async () => {
+    console.log("url: ", url);
+    
     setLoading(true)
     setErrors([])
     try {
@@ -36,8 +38,6 @@ const AdminLogin = () => {
 
       let data: any
       try {
-        console.log("admin: ", admin);
-
         const response = await axios.post(`${url}/Auth/admin-login`, admin, { withCredentials: true })
         data = response.data
         globalContextDetails.setUser(data.user)

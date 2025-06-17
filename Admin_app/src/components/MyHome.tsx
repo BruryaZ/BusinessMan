@@ -239,7 +239,7 @@ const MyHome = () => {
                     textShadow: "0 4px 20px rgba(0,0,0,0.3)",
                   }}
                 >
-                  {/* שלום, {globalContextDetails.user?.firstName || "אורח"} */}
+                  שלום, {globalContextDetails.user?.firstName || "אורח"}
                 </Title>
                 <Title
                   level={2}
