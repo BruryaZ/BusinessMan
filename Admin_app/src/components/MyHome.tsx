@@ -148,6 +148,8 @@ const MyHome = () => {
 
   useEffect(() => {
     const fetchMonthlyReport = async () => {
+      console.log(globalContextDetails.user);
+      
       try {
         const businessId = globalContextDetails.business_global.id
         const year = new Date().getFullYear()

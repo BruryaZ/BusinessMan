@@ -36,9 +36,13 @@ const AdminLogin = () => {
 
       let data: any
       try {
+        console.log("admin: ", admin);
+
         const response = await axios.post(`${url}/Auth/admin-login`, admin, { withCredentials: true })
         data = response.data
         globalContextDetails.setUser(data.user)
+        console.log("User after set-user !!!!!!!!!!!!!!: ", globalContextDetails.user);
+
         globalContextDetails.setIsAdmin(true)
       } catch (e) {
         if (axios.isAxiosError(e) && e.response?.status === 400) {
