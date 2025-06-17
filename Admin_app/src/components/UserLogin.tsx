@@ -220,11 +220,11 @@ const UserLogin = () => {
 
             {errors.length > 0 && (
               <div style={{ marginTop: 16 }}>
-                {errors.map((error, index) => (
+                {errors.map((index) => (
                   <Alert
                     key={index}
                     message="שגיאה בהתחברות"
-                    description={error}
+                    description="המערכת נתקלה בבעיה. אנא נסו מאוחר יותר."
                     type="error"
                     showIcon
                     icon={<ExclamationCircleOutlined />}

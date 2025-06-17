@@ -3,7 +3,7 @@ import { useContext, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import axios from "axios"
 import { Form, Input, Button, Typography, Card, Alert, Space, Avatar, Divider, ConfigProvider } from "antd"
-import { MailOutlined, LockOutlined, CrownOutlined, LoginOutlined } from "@ant-design/icons"
+import { MailOutlined, LockOutlined, CrownOutlined, LoginOutlined, ExclamationCircleOutlined } from "@ant-design/icons"
 
 import type { Admin } from "../models/Admin"
 import { validationSchemaAdminLogin } from "../utils/validationSchema"
@@ -178,18 +178,27 @@ const AdminLogin = () => {
             </div>
 
             {errors.length > 0 && (
-              <div style={{ marginTop: 24 }}>
-                {errors.map((error, idx) => (
+              <div style={{ marginTop: 16 }}>
+                {errors.map((index) => (
                   <Alert
-                    key={idx}
-                    message={error}
+                    key={index}
+                    message="שגיאה בהתחברות"
+                    description="המערכת נתקלה בבעיה. אנא נסו מאוחר יותר."
                     type="error"
                     showIcon
-                    style={{ marginBottom: 8, borderRadius: 8 }}
+                    icon={<ExclamationCircleOutlined />}
+                    style={{
+                      marginBottom: 8,
+                      borderRadius: 8,
+                      background: "linear-gradient(135deg, #fff2f0 0%, #ffebe8 100%)",
+                      border: "1px solid #ffccc7",
+                      fontSize: isMobile ? 12 : 14,
+                    }}
                   />
                 ))}
               </div>
             )}
+            
           </Form>
         </Card>
       </div>
