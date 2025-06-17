@@ -185,8 +185,6 @@ const MyHome = () => {
 
   useEffect(() => {
     const fetchMonthlyReport = async () => {
-      console.log(globalContextDetails.user)
-
       try {
         const businessId = globalContextDetails.business_global.id
         const year = new Date().getFullYear()
@@ -238,22 +236,6 @@ const MyHome = () => {
     },
   }
 
-  const cardHoverVariants = {
-    rest: {
-      scale: 1,
-      boxShadow: "0 10px 30px rgba(0, 0, 0, 0.1)",
-    },
-    hover: {
-      scale: 1.05,
-      boxShadow: "0 20px 60px rgba(0, 0, 0, 0.15)",
-      transition: {
-        type: "spring",
-        stiffness: 300,
-        damping: 20,
-      },
-    },
-  }
-
   const buttonHoverVariants: Variants = {
     rest: { scale: 1 },
     hover: {
@@ -265,17 +247,6 @@ const MyHome = () => {
       },
     },
     tap: { scale: 0.95 },
-  }
-
-  const floatingVariants = {
-    animate: {
-      y: [-10, 10, -10],
-      transition: {
-        duration: 4,
-        repeat: Number.POSITIVE_INFINITY,
-        ease: [0.42, 0, 0.58, 1], // Cubic Bezier easing equivalent to easeInOut
-      },
-    },
   }
 
   const fonts = getHeroFontSize()
@@ -472,7 +443,16 @@ const MyHome = () => {
             </Col>
             {!isMobile && (
               <Col xs={24} lg={12} style={{ textAlign: "center" }}>
-                <motion.div variants={floatingVariants} animate="animate">
+                <motion.div
+                  animate={{
+                    y: [0, -10, 0],
+                  }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                >
                   <div
                     style={{
                       width: "100%",

@@ -23,9 +23,7 @@ const AdminLogin = () => {
   const globalContextDetails = useContext(globalContext)
   const isMobile = useMediaQuery({ maxWidth: 768 })
 
-  const handleSubmit = async () => {
-    console.log("url: ", url);
-    
+  const handleSubmit = async () => {    
     setLoading(true)
     setErrors([])
     try {
@@ -63,7 +61,6 @@ const AdminLogin = () => {
     } catch (e) {
       setErrors([e instanceof Error ? e.message : "שגיאה לא צפויה, נא לנסות שוב מאוחר יותר"])
     } finally {
-      console.log("User after set-user !!!!!!!!!!!!!!: ", globalContextDetails.user);
       setLoading(false)
     }
   }
