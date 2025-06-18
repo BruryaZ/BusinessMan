@@ -91,9 +91,10 @@ const BusinessAndAdmin = () => {
       setSuccess(true)
       setActiveStep(3)
     } catch (e: any) {
-      if (axios.isAxiosError(e)) {
-        const serverMessage = e?.response?.data?.message
-        setError(serverMessage || "אירעה שגיאה בעדכון הנתונים. אנא נסה שנית.")
+      if (e) {
+        const serverMessage = e?.response?.data?.message || "אירעה שגיאה בעדכון הנתונים. אנא נסה שנית.";
+        setError(serverMessage);
+        
       } else {
         setError("שגיאה לא צפויה בעדכון הנתונים.")
       }

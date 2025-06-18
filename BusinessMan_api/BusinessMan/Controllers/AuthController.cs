@@ -138,7 +138,7 @@ namespace BusinessMan.API.Controllers
 
             var emailExists = await _context.EmailList.AnyAsync(e => e.EmailAddress == user.Email);
             if (!emailExists)
-                return Unauthorized(new { Message = "האימייל שלך אינו מופיע ברשימת ההרשאות. פנה למנהל המערכת." });
+                return Unauthorized(new { Message = "האימייל שלך אינו מופיע ברשימת ההרשאות. פנה למנהל המערכת לצורך הרשמה." });
 
             var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.IdNumber == user.IdNumber);
             if (existingUser != null)

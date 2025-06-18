@@ -66,12 +66,8 @@ const UserRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => 
         if (onSubmitSuccess) onSubmitSuccess()
         nav(-1)
       } catch (e: any) {
-        if (axios.isAxiosError(e)) {
-          const serverMessage = e.response?.data?.message || e.response?.data || null
-          setErrors(serverMessage ? [serverMessage] : ["שגיאה ברישום המשתמש"])
-        } else {
-          setErrors(["שגיאה ברישום המשתמש"])
-        }
+        const serverMessage = e.response?.data?.message || e.response?.data || null
+        setErrors(serverMessage ? [serverMessage] : ["שגיאה ברישום המשתמש"])
       }
 
     } catch (e: any) {

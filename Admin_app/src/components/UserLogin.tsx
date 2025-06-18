@@ -35,27 +35,18 @@ const UserLogin = () => {
           globalContextDetails.setUser(data.user)
           nav("/")
         } catch (e: any) {
-          if (axios.isAxiosError(e)) {
-            // בדיקה אם יש הודעת שגיאה מהשרת
-            const serverMessage = e.response?.data?.message || e.response?.data || null
-            setErrors(serverMessage ? [serverMessage] : ["משתמש לא נמצא, נא לבדוק את האימייל והסיסמה"])
-          } else {
-            setErrors(["שגיאה בכניסה, נא לנסות שוב מאוחר יותר"])
-          }
-          return
+          const serverMessage = e.response?.data?.message || e.response?.data || null
+          setErrors(serverMessage ? [serverMessage] : ["שגיאה בכניסה, נא לנסות שוב מאוחר יותר"])
         }
       } else {
         const validationErrors = await validationSchema.validate(userLogin).catch((err) => err.errors)
         setErrors(validationErrors || [])
       }
     } catch (e: any) {
-      if (axios.isAxiosError(e)) {
-        const serverMessage = e.response?.data?.message || e.response?.data || null
-        setErrors(serverMessage ? [serverMessage] : ["שגיאה בכניסה, נא לנסות שוב מאוחר יותר"])
-      } else {
-        setErrors([e.message || "שגיאה בכניסה, נא לנסות שוב מאוחר יותר"])
-      }
-    } finally {
+      const serverMessage = e.response?.data?.message || e.response?.data || null
+      setErrors(serverMessage ? [serverMessage] : ["שגיאה בכניסה, נא לנסות שוב מאוחר יותר"])
+    }
+    finally {
       setLoading(false)
     }
   }
