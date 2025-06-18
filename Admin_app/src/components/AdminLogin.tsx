@@ -84,9 +84,9 @@ const AdminLogin = () => {
             maxWidth: 500,
             width: "100%",
           }}
-          bodyStyle={{
+          styles={{ body:{
             padding: isMobile ? "24px" : "40px",
-          }}
+          }}}
         >
           <div style={{ textAlign: "center", marginBottom: isMobile ? 24 : 32 }}>
             <Avatar

@@ -44,15 +44,15 @@ const RegisterBusinessData = ({ onSubmitSuccess }: { onSubmitSuccess?: () => voi
   const [businessData, setBusinessData] = useState<BusinessPostModel>({
     id: 0,
     businessId: 1,
-    name: "עסק לדוגמה",
-    address: "כתובת לדוגמה",
-    email: "example@business.com",
-    businessType: "סוג עסק לדוגמה",
-    income: 10000,
-    expenses: 5000,
-    cashFlow: 5000,
-    totalAssets: 20000,
-    totalLiabilities: 10000,
+    name: "",
+    address: "",
+    email: "",
+    businessType: "",
+    income: 0,
+    expenses: 0,
+    cashFlow: 0,
+    totalAssets: 0,
+    totalLiabilities: 0,
   })
 
   const handleChange = (field: string, value: any) => {

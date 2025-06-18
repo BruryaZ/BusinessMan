@@ -185,8 +185,6 @@ const MyHome = () => {
 
   useEffect(() => {
     const fetchMonthlyReport = async () => {
-      console.log(globalContextDetails.user)
-
       try {
         const businessId = globalContextDetails.business_global.id
         const year = new Date().getFullYear()
@@ -278,16 +276,16 @@ const MyHome = () => {
 
   const floatingVariants = {
     animate: {
-      y: [0, -10, 0],
-      rotate: [0, 1, 0],
+      y: [0, -10],
+      rotate: [0, 1],
       transition: {
         duration: 2,
         repeat: Infinity,
-        ease: "easeInOut" as const // ✅ טיפוס מפורש כדי למנוע שגיאה
+        repeatType: "reverse" as const,
+        ease: "easeInOut" as const,
       },
     },
   }
-
 
   return (
     <ConfigProvider direction="rtl">
@@ -299,7 +297,7 @@ const MyHome = () => {
             transition: {
               staggerChildren: 0.12,
               delayChildren: 0.1,
-              ease: [0.42, 0, 0.58, 1],
+              ease: "easeInOut",
             },
           },
         }}
@@ -323,7 +321,7 @@ const MyHome = () => {
               transition: {
                 staggerChildren: 0.12,
                 delayChildren: 0.1,
-                ease: "easeInOut", // Replace the array with a valid easing function
+                ease: "easeInOut",
               },
             },
           }}
@@ -369,12 +367,13 @@ const MyHome = () => {
                 left: `${Math.random() * 100}%`,
               }}
               animate={{
-                y: [-20, 20, -20],
-                opacity: [0.3, 0.8, 0.3],
+                y: [-20, 20],
+                opacity: [0.3, 0.8],
               }}
               transition={{
                 duration: 4 + Math.random() * 2,
                 repeat: Infinity,
+                repeatType: "reverse" as const,
                 delay: Math.random() * 2,
                 ease: "easeInOut",
               }}
@@ -403,7 +402,7 @@ const MyHome = () => {
                       y: 0,
                       transition: {
                         duration: 0.8,
-                        ease: "easeInOut", // Use a valid easing function
+                        ease: "easeInOut",
                       },
                     },
                   }}
@@ -427,12 +426,12 @@ const MyHome = () => {
                         textShadow: [
                           "0 4px 20px rgba(0,0,0,0.3)",
                           "0 8px 30px rgba(255,255,255,0.2)",
-                          "0 4px 20px rgba(0,0,0,0.3)",
                         ],
                       }}
                       transition={{
                         duration: 3,
                         repeat: Infinity,
+                        repeatType: "reverse" as const,
                         ease: "easeInOut",
                       }}
                     >
@@ -591,12 +590,12 @@ const MyHome = () => {
                   <motion.div
                     whileHover={{
                       scale: 1.05,
-                      rotate: [0, -2, 2, 0],
-                    }}
-                    transition={{
-                      type: "spring",
-                      stiffness: 300,
-                      damping: 20,
+                      rotate: [-2, 2],
+                      transition: {
+                        type: "tween",
+                        duration: 0.5,
+                        repeatType: "reverse" as const,
+                      }
                     }}
                     style={{
                       width: "100%",
@@ -615,11 +614,12 @@ const MyHome = () => {
                   >
                     <motion.div
                       animate={{
-                        rotate: [0, 5, -5, 0],
+                        rotate: [0, 5],
                       }}
                       transition={{
                         duration: 8,
                         repeat: Infinity,
+                        repeatType: "reverse" as const,
                         ease: "easeInOut",
                       }}
                     >
@@ -646,7 +646,7 @@ const MyHome = () => {
               transition: {
                 staggerChildren: 0.12,
                 delayChildren: 0.1,
-                ease: "easeInOut", // Replace the array with a valid easing function
+                ease: "easeInOut",
               },
             },
           }}
@@ -696,11 +696,12 @@ const MyHome = () => {
               >
                 <motion.span
                   animate={{
-                    backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
+                    backgroundPosition: ["0% 50%", "100% 50%"],
                   }}
                   transition={{
                     duration: 5,
                     repeat: Infinity,
+                    repeatType: "reverse" as const,
                     ease: "linear",
                   }}
                   style={{
@@ -778,7 +779,7 @@ const MyHome = () => {
                           height: "100%",
                           minHeight: isSmallMobile ? "180px" : isMobile ? "220px" : "280px",
                         }}
-                        bodyStyle={{
+                        styles={{ body:{
                           padding: isSmallMobile ? "20px 16px" : isMobile ? "30px 20px" : "40px 24px",
                           height: "100%",
                           display: "flex",
@@ -786,7 +787,7 @@ const MyHome = () => {
                           justifyContent: "center",
                           alignItems: "center",
                           textAlign: "center",
-                        }}
+                        }}}
                       >
                         <motion.div
                           style={{
@@ -801,26 +802,16 @@ const MyHome = () => {
                           whileInView={{ scaleX: 1 }}
                           transition={{ duration: 1, delay: index * 0.1 }}
                           viewport={{ once: true }}
-                        />
-
-                        <motion.div
-                          initial={{ scale: 0, rotate: -180 }}
-                          whileInView={{ scale: 1, rotate: 0 }}
-                          transition={{
-                            delay: index * 0.1,
-                            type: "spring",
-                            stiffness: 200,
-                            duration: 0.8,
-                          }}
-                          viewport={{ once: true }}
                         >
                           <motion.div
                             whileHover={{
                               scale: 1.1,
-                              rotate: [0, -10, 10, 0],
-                            }}
-                            transition={{
-                              duration: 0.5,
+                              rotate: [-10, 10],
+                              transition: {
+                                type: "tween",
+                                duration: 0.5,
+                                repeatType: "reverse" as const,
+                              }
                             }}
                           >
                             <Avatar
@@ -875,12 +866,12 @@ const MyHome = () => {
                               textShadow: [
                                 "0 0 0 transparent",
                                 `0 0 10px ${stat.color}40`,
-                                "0 0 0 transparent",
                               ],
                             }}
                             transition={{
                               duration: 3,
                               repeat: Infinity,
+                              repeatType: "reverse" as const,
                               delay: index * 0.5,
                             }}
                           >
@@ -903,11 +894,12 @@ const MyHome = () => {
                           >
                             <motion.div
                               animate={{
-                                y: [0, -3, 0],
+                                y: [0, -3],
                               }}
                               transition={{
                                 duration: 2,
                                 repeat: Infinity,
+                                repeatType: "reverse" as const,
                                 delay: index * 0.3,
                               }}
                             >
@@ -959,7 +951,7 @@ const MyHome = () => {
               transition: {
                 staggerChildren: 0.12,
                 delayChildren: 0.1,
-                ease: "easeInOut", // Replace the array with a valid easing function
+                ease: "easeInOut",
               },
             },
           }}
@@ -1008,11 +1000,12 @@ const MyHome = () => {
               >
                 <motion.span
                   animate={{
-                    color: ["#2d3748", "#667eea", "#2d3748"],
+                    color: ["#2d3748", "#667eea"],
                   }}
                   transition={{
                     duration: 4,
                     repeat: Infinity,
+                    repeatType: "reverse" as const,
                     ease: "easeInOut",
                   }}
                 >
@@ -1060,22 +1053,23 @@ const MyHome = () => {
                           initial={{ y: 5 }}
                           whileHover={{
                             y: 0,
-                            rotate: [0, -5, 5, 0],
-                          }}
-                          transition={{
-                            type: "spring",
-                            stiffness: 300,
-                            duration: 0.5,
+                            rotate: [-5, 5],
+                            transition: {
+                              type: "tween",
+                              duration: 0.5,
+                              repeatType: "reverse" as const,
+                            }
                           }}
                         >
                           <motion.div
                             style={{ fontSize: isSmallMobile ? 24 : isMobile ? 28 : 32 }}
                             animate={{
-                              scale: [1, 1.1, 1],
+                              scale: [1, 1.1],
                             }}
                             transition={{
                               duration: 3,
                               repeat: Infinity,
+                              repeatType: "reverse" as const,
                               delay: index * 0.5,
                             }}
                           >
@@ -1101,7 +1095,7 @@ const MyHome = () => {
               transition: {
                 staggerChildren: 0.12,
                 delayChildren: 0.1,
-                ease: "easeInOut", // Replace the array with a valid easing function
+                ease: "easeInOut",
               },
             },
           }}
@@ -1138,7 +1132,7 @@ const MyHome = () => {
                     y: 0,
                     transition: {
                       duration: 0.8,
-                      ease: "easeInOut", // Use a valid easing function
+                      ease: "easeInOut",
                     },
                   },
                 }}
@@ -1165,7 +1159,7 @@ const MyHome = () => {
                     y: 0,
                     transition: {
                       duration: 0.8,
-                      ease: "easeInOut", // Use a valid easing function
+                      ease: "easeInOut",
                     },
                   },
                 }}
@@ -1238,13 +1232,13 @@ const MyHome = () => {
                           overflow: "hidden",
                           position: "relative",
                         }}
-                        bodyStyle={{
+                        styles={{ body:{
                           height: "100%",
                           display: "flex",
                           flexDirection: "column",
                           justifyContent: "space-between",
                           padding: isSmallMobile ? "16px" : isMobile ? "20px" : "24px",
-                        }}
+                        }}}
                       >
                         {/* Animated border gradient */}
                         <motion.div
@@ -1260,12 +1254,12 @@ const MyHome = () => {
                             background: [
                               `linear-gradient(90deg, ${item.color}, transparent, ${item.color})`,
                               `linear-gradient(90deg, transparent, ${item.color}, transparent)`,
-                              `linear-gradient(90deg, ${item.color}, transparent, ${item.color})`,
                             ],
                           }}
                           transition={{
                             duration: 3,
                             repeat: Infinity,
+                            repeatType: "reverse" as const,
                             delay: index * 0.5,
                           }}
                         />
@@ -1274,10 +1268,14 @@ const MyHome = () => {
                           <motion.div
                             className="icon-wrapper"
                             whileHover={{
-                              rotate: [0, -10, 10, 0],
+                              rotate: [-10, 10],
                               scale: 1.1,
+                              transition: {
+                                type: "tween",
+                                duration: 0.5,
+                                repeatType: "reverse" as const,
+                              }
                             }}
-                            transition={{ duration: 0.5 }}
                             style={{
                               background: `${item.color}20`,
                               color: item.color,
@@ -1314,11 +1312,12 @@ const MyHome = () => {
                             />
                             <motion.div
                               animate={{
-                                rotate: [0, 5, -5, 0],
+                                rotate: [0, 5],
                               }}
                               transition={{
                                 duration: 4,
                                 repeat: Infinity,
+                                repeatType: "reverse" as const,
                                 delay: index * 0.2,
                               }}
                             >
@@ -1356,11 +1355,12 @@ const MyHome = () => {
                             icon={
                               <motion.div
                                 animate={{
-                                  x: [0, 3, 0],
+                                  x: [0, 3],
                                 }}
                                 transition={{
                                   duration: 2,
                                   repeat: Infinity,
+                                  repeatType: "reverse" as const,
                                   delay: index * 0.2,
                                 }}
                               >
@@ -1417,7 +1417,7 @@ const MyHome = () => {
               transition: {
                 staggerChildren: 0.12,
                 delayChildren: 0.1,
-                ease: "easeInOut", // Use a valid easing string
+                ease: "easeInOut",
               },
             },
           }}
@@ -1474,9 +1474,9 @@ const MyHome = () => {
                     position: "relative",
                     overflow: "hidden",
                   }}
-                  bodyStyle={{
+                  styles={{ body:{
                     padding: isSmallMobile ? "30px 20px" : isMobile ? "40px 30px" : "60px",
-                  }}
+                  }}}
                 >
                   {/* Animated background elements */}
                   {[...Array(3)].map((_, i) => (
@@ -1492,12 +1492,13 @@ const MyHome = () => {
                         right: `${10 + i * 20}%`,
                       }}
                       animate={{
-                        scale: [1, 1.2, 1],
-                        opacity: [0.3, 0.6, 0.3],
+                        scale: [1, 1.2],
+                        opacity: [0.3, 0.6],
                       }}
                       transition={{
                         duration: 4 + i,
                         repeat: Infinity,
+                        repeatType: "reverse" as const,
                         delay: i * 0.5,
                       }}
                     />
@@ -1536,12 +1537,12 @@ const MyHome = () => {
                               textShadow: [
                                 "0 0 0 transparent",
                                 "0 0 20px rgba(102, 126, 234, 0.3)",
-                                "0 0 0 transparent",
                               ],
                             }}
                             transition={{
                               duration: 4,
                               repeat: Infinity,
+                              repeatType: "reverse" as const,
                             }}
                           >
                             "מערכת BusinessMan שינתה את הדרך שבה אני מנהל את העסק שלי. הכל נגיש ויעיל."
@@ -1673,7 +1674,10 @@ const MyHome = () => {
                           rotate: [0, 10, -10, 0],
                           scale: 1.1,
                         }}
-                        transition={{ duration: 0.5 }}
+                        transition={{ 
+                          type: "tween",
+                          duration: 0.5 
+                        }}
                       >
                         <Avatar
                           size={isSmallMobile ? 40 : 48}
@@ -1693,11 +1697,12 @@ const MyHome = () => {
                         >
                           <motion.span
                             animate={{
-                              backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
+                              backgroundPosition: ["0% 50%", "100% 50%"],
                             }}
                             transition={{
                               duration: 3,
                               repeat: Infinity,
+                              repeatType: "reverse" as const,
                               ease: "linear",
                             }}
                             style={{

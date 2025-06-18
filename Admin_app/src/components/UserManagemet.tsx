@@ -169,7 +169,7 @@ const UserManagement: React.FC = () => {
           marginBottom: 16,
           boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
         }}
-        bodyStyle={{ padding: "16px" }}
+        styles={{ body:{ padding: "16px" }}}
       >
         <Row align="middle" gutter={[16, 16]}>
           <Col flex="none">

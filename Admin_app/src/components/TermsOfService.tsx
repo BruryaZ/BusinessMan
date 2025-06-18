@@ -145,7 +145,7 @@ const TermsOfService: React.FC = () => {
               border: "none",
               marginBottom: 40,
             }}
-            bodyStyle={{ padding: "40px" }}
+            styles={{ body:{ padding: "40px" }}}
           >
             <Title level={2} style={{ color: "#2d3748", marginBottom: 24 }}>
               מבוא
@@ -167,7 +167,7 @@ const TermsOfService: React.FC = () => {
               border: "none",
               marginBottom: 40,
             }}
-            bodyStyle={{ padding: "40px" }}
+            styles={{ body:{ padding: "40px" }}}
           >
             <Title level={2} style={{ color: "#2d3748", marginBottom: 32 }}>
               עקרונות יסוד
@@ -191,7 +191,7 @@ const TermsOfService: React.FC = () => {
               border: "none",
               marginBottom: 40,
             }}
-            bodyStyle={{ padding: "40px" }}
+            styles={{ body:{ padding: "40px" }}}
           >
             <div style={{ display: "flex", alignItems: "center", marginBottom: 32 }}>
               <Avatar
@@ -218,7 +218,7 @@ const TermsOfService: React.FC = () => {
                       borderRadius: 12,
                       border: `2px solid ${getSeverityColor(obligation.severity)}20`,
                     }}
-                    bodyStyle={{ padding: "20px" }}
+                    styles={{ body:{ padding: "20px" }}}
                   >
                     <div
                       style={{
@@ -252,7 +252,7 @@ const TermsOfService: React.FC = () => {
                   boxShadow: "0 4px 20px rgba(0, 0, 0, 0.08)",
                   border: "none",
                 }}
-                bodyStyle={{ padding: "24px" }}
+                styles={{ body:{ padding: "24px" }}}
               >
                 <Title level={4} style={{ color: "#2d3748", marginBottom: 16 }}>
                   זמינות השירות
@@ -279,7 +279,7 @@ const TermsOfService: React.FC = () => {
                   boxShadow: "0 4px 20px rgba(0, 0, 0, 0.08)",
                   border: "none",
                 }}
-                bodyStyle={{ padding: "24px" }}
+                styles={{ body:{ padding: "24px" }}}
               >
                 <Title level={4} style={{ color: "#2d3748", marginBottom: 16 }}>
                   הגבלת אחריות
@@ -307,7 +307,7 @@ const TermsOfService: React.FC = () => {
               border: "none",
               color: "white",
             }}
-            bodyStyle={{ padding: "40px" }}
+            styles={{ body:{ padding: "40px" }}}
           >
             <Title level={3} style={{ color: "white", marginBottom: 16 }}>
               שאלות על התנאים?

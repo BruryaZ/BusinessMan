@@ -37,13 +37,13 @@ const { Title, Text } = Typography
 const AdminRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => {
   const validationSchema = validationSchemaAdminLogin
   const [myAdmin, setMyAdmin] = useState<UserPostModel>({
-    firstName: "יוסי",
-    lastName: "כהן",
-    email: "a@a",
+    firstName: "",
+    lastName: "",
+    phone: "",
+    idNumber: "",
+    email: "",
     password: "",
-    phone: "050-1234567",
     role: 1,
-    idNumber: "123456789",
   })
   const [errors, setErrors] = useState<string[]>([])
   const [loading, setLoading] = useState(false)
@@ -51,46 +51,45 @@ const AdminRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) =>
   const url = import.meta.env.VITE_API_URL
 
   const handleSubmit = (adminRegister: UserPostModel) => async () => {
-    setLoading(true)
-  
+    setLoading(true);
+
     try {
-      // נוודא שכל השדות נבדקים לפי הסכמה, כולל הודעות שגיאה
-      await validationSchema.validate(adminRegister, { abortEarly: false })
-  
-      // אם עבר ולידציה, נמשיך לנסות לשלוח לשרת
+      await validationSchema.validate(adminRegister, { abortEarly: false });
+
       try {
         const { data } = await axios.post<UserDto>(
           `${url}/Auth/admin-register`,
           adminRegister,
           { withCredentials: true }
-        )
-  
-        globalContextDetails.setUser(converFromUserDto(data))
+        );
+
+        globalContextDetails.setUser(converFromUserDto(data));
         if (data.role == 1) {
-          globalContextDetails.setIsAdmin(true)
+          globalContextDetails.setIsAdmin(true);
         }
-  
-        if (onSubmitSuccess) onSubmitSuccess()
-        setErrors([]) // ננקה שגיאות אם הכל עבר
-      } catch (e) {
-        setErrors(["שגיאה ברישום"])
+
+        if (onSubmitSuccess) onSubmitSuccess();
+        setErrors([]);
+      } catch (e: any) {
+        const errorMessage =
+          e?.response?.data?.message || "אירעה שגיאה בלתי צפויה בעת הרישום.";
+        setErrors([errorMessage]);
       }
     } catch (err) {
-      // נציג את כל שגיאות ה־Yup
       if (err instanceof Yup.ValidationError) {
-        setErrors(err.errors)
+        setErrors(err.errors);
       } else {
-        setErrors(["שגיאה כללית בוולידציה"])
+        setErrors(["שגיאה כללית באימות הנתונים."]);
       }
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
-  
+  };
+
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const { name, value, type } = event.target
     setMyAdmin((prevUser) => ({
-      ...prevUser,
+      ...prevUser!,
       [name]: type === "number" ? Number(value) : value,
     }))
   }
@@ -114,7 +113,7 @@ const AdminRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) =>
             רישום מנהל חדש
           </Title>
 
-          <Text type="secondary" style={{ fontSize: 16 }}>
+          <Text>
             נא למלא את כל הפרטים הנדרשים לרישום המנהל
           </Text>
 
@@ -213,7 +212,7 @@ const AdminRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) =>
           <Row gutter={[16, 16]} style={{ marginTop: 32 }}>
             <Col xs={24}>
               <Button
-              onClick={() => handleSubmit(myAdmin)}
+                onClick={() => handleSubmit(myAdmin)}
                 type="primary"
                 htmlType="submit"
                 size="large"

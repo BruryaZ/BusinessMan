@@ -33,9 +33,9 @@ const AdminRoute = ({ children }: { children: JSX.Element }) => {
               border: "none",
               textAlign: "center",
             }}
-            bodyStyle={{
+            styles={{ body:{
               padding: "40px 30px",
-            }}
+            }}}
           >
             <Result
               icon={

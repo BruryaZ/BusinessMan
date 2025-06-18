@@ -121,7 +121,7 @@ const ContactUs: React.FC = () => {
                   boxShadow: "0 10px 30px rgba(0, 0, 0, 0.1)",
                   border: "none",
                 }}
-                bodyStyle={{ padding: "40px" }}
+                styles={{ body:{ padding: "40px" }}}
               >
                 <div style={{ marginBottom: 32 }}>
                   <Title level={3} style={{ color: "#2d3748", marginBottom: 8 }}>
@@ -239,7 +239,7 @@ const ContactUs: React.FC = () => {
                       boxShadow: "0 4px 20px rgba(0, 0, 0, 0.08)",
                       border: "none",
                     }}
-                    bodyStyle={{ padding: "24px" }}
+                    styles={{ body:{ padding: "24px" }}}
                   >
                     <Space align="start" size="middle">
                       <Avatar
@@ -275,7 +275,7 @@ const ContactUs: React.FC = () => {
                     border: "none",
                     color: "white",
                   }}
-                  bodyStyle={{ padding: "24px" }}
+                  styles={{ body:{ padding: "24px" }}}
                 >
                   <Space align="start" size="middle">
                     <Avatar
@@ -311,7 +311,7 @@ const ContactUs: React.FC = () => {
               boxShadow: "0 10px 30px rgba(0, 0, 0, 0.1)",
               border: "none",
             }}
-            bodyStyle={{ padding: "40px" }}
+            styles={{ body:{ padding: "40px" }}}
           >
             <div style={{ textAlign: "center", marginBottom: 40 }}>
               <Title level={2} style={{ color: "#2d3748" }}>

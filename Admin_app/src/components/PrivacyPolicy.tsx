@@ -120,7 +120,7 @@ const PrivacyPolicy: React.FC = () => {
               border: "none",
               marginBottom: 40,
             }}
-            bodyStyle={{ padding: "40px" }}
+            styles={{ body:{ padding: "40px" }}}
           >
             <Title level={2} style={{ color: "#2d3748", marginBottom: 24 }}>
               מבוא
@@ -146,7 +146,7 @@ const PrivacyPolicy: React.FC = () => {
                     boxShadow: "0 4px 20px rgba(0, 0, 0, 0.08)",
                     border: "none",
                   }}
-                  bodyStyle={{ padding: "24px" }}
+                  styles={{ body:{ padding: "24px" }}}
                 >
                   <div style={{ display: "flex", alignItems: "center", marginBottom: 16 }}>
                     <Avatar
@@ -182,7 +182,7 @@ const PrivacyPolicy: React.FC = () => {
               border: "none",
               marginBottom: 40,
             }}
-            bodyStyle={{ padding: "40px" }}
+            styles={{ body:{ padding: "40px" }}}
           >
             <div style={{ display: "flex", alignItems: "center", marginBottom: 24 }}>
               <Avatar
@@ -217,7 +217,7 @@ const PrivacyPolicy: React.FC = () => {
               border: "none",
               color: "white",
             }}
-            bodyStyle={{ padding: "40px" }}
+            styles={{ body:{ padding: "40px" }}}
           >
             <Title level={3} style={{ color: "white", marginBottom: 16 }}>
               יש לך שאלות?
