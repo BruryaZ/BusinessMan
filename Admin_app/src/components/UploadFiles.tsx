@@ -96,16 +96,23 @@ const UploadFiles = () => {
       setProgress(100)
 
       setTimeout(() => {
-        setMessage(response.data.message || "הקובץ הועלה בהצלחה")
+        const data = response.data as { message?: string } // Type assertion
+        setMessage(data.message || "הקובץ הועלה בהצלחה")
         setError(null)
         setUploading(false)
         setUploadComplete(true)
       }, 800)
-    } catch (err: any) {
+    } catch (error: any) {
+      console.error("Error fetching business data:", error);
+    
+      const serverMessage =
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        "שגיאה בטעינת נתוני העסק";
+    
+      setError(serverMessage[0]);
       setProgress(0)
       setUploading(false)
-      const msg = err.response?.data || "אירעה שגיאה בהעלאת הקובץ"
-      setError(msg.message || msg)
       setMessage(null)
     }
   }

@@ -3,7 +3,7 @@ import axios from "axios"
 import { useState, useContext } from "react"
 import { globalContext } from "../context/GlobalContext"
 import type { BusinessPostModel } from "../models/BusinessPostModel"
-import {  convertToBusinessDto } from "../utils/convertToBusiness"
+import { convertToBusinessDto } from "../utils/convertToBusiness"
 import { validationSchemaBusinessRegister } from "../utils/validationSchema"
 import {
   Form,
@@ -73,20 +73,14 @@ const RegisterBusinessData = ({ onSubmitSuccess }: { onSubmitSuccess?: () => voi
       })
       globalContextDetails.setBusinessGlobal(convertToBusinessDto(data))
       if (onSubmitSuccess) onSubmitSuccess()
-    } catch (err: any) {
-      if (err.name === "ValidationError") {
-        if (axios.isAxiosError(err)) {
-          setErrors([
-            err.response?.data?.message || "שגיאה כללית מהשרת"
-          ])
-        } else {
-          console.error("Unknown error:", err)
-          setErrors(["שגיאה לא צפויה, נא לנסות שוב מאוחר יותר"])
-        }
-      } else {
-        console.error(err)
-        setErrors(["שגיאה לא צפויה, נא לנסות שוב מאוחר יותר"])
-      }
+    } catch (error: any) {
+      console.error("Error fetching business data:", error);
+
+      const serverMessage =
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        "שגיאה לא צפויה, נא לנסות שוב מאוחר יותר"
+      setErrors([serverMessage]);
     } finally {
       setLoading(false)
     }

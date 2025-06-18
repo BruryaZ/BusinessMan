@@ -84,23 +84,23 @@ function DataViewing() {
         setError(null);
 
         // קריאה לדוח העסק
-        const businessReportResponse = await axios.get(
+        const businessReportResponse = await axios.get<{ totalIncome: number; totalExpenses: number; cashFlow: number; netProfit: number; invoiceCount: number }>(
           `${url}/api/Reports/business-report/${globalContextDetails.user.businessId}`,
           { withCredentials: true }
         );
 
-        const monthlyReportResponse = await axios.get(
+        const monthlyReportResponse = await axios.get<{ incomeChangePercent: number; expensesChangePercent: number; netProfitChangePercent: number }>(
           `${url}/api/Reports/monthly`,
           {
             params: {
               businessId: globalContextDetails.user.businessId,
               year: new Date().getFullYear(),
-              month: new Date().getMonth() + 1, // חודש ב-0 מבוסס, לכן מוסיפים 1
+              month: new Date().getMonth() + 1, 
             },
           }
         );
 
-        setBusinessReport(businessReportResponse.data);
+        setBusinessReport(businessReportResponse.data as { totalIncome: number; totalExpenses: number; cashFlow: number; netProfit: number; invoiceCount: number });
         setMonthlyReport(monthlyReportResponse.data);
       } catch (err) {
         console.error(err);

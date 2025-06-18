@@ -48,7 +48,7 @@ const ProductionReports = () => {
   useEffect(() => {
     const fetchReport = async () => {
       try {
-        const { data } = await axios.get(
+        const { data } = await axios.get<ProdactionReportData>(
           `${url}/api/Reports/business-report/${globalContextDetails.business_global.id}`,
           { withCredentials: true }
         );
@@ -66,7 +66,7 @@ const ProductionReports = () => {
   useEffect(() => {
     const fetchReport = async () => {
       try {
-        const { data } = await axios.get(
+        const { data } = await axios.get<ProdactionReportMonthlyData>(
           `${url}/api/Reports/monthly?businessId=${globalContextDetails.business_global.id}&year=${new Date().getFullYear()}&month=${new Date().getMonth() + 1}`,
           { withCredentials: true }
         );

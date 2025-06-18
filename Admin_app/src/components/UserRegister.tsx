@@ -57,7 +57,7 @@ const UserRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => 
   const handleSubmit = async () => {
     setLoading(true)
     try {
-      await validationSchema.validate(myUser, { abortEarly: false });
+      await validationSchema.validate(myUser, { abortEarly: false })
       setErrors([])
 
       try {
@@ -65,20 +65,23 @@ const UserRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => 
         globalContextDetails.setUserCount(globalContextDetails.usersCount + 1)
         if (onSubmitSuccess) onSubmitSuccess()
         nav(-1)
-      } catch (e) {
-        setErrors(["שגיאה ברישום המשתמש"])
+      } catch (e: any) {
+        if (axios.isAxiosError(e)) {
+          const serverMessage = e.response?.data?.message || e.response?.data || null
+          setErrors(serverMessage ? [serverMessage] : ["שגיאה ברישום המשתמש"])
+        } else {
+          setErrors(["שגיאה ברישום המשתמש"])
+        }
       }
 
-    } catch (e) {
+    } catch (e: any) {
       if (e instanceof Error && 'inner' in e) {
         const validationErrors = (e as any).inner.map((err: any) => err.message)
         setErrors(validationErrors)
       } else {
         setErrors(["שגיאה ברישום המשתמש, נא לנסות שוב מאוחר יותר"])
       }
-    }
-
-    finally {
+    } finally {
       setLoading(false)
     }
   }
@@ -246,6 +249,7 @@ const UserRegister = ({ onSubmitSuccess }: { onSubmitSuccess?: () => void }) => 
                 ))}
               </div>
             )}
+
           </Form>
         </Card>
       </div>

@@ -34,32 +34,32 @@ const UserLogin = () => {
           globalContextDetails.setUserCount(data.user.businessUsersCount)
           globalContextDetails.setUser(data.user)
           nav("/")
-        }
-        catch (e) {
-          if (axios.isAxiosError(e) && e.response?.status === 400) {
-            setErrors(["משתמש לא נמצא, נא לבדוק את האימייל והסיסמה"])
-            return
+        } catch (e: any) {
+          if (axios.isAxiosError(e)) {
+            // בדיקה אם יש הודעת שגיאה מהשרת
+            const serverMessage = e.response?.data?.message || e.response?.data || null
+            setErrors(serverMessage ? [serverMessage] : ["משתמש לא נמצא, נא לבדוק את האימייל והסיסמה"])
+          } else {
+            setErrors(["שגיאה בכניסה, נא לנסות שוב מאוחר יותר"])
           }
-          setErrors(e instanceof Error ? [e.message] : ["שגיאה בכניסה, נא לנסות שוב מאוחר יותר"])
           return
         }
-      }
-      else {
+      } else {
         const validationErrors = await validationSchema.validate(userLogin).catch((err) => err.errors)
         setErrors(validationErrors || [])
       }
-    } catch (e) {
-      if (axios.isAxiosError(e) && e.response?.status === 400) {
-        setErrors(["משתמש לא נמצא, נא לבדוק את האימייל והסיסמה"])
-        return
+    } catch (e: any) {
+      if (axios.isAxiosError(e)) {
+        const serverMessage = e.response?.data?.message || e.response?.data || null
+        setErrors(serverMessage ? [serverMessage] : ["שגיאה בכניסה, נא לנסות שוב מאוחר יותר"])
+      } else {
+        setErrors([e.message || "שגיאה בכניסה, נא לנסות שוב מאוחר יותר"])
       }
-      setErrors(e instanceof Error ? [e.message] : ["שגיאה בכניסה, נא לנסות שוב מאוחר יותר"])
-      return
-    }
-    finally {
+    } finally {
       setLoading(false)
     }
   }
+
 
   const handleChange = (field: string, value: string) => {
     setUserLogin((prev) => ({ ...prev, [field]: value }))
@@ -87,9 +87,11 @@ const UserLogin = () => {
             maxWidth: 500,
             width: "100%",
           }}
-          styles={{ body:{
-            padding: isMobile ? "24px" : "40px",
-          }}}
+          styles={{
+            body: {
+              padding: isMobile ? "24px" : "40px",
+            }
+          }}
         >
           <div style={{ textAlign: "center", marginBottom: isMobile ? 24 : 32 }}>
             <Avatar
@@ -220,11 +222,11 @@ const UserLogin = () => {
 
             {errors.length > 0 && (
               <div style={{ marginTop: 16 }}>
-                {errors.map((index) => (
+                {errors.map((errorMsg, idx) => (
                   <Alert
-                    key={index}
+                    key={idx}
                     message="שגיאה בהתחברות"
-                    description="המערכת נתקלה בבעיה. אנא נסו מאוחר יותר."
+                    description={errorMsg}
                     type="error"
                     showIcon
                     icon={<ExclamationCircleOutlined />}
@@ -239,6 +241,7 @@ const UserLogin = () => {
                 ))}
               </div>
             )}
+
           </Form>
         </Card>
       </div>

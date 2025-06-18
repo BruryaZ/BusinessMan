@@ -90,9 +90,15 @@ const BusinessAndAdmin = () => {
       globalContextDetails.setUser(updateAdmin)
       setSuccess(true)
       setActiveStep(3)
-    } catch (e) {
-      setError("אירעה שגיאה בעדכון הנתונים. אנא נסה שנית.")
+    } catch (e: any) {
+      if (axios.isAxiosError(e)) {
+        const serverMessage = e?.response?.data?.message
+        setError(serverMessage || "אירעה שגיאה בעדכון הנתונים. אנא נסה שנית.")
+      } else {
+        setError("שגיאה לא צפויה בעדכון הנתונים.")
+      }
     }
+
   }
 
   const handleAdminSuccess = () => {

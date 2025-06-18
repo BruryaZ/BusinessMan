@@ -104,7 +104,7 @@ const AccountTransactions: React.FC = () => {
 
   const fetchTotals = async (): Promise<void> => {
     try {
-      const { data } = await axios.get(
+      const { data } = await axios.get<{ totalDebit: number; totalCredit: number }>(
         `${url}/api/Invoice/totals/${user.businessId}`,
         { withCredentials: true }
       )

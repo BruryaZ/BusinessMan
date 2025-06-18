@@ -2,8 +2,25 @@
 import { useContext, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import axios from "axios"
-import { Form, Input, Button, Typography, Card, Alert, Space, Avatar, Divider, ConfigProvider } from "antd"
-import { MailOutlined, LockOutlined, CrownOutlined, LoginOutlined, ExclamationCircleOutlined } from "@ant-design/icons"
+import {
+  Form,
+  Input,
+  Button,
+  Typography,
+  Card,
+  Alert,
+  Space,
+  Avatar,
+  Divider,
+  ConfigProvider
+} from "antd"
+import {
+  MailOutlined,
+  LockOutlined,
+  CrownOutlined,
+  LoginOutlined,
+  ExclamationCircleOutlined
+} from "@ant-design/icons"
 
 import type { Admin } from "../models/Admin"
 import { validationSchemaAdminLogin } from "../utils/validationSchema"
@@ -23,9 +40,10 @@ const AdminLogin = () => {
   const globalContextDetails = useContext(globalContext)
   const isMobile = useMediaQuery({ maxWidth: 768 })
 
-  const handleSubmit = async () => {    
+  const handleSubmit = async () => {
     setLoading(true)
     setErrors([])
+
     try {
       const valid = await validationSchema.isValid(admin)
       if (!valid) {
@@ -35,31 +53,46 @@ const AdminLogin = () => {
       }
 
       let data: any
+
       try {
-        const response = await axios.post(`${url}/Auth/admin-login`, admin, { withCredentials: true })
+        const response = await axios.post(`${url}/Auth/admin-login`, admin, {
+          withCredentials: true
+        })
         data = response.data
         globalContextDetails.setUser(data.user)
         globalContextDetails.setIsAdmin(true)
-      } catch (e) {
-        if (axios.isAxiosError(e) && e.response?.status === 400) {
-          setErrors(["משתמש לא נמצא, נא לבדוק את האימייל והסיסמה"])
-        } else {
-          setErrors([e instanceof Error ? e.message : "שגיאה בכניסה, נא לנסות שוב מאוחר יותר"])
-        }
+      } catch (e: any) {
+        const message =
+          e?.response?.data?.message ||
+          e?.message ||
+          "שגיאה בכניסה, נא לנסות שוב מאוחר יותר"
+        setErrors([message])
         return
       }
 
       try {
-        const res = await axios.get<BusinessDto>(`${url}/api/Business/${data.user.businessId}`, { withCredentials: true })
+        const res = await axios.get<BusinessDto>(
+          `${url}/api/Business/${data.user.businessId}`,
+          { withCredentials: true }
+        )
         globalContextDetails.setBusinessGlobal(res.data)
         globalContextDetails.setUserCount(res.data.usersCount)
-      } catch (e) {
-        setErrors([e instanceof Error ? e.message : "שגיאה בטעינת העסק, נא לנסות שוב מאוחר יותר"])
+      } catch (e: any) {
+        const message =
+          e?.response?.data?.message ||
+          e?.message ||
+          "שגיאה לא צפויה, נסה שוב מאוחר יותר."
+        setErrors([message])
+        return
       }
 
       nav("/")
-    } catch (e) {
-      setErrors([e instanceof Error ? e.message : "שגיאה לא צפויה, נא לנסות שוב מאוחר יותר"])
+    } catch (e: any) {
+      const message =
+        e?.response?.data?.message ||
+        e?.message ||
+        "שגיאה לא צפויה, נסה שוב מאוחר יותר."
+      setErrors([message])
     } finally {
       setLoading(false)
     }
@@ -74,19 +107,20 @@ const AdminLogin = () => {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          padding: isMobile ? "16px" : "24px",
-          // background: "linear-gradient(135deg, #f7f9fc 0%, #eef2f7 100%)",
+          padding: isMobile ? "16px" : "24px"
         }}
       >
         <Card
           className="login-form"
           style={{
             maxWidth: 500,
-            width: "100%",
+            width: "100%"
           }}
-          styles={{ body:{
-            padding: isMobile ? "24px" : "40px",
-          }}}
+          styles={{
+            body: {
+              padding: isMobile ? "24px" : "40px"
+            }
+          }}
         >
           <div style={{ textAlign: "center", marginBottom: isMobile ? 24 : 32 }}>
             <Avatar
@@ -94,7 +128,7 @@ const AdminLogin = () => {
               style={{
                 background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
                 marginBottom: 16,
-                boxShadow: "0 4px 14px rgba(102, 126, 234, 0.3)",
+                boxShadow: "0 4px 14px rgba(102, 126, 234, 0.3)"
               }}
             >
               <CrownOutlined style={{ fontSize: isMobile ? 28 : 40 }} />
@@ -106,7 +140,7 @@ const AdminLogin = () => {
                 marginBottom: 8,
                 color: "#2d3748",
                 textAlign: "center",
-                fontSize: isMobile ? "1.5rem" : "2rem",
+                fontSize: isMobile ? "1.5rem" : "2rem"
               }}
             >
               כניסת מנהל
@@ -115,7 +149,7 @@ const AdminLogin = () => {
               type="secondary"
               style={{
                 fontSize: isMobile ? 14 : 16,
-                display: "block",
+                display: "block"
               }}
             >
               ברוכים הבאים למערכת ניהול העסק
@@ -129,7 +163,9 @@ const AdminLogin = () => {
                 placeholder="הזן את האימייל שלך"
                 size="large"
                 value={admin.email}
-                onChange={(e) => setAdmin((prev) => ({ ...prev, email: e.target.value }))}
+                onChange={(e) =>
+                  setAdmin((prev) => ({ ...prev, email: e.target.value }))
+                }
                 style={{ borderRadius: 10 }}
               />
             </Form.Item>
@@ -140,7 +176,9 @@ const AdminLogin = () => {
                 placeholder="הזן את הסיסמה שלך"
                 size="large"
                 value={admin.password}
-                onChange={(e) => setAdmin((prev) => ({ ...prev, password: e.target.value }))}
+                onChange={(e) =>
+                  setAdmin((prev) => ({ ...prev, password: e.target.value }))
+                }
                 style={{ borderRadius: 10 }}
               />
             </Form.Item>
@@ -157,13 +195,15 @@ const AdminLogin = () => {
                 borderRadius: 10,
                 fontWeight: 600,
                 fontSize: 16,
-                marginBottom: 16,
+                marginBottom: 16
               }}
             >
               התחבר
             </Button>
 
-            <Divider><Text type="secondary">או</Text></Divider>
+            <Divider>
+              <Text type="secondary">או</Text>
+            </Divider>
 
             <div style={{ textAlign: "center" }}>
               <Space>
@@ -176,11 +216,11 @@ const AdminLogin = () => {
 
             {errors.length > 0 && (
               <div style={{ marginTop: 16 }}>
-                {errors.map((index) => (
+                {errors.map((error, index) => (
                   <Alert
                     key={index}
                     message="שגיאה בהתחברות"
-                    description="המערכת נתקלה בבעיה. אנא נסו מאוחר יותר."
+                    description={error}
                     type="error"
                     showIcon
                     icon={<ExclamationCircleOutlined />}
@@ -189,13 +229,12 @@ const AdminLogin = () => {
                       borderRadius: 8,
                       background: "linear-gradient(135deg, #fff2f0 0%, #ffebe8 100%)",
                       border: "1px solid #ffccc7",
-                      fontSize: isMobile ? 12 : 14,
+                      fontSize: isMobile ? 12 : 14
                     }}
                   />
                 ))}
               </div>
             )}
-            
           </Form>
         </Card>
       </div>

@@ -163,7 +163,7 @@ namespace BusinessMan.API.Controllers
 
             var emailExists = await _context.EmailList.FirstOrDefaultAsync(e => e.EmailAddress == user.Email);
             if (emailExists == null)
-                return Unauthorized(new { Message = "אינך מורשה להתחבר כמנהל." });
+                return Unauthorized(new { Message = "אינך רשום לאפליקציה כמנהל." });
 
             var existingUser = await _userRepository.FirstOrDefaultAsync(u => u.Email == emailExists.EmailAddress);
             if (existingUser == null)

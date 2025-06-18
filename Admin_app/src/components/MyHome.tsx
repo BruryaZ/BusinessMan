@@ -23,6 +23,7 @@ import axios from "axios"
 import dayjs from "dayjs"
 import type { UserDto } from "../models/UserDto"
 import { blue, green, orange, purple } from "../App"
+import { MonthlyReportResponse } from "../models/MonthlyReportResponse"
 
 const { Title, Text, Paragraph } = Typography
 
@@ -189,7 +190,8 @@ const MyHome = () => {
         const businessId = globalContextDetails.business_global.id
         const year = new Date().getFullYear()
         const month = new Date().getMonth() + 1
-        const res = await axios.get(`${url}/api/Reports/monthly?businessId=${businessId}&year=${year}&month=${month}`)
+
+        const res = await axios.get<MonthlyReportResponse>(`${url}/api/Reports/monthly?businessId=${businessId}&year=${year}&month=${month}`)
         setMonthlyReport(res.data?.monthlyMetric ?? 0)
         setIcomes(res.data?.currentMonthIncome ?? 0)
         setIcomesPrecent(res.data?.incomeChangePercent ?? 0)
@@ -777,18 +779,22 @@ const MyHome = () => {
                           overflow: "hidden",
                           position: "relative",
                           height: "100%",
-                          minHeight: isSmallMobile ? "180px" : isMobile ? "220px" : "280px",
+                          minHeight: isSmallMobile ? "220px" : isMobile ? "260px" : "300px", // שונה כאן
                         }}
-                        styles={{ body:{
-                          padding: isSmallMobile ? "20px 16px" : isMobile ? "30px 20px" : "40px 24px",
-                          height: "100%",
-                          display: "flex",
-                          flexDirection: "column",
-                          justifyContent: "center",
-                          alignItems: "center",
-                          textAlign: "center",
-                        }}}
+                        styles={{
+                          body: {
+                            padding: isSmallMobile ? "20px 16px" : isMobile ? "30px 20px" : "40px 24px",
+                            height: "100%",
+                            display: "flex",
+                            flexDirection: "column",
+                            justifyContent: "flex-start", // שונה כאן
+                            alignItems: "center",
+                            textAlign: "center",
+                            position: "relative",
+                          },
+                        }}
                       >
+                        {/* פס עליון צבעוני */}
                         <motion.div
                           style={{
                             position: "absolute",
@@ -802,52 +808,52 @@ const MyHome = () => {
                           whileInView={{ scaleX: 1 }}
                           transition={{ duration: 1, delay: index * 0.1 }}
                           viewport={{ once: true }}
-                        >
-                          <motion.div
-                            whileHover={{
-                              scale: 1.1,
-                              rotate: [-10, 10],
-                              transition: {
-                                type: "tween",
-                                duration: 0.5,
-                                repeatType: "reverse" as const,
-                              }
-                            }}
-                          >
-                            <Avatar
-                              size={isSmallMobile ? 60 : isMobile ? 80 : 100}
-                              style={{
-                                background: `${stat.color}15`,
-                                color: stat.color,
-                                marginBottom: isSmallMobile ? 16 : isMobile ? 24 : 32,
-                                border: `3px solid ${stat.color}30`,
-                              }}
-                            >
-                              <div style={{ fontSize: isSmallMobile ? 24 : isMobile ? 32 : 40 }}>{stat.icon}</div>
-                            </Avatar>
-                          </motion.div>
-                        </motion.div>
+                        />
 
+                        {/* אייקון בעיגול */}
                         <motion.div
-                          initial={{ opacity: 0, y: 20 }}
-                          whileInView={{ opacity: 1, y: 0 }}
-                          transition={{ delay: index * 0.1 + 0.2 }}
-                          viewport={{ once: true }}
+                          whileHover={{
+                            scale: 1.1,
+                            rotate: [-10, 10],
+                            transition: {
+                              type: "tween",
+                              duration: 0.5,
+                              repeatType: "reverse" as const,
+                            },
+                          }}
+                          style={{
+                            marginTop: isSmallMobile ? 16 : 24, // הוזז למטה
+                            zIndex: 1,
+                          }}
                         >
-                          <Title
-                            level={isSmallMobile ? 5 : 4}
+                          <Avatar
+                            size={isSmallMobile ? 60 : isMobile ? 80 : 100}
                             style={{
-                              color: "#2d3748",
-                              marginBottom: isSmallMobile ? 8 : 16,
-                              fontSize: isSmallMobile ? 12 : isMobile ? 14 : 16,
-                              fontWeight: 500,
-                              textAlign: "center",
+                              background: `${stat.color}15`,
+                              color: stat.color,
+                              marginBottom: isSmallMobile ? 12 : isMobile ? 16 : 24,
+                              border: `3px solid ${stat.color}30`,
                             }}
                           >
-                            {stat.title}
-                          </Title>
+                            <div style={{ fontSize: isSmallMobile ? 24 : isMobile ? 32 : 40 }}>{stat.icon}</div>
+                          </Avatar>
                         </motion.div>
 
+                        {/* כותרת */}
+                        <Title
+                          level={isSmallMobile ? 5 : 4}
+                          style={{
+                            color: "#2d3748",
+                            marginBottom: isSmallMobile ? 8 : 16,
+                            fontSize: isSmallMobile ? 12 : isMobile ? 14 : 16,
+                            fontWeight: 500,
+                            textAlign: "center",
+                          }}
+                        >
+                          {stat.title}
+                        </Title>
+
+                        {/* ערך */}
                         <motion.div
                           initial={{ scale: 0.5, opacity: 0 }}
                           whileInView={{ scale: 1, opacity: 1 }}
@@ -881,6 +887,7 @@ const MyHome = () => {
                           </motion.span>
                         </motion.div>
 
+                        {/* טרנד */}
                         <motion.div
                           initial={{ x: -20, opacity: 0 }}
                           whileInView={{ x: 0, opacity: 1 }}
@@ -934,6 +941,7 @@ const MyHome = () => {
                           </motion.div>
                         </motion.div>
                       </Card>
+
                     </motion.div>
                   </motion.div>
                 </Col>
@@ -1232,13 +1240,15 @@ const MyHome = () => {
                           overflow: "hidden",
                           position: "relative",
                         }}
-                        styles={{ body:{
-                          height: "100%",
-                          display: "flex",
-                          flexDirection: "column",
-                          justifyContent: "space-between",
-                          padding: isSmallMobile ? "16px" : isMobile ? "20px" : "24px",
-                        }}}
+                        styles={{
+                          body: {
+                            height: "100%",
+                            display: "flex",
+                            flexDirection: "column",
+                            justifyContent: "space-between",
+                            padding: isSmallMobile ? "16px" : isMobile ? "20px" : "24px",
+                          }
+                        }}
                       >
                         {/* Animated border gradient */}
                         <motion.div
@@ -1474,9 +1484,11 @@ const MyHome = () => {
                     position: "relative",
                     overflow: "hidden",
                   }}
-                  styles={{ body:{
-                    padding: isSmallMobile ? "30px 20px" : isMobile ? "40px 30px" : "60px",
-                  }}}
+                  styles={{
+                    body: {
+                      padding: isSmallMobile ? "30px 20px" : isMobile ? "40px 30px" : "60px",
+                    }
+                  }}
                 >
                   {/* Animated background elements */}
                   {[...Array(3)].map((_, i) => (
@@ -1674,9 +1686,9 @@ const MyHome = () => {
                           rotate: [0, 10, -10, 0],
                           scale: 1.1,
                         }}
-                        transition={{ 
+                        transition={{
                           type: "tween",
-                          duration: 0.5 
+                          duration: 0.5
                         }}
                       >
                         <Avatar

@@ -42,14 +42,14 @@ namespace BusinessMan.Service
             var isExists = await _emailService.EmailExistsAsync(user.Email);
             if (!isExists)
             {
-                throw new NotFoundException("Email does not exist. You do not have permission to perform this action.");
+                throw new NotFoundException("האימייל אל קיים. אתה צריך אישור כדי להיכנס לפלטפורמה הזו.");
             }
 
             // בדיקה שהיוזר אינו קיים
             var userExists = await _userRepository.FirstOrDefaultAsync(u => u.Email == user.Email);
             if (userExists != default)
             {
-                throw new Exceptions("The user already exists. User cannot be added.");
+                throw new Exceptions("המשתמש כבר קיים. לא ניתן להוסיף אותו.");
             }
 
             await _repositoryManager.User.AddAsync(user);

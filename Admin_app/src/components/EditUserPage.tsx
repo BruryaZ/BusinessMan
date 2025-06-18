@@ -62,8 +62,13 @@ const EditUserPage = () => {
       try {
         const { data } = await axios.get<UserDto>(`${url}/api/User/${id}`, { withCredentials: true })
         setMyUser(data)
-      } catch (e) {
-        setErrors(["שגיאה בטעינת נתוני המשתמש"])
+      } catch (error: any) {
+        const serverMessage =
+          error.response?.data?.message ||
+          error.response?.data?.error ||
+          "שגיאה בטעינת נתוני העסק";
+
+        setErrors([serverMessage]);
       }
     }
 
@@ -80,15 +85,19 @@ const EditUserPage = () => {
       const valid = await validationSchema.isValid(myUser)
       setErrors([])
 
-      if (valid && id) {        
+      if (valid && id) {
         const { data } = await axios.put<UserPostModel>(`${url}/api/User/${id}`, myUser, { withCredentials: true })
         setUser(convertToUser(data))
         nav("/user-management")
       } else {
         setErrors(["נא למלא את כל השדות הנדרשים"])
       }
-    } catch (e) {
-      setErrors(["שגיאה בעדכון המשתמש"])
+    } catch (error: any) {
+      const serverMessage =
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        "שגיאה בעדכון המשתמש";
+      setErrors([serverMessage]);
     } finally {
       setLoading(false)
     }

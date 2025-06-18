@@ -1,138 +1,142 @@
+"use client"
+
 import React, { useEffect, useState } from "react"
 import {
-    Button,
-    List,
-    Typography,
-    message,
-    Spin,
-    Card,
-    Space,
-    Empty,
-    Badge,
-    Tooltip,
-    Divider,
-    Row,
-    Col,
+  Button,
+  List,
+  Typography,
+  message,
+  Spin,
+  Card,
+  Space,
+  Empty,
+  Badge,
+  Tooltip,
+  Divider,
+  Row,
+  Col,
 } from "antd"
 import {
-    DownloadOutlined,
-    FileOutlined,
-    CloudDownloadOutlined,
-    FolderOpenOutlined,
-    FileTextOutlined,
-    FilePdfOutlined,
-    FileImageOutlined,
-    FileExcelOutlined,
-    FileWordOutlined,
-    FileZipOutlined
+  DownloadOutlined,
+  FileOutlined,
+  CloudDownloadOutlined,
+  FolderOpenOutlined,
+  FileTextOutlined,
+  FilePdfOutlined,
+  FileImageOutlined,
+  FileExcelOutlined,
+  FileWordOutlined,
+  FileZipOutlined,
 } from "@ant-design/icons"
-import axios from "axios"
+import axios from 'axios';
 import { FileItem } from "../models/FileItem"
 
 const { Text, Title } = Typography
 
 const BusinessFiles: React.FC = () => {
-    const [files, setFiles] = useState<FileItem[]>([])
-    const [loading, setLoading] = useState(false)
-    const [downloadingZip, setDownloadingZip] = useState(false)
-    const [downloadingFileId, setDownloadingFileId] = useState<string | null>(null)
-    const url = import.meta.env.VITE_API_URL
+  const [files, setFiles] = useState<FileItem[]>([])
+  const [loading, setLoading] = useState(false)
+  const [downloadingZip, setDownloadingZip] = useState(false)
+  const [downloadingFileId, setDownloadingFileId] = useState<string | null>(null)
+  const url = import.meta.env.VITE_API_URL
 
-    const fetchFiles = async () => {
-        try {
-            setLoading(true)
-            const response = await axios.get<FileItem[]>(`${url}/FileUpload/my-files`, {
-                withCredentials: true,
-            })
-            setFiles(response.data)
-        } catch (err) {
-            message.error("אירעה שגיאה בעת טעינת הקבצים")
-        } finally {
-            setLoading(false)
-        }
+  const extractServerMessage = (err: any, fallback: string) => {
+    return err?.response?.data?.message || err?.message || fallback;
+  };  
+
+  const fetchFiles = async () => {
+    setLoading(true)
+    try {
+      const response = await axios.get<FileItem[]>(`${url}/FileUpload/my-files`, {
+        withCredentials: true,
+      })
+      setFiles(response.data)
+    } catch (err) {
+      message.error(extractServerMessage(err, "אירעה שגיאה בעת טעינת הקבצים"))
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchFiles()
+  }, [])
+
+  const getFileIcon = (fileName: string) => {
+    const extension = fileName.split('.').pop()?.toLowerCase()
+    switch (extension) {
+      case 'pdf':
+        return <FilePdfOutlined style={{ color: '#ff4d4f' }} />
+      case 'doc':
+      case 'docx':
+        return <FileWordOutlined style={{ color: '#1890ff' }} />
+      case 'xls':
+      case 'xlsx':
+        return <FileExcelOutlined style={{ color: '#52c41a' }} />
+      case 'jpg':
+      case 'jpeg':
+      case 'png':
+      case 'gif':
+        return <FileImageOutlined style={{ color: '#722ed1' }} />
+      case 'zip':
+      case 'rar':
+        return <FileZipOutlined style={{ color: '#fa8c16' }} />
+      case 'txt':
+        return <FileTextOutlined style={{ color: '#13c2c2' }} />
+      default:
+        return <FileOutlined style={{ color: '#8c8c8c' }} />
+    }
+  }
+
+  const handleDownloadZip = async () => {
+    setDownloadingZip(true)
+    try {
+      const response = await axios.get(`${url}/FileUpload/my-files-download-zip`, {
+        responseType: "blob",
+        withCredentials: true,
+      })
+
+      const blob = new Blob([response.data as BlobPart], { type: "application/zip" })
+      const link = document.createElement("a")
+      link.href = URL.createObjectURL(blob)
+      link.download = "business-files.zip"
+      link.click()
+      URL.revokeObjectURL(link.href)
+      message.success("הקבצים הורדו בהצלחה!")
+    } catch (err) {
+      message.error(extractServerMessage(err, "לא הצלחנו להוריד את כל הקבצים"))
+    } finally {
+      setDownloadingZip(false)
+    }
+  }
+
+  const handleDownloadFile = async (file: FileItem) => {
+    if (!file.id) {
+      message.error("קובץ לא זמין להורדה")
+      return
     }
 
-    useEffect(() => {
-        fetchFiles()
-    }, [])
+    setDownloadingFileId(file.id.toString())
+    try {
+      const response = await axios.get(`${url}/FileUpload/download-file/${file.id}`, {
+        responseType: "blob",
+        withCredentials: true,
+      })
 
-    const getFileIcon = (fileName: string) => {
-        const extension = fileName.split('.').pop()?.toLowerCase()
-        switch (extension) {
-            case 'pdf':
-                return <FilePdfOutlined style={{ color: '#ff4d4f' }} />
-            case 'doc':
-            case 'docx':
-                return <FileWordOutlined style={{ color: '#1890ff' }} />
-            case 'xls':
-            case 'xlsx':
-                return <FileExcelOutlined style={{ color: '#52c41a' }} />
-            case 'jpg':
-            case 'jpeg':
-            case 'png':
-            case 'gif':
-                return <FileImageOutlined style={{ color: '#722ed1' }} />
-            case 'zip':
-            case 'rar':
-                return <FileZipOutlined style={{ color: '#fa8c16' }} />
-            case 'txt':
-                return <FileTextOutlined style={{ color: '#13c2c2' }} />
-            default:
-                return <FileOutlined style={{ color: '#8c8c8c' }} />
-        }
+      const fileName = file.fileName ?? "file"
+      const blob = new Blob([response.data as BlobPart])
+      const link = document.createElement("a")
+      link.href = URL.createObjectURL(blob)
+      link.download = fileName
+      link.click()
+      URL.revokeObjectURL(link.href)
+      message.success(`הקובץ "${fileName}" הורד בהצלחה!`)
+    } catch (err) {
+      message.error(extractServerMessage(err, "שגיאה בהורדת הקובץ"))
+    } finally {
+      setDownloadingFileId(null)
     }
-
-    const handleDownloadZip = async () => {
-        try {
-            setDownloadingZip(true)
-            const response = await axios.get(`${url}/FileUpload/my-files-download-zip`, {
-                responseType: "blob",
-                withCredentials: true,
-            })
-
-            const blob = new Blob([response.data], { type: "application/zip" })
-            const link = document.createElement("a")
-            link.href = URL.createObjectURL(blob)
-            link.download = "business-files.zip"
-            link.click()
-            URL.revokeObjectURL(link.href)
-            message.success("הקבצים הורדו בהצלחה!")
-        } catch (err) {
-            console.error(err)
-            message.error("לא הצלחנו להוריד את כל הקבצים")
-        } finally {
-            setDownloadingZip(false)
-        }
-    }
-
-    const handleDownloadFile = async (file: FileItem) => {
-        try {
-            if (!file.id) {
-                message.error("קובץ לא זמין להורדה")
-                return
-            }
-
-            setDownloadingFileId(file.id.toString())
-            const response = await axios.get(`${url}/FileUpload/download-file/${file.id}`, {
-                responseType: "blob",
-                withCredentials: true,
-            })
-
-            const fileName = file.fileName ?? "file"
-            const blob = new Blob([response.data])
-            const link = document.createElement("a")
-            link.href = URL.createObjectURL(blob)
-            link.download = fileName
-            link.click()
-            URL.revokeObjectURL(link.href)
-            message.success(`קובץ "${fileName}" הורד בהצלחה!`)
-        } catch (err) {
-            console.error(err)
-            message.error("שגיאה בהורדת הקובץ")
-        } finally {
-            setDownloadingFileId(null)
-        }
-    }
+  }
 
     return (
         <div dir="rtl" style={{ padding: "24px", minHeight: "100vh", backgroundColor: "#f5f5f5" }}>
