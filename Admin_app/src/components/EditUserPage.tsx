@@ -59,6 +59,12 @@ const EditUserPage = () => {
   })
 
   useEffect(() => {
+    if (!id) return; // הגנה
+    // שליפת נתונים
+  }, [id]);
+
+
+  useEffect(() => {
     const fetchUser = async () => {
       try {
         const { data } = await axios.get<UserDto>(`${url}/api/User/${id}`, { withCredentials: true })
