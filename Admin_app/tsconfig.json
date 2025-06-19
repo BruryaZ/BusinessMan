@@ -1,17 +1,24 @@
 {
   "files": [],
   "references": [
-    { "path": "./tsconfig.app.json" },
-    { "path": "./tsconfig.node.json" }
+    {
+      "path": "./tsconfig.app.json"
+    },
+    {
+      "path": "./tsconfig.node.json"
+    }
   ],
-    "compilerOptions": {
-      "esModuleInterop": true,
-      "skipLibCheck": true,
-      "strict": true,
-      "moduleResolution": "node",
-      "resolveJsonModule": true,
-      "target": "ES2020",
-      "module": "ESNext",
-      "jsx": "react-jsx"
-    }  
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "target": "ES2020",
+    "module": "ESNext",
+    "jsx": "react-jsx"
+  },
+  "exclude": [
+    "public/_redirects"
+  ]
 }
