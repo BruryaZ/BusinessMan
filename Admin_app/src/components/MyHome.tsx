@@ -24,30 +24,72 @@ import dayjs from "dayjs"
 import type { UserDto } from "../models/UserDto"
 import { blue, green, orange, purple } from "../App"
 import { MonthlyReportResponse } from "../models/MonthlyReportResponse"
+import { DemoWelcomeModal } from "./DemoWelcomeModal"
 
 const { Title, Text, Paragraph } = Typography
 
-const MyHome = () => {
-  const globalContextDetails = useContext(globalContext)
-  const url = import.meta.env.VITE_API_URL
-  const nav = useNavigate()
-  const [incomes, setIcomes] = useState<number>(0)
-  const [incomesPrecent, setIcomesPrecent] = useState<number>(0)
-  const [expenses, setExpenses] = useState<number>(0)
-  const [expensesPrecent, setExpensesPrecent] = useState<number>(0)
-  const [userPrecent, setUserPrecent] = useState<number>(0)
-  const users = globalContextDetails.usersCount || 0
-  const [monthlyReport, setMonthlyReport] = useState<number | null>(null)
+// Hook מותאם לביקור ראשון - חוץ מהקומפוננטה!
+const useFirstVisit = () => {
+  const [isFirstVisit, setIsFirstVisit] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
 
+  useEffect(() => {
+    const hasVisitedBefore = localStorage.getItem('businessman_has_visited')
+    const dontShowDemo = localStorage.getItem('businessman_dont_show_demo')
+
+    if (!hasVisitedBefore && !dontShowDemo) {
+      setIsFirstVisit(true)
+    }
+    setIsLoading(false)
+  }, [])
+
+  const markAsVisited = () => {
+    localStorage.setItem('businessman_has_visited', 'true')
+    setIsFirstVisit(false)
+  }
+
+  const resetFirstVisit = () => {
+    localStorage.removeItem('businessman_has_visited')
+    localStorage.removeItem('businessman_dont_show_demo')
+    setIsFirstVisit(true)
+  }
+
+  return { isFirstVisit, isLoading, markAsVisited, resetFirstVisit }
+}
+
+const MyHome = () => {
+  // 🔥 חובה! כל ה-hooks צריכים להיות בתחילת הקומפוננטה בסדר קבוע!
+
+  // 1️⃣ Context hooks
+  const globalContextDetails = useContext(globalContext)
+
+  // 2️⃣ Router hooks  
+  const nav = useNavigate()
   const navigate = useNavigate()
 
-  // רספונסיביות מתקדמת
+  // 3️⃣ Media Query hooks
   const isSmallMobile = useMediaQuery({ maxWidth: 479 })
   const isMobile = useMediaQuery({ maxWidth: 767 })
   const isTablet = useMediaQuery({ minWidth: 768, maxWidth: 1023 })
   const isDesktop = useMediaQuery({ minWidth: 1024, maxWidth: 1439 })
 
-  // פונקציות עזר לגדלים
+  // 4️⃣ Custom hooks
+  const { isFirstVisit, isLoading, markAsVisited } = useFirstVisit()
+
+  // 5️⃣ כל ה-useState hooks
+  const [incomes, setIcomes] = useState<number>(0)
+  const [incomesPrecent, setIcomesPrecent] = useState<number>(0)
+  const [expenses, setExpenses] = useState<number>(0)
+  const [expensesPrecent, setExpensesPrecent] = useState<number>(0)
+  const [userPrecent, setUserPrecent] = useState<number>(0)
+  const [monthlyReport, setMonthlyReport] = useState<number | null>(null)
+  const [showDemoModal, setShowDemoModal] = useState(false)
+
+  // 6️⃣ משתנים נגזרים
+  const url = import.meta.env.VITE_API_URL
+  const users = globalContextDetails.usersCount || 0
+
+  // 7️⃣ פונקציות עזר (לא hooks!)
   const getContainerPadding = () => {
     if (isSmallMobile) return "20px 12px"
     if (isMobile) return "30px 16px"
@@ -78,6 +120,101 @@ const MyHome = () => {
     return { width: "100%", maxWidth: 600, height: 500 }
   }
 
+  const fetchUserGrowthPercent = async (businessId: number): Promise<number> => {
+    try {
+      const response = await axios.get<UserDto[]>(`${url}/api/User/users-by-business/${businessId}`)
+      const users = response.data
+
+      const now = dayjs()
+      const currentMonth = now.month()
+      const currentYear = now.year()
+      const lastMonth = now.subtract(1, "month").month()
+      const lastMonthYear = now.subtract(1, "month").year()
+
+      const usersThisMonth = users.filter((user) => {
+        const created = dayjs(user.createdAt)
+        return created.month() === currentMonth && created.year() === currentYear
+      })
+
+      const usersLastMonth = users.filter((user) => {
+        const created = dayjs(user.createdAt)
+        return created.month() === lastMonth && created.year() === lastMonthYear
+      })
+
+      const countThisMonth = usersThisMonth.length
+      const countLastMonth = usersLastMonth.length
+
+      if (countLastMonth === 0) {
+        return countThisMonth > 0 ? 100 : 0
+      }
+
+      const percentGrowth = ((countThisMonth - countLastMonth) / countLastMonth) * 100
+      return Math.round(percentGrowth)
+    } catch (error) {
+      console.error("שגיאה בעת שליפת המשתמשים:", error)
+      return 0
+    }
+  }
+
+  const handleDemoLogin = (credentials: { email: string; password: string }) => {
+    console.log('נתוני הכניסה להדגמה:', credentials)
+    markAsVisited() // 🔥 חשוב! סימון שהמשתמש כבר ביקר
+    navigate('/admin-login', {
+      state: {
+        demoCredentials: credentials,
+        fromDemo: true
+      }
+    })
+  }
+
+  const handleCloseModal = () => {
+    setShowDemoModal(false)
+    markAsVisited() // 🔥 גם כשסוגר בלי לעשות כלום
+  }
+
+  // 8️⃣ כל ה-useEffect hooks - תמיד באותו מקום ובאותו סדר!
+
+  // useEffect ראשון: טעינת נתוני הדוח החודשי
+  useEffect(() => {
+    const fetchMonthlyReport = async () => {
+      try {
+        const businessId = globalContextDetails.business_global.id
+        const year = new Date().getFullYear()
+        const month = new Date().getMonth() + 1
+
+        const res = await axios.get<MonthlyReportResponse>(`${url}/api/Reports/monthly?businessId=${businessId}&year=${year}&month=${month}`)
+        setMonthlyReport(res.data?.monthlyMetric ?? 0)
+        setIcomes(res.data?.currentMonthIncome ?? 0)
+        setIcomesPrecent(res.data?.incomeChangePercent ?? 0)
+        setExpenses(res.data?.currentMonthExpenses ?? 0)
+        setExpensesPrecent(res.data?.expensesChangePercent ?? 0)
+        setUserPrecent(await fetchUserGrowthPercent(businessId))
+      } catch (err) {
+        console.error("שגיאה בקבלת דוח חודשי:", err)
+        setMonthlyReport(0)
+      }
+    }
+
+    if (globalContextDetails.business_global?.id) {
+      fetchMonthlyReport()
+    }
+  }, [globalContextDetails.business_global?.id, url])
+
+  // useEffect שני: הצגת מודאל הדגמה לביקור ראשון
+  useEffect(() => {
+    if (!isLoading && isFirstVisit) {
+      const dontShowDemo = localStorage.getItem('businessman_dont_show_demo')
+
+      if (!dontShowDemo) {
+        const timer = setTimeout(() => {
+          setShowDemoModal(true)
+        }, 2000)
+        return () => clearTimeout(timer)
+      }
+    }
+  }, [isFirstVisit, isLoading])
+
+  // 9️⃣ נתונים לממשק
   const menuItems = [
     {
       title: "לוח בקרה",
@@ -147,67 +284,6 @@ const MyHome = () => {
       icon: <BarChartOutlined />,
     },
   ]
-
-  const fetchUserGrowthPercent = async (businessId: number): Promise<number> => {
-    try {
-      const response = await axios.get<UserDto[]>(`${url}/api/User/users-by-business/${businessId}`)
-      const users = response.data
-
-      const now = dayjs()
-      const currentMonth = now.month()
-      const currentYear = now.year()
-      const lastMonth = now.subtract(1, "month").month()
-      const lastMonthYear = now.subtract(1, "month").year()
-
-      const usersThisMonth = users.filter((user) => {
-        const created = dayjs(user.createdAt)
-        return created.month() === currentMonth && created.year() === currentYear
-      })
-
-      const usersLastMonth = users.filter((user) => {
-        const created = dayjs(user.createdAt)
-        return created.month() === lastMonth && created.year() === lastMonthYear
-      })
-
-      const countThisMonth = usersThisMonth.length
-      const countLastMonth = usersLastMonth.length
-
-      if (countLastMonth === 0) {
-        return countThisMonth > 0 ? 100 : 0
-      }
-
-      const percentGrowth = ((countThisMonth - countLastMonth) / countLastMonth) * 100
-      return Math.round(percentGrowth)
-    } catch (error) {
-      console.error("שגיאה בעת שליפת המשתמשים:", error)
-      return 0
-    }
-  }
-
-  useEffect(() => {
-    const fetchMonthlyReport = async () => {
-      try {
-        const businessId = globalContextDetails.business_global.id
-        const year = new Date().getFullYear()
-        const month = new Date().getMonth() + 1
-
-        const res = await axios.get<MonthlyReportResponse>(`${url}/api/Reports/monthly?businessId=${businessId}&year=${year}&month=${month}`)
-        setMonthlyReport(res.data?.monthlyMetric ?? 0)
-        setIcomes(res.data?.currentMonthIncome ?? 0)
-        setIcomesPrecent(res.data?.incomeChangePercent ?? 0)
-        setExpenses(res.data?.currentMonthExpenses ?? 0)
-        setExpensesPrecent(res.data?.expensesChangePercent ?? 0)
-        setUserPrecent(await fetchUserGrowthPercent(businessId))
-      } catch (err) {
-        console.error("שגיאה בקבלת דוח חודשי:", err)
-        setMonthlyReport(0)
-      }
-    }
-
-    if (globalContextDetails.business_global?.id) {
-      fetchMonthlyReport()
-    }
-  }, [globalContextDetails.business_global?.id])
 
   const itemVariants: Variants = {
     hidden: {
@@ -287,6 +363,32 @@ const MyHome = () => {
         ease: "easeInOut" as const,
       },
     },
+  }
+
+  // 🔟 בדיקת Loading State
+  if (isLoading) {
+    return (
+      <div style={{
+        height: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+      }}>
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+        >
+          <div style={{
+            width: '50px',
+            height: '50px',
+            border: '3px solid rgba(255,255,255,0.3)',
+            borderTop: '3px solid white',
+            borderRadius: '50%'
+          }} />
+        </motion.div>
+      </div>
+    )
   }
 
   return (
@@ -1807,6 +1909,11 @@ const MyHome = () => {
           </div>
         </motion.div>
       </motion.div>
+      <DemoWelcomeModal
+        visible={showDemoModal}
+        onClose={handleCloseModal}
+        onLogin={handleDemoLogin}
+      />
     </ConfigProvider>
   )
 }
