@@ -28,12 +28,76 @@ export const validationSchemaUserLogin = Yup.object().shape({
 })
 
 export const validationSchemaUserRegister = Yup.object().shape({
-  email: Yup.string().email('אימייל לא חוקי').required('אימייל הוא שדה חובה'),
-  password: Yup.string().required('סיסמא היא שדה חובה').min(1, 'סיסמא חייבת להיות לפחות 3 תווים'),
-  role: Yup.number().required('תפקיד הוא שדה חובה').min(2, 'תפקיד חייב להיות מעל 1').max(3, 'תפקיד חייב להיות בין 2 ל-3'),
+  email: Yup.string()
+    .email('אימייל לא חוקי')
+    .required('אימייל הוא שדה חובה'),
+
+  password: Yup.string()
+    .required('סיסמא היא שדה חובה')
+    .min(6, 'סיסמא חייבת להיות לפחות 6 תווים')
+    .matches(/[A-Z]/, 'סיסמא חייבת להכיל לפחות אות גדולה אחת')
+    .matches(/[a-z]/, 'סיסמא חייבת להכיל לפחות אות קטנה אחת')
+    .matches(/\d/, 'סיסמא חייבת להכיל לפחות מספר אחד')
+    .matches(/[@$!%*?&]/, 'סיסמא חייבת להכיל לפחות תו מיוחד אחד'),
+
+  role: Yup.number()
+    .required('תפקיד הוא שדה חובה')
+    .min(1, 'תפקיד חייב להיות בין 1 ל-3')
+    .max(3, 'תפקיד חייב להיות בין 1 ל-3'),
+
+  phone: Yup.string()
+    .required('טלפון הוא שדה חובה')
+    .matches(/^05\d{8}$/, 'טלפון חייב להיות מספר נייד תקני'),
+
+  firstName: Yup.string()
+    .required('שם פרטי הוא שדה חובה')
+    .min(2, 'שם פרטי חייב להכיל לפחות 2 תווים')
+    .max(30, 'שם פרטי לא יכול להיות ארוך מ-30 תווים'),
+
+  lastName: Yup.string()
+    .required('שם משפחה הוא שדה חובה')
+    .min(2, 'שם משפחה חייב להכיל לפחות 2 תווים')
+    .max(30, 'שם משפחה לא יכול להיות ארוך מ-30 תווים'),
+
+    idNumber: Yup.string()
+    .required('תעודת זהות היא שדה חובה')
+    .trim()  // מסיר רווחים בתחילת וסוף המחרוזת
+    .matches(/^\d{9}$/, 'תעודת זהות חייבת להיות בדיוק 9 ספרות'),
 })
 
 export const validationSchemaAdminRegister = Yup.object().shape({
-  email: Yup.string().email('אימייל לא חוקי').required('אימייל הוא שדה חובה'),
-  password: Yup.string().required('סיסמא היא שדה חובה').min(1, 'סיסמא חייבת להיות לפחות 3 תווים'),
+  email: Yup.string()
+    .email('אימייל לא חוקי')
+    .required('אימייל הוא שדה חובה'),
+
+  password: Yup.string()
+    .required('סיסמא היא שדה חובה')
+    .min(6, 'סיסמא חייבת להיות לפחות 6 תווים')
+    .matches(/[A-Z]/, 'סיסמא חייבת להכיל לפחות אות גדולה אחת')
+    .matches(/[a-z]/, 'סיסמא חייבת להכיל לפחות אות קטנה אחת')
+    .matches(/\d/, 'סיסמא חייבת להכיל לפחות מספר אחד')
+    .matches(/[@$!%*?&]/, 'סיסמא חייבת להכיל לפחות תו מיוחד אחד'),
+
+  role: Yup.number()
+    .required('תפקיד הוא שדה חובה')
+    .oneOf([1], 'תפקיד חייב להיות 1'),
+
+  phone: Yup.string()
+    .required('טלפון הוא שדה חובה')
+    .matches(/^05\d{8}$/, 'טלפון חייב להיות מספר נייד תקני'),
+
+  firstName: Yup.string()
+    .required('שם פרטי הוא שדה חובה')
+    .min(2, 'שם פרטי חייב להכיל לפחות 2 תווים')
+    .max(30, 'שם פרטי לא יכול להיות ארוך מ-30 תווים'),
+
+  lastName: Yup.string()
+    .required('שם משפחה הוא שדה חובה')
+    .min(2, 'שם משפחה חייב להכיל לפחות 2 תווים')
+    .max(30, 'שם משפחה לא יכול להיות ארוך מ-30 תווים'),
+
+    idNumber: Yup.string()
+    .required('תעודת זהות היא שדה חובה')
+    .trim()  // מסיר רווחים בתחילת וסוף המחרוזת
+    .matches(/^\d{9}$/, 'תעודת זהות חייבת להיות בדיוק 9 ספרות'),  
 })

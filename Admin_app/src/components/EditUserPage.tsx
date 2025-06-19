@@ -6,6 +6,7 @@ import { validationSchemaUserRegister } from "../utils/validationSchema"
 import { globalContext } from "../context/GlobalContext"
 import { convertToUser } from "../utils/converToUser"
 import type { UserPostModel } from "../models/UserPostModel"
+import { ValidationError } from "yup"
 import {
   Form,
   Input,
@@ -50,11 +51,11 @@ const EditUserPage = () => {
     idNumber: "",
     password: "",
     role: 0,
-    status: "", // Default value for status
-    lastLogin: new Date(), // Default value for lastLogin
-    createdAt: new Date(), // Default value for createdAt
-    updateAt: new Date(), // Default value for updateAt
-    businessId: 0, // Default value for businessId
+    status: "",
+    lastLogin: new Date(),
+    createdAt: new Date(),
+    updateAt: new Date(),
+    businessId: 0,
   })
 
   useEffect(() => {
@@ -63,12 +64,17 @@ const EditUserPage = () => {
         const { data } = await axios.get<UserDto>(`${url}/api/User/${id}`, { withCredentials: true })
         setMyUser(data)
       } catch (error: any) {
-        const serverMessage =
-          error.response?.data?.message ||
-          error.response?.data?.error ||
-          "שגיאה בטעינת נתוני העסק";
+        const serverErrors = error.response?.data?.errors
+        const serverMessage = error.response?.data?.message || error.response?.data?.error
 
-        setErrors([serverMessage]);
+        if (serverErrors && typeof serverErrors === "object") {
+          const extractedErrors = Object.values(serverErrors).flat()
+          setErrors(extractedErrors as string[])
+        } else if (serverMessage) {
+          setErrors([serverMessage])
+        } else {
+          setErrors(["שגיאה בטעינת נתוני המשתמש"])
+        }
       }
     }
 
@@ -81,23 +87,34 @@ const EditUserPage = () => {
 
   const handleSubmit = async () => {
     setLoading(true)
+    console.log(`ID received: "${id}"`, id?.length)
     try {
-      const valid = await validationSchema.isValid(myUser)
+      await validationSchema.validate(myUser, { abortEarly: false })
       setErrors([])
 
-      if (valid && id) {
-        const { data } = await axios.put<UserPostModel>(`${url}/api/User/${id}`, myUser, { withCredentials: true })
+      if (id) {
+        const { data } = await axios.put<UserPostModel>(`${url}/api/User/${id}`, myUser, {
+          withCredentials: true,
+        })
         setUser(convertToUser(data))
         nav("/user-management")
-      } else {
-        setErrors(["נא למלא את כל השדות הנדרשים"])
       }
     } catch (error: any) {
-      const serverMessage =
-        error.response?.data?.message ||
-        error.response?.data?.error ||
-        "שגיאה בעדכון המשתמש";
-      setErrors([serverMessage]);
+      if (error instanceof ValidationError) {
+        setErrors(error.errors)
+      } else {
+        const serverErrors = error.response?.data?.errors
+        const serverMessage = error.response?.data?.message || error.response?.data?.error
+
+        if (serverErrors && typeof serverErrors === "object") {
+          const extractedErrors = Object.values(serverErrors).flat()
+          setErrors(extractedErrors as string[])
+        } else if (serverMessage) {
+          setErrors([serverMessage])
+        } else {
+          setErrors(["שגיאה בעדכון המשתמש"])
+        }
+      }
     } finally {
       setLoading(false)
     }
