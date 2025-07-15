@@ -96,7 +96,7 @@ const UploadFiles = () => {
       setProgress(100)
 
       setTimeout(() => {
-        const data = response.data as { message?: string } // Type assertion
+        const data = response.data as { message?: string }
         setMessage(data.message || "הקובץ הועלה בהצלחה")
         setError(null)
         setUploading(false)
@@ -144,53 +144,6 @@ const UploadFiles = () => {
 
   return (
     <ConfigProvider direction="rtl">
-      {/* Floating Upload Status Overlay */}
-      {uploading && file && (
-        <div
-          style={{
-            position: "fixed",
-            top: "20px",
-            left: "50%",
-            transform: "translateX(-50%)",
-            zIndex: 9999,
-            background: "rgba(255, 255, 255, 0.95)",
-            backdropFilter: "blur(10px)",
-            border: "1px solid #d9d9d9",
-            borderRadius: "12px",
-            padding: "16px 24px",
-            boxShadow: "0 4px 20px rgba(0, 0, 0, 0.15)",
-            minWidth: "300px",
-            maxWidth: "500px",
-          }}
-        >
-          <Space direction="vertical" style={{ width: "100%" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <Space>
-                {getFileIcon(file.name)}
-                <Text strong>{file.name}</Text>
-              </Space>
-              <Text style={{ color: "#fa8c16", fontWeight: "bold" }}>{Math.round(progress)}%</Text>
-            </div>
-            <Progress
-              percent={progress}
-              strokeColor={{
-                "0%": "#667eea",
-                "50%": "#764ba2",
-                "100%": "#52c41a",
-              }}
-              strokeWidth={6}
-              showInfo={false}
-            />
-            <Text type="secondary" style={{ fontSize: 12, textAlign: "center" }}>
-              {progress < 30 && "מתחיל העלאה..."}
-              {progress >= 30 && progress < 60 && "מעלה נתונים..."}
-              {progress >= 60 && progress < 90 && "מעבד קובץ..."}
-              {progress >= 90 && "משלים העלאה..."}
-            </Text>
-          </Space>
-        </div>
-      )}
-
       <div className="upload-container" style={{ maxWidth: 900, margin: "0 auto"}}>
         <Card className="form-section">
           <div style={{ textAlign: "center", marginBottom: 32 }}>
@@ -218,7 +171,7 @@ const UploadFiles = () => {
           </div>
 
           <Row gutter={[24, 24]}>
-            <Col xs={24} lg={16}>
+            <Col xs={24} lg={uploadComplete ? 24 : 16}>
               <Dragger
                 {...uploadProps}
                 className={`upload-dragger ${dragActive ? "drag-active" : ""}`}
@@ -270,12 +223,14 @@ const UploadFiles = () => {
                 </div>
               </Dragger>
 
-              {file && !uploading && (
+              {file && !uploadComplete && (
                 <Card
                   size="small"
                   style={{
                     marginBottom: 24,
-                    background: "linear-gradient(145deg, #f0f9ff, #ffffff)",
+                    background: uploading 
+                      ? "linear-gradient(145deg, #f0f9ff, #ffffff)"
+                      : "linear-gradient(145deg, #f0f9ff, #ffffff)",
                     border: "1px solid #e6f4ff",
                     borderRadius: 12,
                   }}
@@ -293,33 +248,63 @@ const UploadFiles = () => {
                         </div>
                       </Space>
                     </Col>
-                    <Col>
-                      <Space>
-                        <Button type="text" icon={<EyeOutlined />} size="small" style={{ color: "#1890ff" }}>
-                          תצוגה מקדימה
-                        </Button>
-                        <Button
-                          type="text"
-                          icon={<DeleteOutlined />}
-                          size="small"
-                          danger
-                          onClick={() => {
-                            setFile(null)
-                            setMessage(null)
-                            setError(null)
-                            setUploadComplete(false)
-                          }}
-                        >
-                          הסר
-                        </Button>
-                      </Space>
-                    </Col>
+                    {!uploading && (
+                      <Col>
+                        <Space>
+                          <Button type="text" icon={<EyeOutlined />} size="small" style={{ color: "#1890ff" }}>
+                            תצוגה מקדימה
+                          </Button>
+                          <Button
+                            type="text"
+                            icon={<DeleteOutlined />}
+                            size="small"
+                            danger
+                            onClick={() => {
+                              setFile(null)
+                              setMessage(null)
+                              setError(null)
+                              setUploadComplete(false)
+                            }}
+                          >
+                            הסר
+                          </Button>
+                        </Space>
+                      </Col>
+                    )}
                   </Row>
+                  
+                  {/* Progress Bar during upload */}
+                  {uploading && (
+                    <div style={{ marginTop: 16, textAlign: "center" }}>
+                      <Space direction="vertical" style={{ width: "100%" }}>
+                        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 8 }}>
+                          <CloudUploadOutlined style={{ color: "#1890ff", fontSize: 20 }} />
+                          <Text strong style={{ fontSize: 16 }}>מעלה קובץ...</Text>
+                        </div>
+                        <Progress
+                          percent={Math.round(progress)}
+                          strokeColor={{
+                            "0%": "#667eea",
+                            "50%": "#764ba2",
+                            "100%": "#52c41a",
+                          }}
+                          strokeWidth={8}
+                          style={{ maxWidth: 300, margin: "0 auto" }}
+                        />
+                        <Text type="secondary" style={{ fontSize: 14 }}>
+                          {progress < 30 && "מתחיל העלאה..."}
+                          {progress >= 30 && progress < 60 && "מעלה נתונים..."}
+                          {progress >= 60 && progress < 90 && "מעבד קובץ..."}
+                          {progress >= 90 && "משלים העלאה..."}
+                        </Text>
+                      </Space>
+                    </div>
+                  )}
                 </Card>
               )}
             </Col>
 
-            <Col xs={24} lg={8}>
+            <Col xs={24} lg={uploadComplete ? 0 : 8} style={{ display: uploadComplete ? 'none' : 'block' }}>
               <Card title="פעולות מהירות" size="small" style={{ marginBottom: 24 }}>
                 <Space direction="vertical" style={{ width: "100%" }}>
                   <Button
@@ -389,49 +374,75 @@ const UploadFiles = () => {
             </Col>
           </Row>
 
-          {message && (
-            <Alert
-              message="הצלחה!"
-              description={
-                <Space direction="vertical">
-                  <Text>{message}</Text>
-                  <Text type="secondary">הקובץ נשמר בבטחה במערכת</Text>
-                </Space>
-              }
-              type="success"
-              showIcon
-              icon={<CheckCircleOutlined />}
-              style={{
-                borderRadius: 12,
-                border: "1px solid #b7eb8f",
-                background: "linear-gradient(145deg, #f6ffed, #ffffff)",
-              }}
-              action={
-                <Button size="small" type="primary" ghost>
-                  צפה בקובץ
-                </Button>
-              }
-            />
-          )}
-
-          {error && (
-            <Alert
-              message="שגיאה!"
-              description={error}
-              type="error"
-              showIcon
-              icon={<ExclamationCircleOutlined />}
-              style={{
-                borderRadius: 12,
-                border: "1px solid #ffccc7",
-                background: "linear-gradient(145deg, #fff2f0, #ffffff)",
-              }}
-              action={
-                <Button size="small" danger ghost>
-                  נסה שוב
-                </Button>
-              }
-            />
+          {/* Single unified message display */}
+          {(message || error) && (
+            <div style={{ marginTop: 24 }}>
+              <Alert
+                message={error ? "שגיאה!" : "הצלחה!"}
+                description={
+                  <div style={{ textAlign: "center", padding: "8px 0" }}>
+                    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 12, marginBottom: 8 }}>
+                      {error ? (
+                        <ExclamationCircleOutlined style={{ color: "#ff4d4f", fontSize: 24 }} />
+                      ) : (
+                        <CheckCircleOutlined style={{ color: "#52c41a", fontSize: 24 }} />
+                      )}
+                      <Text strong style={{ fontSize: 16 }}>
+                        {error || message}
+                      </Text>
+                    </div>
+                    {!error && (
+                      <Text type="secondary" style={{ fontSize: 14 }}>
+                        הקובץ נשמר בבטחה במערכת ומוכן לניתוח
+                      </Text>
+                    )}
+                  </div>
+                }
+                type={error ? "error" : "success"}
+                showIcon={false}
+                style={{
+                  borderRadius: 16,
+                  border: error ? "2px solid #ffccc7" : "2px solid #b7eb8f",
+                  background: error 
+                    ? "linear-gradient(145deg, #fff2f0, #ffffff)"
+                    : "linear-gradient(145deg, #f6ffed, #ffffff)",
+                  boxShadow: error 
+                    ? "0 4px 12px rgba(255, 77, 79, 0.15)"
+                    : "0 4px 12px rgba(82, 196, 26, 0.15)",
+                }}
+                action={
+                  <div style={{ display: "flex", gap: 8 }}>
+                    {error ? (
+                      <Button 
+                        size="small" 
+                        danger 
+                        ghost 
+                        onClick={() => setError(null)}
+                      >
+                        נסה שוב
+                      </Button>
+                    ) : (
+                      <>
+                        <Button 
+                          size="small" 
+                          type="primary" 
+                          ghost
+                          onClick={() => setMessage(null)}
+                        >
+                          סגור
+                        </Button>
+                        <Button 
+                          size="small" 
+                          type="default"
+                        >
+                          צפה בקובץ
+                        </Button>
+                      </>
+                    )}
+                  </div>
+                }
+              />
+            </div>
           )}
         </Card>
       </div>

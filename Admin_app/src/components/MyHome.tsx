@@ -28,33 +28,6 @@ import { DemoWelcomeModal } from "./DemoWelcomeModal"
 
 const { Title, Text, Paragraph } = Typography
 
-// Hook מותאם לביקור ראשון - חוץ מהקומפוננטה!
-const useFirstVisit = () => {
-  const [isFirstVisit, setIsFirstVisit] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
-
-  useEffect(() => {
-    const dontShowDemo = localStorage.getItem('businessman_dont_show_demo')
-
-    if (!dontShowDemo) {
-      setIsFirstVisit(true)
-    }
-    setIsLoading(false)
-  }, [])
-
-  const markAsVisited = () => {
-    setIsFirstVisit(false)
-  }
-
-  const resetFirstVisit = () => {
-    localStorage.removeItem('businessman_has_visited')
-    localStorage.removeItem('businessman_dont_show_demo')
-    setIsFirstVisit(true)
-  }
-
-  return { isFirstVisit, isLoading, markAsVisited, resetFirstVisit }
-}
-
 const MyHome = () => {
   // 🔥 חובה! כל ה-hooks צריכים להיות בתחילת הקומפוננטה בסדר קבוע!
 
@@ -70,9 +43,37 @@ const MyHome = () => {
   const isMobile = useMediaQuery({ maxWidth: 767 })
   const isTablet = useMediaQuery({ minWidth: 768, maxWidth: 1023 })
   const isDesktop = useMediaQuery({ minWidth: 1024, maxWidth: 1439 })
+  const useShowDemo = () => {
+    const [shouldShowDemo, setShouldShowDemo] = useState(false)
+    const [isLoading, setIsLoading] = useState(true)
+
+    useEffect(() => {
+      // בדיקה רק אם המשתמש סגר את הדמו בעבר
+      const demoWasClosed = localStorage.getItem('businessman_demo_closed')
+
+      if (!demoWasClosed) {
+        setShouldShowDemo(true)
+      }
+      setIsLoading(false)
+    }, [])
+
+    const closeDemo = () => {
+      // סימון שהמשתמש סגר את הדמו
+      localStorage.setItem('businessman_demo_closed', 'true')
+      setShouldShowDemo(false)
+    }
+
+    const resetDemo = () => {
+      // פונקציה לאיפוס הדמו (למקרה שתרצה לבדוק)
+      localStorage.removeItem('businessman_demo_closed')
+      setShouldShowDemo(true)
+    }
+
+    return { shouldShowDemo, isLoading, closeDemo, resetDemo }
+  }
 
   // 4️⃣ Custom hooks
-  const { isFirstVisit, isLoading, markAsVisited } = useFirstVisit()
+  const { shouldShowDemo, isLoading, closeDemo } = useShowDemo()
 
   // 5️⃣ כל ה-useState hooks
   const [incomes, setIcomes] = useState<number>(0)
@@ -155,7 +156,7 @@ const MyHome = () => {
   }
 
   const handleDemoLogin = (credentials: { email: string; password: string }) => {
-    markAsVisited() // 🔥 חשוב! סימון שהמשתמש כבר ביקר
+    closeDemo() // סגירת הדמו לצמיתות
     navigate('/admin-login', {
       state: {
         demoCredentials: credentials,
@@ -165,8 +166,8 @@ const MyHome = () => {
   }
 
   const handleCloseModal = () => {
+    closeDemo() // סגירת הדמו לצמיתות
     setShowDemoModal(false)
-    markAsVisited() // 🔥 גם כשסוגר בלי לעשות כלום
   }
 
   // 8️⃣ כל ה-useEffect hooks - תמיד באותו מקום ובאותו סדר!
@@ -199,17 +200,13 @@ const MyHome = () => {
 
   // useEffect שני: הצגת מודאל הדגמה לביקור ראשון
   useEffect(() => {
-    if (!isLoading && isFirstVisit) {
-      const dontShowDemo = localStorage.getItem('businessman_dont_show_demo')
-
-      if (!dontShowDemo) {
-        const timer = setTimeout(() => {
-          setShowDemoModal(true)
-        }, 2000)
-        return () => clearTimeout(timer)
-      }
+    if (!isLoading && shouldShowDemo) {
+      const timer = setTimeout(() => {
+        setShowDemoModal(true)
+      }, 2000)
+      return () => clearTimeout(timer)
     }
-  }, [isFirstVisit, isLoading])
+  }, [shouldShowDemo, isLoading])
 
   // 9️⃣ נתונים לממשק
   const menuItems = [
