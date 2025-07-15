@@ -34,17 +34,15 @@ const useFirstVisit = () => {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    const hasVisitedBefore = localStorage.getItem('businessman_has_visited')
     const dontShowDemo = localStorage.getItem('businessman_dont_show_demo')
 
-    if (!hasVisitedBefore && !dontShowDemo) {
+    if (!dontShowDemo) {
       setIsFirstVisit(true)
     }
     setIsLoading(false)
   }, [])
 
   const markAsVisited = () => {
-    localStorage.setItem('businessman_has_visited', 'true')
     setIsFirstVisit(false)
   }
 
@@ -157,7 +155,6 @@ const MyHome = () => {
   }
 
   const handleDemoLogin = (credentials: { email: string; password: string }) => {
-    console.log('נתוני הכניסה להדגמה:', credentials)
     markAsVisited() // 🔥 חשוב! סימון שהמשתמש כבר ביקר
     navigate('/admin-login', {
       state: {
