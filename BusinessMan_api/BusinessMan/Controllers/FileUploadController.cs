@@ -2,6 +2,7 @@
 using AutoMapper;
 using BusinessMan.Core.BasicModels;
 using BusinessMan.Core.DTO_s;
+using BusinessMan.Core.Models;
 using BusinessMan.Core.Services;
 using BusinessMan.Service;
 using BusinessMan.Service.OperationsOnFiles;
@@ -96,13 +97,15 @@ namespace BusinessMan.API.Controllers
                 Invoice invoice = null;
                 if (analyzeAndSave)
                 {
+                    // *** זה החלק החשוב - צור FileDto עם הקובץ מהזיכרון ***
                     var fileDtoForAnalysis = new FileDto
                     {
                         FileName = $"{fileName}{fileExtension}",
                         Size = fileUpload.Length,
                         UploadDate = DateTime.UtcNow,
                         FilePath = fileUrl,
-                        BusinessId = 0, // לא נדרש בשלב זה
+                        FileContent = fileUpload, // הוספת הקובץ מהזיכרון
+                        BusinessId = 0,
                         UserId = 0
                     };
 
@@ -118,7 +121,6 @@ namespace BusinessMan.API.Controllers
                             invoice.UserId = user.Id;
                         }
                     }
-                    // לא שומרים כלום במסד עדיין!
                 }
 
                 return Ok(new
@@ -134,14 +136,6 @@ namespace BusinessMan.API.Controllers
             {
                 return StatusCode(500, $"אירעה שגיאה בהעלאה: {ex.Message}");
             }
-        }
-
-        public class ConfirmInvoiceRequest
-        {
-            public Invoice Invoice { get; set; }
-            public string FileUrl { get; set; }
-            public string FileName { get; set; }
-            public long FileSize { get; set; }
         }
 
         // POST api/FileUpload/confirm-invoice
