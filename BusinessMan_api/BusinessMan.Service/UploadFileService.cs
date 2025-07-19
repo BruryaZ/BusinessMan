@@ -17,7 +17,7 @@ using static OpenAI.ObjectModels.StaticValues.AudioStatics;
 
 namespace BusinessMan.Service
 {
-    public class FileUploadService : IService<FileDto>
+    public class FileUploadService : IFileService
     {
         private ReadFileContent readFileContent;
         private readonly IRepositoryManager _repositoryManager;
@@ -44,32 +44,44 @@ namespace BusinessMan.Service
             return await _repositoryManager.Files.GetAllAsync();
         }
 
-        public async Task<FileDto> AddAsync(FileDto fileUpload)
+        public async Task<FileDto> AddAsync(FileDto fileUpload, bool analyzeAndSave = false)
         {
-            // ניתוח הקובץ
-            var invoiceToAdd = await readFileContent.FileAnalysis(fileUpload);
-
-            // טיפול נכון בתאריכים
-            invoiceToAdd.InvoiceDate = ExtentionsFunctions.ForceUtc(invoiceToAdd.InvoiceDate);
-            invoiceToAdd.CreatedAt = ExtentionsFunctions.ForceUtc(invoiceToAdd.CreatedAt);
-            invoiceToAdd.UpdatedAt = DateTime.UtcNow;
-            invoiceToAdd.InvoicePath = fileUpload.FilePath;
-
-            // הגדרת המידע של מי שיצר את החשבונית
             var user = _httpContextAccessor.HttpContext.Items["CurrentUser"] as User;
             if (user != null)
             {
-                invoiceToAdd.User = user;
-                invoiceToAdd.UserId = user.Id;
-                invoiceToAdd.BusinessId = user.BusinessId;
-                invoiceToAdd.CreatedBy = user.FirstName + " " + user.LastName;
-                invoiceToAdd.UpdatedBy = user.FirstName + " " + user.LastName;
+                fileUpload.UserId = user.Id;
+                fileUpload.BusinessId = user.BusinessId ?? 0;
             }
 
+            // שמירת הקובץ תמיד
             await _repositoryManager.Files.AddAsync(fileUpload);
-            await _invoiceService.AddAsync(invoiceToAdd);
-            await _repositoryManager.SaveAsync();
 
+            if (analyzeAndSave)
+            {
+                // ניתוח הקובץ לחשבונית
+                var invoiceToAdd = await readFileContent.FileAnalysis(fileUpload);
+
+                if (invoiceToAdd != null)
+                {
+                    invoiceToAdd.InvoiceDate = ExtentionsFunctions.ForceUtc(invoiceToAdd.InvoiceDate);
+                    invoiceToAdd.CreatedAt = ExtentionsFunctions.ForceUtc(invoiceToAdd.CreatedAt);
+                    invoiceToAdd.UpdatedAt = DateTime.UtcNow;
+                    invoiceToAdd.InvoicePath = fileUpload.FilePath;
+
+                    if (user != null)
+                    {
+                        invoiceToAdd.User = user;
+                        invoiceToAdd.UserId = user.Id;
+                        invoiceToAdd.BusinessId = user.BusinessId;
+                        invoiceToAdd.CreatedBy = user.FirstName + " " + user.LastName;
+                        invoiceToAdd.UpdatedBy = user.FirstName + " " + user.LastName;
+                    }
+
+                    await _invoiceService.AddAsync(invoiceToAdd);
+                }
+            }
+
+            await _repositoryManager.SaveAsync();
             return fileUpload;
         }
 

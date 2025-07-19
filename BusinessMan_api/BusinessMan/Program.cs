@@ -56,7 +56,7 @@ builder.Services.AddScoped<IService<Business>, BusinessService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IBusinessReportService, BusinessReportService>();
 builder.Services.AddScoped<IRepository<FileDto>, Repository<FileDto>>();
-builder.Services.AddScoped<IService<FileDto>, FileUploadService>();
+builder.Services.AddScoped<IFileService, FileUploadService>();
 builder.Services.AddScoped<ReadFileContent>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IAuthService, AuthService>();

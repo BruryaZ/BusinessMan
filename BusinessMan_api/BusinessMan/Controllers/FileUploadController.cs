@@ -1,14 +1,16 @@
-﻿using AutoMapper;
+﻿using Amazon.S3;
+using AutoMapper;
+using BusinessMan.Core.BasicModels;
 using BusinessMan.Core.DTO_s;
 using BusinessMan.Core.Services;
+using BusinessMan.Service;
+using BusinessMan.Service.OperationsOnFiles;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using Microsoft.AspNetCore.Http;
 using System.IO;
 using System.Threading.Tasks;
-using Amazon.S3;
-using BusinessMan.Core.BasicModels;
 
 namespace BusinessMan.API.Controllers
 {
@@ -56,16 +58,15 @@ namespace BusinessMan.API.Controllers
 
         // POST api/<FileUploadController>
         [HttpPost("upload")]
-        public async Task<IActionResult> Upload(IFormFile fileUpload)
+        public async Task<IActionResult> Upload(IFormFile fileUpload, [FromQuery] bool analyzeAndSave = false)
         {
             if (fileUpload == null || fileUpload.Length == 0)
                 return BadRequest("לא נבחר קובץ.");
 
-            if (fileUpload.Length > 50 * 1024 * 1024) // מגבלת 50MB
+            if (fileUpload.Length > 50 * 1024 * 1024)
                 return BadRequest("גודל הקובץ חורג מהמגבלה המותרת.");
 
-            // בדיקת סוג קובץ מותר
-            var allowedExtensions = new[] { ".jpg", ".png", ".pdf", ".docx", ".txt" };
+            var allowedExtensions = new[] { ".jpg", ".png", ".pdf", ".docx", ".txt", ".xlsx" };
             var fileExtension = Path.GetExtension(fileUpload.FileName).ToLower();
             if (!allowedExtensions.Contains(fileExtension))
                 return BadRequest("סוג הקובץ אינו נתמך.");
@@ -99,18 +100,41 @@ namespace BusinessMan.API.Controllers
                     Size = fileUpload.Length,
                     UploadDate = DateTime.UtcNow,
                     FilePath = fileUrl,
-                    BusinessId = user.BusinessId ?? 0,
                     FileContent = fileUpload,
+                    BusinessId = user.BusinessId ?? 0,
                     UserId = user.Id,
                 };
 
+                // שמירת קובץ
                 var createdFile = await _fileService.AddAsync(fileDto);
 
-                return Ok(new { message = "ההעלאה הצליחה", fileUrl });
+                Invoice invoice = null;
+
+                // אם ביקשו לנתח גם חשבונית
+                if (analyzeAndSave)
+                {
+                    var reader = new ReadFileContent(_configuration);
+                    invoice = await reader.FileAnalysis(fileDto);
+
+                    if (invoice != null)
+                    {
+                        invoice.BusinessId = user.BusinessId;
+                        invoice.UserId = user.Id;
+                    }
+                }
+
+                return Ok(new
+                {
+                    message = analyzeAndSave
+                        ? "הקובץ נשמר ונותח בהצלחה."
+                        : "הקובץ נשמר בהצלחה.",
+                    fileUrl,
+                    invoice
+                });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"אירעה שגיאה בהעלאת הקובץ: {ex.Message}");
+                return StatusCode(500, $"אירעה שגיאה בהעלאה: {ex.Message}");
             }
         }
 
