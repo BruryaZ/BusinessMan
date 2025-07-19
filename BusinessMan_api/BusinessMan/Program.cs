@@ -34,7 +34,6 @@ builder.Configuration
 // הוראה להתעלם מהפניייה מעגלית
 
 // הוספת קובץ appsettings.Development.json
-builder.Services.AddTransient<ReadFileContent>();
 
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
@@ -43,6 +42,7 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 });
 
 // הזרקת תלויות
+builder.Services.AddScoped<ReadFileContent>();
 builder.Services.AddScoped<IRepositoryManager, RepositoryManager>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRepository<User>, UserRepository>();
@@ -139,7 +139,6 @@ builder.Services.AddSwaggerGen(options =>
 
 
 // AWS הוספת שירותי 
-builder.Services.AddAWSService<IAmazonS3>();
 builder.Services.AddSingleton<IAmazonS3>(sp =>
 {
     var configuration = sp.GetRequiredService<IConfiguration>();

@@ -29,7 +29,7 @@ namespace BusinessMan.Service.OperationsOnFiles
     {
         private readonly IConfiguration _configuration = configuration;
 
-        public static async Task<string> Read(FileDto fileUpload)
+        public async Task<string> Read(FileDto fileUpload)
         {
             var fileExtension = Path.GetExtension(fileUpload.FileName).ToLower();
 
@@ -46,8 +46,13 @@ namespace BusinessMan.Service.OperationsOnFiles
             else if (!string.IsNullOrEmpty(fileUpload.FilePath) && fileUpload.FilePath.Contains("s3"))
             {
                 // הקובץ שמור ב-S3 - נשלוף אותו
-                var s3Client = new AmazonS3Client();
-                var bucketName = "businessfiles235";
+                var s3Client = new AmazonS3Client(
+               _configuration["AWS:AccessKey"],
+               _configuration["AWS:SecretKey"],
+               Amazon.RegionEndpoint.GetBySystemName(_configuration["AWS:Region"])
+           );
+
+                var bucketName = _configuration["AWS:BucketName"];
                 var key = GetS3KeyFromUrl(fileUpload.FilePath);
 
                 var getRequest = new GetObjectRequest
@@ -68,7 +73,7 @@ namespace BusinessMan.Service.OperationsOnFiles
 
             return await HandleStreamByExtension(fileExtension, stream, fileUpload);
         }
-        private static async Task<string> ReadDocxContent(Stream stream)
+        private async Task<string> ReadDocxContent(Stream stream)
         {
             using (WordprocessingDocument wordDoc = WordprocessingDocument.Open(stream, false))
             {
@@ -84,7 +89,7 @@ namespace BusinessMan.Service.OperationsOnFiles
             }
         }
 
-        private static async Task<string> ReadExcelContent(Stream stream)
+        private async Task<string> ReadExcelContent(Stream stream)
         {
             using (ExcelPackage package = new ExcelPackage(stream))
             {
@@ -104,7 +109,7 @@ namespace BusinessMan.Service.OperationsOnFiles
             }
         }
 
-        private static async Task<string> ReadPdfContent(Stream stream)
+        private async Task<string> ReadPdfContent(Stream stream)
         {
             StringBuilder text = new StringBuilder();
 
@@ -124,7 +129,7 @@ namespace BusinessMan.Service.OperationsOnFiles
             return text.ToString();
         }
 
-        private static async Task<string> ReadImageContent(Stream stream, FileDto fileUpload)
+        private async Task<string> ReadImageContent(Stream stream, FileDto fileUpload)
         {
             string tempFilePath = Path.GetTempFileName() + Path.GetExtension(fileUpload.FileName);
 
@@ -139,7 +144,7 @@ namespace BusinessMan.Service.OperationsOnFiles
             return ReadTextFromImage(tempFilePath);
         }
 
-        private static string ReadTextFromImage(string imagePath)
+        private string ReadTextFromImage(string imagePath)
         {
             using (var engine = new TesseractEngine(@"./tessdata", "eng", EngineMode.Default))
             {
@@ -161,7 +166,8 @@ namespace BusinessMan.Service.OperationsOnFiles
                 ApiKey = apiKey
             });
 
-            string invoiceText = await ReadFileContent.Read(file);
+            ReadFileContent f = new ReadFileContent(_configuration);
+            string invoiceText = await f.Read(file);
 
             var result = await service.ChatCompletion.CreateCompletion(new ChatCompletionCreateRequest
             {
@@ -169,15 +175,16 @@ namespace BusinessMan.Service.OperationsOnFiles
                 Messages = new List<ChatMessage>
     {
         ChatMessage.FromSystem("אתה עוזר לנתח חשבוניות ולהחזיר תוצאה כ־JSON לפי מבנה קבוע."),
-        ChatMessage.FromUser(
-    @$"הנה תוכן חשבונית:
+                ChatMessage.FromUser(
+@$"הנה תוכן חשבונית:
 
 {invoiceText}
 
-החזר לי JSON מתאים למחלקה C# בשם Invoice. הנה מבנה המחלקה:
+החזר לי JSON מתאים למחלקה C# בשם Invoice, לפי המבנה הבא:
+
 {{
-  ""AmountDebit"": <סכום החובה>,
-  ""AmountCredit"": <סכום הזכות>,
+  ""AmountDebit"": <סכום החובה, מספר חיובי גדול מאפס>,
+  ""AmountCredit"": <סכום הזכות, מספר חיובי גדול מאפס>,
   ""InvoiceDate"": ""<תאריך החשבונית>"",
   ""Status"": 1,
   ""Notes"": ""נותח ע״י GPT"",
@@ -185,11 +192,15 @@ namespace BusinessMan.Service.OperationsOnFiles
   ""UpdatedBy"": ""gpt"",
   ""UserId"": null,
   ""BusinessId"": null,
-  ""Type"": ""<מספר של enum>"" // אחד מהערכים: Income = 0, Expense = 1, AssetIncrease = 2, AssetDecrease = 3, LiabilityIncrease = 4, LiabilityDecrease = 5, EquityIncrease = 6, EquityDecrease = 7
+  ""Type"": ""<מספר של enum>""
 }}
 
-החזר את ה-JSON בלבד וללא טקסט נוסף. החזר את התאריך בפורמט yyyy-MM-dd")
-    },
+שים לב, לפי עקרונות הנהלת חשבונות כפולה:  
+- סכום החובה וסכום הזכות חייבים להיות שווים זה לזה.  
+- שני הסכומים חייבים להיות מספרים חיוביים גדולים מאפס.  
+- אין להחזיר סכומים שליליים או אפסיים.  
+החזר רק JSON נקי, ללא טקסט נוסף, ותאריך בפורמט yyyy-MM-dd.")
+},
                 Temperature = 0.2f
             });
 
@@ -219,14 +230,14 @@ namespace BusinessMan.Service.OperationsOnFiles
                 return null;
             }
         }
-        private static string GetS3KeyFromUrl(string url)
+        private string GetS3KeyFromUrl(string url)
         {
             // לדוגמה, מתוך URL בסגנון: https://s3.amazonaws.com/your-bucket-name/invoices/filename.pdf
             var uri = new Uri(url);
             return uri.AbsolutePath.TrimStart('/').Split('/', 2).Last(); // "invoices/filename.pdf"
         }
 
-        private static async Task<string> HandleStreamByExtension(string extension, Stream stream, FileDto file)
+        private async Task<string> HandleStreamByExtension(string extension, Stream stream, FileDto file)
         {
             return extension switch
             {

@@ -40,8 +40,14 @@ namespace BusinessMan.Service
                 throw new InvalidOperationException("עסק לא קיים");
 
             // סכום אחיד, חובה וזכות יהיו שווים
-            if (invoice.Amount <= 0)
-                throw new InvalidOperationException("הסכום חייב להיות גדול מאפס");
+            // סכום אחיד, חובה וזכות יהיו שווים
+            if (invoice.AmountDebit <= 0 || invoice.AmountCredit <= 0)
+                throw new InvalidOperationException("סכום חובה וזכות חייבים להיות חיוביים וגדולים מאפס");
+
+            if (invoice.AmountDebit != invoice.AmountCredit)
+                throw new InvalidOperationException("סכום חובה וסכום זכות חייבים להיות שווים");
+
+            invoice.Amount = invoice.AmountDebit; // קביעת הסכום הכללי לפי אחד מהם
 
             invoice.AmountDebit = invoice.Amount;
             invoice.AmountCredit = invoice.Amount;

@@ -18,14 +18,15 @@ namespace BusinessMan.API.Controllers
     [ApiController]
     public class FileUploadController : Controller
     {
-        private readonly IService<FileDto> _fileService;
+        private readonly IFileService _fileService;
         private readonly IMapper _mapper;
         private readonly IAmazonS3 _s3Client;
         private readonly string _bucketName;
         private readonly IConfiguration _configuration;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IInvoiceService _invoiceService;
 
-        public FileUploadController(IService<FileDto> fileService, IMapper mapper, IAmazonS3 amazonS3, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
+        public FileUploadController(IFileService fileService, IMapper mapper, IAmazonS3 amazonS3, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
         {
             _fileService = fileService;
             _mapper = mapper;
@@ -92,42 +93,39 @@ namespace BusinessMan.API.Controllers
 
                 string fileUrl = $"https://{_bucketName}.s3.{_s3Client.Config.RegionEndpoint.SystemName}.amazonaws.com/{key}";
 
-                var user = _httpContextAccessor.HttpContext.Items["CurrentUser"] as User;
-
-                var fileDto = new FileDto
-                {
-                    FileName = $"{fileName}{fileExtension}",
-                    Size = fileUpload.Length,
-                    UploadDate = DateTime.UtcNow,
-                    FilePath = fileUrl,
-                    FileContent = fileUpload,
-                    BusinessId = user.BusinessId ?? 0,
-                    UserId = user.Id,
-                };
-
-                // שמירת קובץ
-                var createdFile = await _fileService.AddAsync(fileDto);
-
                 Invoice invoice = null;
-
-                // אם ביקשו לנתח גם חשבונית
                 if (analyzeAndSave)
                 {
+                    var fileDtoForAnalysis = new FileDto
+                    {
+                        FileName = $"{fileName}{fileExtension}",
+                        Size = fileUpload.Length,
+                        UploadDate = DateTime.UtcNow,
+                        FilePath = fileUrl,
+                        BusinessId = 0, // לא נדרש בשלב זה
+                        UserId = 0
+                    };
+
                     var reader = new ReadFileContent(_configuration);
-                    invoice = await reader.FileAnalysis(fileDto);
+                    invoice = await reader.FileAnalysis(fileDtoForAnalysis);
 
                     if (invoice != null)
                     {
-                        invoice.BusinessId = user.BusinessId;
-                        invoice.UserId = user.Id;
+                        var user = _httpContextAccessor.HttpContext.Items["CurrentUser"] as User;
+                        if (user != null)
+                        {
+                            invoice.BusinessId = user.BusinessId;
+                            invoice.UserId = user.Id;
+                        }
                     }
+                    // לא שומרים כלום במסד עדיין!
                 }
 
                 return Ok(new
                 {
                     message = analyzeAndSave
-                        ? "הקובץ נשמר ונותח בהצלחה."
-                        : "הקובץ נשמר בהצלחה.",
+                        ? "הקובץ הועלה ונותח. ממתין לאישור שמירת החשבונית."
+                        : "הקובץ הועלה בהצלחה.",
                     fileUrl,
                     invoice
                 });
@@ -136,6 +134,54 @@ namespace BusinessMan.API.Controllers
             {
                 return StatusCode(500, $"אירעה שגיאה בהעלאה: {ex.Message}");
             }
+        }
+
+        public class ConfirmInvoiceRequest
+        {
+            public Invoice Invoice { get; set; }
+            public string FileUrl { get; set; }
+            public string FileName { get; set; }
+            public long FileSize { get; set; }
+        }
+
+        // POST api/FileUpload/confirm-invoice
+        [HttpPost("confirm-invoice")]
+        public async Task<IActionResult> ConfirmInvoice([FromBody] ConfirmInvoiceRequest request)
+        {
+            if (request == null || request.Invoice == null || string.IsNullOrEmpty(request.FileUrl))
+                return BadRequest("נתונים חסרים לאישור.");
+
+            var user = _httpContextAccessor.HttpContext.Items["CurrentUser"] as User;
+            if (user == null)
+                return Unauthorized();
+
+            // השמת שדות משתמש בעסק
+            var invoice = request.Invoice;
+            invoice.BusinessId = user.BusinessId;
+            invoice.UserId = user.Id;
+            invoice.CreatedAt = DateTime.UtcNow;
+            invoice.UpdatedAt = DateTime.UtcNow;
+            invoice.CreatedBy = $"{user.FirstName} {user.LastName}";
+            invoice.UpdatedBy = $"{user.FirstName} {user.LastName}";
+
+            // שמירת החשבונית במסד
+            await _invoiceService.AddAsync(invoice);
+
+            // יצירת FileDto לשמירה במסד
+            var fileDto = new FileDto
+            {
+                FileName = request.FileName,
+                FilePath = request.FileUrl,
+                Size = request.FileSize,
+                UploadDate = DateTime.UtcNow,
+                BusinessId = user.BusinessId ?? 0,
+                UserId = user.Id
+            };
+
+            // שמירת פרטי הקובץ במסד
+            await _fileService.AddAsync(fileDto, true);
+
+            return Ok(new { message = "החשבונית והקובץ נשמרו בהצלחה." });
         }
 
         // PUT api/<FileUploadController>/5
