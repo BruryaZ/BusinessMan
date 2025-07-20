@@ -284,8 +284,8 @@ const UploadFiles = () => {
         Invoice: {
           Id: 0, // יווצר בשרת
           Amount: totalAmount,
-          AmountDebit: editedInvoiceData.type === 0 ? 0 : totalAmount, // אם הכנסה - חובה 0, אחרת - הסכום
-          AmountCredit: editedInvoiceData.type === 0 ? totalAmount : 0, // אם הכנסה - זכות הסכום, אחרת - 0
+          AmountDebit:  totalAmount, // אם הכנסה - חובה 0, אחרת - הסכום
+          AmountCredit:  totalAmount, // אם הכנסה - זכות הסכום, אחרת - 0
           InvoiceDate: editedInvoiceData.invoiceDate ? 
             new Date(editedInvoiceData.invoiceDate + 'T00:00:00.000Z').toISOString() : 
             new Date().toISOString(),
@@ -308,7 +308,7 @@ const UploadFiles = () => {
       }
   
       console.log("שולח בקשה עם הנתונים:", JSON.stringify(confirmRequest, null, 2))
-  
+      
       // שליחת בקשה עם credentials (עקבי עם handleSubmit)
       const response = await axios.post(
         `${url}/FileUpload/confirm-and-save`, 
