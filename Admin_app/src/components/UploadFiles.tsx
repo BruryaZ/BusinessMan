@@ -227,7 +227,7 @@ const UploadFiles = () => {
                 new Date().toISOString().split('T')[0],
               dueDate: calculateDueDate(invoiceFromServer.invoiceDate),
               description: invoiceFromServer.notes || "נותח ע״י AI",
-              type: typeof invoiceFromServer.type === "string" ? getInvoiceTypeNumber(invoiceFromServer.type) : invoiceFromServer.type || 2, // ברירת מחדל: הוצאה
+              type: getInvoiceTypeNumber(invoiceFromServer.type) || 2, // ברירת מחדל: הוצאה
               items: []
             }
             
@@ -313,16 +313,41 @@ const UploadFiles = () => {
       console.log("נתוני החשבונית שנבנו:", JSON.stringify(serverInvoiceData, null, 2))
       console.log("בקשת אישור מלאה:", JSON.stringify(confirmRequest, null, 2))
 
-      const response = await axios.post(
-        `${url}/FileUpload/confirm-invoice`, 
-        confirmRequest,
-        {
-          headers: { "Content-Type": "application/json" },
-          withCredentials: true,
-        }
-      )
+      // ניסיון ראשון עם credentials
+      let response
+      try {
+        response = await axios.post(
+          `${url}/FileUpload/confirm-invoice`, 
+          confirmRequest,
+          {
+            headers: { 
+              "Content-Type": "application/json",
+              "Accept": "application/json"
+            },
+            withCredentials: true,
+            timeout: 30000 // 30 שניות timeout
+          }
+        )
+      } catch (corsError: any) {
+        console.log("שגיאה עם credentials, מנסה בלי:", corsError.message)
+        
+        // ניסיון שני בלי credentials
+        response = await axios.post(
+          `${url}/FileUpload/confirm-invoice`, 
+          confirmRequest,
+          {
+            headers: { 
+              "Content-Type": "application/json",
+              "Accept": "application/json"
+            },
+            withCredentials: false,
+            timeout: 30000
+          }
+        )
+      }
 
-      message.success("החשבונית והקובץ נשמרו בהצלחה!")
+      console.log("תשובת השרת:", response.data)
+      
       setShowInvoiceModal(false)
       setUploadComplete(true)
       setCurrentStep(4)
@@ -330,11 +355,20 @@ const UploadFiles = () => {
       
     } catch (error: any) {
       console.error("Error confirming invoice:", error)
-      console.log("פרטי השגיאה מפורטים:", JSON.stringify(error.response?.data, null, 2))
-      console.log("status code:", error.response?.status)
-      console.log("status text:", error.response?.statusText)
-      const errorMessage = error.response?.data?.message || error.response?.data || "שגיאה באישור החשבונית"
-      message.error(errorMessage)
+      
+      if (error.code === 'ERR_NETWORK') {
+        console.log("בעיית רשת או CORS")
+        setError("שגיאת רשת - לא ניתן להתחבר לשרת. בדוק את הגדרות CORS בשרת.")
+      } else if (error.code === 'ECONNABORTED') {
+        setError("הבקשה לקחה יותר מדי זמן - נסה שוב")
+      } else {
+        console.log("פרטי השגיאה מפורטים:", JSON.stringify(error.response?.data, null, 2))
+        console.log("status code:", error.response?.status)
+        console.log("status text:", error.response?.statusText)
+        
+        const errorMessage = error.response?.data?.message || error.response?.data || error.message || "שגיאה באישור החשבונית"
+        setError(errorMessage)
+      }
     } finally {
       setConfirmingInvoice(false)
     }
