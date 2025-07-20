@@ -281,12 +281,22 @@ const UploadFiles = () => {
     setConfirmingInvoice(true)
 
     try {
+      // וידוא שהסכומים תקינים וחיוביים
+      const totalAmount = Number(editedInvoiceData.totalAmount) || 0
+      
+      // בדיקת תקינות סכומים
+      if (totalAmount <= 0) {
+        setError("סכום כולל חייב להיות גדול מאפס")
+        setConfirmingInvoice(false)
+        return
+      }
+
       // יצירת אובייקט חשבונית במבנה הנכון לשרת (לפי מודל Invoice)
       const serverInvoiceData = {
         Id: 0, // יווצר בשרת
-        Amount: Number(editedInvoiceData.totalAmount) || 100,
-        AmountDebit: Number(editedInvoiceData.totalAmount) || 100,
-        AmountCredit: Number(editedInvoiceData.totalAmount) || 100,
+        Amount: totalAmount,
+        AmountDebit: editedInvoiceData.type === 0 ? 0 : totalAmount, // אם הכנסה - חובה 0, אחרת - הסכום
+        AmountCredit: editedInvoiceData.type === 0 ? totalAmount : 0, // אם הכנסה - זכות הסכום, אחרת - 0
         InvoiceDate: editedInvoiceData.invoiceDate ? 
           new Date(editedInvoiceData.invoiceDate + 'T00:00:00.000Z').toISOString() : 
           new Date().toISOString(),
@@ -296,12 +306,12 @@ const UploadFiles = () => {
         CreatedBy: "gpt",
         UpdatedAt: new Date().toISOString(),
         UpdatedBy: "gpt",
-        InvoicePath: fileUrl, // השדה החסר שגרם לשגיאה!
+        InvoicePath: fileUrl,
         UserId: null,
         BusinessId: null,
         Business: null,
         User: null,
-        Type: getInvoiceTypeString(editedInvoiceData.type || 1) // המרה חזרה ל-string
+        Type: getInvoiceTypeString(editedInvoiceData.type || 1)
       }
 
       const confirmRequest = {
@@ -314,38 +324,19 @@ const UploadFiles = () => {
       console.log("נתוני החשבונית שנבנו:", JSON.stringify(serverInvoiceData, null, 2))
       console.log("בקשת אישור מלאה:", JSON.stringify(confirmRequest, null, 2))
 
-      // ניסיון ראשון עם credentials
-      let response
-      try {
-        response = await axios.post(
-          `${url}/FileUpload/confirm-and-save`, 
-          confirmRequest,
-          {
-            headers: { 
-              "Content-Type": "application/json",
-              "Accept": "application/json"
-            },
-            withCredentials: true,
-            timeout: 30000 // 30 שניות timeout
-          }
-        )
-      } catch (corsError: any) {
-        console.log("שגיאה עם credentials, מנסה בלי:", corsError.message)
-        
-        // ניסיון שני בלי credentials
-        response = await axios.post(
-          `${url}/FileUpload/confirm-and-save`, 
-          confirmRequest,
-          {
-            headers: { 
-              "Content-Type": "application/json",
-              "Accept": "application/json"
-            },
-            withCredentials: false,
-            timeout: 30000
-          }
-        )
-      }
+      // שליחת בקשה עם credentials (עקבי עם handleSubmit)
+      const response = await axios.post(
+        `${url}/FileUpload/confirm-and-save`, 
+        confirmRequest,
+        {
+          headers: { 
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+          },
+          withCredentials: true,
+          timeout: 30000 // 30 שניות timeout
+        }
+      )
 
       console.log("תשובת השרת:", response.data)
       

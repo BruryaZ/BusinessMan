@@ -102,6 +102,36 @@ const AccountTransactions: React.FC = () => {
       { key: type, label: type, color: "#8c8c8c", icon: <FileTextOutlined /> }
   }
 
+  // פונקציה לחישוב חובה/זכות לפי סוג התנועה
+  const calculateDebitCredit = (type: string, amount: number) => {
+    let amountDebit = 0
+    let amountCredit = 0
+
+    switch (type) {
+      case "Income":
+      case "Revenue":
+      case "OtherIncome":
+      case "AssetDecrease":
+      case "LiabilityIncrease":
+      case "EquityIncrease":
+        amountDebit = 0
+        amountCredit = amount
+        break
+      case "Expense":
+      case "CostOfGoodsSold":
+      case "OtherExpense":
+      case "AssetIncrease":
+      case "LiabilityDecrease":
+      case "EquityDecrease":
+      default:
+        amountDebit = amount
+        amountCredit = 0
+        break
+    }
+
+    return { amountDebit, amountCredit }
+  }
+
   const fetchTotals = async (): Promise<void> => {
     try {
       const { data } = await axios.get<{ totalDebit: number; totalCredit: number }>(
@@ -138,15 +168,30 @@ const AccountTransactions: React.FC = () => {
     setSuccess(false)
     setError(null)
 
-    if (!values.amount || values.amount <= 0) {
+    const amount = Number(values.amount)
+    
+    // בדיקת תקינות סכום
+    if (!amount || amount <= 0) {
       setError("נא להזין סכום תקין הגדול מאפס")
       setLoading(false)
       return
     }
 
+    console.log("ערכי הטופס:", values)
+    console.log("סכום לאחר המרה:", amount)
+    console.log("סוג התנועה:", values.transactionType)
+
+    // חישוב חובה/זכות לפי סוג התנועה
+    const { amountDebit, amountCredit } = calculateDebitCredit(values.transactionType, amount)
+    
+    console.log("חובה מחושבת:", amountDebit)
+    console.log("זכות מחושבת:", amountCredit)
+
     const invoiceToSend: Partial<InvoiceDto> = {
       id: 0,
-      amount: values.amount,
+      amount: amount,
+      amountDebit: amountDebit,
+      amountCredit: amountCredit,
       invoiceDate: new Date(),
       status: 1,
       notes: values.description ?? "",
@@ -160,10 +205,15 @@ const AccountTransactions: React.FC = () => {
       type: values.transactionType,
     }
 
+    console.log("אובייקט החשבונית לשליחה:", JSON.stringify(invoiceToSend, null, 2))
+
     try {
-      await axios.post(`${url}/api/Invoice`, invoiceToSend, {
+      const response = await axios.post(`${url}/api/Invoice`, invoiceToSend, {
         withCredentials: true,
       })
+      
+      console.log("תשובת השרת:", response.data)
+      
       setSuccess(true)
       form.resetFields()
       message.success("התנועה נוספה בהצלחה!")
@@ -171,8 +221,15 @@ const AccountTransactions: React.FC = () => {
       if (activeTab === "2") {
         await GetAllTransactions()
       }
-    } catch (err) {
-      setError("אירעה שגיאה בשמירת התנועה.")
+    } catch (err: any) {
+      console.error("שגיאה בשמירת התנועה:", err)
+      console.log("פרטי השגיאה:", err.response?.data)
+      
+      const errorMessage = err.response?.data?.message || 
+                          err.response?.data || 
+                          err.message || 
+                          "אירעה שגיאה בשמירת התנועה."
+      setError(errorMessage)
     } finally {
       setLoading(false)
     }
@@ -274,6 +331,40 @@ const AccountTransactions: React.FC = () => {
         </Text>
       ),
       sorter: (a, b) => a.amount - b.amount,
+    },
+    {
+      title: "חובה",
+      dataIndex: "amountDebit",
+      key: "amountDebit",
+      width: screens.xs ? 80 : 100,
+      align: "center",
+      render: (amountDebit: number) => (
+        <Text
+          style={{
+            color: amountDebit > 0 ? "#ff4d4f" : "#8c8c8c",
+            fontSize: screens.xs ? 12 : 13
+          }}
+        >
+          {amountDebit > 0 ? formatCurrency(amountDebit) : "-"}
+        </Text>
+      ),
+    },
+    {
+      title: "זכות",
+      dataIndex: "amountCredit",
+      key: "amountCredit",
+      width: screens.xs ? 80 : 100,
+      align: "center",
+      render: (amountCredit: number) => (
+        <Text
+          style={{
+            color: amountCredit > 0 ? "#52c41a" : "#8c8c8c",
+            fontSize: screens.xs ? 12 : 13
+          }}
+        >
+          {amountCredit > 0 ? formatCurrency(amountCredit) : "-"}
+        </Text>
+      ),
     },
     {
       title: "תיאור",
