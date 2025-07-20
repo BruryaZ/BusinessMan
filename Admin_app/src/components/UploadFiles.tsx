@@ -43,7 +43,6 @@ import {
   UserOutlined,
   EditOutlined,
   SaveOutlined,
-  CloseOutlined,
 } from "@ant-design/icons"
 import type { UploadProps } from "antd"
 import dayjs from "dayjs"
@@ -103,7 +102,6 @@ interface UploadResponse {
 }
 
 const UploadFiles = () => {
-  const { message } = App.useApp()
   const [file, setFile] = useState<File | null>(null)
   const [messageText, setMessageText] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -619,7 +617,7 @@ const UploadFiles = () => {
                   position: "relative",
                   overflow: "hidden",
                 }}
-                onDragEnter={() => setDragActive(true)}
+                onDragOver={() => setDragActive(true)}
                 onDragLeave={() => setDragActive(false)}
               >
                 <div
@@ -1003,7 +1001,7 @@ const UploadFiles = () => {
                             onChange={(value) => handleEditField('totalAmount', value)}
                             style={{ width: '100%' }}
                             formatter={(value) => `₪ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                            parser={(value) => value!.replace(/₪\s?|(,*)/g, '')}
+                            parser={(value) => parseFloat(value!.replace(/₪\s?|(,*)/g, '') || '0')}
                           />
                         </Form.Item>
                       </Col>
@@ -1014,7 +1012,7 @@ const UploadFiles = () => {
                             onChange={(value) => handleEditField('taxAmount', value)}
                             style={{ width: '100%' }}
                             formatter={(value) => `₪ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                            parser={(value) => value!.replace(/₪\s?|(,*)/g, '')}
+                            parser={(value) => parseFloat(value!.replace(/₪\s?|(,*)/g, '') || '0')}
                           />
                         </Form.Item>
                       </Col>
