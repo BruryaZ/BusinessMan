@@ -237,45 +237,6 @@ namespace BusinessMan.API.Controllers
                 return StatusCode(500, $"שגיאה בשמירת הקובץ: {ex.Message}");
             }
         }
-        // POST api/FileUpload/confirm-invoice
-        [HttpPost("confirm-invoice")]
-        public async Task<IActionResult> ConfirmInvoice([FromBody] ConfirmInvoiceRequest request)
-        {
-            if (request == null || request.Invoice == null || string.IsNullOrEmpty(request.FileUrl))
-                return BadRequest("נתונים חסרים לאישור.");
-
-            var user = _httpContextAccessor.HttpContext.Items["CurrentUser"] as User;
-            if (user == null)
-                return Unauthorized();
-
-            // השמת שדות משתמש בעסק
-            var invoice = request.Invoice;
-            invoice.BusinessId = user.BusinessId;
-            invoice.UserId = user.Id;
-            invoice.CreatedAt = DateTime.UtcNow;
-            invoice.UpdatedAt = DateTime.UtcNow;
-            invoice.CreatedBy = $"{user.FirstName} {user.LastName}";
-            invoice.UpdatedBy = $"{user.FirstName} {user.LastName}";
-
-            // שמירת החשבונית במסד
-            await _invoiceService.AddAsync(invoice);
-
-            // יצירת FileDto לשמירה במסד
-            var fileDto = new FileDto
-            {
-                FileName = request.FileName,
-                FilePath = request.FileUrl,
-                Size = request.FileSize,
-                UploadDate = DateTime.UtcNow,
-                BusinessId = user.BusinessId ?? 0,
-                UserId = user.Id
-            };
-
-            // שמירת פרטי הקובץ במסד
-            await _fileService.AddAsync(fileDto, true);
-
-            return Ok(new { message = "החשבונית והקובץ נשמרו בהצלחה." });
-        }
 
         // PUT api/<FileUploadController>/5
         [HttpPut("{id}")]

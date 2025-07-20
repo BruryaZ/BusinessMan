@@ -178,7 +178,10 @@ builder.Services.AddHttpContextAccessor();
 var app = builder.Build();
 
 // הוספת-CORS
-app.UseCors("AllowFrontend");
+app.UseCors(policy => policy
+    .AllowAnyOrigin()
+    .AllowAnyMethod()
+    .AllowAnyHeader());
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

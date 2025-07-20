@@ -17,7 +17,6 @@ import {
   Modal,
   Descriptions,
   Tag,
-  message as antMessage,
   Spin,
   Steps,
   Result,
@@ -26,6 +25,7 @@ import {
   InputNumber,
   DatePicker,
   Select,
+  App,
 } from "antd"
 import {
   CloudUploadOutlined,
@@ -53,7 +53,27 @@ const { Dragger } = Upload
 const { Step } = Steps
 const { Option } = Select
 
-// Types for Invoice data
+// Types for Invoice data - מותאם למבנה השרת האמיתי
+interface ServerInvoiceData {
+  id: number
+  amount: number
+  amountDebit: number
+  amountCredit: number
+  invoiceDate: string
+  status: number
+  notes: string
+  createdAt: string
+  createdBy: string
+  updatedAt: string
+  updatedBy: string
+  invoicePath: string | null
+  userId: number | null
+  businessId: number | null
+  business: null
+  user: null
+  type: string // זה string בתשובה השרת! (למשל "Income")
+}
+
 interface InvoiceData {
   id?: number
   invoiceNumber?: string
@@ -64,6 +84,7 @@ interface InvoiceData {
   dueDate?: string
   description?: string
   items?: InvoiceItem[]
+  type?: number
 }
 
 interface InvoiceItem {
@@ -76,12 +97,15 @@ interface InvoiceItem {
 interface UploadResponse {
   message: string
   fileUrl: string
-  invoice?: InvoiceData
+  fileName: string
+  fileSize: number
+  analyzedInvoice?: ServerInvoiceData // מותאם למבנה השרת
 }
 
 const UploadFiles = () => {
+  const { message } = App.useApp()
   const [file, setFile] = useState<File | null>(null)
-  const [message, setMessage] = useState<string | null>(null)
+  const [messageText, setMessageText] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [uploading, setUploading] = useState(false)
   const [analyzing, setAnalyzing] = useState(false)
@@ -106,7 +130,7 @@ const UploadFiles = () => {
     accept: ".jpg,.png,.pdf,.docx,.txt,.xlsx",
     beforeUpload: (file) => {
       setFile(file)
-      setMessage(null)
+      setMessageText(null)
       setError(null)
       setUploadComplete(false)
       setShowInvoiceModal(false)
@@ -122,7 +146,7 @@ const UploadFiles = () => {
 
   const resetState = () => {
     setFile(null)
-    setMessage(null)
+    setMessageText(null)
     setError(null)
     setUploadComplete(false)
     setProgress(0)
@@ -180,7 +204,8 @@ const UploadFiles = () => {
       setTimeout(() => {
         const data = response.data as UploadResponse
         
-        console.log("תשובת השרת:", data) // לבדיקה
+        console.log("תשובת השרת המלאה:", data) // לבדיקה
+        console.log("האם analyzeAndSave:", analyzeAndSave) // לבדיקה
         
         if (analyzeAndSave) {
           if (data.analyzedInvoice) {
@@ -188,18 +213,21 @@ const UploadFiles = () => {
             const invoiceFromServer = data.analyzedInvoice
             
             console.log("נתוני החשבונית מהשרת:", invoiceFromServer)
+            console.log("סכום חובה:", invoiceFromServer.amountDebit)
+            console.log("הערות:", invoiceFromServer.notes)
             
             // המרת הנתונים מהשרת לפורמט הקליינט
             const clientInvoiceData: InvoiceData = {
               invoiceNumber: extractInvoiceNumber(invoiceFromServer) || "לא זוהה",
               supplierName: extractSupplierName(invoiceFromServer) || "לא זוהה", 
-              totalAmount: invoiceFromServer.AmountDebit || invoiceFromServer.Amount || 100,
-              taxAmount: calculateTax(invoiceFromServer.AmountDebit || invoiceFromServer.Amount || 100),
-              invoiceDate: invoiceFromServer.InvoiceDate ? 
-                new Date(invoiceFromServer.InvoiceDate).toISOString().split('T')[0] : 
+              totalAmount: invoiceFromServer.amountDebit || invoiceFromServer.amount || 100,
+              taxAmount: calculateTax(invoiceFromServer.amountDebit || invoiceFromServer.amount || 100),
+              invoiceDate: invoiceFromServer.invoiceDate ? 
+                new Date(invoiceFromServer.invoiceDate).toISOString().split('T')[0] : 
                 new Date().toISOString().split('T')[0],
-              dueDate: calculateDueDate(invoiceFromServer.InvoiceDate),
-              description: invoiceFromServer.Notes || "נותח ע״י AI",
+              dueDate: calculateDueDate(invoiceFromServer.invoiceDate),
+              description: invoiceFromServer.notes || "נותח ע״י AI",
+              type: typeof invoiceFromServer.type === "string" ? getInvoiceTypeNumber(invoiceFromServer.type) : invoiceFromServer.type || 2, // ברירת מחדל: הוצאה
               items: []
             }
             
@@ -210,14 +238,15 @@ const UploadFiles = () => {
             setFileUrl(data.fileUrl)
             setShowInvoiceModal(true)
             setCurrentStep(3)
-            setMessage("הקובץ נותח בהצלחה! בדוק ואשר את פרטי החשבונית")
+            setMessageText("הקובץ נותח בהצלחה! בדוק ואשר את פרטי החשבונית")
           } else {
             console.log("לא נמצאו נתוני חשבונית בתשובת השרת")
+            console.log("מבנה התשובה:", Object.keys(data))
             setError("לא ניתן לנתח את הקובץ כחשבונית")
             setCurrentStep(0)
           }
         } else {
-          setMessage(data.message || "הקובץ הועלה בהצלחה")
+          setMessageText(data.message || "הקובץ הועלה בהצלחה")
           setUploadComplete(true)
           setCurrentStep(4)
         }
@@ -240,7 +269,7 @@ const UploadFiles = () => {
       setProgress(0)
       setUploading(false)
       setAnalyzing(false)
-      setMessage(null)
+      setMessageText(null)
       setCurrentStep(0)
     }
   }
@@ -251,26 +280,38 @@ const UploadFiles = () => {
     setConfirmingInvoice(true)
 
     try {
-      // המרת נתוני הקליינט לפורמט השרת
+      // יצירת אובייקט חשבונית במבנה הנכון לשרת (לפי מודל Invoice)
       const serverInvoiceData = {
-        AmountDebit: editedInvoiceData.totalAmount || 100,
-        AmountCredit: editedInvoiceData.totalAmount || 100,
-        InvoiceDate: editedInvoiceData.invoiceDate || new Date().toISOString().split('T')[0],
+        Id: 0, // יווצר בשרת
+        Amount: Number(editedInvoiceData.totalAmount) || 100,
+        AmountDebit: Number(editedInvoiceData.totalAmount) || 100,
+        AmountCredit: Number(editedInvoiceData.totalAmount) || 100,
+        InvoiceDate: editedInvoiceData.invoiceDate ? 
+          new Date(editedInvoiceData.invoiceDate + 'T00:00:00.000Z').toISOString() : 
+          new Date().toISOString(),
         Status: 1,
         Notes: `מס' חשבונית: ${editedInvoiceData.invoiceNumber || "לא זוהה"}, ספק: ${editedInvoiceData.supplierName || "לא זוהה"}, ${editedInvoiceData.description || "נותח ע״י GPT"}`,
+        CreatedAt: new Date().toISOString(),
         CreatedBy: "gpt",
+        UpdatedAt: new Date().toISOString(),
         UpdatedBy: "gpt",
-        Type: "2" // Expense
+        InvoicePath: fileUrl, // השדה החסר שגרם לשגיאה!
+        UserId: null,
+        BusinessId: null,
+        Business: null,
+        User: null,
+        Type: getInvoiceTypeString(editedInvoiceData.type || 1) // המרה חזרה ל-string
       }
 
       const confirmRequest = {
-        invoice: serverInvoiceData,
-        fileUrl: fileUrl,
-        fileName: file.name,
-        fileSize: file.size
+        Invoice: serverInvoiceData,
+        FileUrl: fileUrl,          
+        FileName: file.name,       
+        FileSize: file.size        
       }
 
-      console.log("שולח לשרת:", confirmRequest) // לבדיקה
+      console.log("נתוני החשבונית שנבנו:", JSON.stringify(serverInvoiceData, null, 2))
+      console.log("בקשת אישור מלאה:", JSON.stringify(confirmRequest, null, 2))
 
       const response = await axios.post(
         `${url}/FileUpload/confirm-invoice`, 
@@ -281,16 +322,19 @@ const UploadFiles = () => {
         }
       )
 
-      antMessage.success("החשבונית והקובץ נשמרו בהצלחה!")
+      message.success("החשבונית והקובץ נשמרו בהצלחה!")
       setShowInvoiceModal(false)
       setUploadComplete(true)
       setCurrentStep(4)
-      setMessage("החשבונית והקובץ נשמרו בהצלחה במערכת")
+      setMessageText("החשבונית והקובץ נשמרו בהצלחה במערכת")
       
     } catch (error: any) {
       console.error("Error confirming invoice:", error)
-      const errorMessage = error.response?.data?.message || "שגיאה באישור החשבונית"
-      antMessage.error(errorMessage)
+      console.log("פרטי השגיאה מפורטים:", JSON.stringify(error.response?.data, null, 2))
+      console.log("status code:", error.response?.status)
+      console.log("status text:", error.response?.statusText)
+      const errorMessage = error.response?.data?.message || error.response?.data || "שגיאה באישור החשבונית"
+      message.error(errorMessage)
     } finally {
       setConfirmingInvoice(false)
     }
@@ -301,7 +345,7 @@ const UploadFiles = () => {
     setInvoiceData(null)
     setEditedInvoiceData(null)
     setFileUrl("")
-    setMessage("הקובץ הועלה אך החשבונית לא נשמרה")
+    setMessageText("הקובץ הועלה אך החשבונית לא נשמרה")
     setUploadComplete(true)
     setCurrentStep(4)
   }
@@ -358,9 +402,9 @@ const UploadFiles = () => {
   }
 
   // פונקציות עזר לחילוץ נתונים מתשובת השרת
-  const extractInvoiceNumber = (invoice: any) => {
+  const extractInvoiceNumber = (invoice: ServerInvoiceData) => {
     // ניסיון לחלץ מספר חשבונית מהערות
-    if (invoice.Notes) {
+    if (invoice.notes) {
       const patterns = [
         /מס['׳]?\s*חשבונית\s*:?\s*([^\s,]+)/,
         /חשבונית\s*(?:מס|מספר)?\.?\s*:?\s*([A-Za-z0-9\-\/]+)/,
@@ -368,18 +412,18 @@ const UploadFiles = () => {
       ]
       
       for (const pattern of patterns) {
-        const match = invoice.Notes.match(pattern)
+        const match = invoice.notes.match(pattern)
         if (match && match[1]) {
           return match[1].trim()
         }
       }
     }
-    return null
+    return "לא זוהה"
   }
 
-  const extractSupplierName = (invoice: any) => {
+  const extractSupplierName = (invoice: ServerInvoiceData) => {
     // ניסיון לחלץ שם ספק מהערות
-    if (invoice.Notes) {
+    if (invoice.notes) {
       const patterns = [
         /ספק\s*:?\s*([^,\n]+)/,
         /([\u0590-\u05FF\s]+(?:בע״מ|בעמ|בע\"מ|ltd|LTD))/,
@@ -387,13 +431,41 @@ const UploadFiles = () => {
       ]
       
       for (const pattern of patterns) {
-        const match = invoice.Notes.match(pattern)
+        const match = invoice.notes.match(pattern)
         if (match && match[1]) {
           return match[1].trim()
         }
       }
     }
-    return null
+    return "לא זוהה"
+  }
+
+  const getInvoiceTypeNumber = (typeString: string) => {
+    const typeMap: { [key: string]: number } = {
+      "Income": 0,
+      "Expense": 1,
+      "AssetIncrease": 2,
+      "AssetDecrease": 3,
+      "LiabilityIncrease": 4,
+      "LiabilityDecrease": 5,
+      "EquityIncrease": 6,
+      "EquityDecrease": 7
+    }
+    return typeMap[typeString] || 1 // ברירת מחדל: Expense
+  }
+
+  const getInvoiceTypeString = (typeNumber: number) => {
+    const typeMap: { [key: number]: string } = {
+      0: "Income",
+      1: "Expense", 
+      2: "AssetIncrease",
+      3: "AssetDecrease",
+      4: "LiabilityIncrease",
+      5: "LiabilityDecrease",
+      6: "EquityIncrease",
+      7: "EquityDecrease"
+    }
+    return typeMap[typeNumber] || "Expense"
   }
 
   const calculateTax = (amount: number) => {
@@ -403,6 +475,20 @@ const UploadFiles = () => {
   const calculateDueDate = (invoiceDate?: string) => {
     if (!invoiceDate) return dayjs().add(30, 'day').format('YYYY-MM-DD')
     return dayjs(invoiceDate).add(30, 'day').format('YYYY-MM-DD')
+  }
+
+  const getInvoiceTypeText = (type?: number) => {
+    const types = {
+      0: "הכנסה",
+      1: "הוצאה",
+      2: "הגדלת נכס",
+      3: "הקטנת נכס",
+      4: "הגדלת התחייבות",
+      5: "הקטנת התחייבות",
+      6: "הגדלת הון",
+      7: "הקטנת הון"
+    }
+    return types[type as keyof typeof types] || "הוצאה"
   }
 
   const steps = [
@@ -435,7 +521,8 @@ const UploadFiles = () => {
 
   return (
     <ConfigProvider direction="rtl">
-      <div className="upload-container" style={{ maxWidth: 1200, margin: "0 auto", padding: "24px" }}>
+      <App>
+        <div className="upload-container" style={{ maxWidth: 1200, margin: "0 auto", padding: "24px" }}>
         <Card className="form-section">
           <div style={{ textAlign: "center", marginBottom: 32 }}>
             <Avatar
@@ -706,7 +793,7 @@ const UploadFiles = () => {
           </Row>
 
           {/* Single unified message display */}
-          {(message || error) && (
+          {(messageText || error) && (
             <div style={{ marginTop: 24 }}>
               <Alert
                 message={error ? "שגיאה!" : "הצלחה!"}
@@ -719,7 +806,7 @@ const UploadFiles = () => {
                         <CheckCircleOutlined style={{ color: "#52c41a", fontSize: 24 }} />
                       )}
                       <Text strong style={{ fontSize: 16 }}>
-                        {error || message}
+                        {error || messageText}
                       </Text>
                     </div>
                     {!error && (
@@ -758,7 +845,7 @@ const UploadFiles = () => {
                           size="small" 
                           type="primary" 
                           ghost
-                          onClick={() => setMessage(null)}
+                          onClick={() => setMessageText(null)}
                         >
                           סגור
                         </Button>
@@ -930,6 +1017,23 @@ const UploadFiles = () => {
                         placeholder="הכנס תיאור החשבונית"
                       />
                     </Form.Item>
+
+                    <Form.Item label="סוג חשבונית">
+                      <Select
+                        value={editedInvoiceData.type || 1}
+                        onChange={(value) => handleEditField('type', value)}
+                        style={{ width: '100%' }}
+                      >
+                        <Option value={0}>הכנסה</Option>
+                        <Option value={1}>הוצאה</Option>
+                        <Option value={2}>הגדלת נכס</Option>
+                        <Option value={3}>הקטנת נכס</Option>
+                        <Option value={4}>הגדלת התחייבות</Option>
+                        <Option value={5}>הקטנת התחייבות</Option>
+                        <Option value={6}>הגדלת הון</Option>
+                        <Option value={7}>הקטנת הון</Option>
+                      </Select>
+                    </Form.Item>
                   </Form>
                 ) : (
                   <Descriptions 
@@ -1015,6 +1119,14 @@ const UploadFiles = () => {
                         <Text>{editedInvoiceData.description}</Text>
                       </Descriptions.Item>
                     )}
+
+                    <Descriptions.Item 
+                      label="סוג חשבונית"
+                    >
+                      <Tag color={editedInvoiceData.type === 0 ? "green" : "orange"}>
+                        {getInvoiceTypeText(editedInvoiceData.type)}
+                      </Tag>
+                    </Descriptions.Item>
                   </Descriptions>
                 )}
 
@@ -1108,6 +1220,7 @@ const UploadFiles = () => {
           )}
         </Card>
       </div>
+      </App>
     </ConfigProvider>
   )
 }
