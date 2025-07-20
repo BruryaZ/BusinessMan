@@ -28,7 +28,7 @@ namespace BusinessMan.API.Controllers
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IInvoiceService _invoiceService;
 
-        public FileUploadController(IFileService fileService, IMapper mapper, IAmazonS3 amazonS3, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
+        public FileUploadController(IFileService fileService, IMapper mapper, IAmazonS3 amazonS3, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, IInvoiceService invoiceService)
         {
             _fileService = fileService;
             _mapper = mapper;
@@ -36,6 +36,7 @@ namespace BusinessMan.API.Controllers
             _configuration = configuration;
             _bucketName = configuration["AWS:BucketName"] ?? throw new ArgumentNullException("AWS:BucketName");
             _httpContextAccessor = httpContextAccessor;
+            _invoiceService = invoiceService;
         }
 
         // GET: api/<FileUploadController>

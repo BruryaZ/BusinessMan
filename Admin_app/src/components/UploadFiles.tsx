@@ -43,6 +43,7 @@ import {
   UserOutlined,
   EditOutlined,
   SaveOutlined,
+  CloseOutlined,
 } from "@ant-design/icons"
 import type { UploadProps } from "antd"
 import dayjs from "dayjs"
@@ -165,7 +166,7 @@ const UploadFiles = () => {
       }
 
       const response = await axios.post(
-        `${url}/FileUpload/upload?analyzeAndSave=${analyzeAndSave}`, 
+        `${url}/FileUpload/upload?analyzeOnly=${analyzeAndSave}`, 
         formData, 
         {
           headers: { "Content-Type": "multipart/form-data" },
@@ -179,14 +180,42 @@ const UploadFiles = () => {
       setTimeout(() => {
         const data = response.data as UploadResponse
         
-        if (analyzeAndSave && data.invoice) {
-          // Show invoice confirmation modal
-          setInvoiceData(data.invoice)
-          setEditedInvoiceData({ ...data.invoice })
-          setFileUrl(data.fileUrl)
-          setShowInvoiceModal(true)
-          setCurrentStep(3)
-          setMessage("הקובץ נותח בהצלחה! בדוק ואשר את פרטי החשבונית")
+        console.log("תשובת השרת:", data) // לבדיקה
+        
+        if (analyzeAndSave) {
+          if (data.analyzedInvoice) {
+            // השרת מחזיר analyzedInvoice
+            const invoiceFromServer = data.analyzedInvoice
+            
+            console.log("נתוני החשבונית מהשרת:", invoiceFromServer)
+            
+            // המרת הנתונים מהשרת לפורמט הקליינט
+            const clientInvoiceData: InvoiceData = {
+              invoiceNumber: extractInvoiceNumber(invoiceFromServer) || "לא זוהה",
+              supplierName: extractSupplierName(invoiceFromServer) || "לא זוהה", 
+              totalAmount: invoiceFromServer.AmountDebit || invoiceFromServer.Amount || 100,
+              taxAmount: calculateTax(invoiceFromServer.AmountDebit || invoiceFromServer.Amount || 100),
+              invoiceDate: invoiceFromServer.InvoiceDate ? 
+                new Date(invoiceFromServer.InvoiceDate).toISOString().split('T')[0] : 
+                new Date().toISOString().split('T')[0],
+              dueDate: calculateDueDate(invoiceFromServer.InvoiceDate),
+              description: invoiceFromServer.Notes || "נותח ע״י AI",
+              items: []
+            }
+            
+            console.log("נתוני החשבונית לקליינט:", clientInvoiceData)
+            
+            setInvoiceData(clientInvoiceData)
+            setEditedInvoiceData({ ...clientInvoiceData })
+            setFileUrl(data.fileUrl)
+            setShowInvoiceModal(true)
+            setCurrentStep(3)
+            setMessage("הקובץ נותח בהצלחה! בדוק ואשר את פרטי החשבונית")
+          } else {
+            console.log("לא נמצאו נתוני חשבונית בתשובת השרת")
+            setError("לא ניתן לנתח את הקובץ כחשבונית")
+            setCurrentStep(0)
+          }
         } else {
           setMessage(data.message || "הקובץ הועלה בהצלחה")
           setUploadComplete(true)
@@ -199,6 +228,7 @@ const UploadFiles = () => {
       }, 800)
     } catch (error: any) {
       console.error("Error uploading file:", error)
+      console.log("פרטי השגיאה:", error.response?.data)
     
       const serverMessage =
         error.response?.data?.message ||
@@ -221,12 +251,26 @@ const UploadFiles = () => {
     setConfirmingInvoice(true)
 
     try {
+      // המרת נתוני הקליינט לפורמט השרת
+      const serverInvoiceData = {
+        AmountDebit: editedInvoiceData.totalAmount || 100,
+        AmountCredit: editedInvoiceData.totalAmount || 100,
+        InvoiceDate: editedInvoiceData.invoiceDate || new Date().toISOString().split('T')[0],
+        Status: 1,
+        Notes: `מס' חשבונית: ${editedInvoiceData.invoiceNumber || "לא זוהה"}, ספק: ${editedInvoiceData.supplierName || "לא זוהה"}, ${editedInvoiceData.description || "נותח ע״י GPT"}`,
+        CreatedBy: "gpt",
+        UpdatedBy: "gpt",
+        Type: "2" // Expense
+      }
+
       const confirmRequest = {
-        invoice: editedInvoiceData,
+        invoice: serverInvoiceData,
         fileUrl: fileUrl,
         fileName: file.name,
         fileSize: file.size
       }
+
+      console.log("שולח לשרת:", confirmRequest) // לבדיקה
 
       const response = await axios.post(
         `${url}/FileUpload/confirm-invoice`, 
@@ -311,6 +355,54 @@ const UploadFiles = () => {
     } catch {
       return dateStr
     }
+  }
+
+  // פונקציות עזר לחילוץ נתונים מתשובת השרת
+  const extractInvoiceNumber = (invoice: any) => {
+    // ניסיון לחלץ מספר חשבונית מהערות
+    if (invoice.Notes) {
+      const patterns = [
+        /מס['׳]?\s*חשבונית\s*:?\s*([^\s,]+)/,
+        /חשבונית\s*(?:מס|מספר)?\.?\s*:?\s*([A-Za-z0-9\-\/]+)/,
+        /Invoice\s*(?:No|Number)?\.?\s*:?\s*([A-Za-z0-9\-\/]+)/
+      ]
+      
+      for (const pattern of patterns) {
+        const match = invoice.Notes.match(pattern)
+        if (match && match[1]) {
+          return match[1].trim()
+        }
+      }
+    }
+    return null
+  }
+
+  const extractSupplierName = (invoice: any) => {
+    // ניסיון לחלץ שם ספק מהערות
+    if (invoice.Notes) {
+      const patterns = [
+        /ספק\s*:?\s*([^,\n]+)/,
+        /([\u0590-\u05FF\s]+(?:בע״מ|בעמ|בע\"מ|ltd|LTD))/,
+        /חברה\s*:?\s*([^,\n]+)/
+      ]
+      
+      for (const pattern of patterns) {
+        const match = invoice.Notes.match(pattern)
+        if (match && match[1]) {
+          return match[1].trim()
+        }
+      }
+    }
+    return null
+  }
+
+  const calculateTax = (amount: number) => {
+    return Math.round(amount * 0.17 * 100) / 100 // 17% מע״מ
+  }
+
+  const calculateDueDate = (invoiceDate?: string) => {
+    if (!invoiceDate) return dayjs().add(30, 'day').format('YYYY-MM-DD')
+    return dayjs(invoiceDate).add(30, 'day').format('YYYY-MM-DD')
   }
 
   const steps = [
@@ -790,7 +882,7 @@ const UploadFiles = () => {
                             onChange={(value) => handleEditField('totalAmount', value)}
                             style={{ width: '100%' }}
                             formatter={(value) => `₪ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                            parser={(value) => parseFloat(value!.replace(/₪\s?|(,*)/g, '') || '0')}
+                            parser={(value) => value!.replace(/₪\s?|(,*)/g, '')}
                           />
                         </Form.Item>
                       </Col>
@@ -801,7 +893,7 @@ const UploadFiles = () => {
                             onChange={(value) => handleEditField('taxAmount', value)}
                             style={{ width: '100%' }}
                             formatter={(value) => `₪ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                            parser={(value) => parseFloat(value!.replace(/₪\s?|(,*)/g, '') || '0')}
+                            parser={(value) => value!.replace(/₪\s?|(,*)/g, '')}
                           />
                         </Form.Item>
                       </Col>
