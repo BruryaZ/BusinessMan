@@ -44,7 +44,7 @@ namespace BusinessMan.Service
             return await _repositoryManager.Files.GetAllAsync();
         }
 
-        public async Task<FileDto> AddAsync(FileDto fileUpload, bool analyzeAndSave = false)
+        public async Task<FileDto> AddAsync(FileDto fileUpload, bool shouldAnalyze = false)
         {
             var user = _httpContextAccessor.HttpContext.Items["CurrentUser"] as User;
             if (user != null)
@@ -53,38 +53,39 @@ namespace BusinessMan.Service
                 fileUpload.BusinessId = user.BusinessId ?? 0;
             }
 
-            // שמירת הקובץ תמיד
+            // שמירת הקובץ במסד הנתונים
             await _repositoryManager.Files.AddAsync(fileUpload);
+            await _repositoryManager.SaveAsync();
 
-            if (analyzeAndSave)
+            // אם shouldAnalyze = false, רק נשמור את הקובץ
+            if (!shouldAnalyze)
             {
-                // ניתוח הקובץ לחשבונית
-                var invoiceToAdd = await readFileContent.FileAnalysis(fileUpload);
-
-                if (invoiceToAdd != null)
-                {
-                    invoiceToAdd.InvoiceDate = ExtentionsFunctions.ForceUtc(invoiceToAdd.InvoiceDate);
-                    invoiceToAdd.CreatedAt = ExtentionsFunctions.ForceUtc(invoiceToAdd.CreatedAt);
-                    invoiceToAdd.UpdatedAt = DateTime.UtcNow;
-                    invoiceToAdd.InvoicePath = fileUpload.FilePath;
-
-                    if (user != null)
-                    {
-                        invoiceToAdd.User = user;
-                        invoiceToAdd.UserId = user.Id;
-                        invoiceToAdd.BusinessId = user.BusinessId;
-                        invoiceToAdd.CreatedBy = user.FirstName + " " + user.LastName;
-                        invoiceToAdd.UpdatedBy = user.FirstName + " " + user.LastName;
-                    }
-
-                    await _invoiceService.AddAsync(invoiceToAdd);
-                }
+                return fileUpload;
             }
 
-            await _repositoryManager.SaveAsync();
+            // אחרת, גם ננתח וגם נשמור חשבונית (זה יקרה רק אחרי אישור המשתמש)
+            var invoiceToAdd = await readFileContent.FileAnalysis(fileUpload);
+            if (invoiceToAdd != null)
+            {
+                invoiceToAdd.InvoiceDate = ExtentionsFunctions.ForceUtc(invoiceToAdd.InvoiceDate);
+                invoiceToAdd.CreatedAt = ExtentionsFunctions.ForceUtc(invoiceToAdd.CreatedAt);
+                invoiceToAdd.UpdatedAt = DateTime.UtcNow;
+                invoiceToAdd.InvoicePath = fileUpload.FilePath;
+
+                if (user != null)
+                {
+                    invoiceToAdd.User = user;
+                    invoiceToAdd.UserId = user.Id;
+                    invoiceToAdd.BusinessId = user.BusinessId;
+                    invoiceToAdd.CreatedBy = user.FirstName + " " + user.LastName;
+                    invoiceToAdd.UpdatedBy = user.FirstName + " " + user.LastName;
+                }
+
+                await _invoiceService.AddAsync(invoiceToAdd);
+            }
+
             return fileUpload;
         }
-
         public async Task DeleteAsync(FileDto item)
         {
             await _repositoryManager.Files.DeleteAsync(item);

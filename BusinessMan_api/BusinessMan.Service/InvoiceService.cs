@@ -13,7 +13,7 @@ using InvoiceType = BusinessMan.Core.BasicModels.InvoiceType;
 
 namespace BusinessMan.Service
 {
-    public class InvoiceService :IInvoiceService
+    public class InvoiceService : IInvoiceService
     {
         private readonly IRepositoryManager _repositoryManager;
         private readonly IMapper _mapper;

@@ -19,6 +19,13 @@ import {
   Tag,
   message as antMessage,
   Spin,
+  Steps,
+  Result,
+  Form,
+  Input,
+  InputNumber,
+  DatePicker,
+  Select,
 } from "antd"
 import {
   CloudUploadOutlined,
@@ -34,11 +41,16 @@ import {
   DollarOutlined,
   CalendarOutlined,
   UserOutlined,
+  EditOutlined,
+  SaveOutlined,
 } from "@ant-design/icons"
 import type { UploadProps } from "antd"
+import dayjs from "dayjs"
 
 const { Title, Text } = Typography
 const { Dragger } = Upload
+const { Step } = Steps
+const { Option } = Select
 
 // Types for Invoice data
 interface InvoiceData {
@@ -77,10 +89,13 @@ const UploadFiles = () => {
   const [dragActive, setDragActive] = useState(false)
   
   // Invoice confirmation states
+  const [currentStep, setCurrentStep] = useState(0)
   const [showInvoiceModal, setShowInvoiceModal] = useState(false)
   const [invoiceData, setInvoiceData] = useState<InvoiceData | null>(null)
+  const [editedInvoiceData, setEditedInvoiceData] = useState<InvoiceData | null>(null)
   const [fileUrl, setFileUrl] = useState<string>("")
   const [confirmingInvoice, setConfirmingInvoice] = useState(false)
+  const [isEditing, setIsEditing] = useState(false)
 
   const url = import.meta.env.VITE_API_URL
 
@@ -95,18 +110,27 @@ const UploadFiles = () => {
       setUploadComplete(false)
       setShowInvoiceModal(false)
       setInvoiceData(null)
+      setCurrentStep(0)
       return false
     },
     onRemove: () => {
-      setFile(null)
-      setMessage(null)
-      setError(null)
-      setUploadComplete(false)
-      setProgress(0)
-      setShowInvoiceModal(false)
-      setInvoiceData(null)
+      resetState()
     },
     onDrop: () => setDragActive(false),
+  }
+
+  const resetState = () => {
+    setFile(null)
+    setMessage(null)
+    setError(null)
+    setUploadComplete(false)
+    setProgress(0)
+    setShowInvoiceModal(false)
+    setInvoiceData(null)
+    setEditedInvoiceData(null)
+    setCurrentStep(0)
+    setIsEditing(false)
+    setFileUrl("")
   }
 
   const handleSubmit = async (analyzeAndSave: boolean = false) => {
@@ -117,6 +141,7 @@ const UploadFiles = () => {
 
     setUploading(true)
     setProgress(0)
+    setCurrentStep(1)
 
     const formData = new FormData()
     formData.append("fileUpload", file)
@@ -136,6 +161,7 @@ const UploadFiles = () => {
 
       if (analyzeAndSave) {
         setAnalyzing(true)
+        setCurrentStep(2)
       }
 
       const response = await axios.post(
@@ -156,12 +182,15 @@ const UploadFiles = () => {
         if (analyzeAndSave && data.invoice) {
           // Show invoice confirmation modal
           setInvoiceData(data.invoice)
+          setEditedInvoiceData({ ...data.invoice })
           setFileUrl(data.fileUrl)
           setShowInvoiceModal(true)
-          setMessage("הקובץ נותח בהצלחה! אשר את פרטי החשבונית")
+          setCurrentStep(3)
+          setMessage("הקובץ נותח בהצלחה! בדוק ואשר את פרטי החשבונית")
         } else {
           setMessage(data.message || "הקובץ הועלה בהצלחה")
           setUploadComplete(true)
+          setCurrentStep(4)
         }
         
         setError(null)
@@ -182,17 +211,18 @@ const UploadFiles = () => {
       setUploading(false)
       setAnalyzing(false)
       setMessage(null)
+      setCurrentStep(0)
     }
   }
 
   const handleConfirmInvoice = async () => {
-    if (!invoiceData || !fileUrl || !file) return
+    if (!editedInvoiceData || !fileUrl || !file) return
 
     setConfirmingInvoice(true)
 
     try {
       const confirmRequest = {
-        invoice: invoiceData,
+        invoice: editedInvoiceData,
         fileUrl: fileUrl,
         fileName: file.name,
         fileSize: file.size
@@ -210,6 +240,7 @@ const UploadFiles = () => {
       antMessage.success("החשבונית והקובץ נשמרו בהצלחה!")
       setShowInvoiceModal(false)
       setUploadComplete(true)
+      setCurrentStep(4)
       setMessage("החשבונית והקובץ נשמרו בהצלחה במערכת")
       
     } catch (error: any) {
@@ -224,9 +255,20 @@ const UploadFiles = () => {
   const handleCancelInvoice = () => {
     setShowInvoiceModal(false)
     setInvoiceData(null)
+    setEditedInvoiceData(null)
     setFileUrl("")
     setMessage("הקובץ הועלה אך החשבונית לא נשמרה")
     setUploadComplete(true)
+    setCurrentStep(4)
+  }
+
+  const handleEditField = (field: string, value: any) => {
+    if (editedInvoiceData) {
+      setEditedInvoiceData({
+        ...editedInvoiceData,
+        [field]: value
+      })
+    }
   }
 
   const formatFileSize = (bytes: number) => {
@@ -265,15 +307,43 @@ const UploadFiles = () => {
   const formatDate = (dateStr?: string) => {
     if (!dateStr) return "לא זוהה"
     try {
-      return new Date(dateStr).toLocaleDateString('he-IL')
+      return dayjs(dateStr).format('DD/MM/YYYY')
     } catch {
       return dateStr
     }
   }
 
-return (
+  const steps = [
+    {
+      title: 'בחירת קובץ',
+      description: 'בחר קובץ להעלאה',
+      icon: <InboxOutlined />
+    },
+    {
+      title: 'העלאה',
+      description: 'מעלה קובץ לשרת',
+      icon: <CloudUploadOutlined />
+    },
+    {
+      title: 'ניתוח',
+      description: 'מנתח תוכן עם AI',
+      icon: <FileTextOutlined />
+    },
+    {
+      title: 'אישור נתונים',
+      description: 'בדוק ואשר פרטים',
+      icon: <CheckCircleOutlined />
+    },
+    {
+      title: 'הושלם',
+      description: 'התהליך הושלם בהצלחה',
+      icon: <RocketOutlined />
+    }
+  ]
+
+  return (
     <ConfigProvider direction="rtl">
-      <div className="upload-container" style={{ maxWidth: 900, margin: "0 auto"}}>
+      <div className="upload-container" style={{ maxWidth: 1200, margin: "0 auto", padding: "24px" }}>
         <Card className="form-section">
           <div style={{ textAlign: "center", marginBottom: 32 }}>
             <Avatar
@@ -297,6 +367,27 @@ return (
             </Text>
 
             <Divider />
+
+            {/* Progress Steps */}
+            <Steps 
+              current={currentStep} 
+              size="small" 
+              style={{ marginBottom: 24, maxWidth: 800, margin: "0 auto 24px auto" }}
+            >
+              {steps.map((step, index) => (
+                <Step
+                  key={index}
+                  title={step.title}
+                  description={step.description}
+                  icon={currentStep === index && (uploading || analyzing) ? <Spin size="small" /> : step.icon}
+                  status={
+                    currentStep > index ? 'finish' : 
+                    currentStep === index ? (error ? 'error' : 'process') : 
+                    'wait'
+                  }
+                />
+              ))}
+            </Steps>
           </div>
 
           <Row gutter={[24, 24]}>
@@ -390,14 +481,7 @@ return (
                             icon={<DeleteOutlined />}
                             size="small"
                             danger
-                            onClick={() => {
-                              setFile(null)
-                              setMessage(null)
-                              setError(null)
-                              setUploadComplete(false)
-                              setInvoiceData(null)
-                              setShowInvoiceModal(false)
-                            }}
+                            onClick={resetState}
                           >
                             הסר
                           </Button>
@@ -509,27 +593,19 @@ return (
               <Card title="מידע שימושי" size="small">
                 <Space direction="vertical" style={{ width: "100%" }}>
                   <div>
-                    <Text strong style={{ color: "#52c41a" }}>
-                      ✓
-                    </Text>
+                    <Text strong style={{ color: "#52c41a" }}>✓</Text>
                     <Text style={{ marginRight: 8 }}>העלאה מאובטחת</Text>
                   </div>
                   <div>
-                    <Text strong style={{ color: "#52c41a" }}>
-                      ✓
-                    </Text>
+                    <Text strong style={{ color: "#52c41a" }}>✓</Text>
                     <Text style={{ marginRight: 8 }}>ניתוח נתונים לעסק עם AI</Text>
                   </div>
                   <div>
-                    <Text strong style={{ color: "#52c41a" }}>
-                      ✓
-                    </Text>
+                    <Text strong style={{ color: "#52c41a" }}>✓</Text>
                     <Text style={{ marginRight: 8 }}>זיהוי אוטומטי של חשבוניות</Text>
                   </div>
                   <div>
-                    <Text strong style={{ color: "#52c41a" }}>
-                      ✓
-                    </Text>
+                    <Text strong style={{ color: "#52c41a" }}>✓</Text>
                     <Text style={{ marginRight: 8 }}>גיבוי אוטומטי</Text>
                   </div>
                 </Space>
@@ -608,7 +684,7 @@ return (
             </div>
           )}
 
-          {/* Invoice Confirmation Modal */}
+          {/* Enhanced Invoice Confirmation Modal */}
           <Modal
             title={
               <div style={{ textAlign: "center", padding: "16px 0" }}>
@@ -622,16 +698,16 @@ return (
                   <FileTextOutlined style={{ fontSize: 32 }} />
                 </Avatar>
                 <Title level={3} style={{ margin: 0, color: "#2d3748" }}>
-                  אישור פרטי החשבונית
+                  {isEditing ? "עריכת פרטי החשבונית" : "אישור פרטי החשבונית"}
                 </Title>
                 <Text type="secondary">
-                  בדוק את הפרטים שזוהו על ידי ה-AI ואשר לשמירה
+                  {isEditing ? "ערוך את הפרטים הנדרשים" : "בדוק את הפרטים שזוהו על ידי ה-AI ואשר לשמירה"}
                 </Text>
               </div>
             }
             open={showInvoiceModal}
             onCancel={handleCancelInvoice}
-            width={700}
+            width={800}
             centered
             footer={[
               <Button 
@@ -642,102 +718,215 @@ return (
               >
                 ביטול - שמור קובץ בלבד
               </Button>,
-              <Button
-                key="confirm"
-                type="primary"
-                onClick={handleConfirmInvoice}
-                loading={confirmingInvoice}
-                size="large"
-                style={{
-                  background: "linear-gradient(135deg, #52c41a 0%, #389e0d 100%)",
-                  border: "none",
-                  fontWeight: 600,
-                }}
-              >
-                {confirmingInvoice ? "שומר..." : "אשר ושמור חשבונית"}
-              </Button>
+              isEditing ? (
+                <Button
+                  key="save-edit"
+                  type="primary"
+                  onClick={() => setIsEditing(false)}
+                  size="large"
+                  icon={<SaveOutlined />}
+                >
+                  שמור שינויים
+                </Button>
+              ) : (
+                <>
+                  <Button
+                    key="edit"
+                    onClick={() => setIsEditing(true)}
+                    size="large"
+                    icon={<EditOutlined />}
+                    style={{ marginLeft: 8 }}
+                  >
+                    ערוך פרטים
+                  </Button>
+                  <Button
+                    key="confirm"
+                    type="primary"
+                    onClick={handleConfirmInvoice}
+                    loading={confirmingInvoice}
+                    size="large"
+                    style={{
+                      background: "linear-gradient(135deg, #52c41a 0%, #389e0d 100%)",
+                      border: "none",
+                      fontWeight: 600,
+                    }}
+                  >
+                    {confirmingInvoice ? "שומר..." : "אשר ושמור חשבונית"}
+                  </Button>
+                </>
+              )
             ]}
           >
-            {invoiceData && (
+            {editedInvoiceData && (
               <div style={{ padding: "16px 0" }}>
-                <Descriptions 
-                  bordered 
-                  column={1}
-                  size="small"
-                  style={{ marginBottom: 24 }}
-                >
-                  <Descriptions.Item 
-                    label={
-                      <Space>
-                        <FileTextOutlined />
-                        מספר חשבונית
-                      </Space>
-                    }
-                  >
-                    <Tag color="blue" style={{ fontSize: 14, padding: "4px 8px" }}>
-                      {invoiceData.invoiceNumber || "לא זוהה"}
-                    </Tag>
-                  </Descriptions.Item>
-                  
-                  <Descriptions.Item 
-                    label={
-                      <Space>
-                        <UserOutlined />
-                        ספק
-                      </Space>
-                    }
-                  >
-                    <Text strong>{invoiceData.supplierName || "לא זוהה"}</Text>
-                  </Descriptions.Item>
-                  
-                  <Descriptions.Item 
-                    label={
-                      <Space>
-                        <DollarOutlined />
-                        סכום כולל
-                      </Space>
-                    }
-                  >
-                    <Text strong style={{ color: "#52c41a", fontSize: 16 }}>
-                      {formatCurrency(invoiceData.totalAmount)}
-                    </Text>
-                  </Descriptions.Item>
-                  
-                  <Descriptions.Item 
-                    label={
-                      <Space>
-                        <DollarOutlined />
-                        מע"מ
-                      </Space>
-                    }
-                  >
-                    <Text>{formatCurrency(invoiceData.taxAmount)}</Text>
-                  </Descriptions.Item>
-                  
-                  <Descriptions.Item 
-                    label={
-                      <Space>
-                        <CalendarOutlined />
-                        תאריך חשבונית
-                      </Space>
-                    }
-                  >
-                    <Text>{formatDate(invoiceData.invoiceDate)}</Text>
-                  </Descriptions.Item>
-                  
-                  <Descriptions.Item 
-                    label={
-                      <Space>
-                        <CalendarOutlined />
-                        תאריך פירעון
-                      </Space>
-                    }
-                  >
-                    <Text>{formatDate(invoiceData.dueDate)}</Text>
-                  </Descriptions.Item>
-                </Descriptions>
+                {isEditing ? (
+                  <Form layout="vertical">
+                    <Row gutter={16}>
+                      <Col span={12}>
+                        <Form.Item label="מספר חשבונית">
+                          <Input
+                            value={editedInvoiceData.invoiceNumber}
+                            onChange={(e) => handleEditField('invoiceNumber', e.target.value)}
+                            placeholder="הכנס מספר חשבונית"
+                          />
+                        </Form.Item>
+                      </Col>
+                      <Col span={12}>
+                        <Form.Item label="שם הספק">
+                          <Input
+                            value={editedInvoiceData.supplierName}
+                            onChange={(e) => handleEditField('supplierName', e.target.value)}
+                            placeholder="הכנס שם ספק"
+                          />
+                        </Form.Item>
+                      </Col>
+                    </Row>
+                    
+                    <Row gutter={16}>
+                      <Col span={12}>
+                        <Form.Item label="סכום כולל">
+                          <InputNumber
+                            value={editedInvoiceData.totalAmount}
+                            onChange={(value) => handleEditField('totalAmount', value)}
+                            style={{ width: '100%' }}
+                            formatter={(value) => `₪ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                            parser={(value) => parseFloat(value!.replace(/₪\s?|(,*)/g, '') || '0')}
+                          />
+                        </Form.Item>
+                      </Col>
+                      <Col span={12}>
+                        <Form.Item label="מע״מ">
+                          <InputNumber
+                            value={editedInvoiceData.taxAmount}
+                            onChange={(value) => handleEditField('taxAmount', value)}
+                            style={{ width: '100%' }}
+                            formatter={(value) => `₪ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                            parser={(value) => parseFloat(value!.replace(/₪\s?|(,*)/g, '') || '0')}
+                          />
+                        </Form.Item>
+                      </Col>
+                    </Row>
 
-                {invoiceData.items && invoiceData.items.length > 0 && (
+                    <Row gutter={16}>
+                      <Col span={12}>
+                        <Form.Item label="תאריך חשבונית">
+                          <DatePicker
+                            value={editedInvoiceData.invoiceDate ? dayjs(editedInvoiceData.invoiceDate) : null}
+                            onChange={(date) => handleEditField('invoiceDate', date?.format('YYYY-MM-DD'))}
+                            style={{ width: '100%' }}
+                            format="DD/MM/YYYY"
+                          />
+                        </Form.Item>
+                      </Col>
+                      <Col span={12}>
+                        <Form.Item label="תאריך פירעון">
+                          <DatePicker
+                            value={editedInvoiceData.dueDate ? dayjs(editedInvoiceData.dueDate) : null}
+                            onChange={(date) => handleEditField('dueDate', date?.format('YYYY-MM-DD'))}
+                            style={{ width: '100%' }}
+                            format="DD/MM/YYYY"
+                          />
+                        </Form.Item>
+                      </Col>
+                    </Row>
+
+                    <Form.Item label="תיאור">
+                      <Input.TextArea
+                        value={editedInvoiceData.description}
+                        onChange={(e) => handleEditField('description', e.target.value)}
+                        rows={3}
+                        placeholder="הכנס תיאור החשבונית"
+                      />
+                    </Form.Item>
+                  </Form>
+                ) : (
+                  <Descriptions 
+                    bordered 
+                    column={1}
+                    size="small"
+                    style={{ marginBottom: 24 }}
+                  >
+                    <Descriptions.Item 
+                      label={
+                        <Space>
+                          <FileTextOutlined />
+                          מספר חשבונית
+                        </Space>
+                      }
+                    >
+                      <Tag color="blue" style={{ fontSize: 14, padding: "4px 8px" }}>
+                        {editedInvoiceData.invoiceNumber || "לא זוהה"}
+                      </Tag>
+                    </Descriptions.Item>
+                    
+                    <Descriptions.Item 
+                      label={
+                        <Space>
+                          <UserOutlined />
+                          ספק
+                        </Space>
+                      }
+                    >
+                      <Text strong>{editedInvoiceData.supplierName || "לא זוהה"}</Text>
+                    </Descriptions.Item>
+                    
+                    <Descriptions.Item 
+                      label={
+                        <Space>
+                          <DollarOutlined />
+                          סכום כולל
+                        </Space>
+                      }
+                    >
+                      <Text strong style={{ color: "#52c41a", fontSize: 16 }}>
+                        {formatCurrency(editedInvoiceData.totalAmount)}
+                      </Text>
+                    </Descriptions.Item>
+                    
+                    <Descriptions.Item 
+                      label={
+                        <Space>
+                          <DollarOutlined />
+                          מע"מ
+                        </Space>
+                      }
+                    >
+                      <Text>{formatCurrency(editedInvoiceData.taxAmount)}</Text>
+                    </Descriptions.Item>
+                    
+                    <Descriptions.Item 
+                      label={
+                        <Space>
+                          <CalendarOutlined />
+                          תאריך חשבונית
+                        </Space>
+                      }
+                    >
+                      <Text>{formatDate(editedInvoiceData.invoiceDate)}</Text>
+                    </Descriptions.Item>
+                    
+                    <Descriptions.Item 
+                      label={
+                        <Space>
+                          <CalendarOutlined />
+                          תאריך פירעון
+                        </Space>
+                      }
+                    >
+                      <Text>{formatDate(editedInvoiceData.dueDate)}</Text>
+                    </Descriptions.Item>
+
+                    {editedInvoiceData.description && (
+                      <Descriptions.Item 
+                        label="תיאור"
+                      >
+                        <Text>{editedInvoiceData.description}</Text>
+                      </Descriptions.Item>
+                    )}
+                  </Descriptions>
+                )}
+
+                {editedInvoiceData.items && editedInvoiceData.items.length > 0 && !isEditing && (
                   <div>
                     <Title level={5} style={{ marginBottom: 16 }}>
                       פירוט פריטים:
@@ -749,7 +938,7 @@ return (
                       borderRadius: 8,
                       padding: 16
                     }}>
-                      {invoiceData.items.map((item, index) => (
+                      {editedInvoiceData.items.map((item, index) => (
                         <Card 
                           key={index} 
                           size="small" 
@@ -773,15 +962,58 @@ return (
                 )}
 
                 <Alert
-                  message="שים לב"
-                  description="הנתונים זוהו אוטומטיות על ידי AI. אנא בדוק את הדיוק לפני האישור."
-                  type="info"
+                  message={isEditing ? "עריכת נתונים" : "שים לב"}
+                  description={
+                    isEditing 
+                      ? "ערוך את הפרטים הנדרשים ולחץ 'שמור שינויים' כדי לעדכן את הנתונים."
+                      : "הנתונים זוהו אוטומטיות על ידי AI. אנא בדוק את הדיוק לפני האישור."
+                  }
+                  type={isEditing ? "warning" : "info"}
                   showIcon
                   style={{ marginTop: 16 }}
                 />
               </div>
             )}
           </Modal>
+
+          {/* Success Result */}
+          {uploadComplete && (
+            <div style={{ marginTop: 24 }}>
+              <Result
+                status="success"
+                title="התהליך הושלם בהצלחה!"
+                subTitle={
+                  invoiceData 
+                    ? "הקובץ הועלה, נותח והחשבונית נשמרה במערכת."
+                    : "הקובץ הועלה בהצלחה למערכת."
+                }
+                extra={[
+                  <Button 
+                    type="primary" 
+                    key="new"
+                    onClick={resetState}
+                    icon={<CloudUploadOutlined />}
+                  >
+                    העלה קובץ נוסף
+                  </Button>,
+                  <Button 
+                    key="view"
+                    icon={<EyeOutlined />}
+                  >
+                    צפה בקבצים שלי
+                  </Button>,
+                  file && (
+                    <Button 
+                      key="download"
+                      icon={<DownloadOutlined />}
+                    >
+                      הורד קובץ
+                    </Button>
+                  )
+                ]}
+              />
+            </div>
+          )}
         </Card>
       </div>
     </ConfigProvider>

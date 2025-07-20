@@ -1,4 +1,5 @@
-﻿using BusinessMan.Core.DTO_s;
+﻿using BusinessMan.Core.BasicModels;
+using BusinessMan.Core.DTO_s;
 using BusinessMan.Core.Models;
 using System;
 using System.Collections.Generic;
