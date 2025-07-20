@@ -175,7 +175,13 @@ namespace BusinessMan.API.Controllers
             if (existingUser.Role != 1)
                 return StatusCode(403, new { Message = "אין לך הרשאות מתאימות לביצוע פעולה זו." });
 
-            var token = _authService.GenerateJwtToken(existingUser.Id, existingUser.BusinessId, existingUser.FirstName, existingUser.Role, existingUser.Email);
+            var token = _authService.GenerateJwtToken(
+                existingUser.Id,
+                existingUser.BusinessId,
+                existingUser.FirstName,
+                existingUser.Role,
+                existingUser.Email
+            );
 
             Response.Cookies.Append("jwt", token, new CookieOptions
             {
@@ -184,6 +190,17 @@ namespace BusinessMan.API.Controllers
                 SameSite = SameSiteMode.None,
                 Expires = DateTimeOffset.UtcNow.AddDays(7)
             });
+
+            // 🔥 כאן מוסיפים התחברות ללוג
+            _context.LoginLogList.Add(new LoginLog
+            {
+                AdminId = existingUser.Id,
+                Email = existingUser.Email,
+                LoginTime = DateTime.UtcNow,
+                UserAgent = Request.Headers["User-Agent"].ToString(),
+                IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString()
+            });
+            await _context.SaveChangesAsync();
 
             return Ok(new
             {

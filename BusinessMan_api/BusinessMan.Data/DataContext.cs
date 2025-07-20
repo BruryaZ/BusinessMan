@@ -26,6 +26,7 @@ namespace BusinessMan.Data
         public DbSet<FileDto> Files { get; set; }
         public DbSet<Email> EmailList { get; set; }
         public DbSet<JournalEntry> JournalEntries { get; set; } 
+        public DbSet<LoginLog> LoginLogList { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // 🗃️ טבלאות
@@ -35,6 +36,7 @@ namespace BusinessMan.Data
             modelBuilder.Entity<FileDto>().ToTable("files");
             modelBuilder.Entity<Email>().ToTable("email-list");
             modelBuilder.Entity<JournalEntry>().ToTable("Journal-entries");
+            modelBuilder.Entity<LoginLog>().ToTable("login-log");
 
             // 📌 קשרים בין Invoice ל-User
             modelBuilder.Entity<Invoice>()
