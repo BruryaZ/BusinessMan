@@ -156,6 +156,7 @@ const UploadFiles = () => {
     setCurrentStep(0)
     setIsEditing(false)
     setFileUrl("")
+    setDragActive(false)
   }
 
   const handleSubmit = async (analyzeAndSave: boolean = false) => {
@@ -630,8 +631,6 @@ const UploadFiles = () => {
                     overflow: "hidden",
                     transition: 'all 0.3s ease',
                   }}
-                  onDragOver={() => setDragActive(true)}
-                  onDragLeave={() => setDragActive(false)}
                 >
                   <div
                     style={{
