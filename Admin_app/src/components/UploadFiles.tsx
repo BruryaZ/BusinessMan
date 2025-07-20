@@ -317,7 +317,7 @@ const UploadFiles = () => {
       let response
       try {
         response = await axios.post(
-          `${url}/FileUpload/confirm-invoice`, 
+          `${url}/FileUpload/confirm-and-save`, 
           confirmRequest,
           {
             headers: { 
@@ -333,7 +333,7 @@ const UploadFiles = () => {
         
         // ניסיון שני בלי credentials
         response = await axios.post(
-          `${url}/FileUpload/confirm-invoice`, 
+          `${url}/FileUpload/confirm-and-save`, 
           confirmRequest,
           {
             headers: { 
