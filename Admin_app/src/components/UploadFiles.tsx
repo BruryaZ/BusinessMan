@@ -205,17 +205,10 @@ const UploadFiles = () => {
       setTimeout(() => {
         const data = response.data as UploadResponse
         
-        console.log("תשובת השרת המלאה:", data) // לבדיקה
-        console.log("האם analyzeAndSave:", analyzeAndSave) // לבדיקה
-        
         if (analyzeAndSave) {
           if (data.analyzedInvoice) {
             // השרת מחזיר analyzedInvoice
             const invoiceFromServer = data.analyzedInvoice
-            
-            console.log("נתוני החשבונית מהשרת:", invoiceFromServer)
-            console.log("סכום חובה:", invoiceFromServer.amountDebit)
-            console.log("הערות:", invoiceFromServer.notes)
             
             // המרת הנתונים מהשרת לפורמט הקליינט
             const clientInvoiceData: InvoiceData = {
@@ -231,9 +224,7 @@ const UploadFiles = () => {
               type: getInvoiceTypeNumber(invoiceFromServer.type) || 2, // ברירת מחדל: הוצאה
               items: []
             }
-            
-            console.log("נתוני החשבונית לקליינט:", clientInvoiceData)
-            
+                        
             setInvoiceData(clientInvoiceData)
             setEditedInvoiceData({ ...clientInvoiceData })
             setFileUrl(data.fileUrl)
@@ -241,8 +232,6 @@ const UploadFiles = () => {
             setCurrentStep(3)
             setMessageText("הקובץ נותח בהצלחה! בדוק ואשר את פרטי החשבונית")
           } else {
-            console.log("לא נמצאו נתוני חשבונית בתשובת השרת")
-            console.log("מבנה התשובה:", Object.keys(data))
             setError("לא ניתן לנתח את הקובץ כחשבונית")
             setCurrentStep(0)
           }
@@ -257,7 +246,6 @@ const UploadFiles = () => {
         setAnalyzing(false)
       }, 800)
     } catch (error: any) {
-      console.error("Error uploading file:", error)
       console.log("פרטי השגיאה:", error.response?.data)
     
       const serverMessage =
@@ -277,9 +265,9 @@ const UploadFiles = () => {
 
   const handleConfirmInvoice = async () => {
     if (!editedInvoiceData || !fileUrl || !file) return
-
+  
     setConfirmingInvoice(true)
-
+  
     try {
       // וידוא שהסכומים תקינים וחיוביים
       const totalAmount = Number(editedInvoiceData.totalAmount) || 0
@@ -290,40 +278,37 @@ const UploadFiles = () => {
         setConfirmingInvoice(false)
         return
       }
-
-      // יצירת אובייקט חשבונית במבנה הנכון לשרת (לפי מודל Invoice)
-      const serverInvoiceData = {
-        Id: 0, // יווצר בשרת
-        Amount: totalAmount,
-        AmountDebit: editedInvoiceData.type === 0 ? 0 : totalAmount, // אם הכנסה - חובה 0, אחרת - הסכום
-        AmountCredit: editedInvoiceData.type === 0 ? totalAmount : 0, // אם הכנסה - זכות הסכום, אחרת - 0
-        InvoiceDate: editedInvoiceData.invoiceDate ? 
-          new Date(editedInvoiceData.invoiceDate + 'T00:00:00.000Z').toISOString() : 
-          new Date().toISOString(),
-        Status: 1,
-        Notes: `מס' חשבונית: ${editedInvoiceData.invoiceNumber || "לא זוהה"}, ספק: ${editedInvoiceData.supplierName || "לא זוהה"}, ${editedInvoiceData.description || "נותח ע״י GPT"}`,
-        CreatedAt: new Date().toISOString(),
-        CreatedBy: "gpt",
-        UpdatedAt: new Date().toISOString(),
-        UpdatedBy: "gpt",
-        InvoicePath: fileUrl,
-        UserId: null,
-        BusinessId: null,
-        Business: null,
-        User: null,
-        Type: getInvoiceTypeString(editedInvoiceData.type || 1)
-      }
-
+  
+      // יצירת אובייקט חשבונית במבנה הנכון לשרת (מותאם למבנה ConfirmInvoiceRequest)
       const confirmRequest = {
-        Invoice: serverInvoiceData,
-        FileUrl: fileUrl,          
-        FileName: file.name,       
-        FileSize: file.size        
+        Invoice: {
+          Id: 0, // יווצר בשרת
+          Amount: totalAmount,
+          AmountDebit: editedInvoiceData.type === 0 ? 0 : totalAmount, // אם הכנסה - חובה 0, אחרת - הסכום
+          AmountCredit: editedInvoiceData.type === 0 ? totalAmount : 0, // אם הכנסה - זכות הסכום, אחרת - 0
+          InvoiceDate: editedInvoiceData.invoiceDate ? 
+            new Date(editedInvoiceData.invoiceDate + 'T00:00:00.000Z').toISOString() : 
+            new Date().toISOString(),
+          Status: 1,
+          Notes: `מס' חשבונית: ${editedInvoiceData.invoiceNumber || "לא זוהה"}, ספק: ${editedInvoiceData.supplierName || "לא זוהה"}, ${editedInvoiceData.description || "נותח ע״י AI"}`,
+          CreatedAt: new Date().toISOString(),
+          CreatedBy: "AI",
+          UpdatedAt: new Date().toISOString(),
+          UpdatedBy: "AI",
+          InvoicePath: fileUrl,
+          UserId: null, // יושלם בשרת
+          BusinessId: null, // יושלם בשרת
+          Business: null,
+          User: null,
+          Type: getInvoiceTypeString(editedInvoiceData.type || 1)
+        },
+        FileUrl: fileUrl,
+        FileName: file.name,
+        FileSize: file.size
       }
-
-      console.log("נתוני החשבונית שנבנו:", JSON.stringify(serverInvoiceData, null, 2))
-      console.log("בקשת אישור מלאה:", JSON.stringify(confirmRequest, null, 2))
-
+  
+      console.log("שולח בקשה עם הנתונים:", JSON.stringify(confirmRequest, null, 2))
+  
       // שליחת בקשה עם credentials (עקבי עם handleSubmit)
       const response = await axios.post(
         `${url}/FileUpload/confirm-and-save`, 
@@ -337,7 +322,7 @@ const UploadFiles = () => {
           timeout: 30000 // 30 שניות timeout
         }
       )
-
+  
       console.log("תשובת השרת:", response.data)
       
       setShowInvoiceModal(false)
@@ -345,22 +330,8 @@ const UploadFiles = () => {
       setCurrentStep(4)
       setMessageText("החשבונית והקובץ נשמרו בהצלחה במערכת")
       
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error confirming invoice:", error)
-      
-      if (error.code === 'ERR_NETWORK') {
-        console.log("בעיית רשת או CORS")
-        setError("שגיאת רשת - לא ניתן להתחבר לשרת. בדוק את הגדרות CORS בשרת.")
-      } else if (error.code === 'ECONNABORTED') {
-        setError("הבקשה לקחה יותר מדי זמן - נסה שוב")
-      } else {
-        console.log("פרטי השגיאה מפורטים:", JSON.stringify(error.response?.data, null, 2))
-        console.log("status code:", error.response?.status)
-        console.log("status text:", error.response?.statusText)
-        
-        const errorMessage = error.response?.data?.message || error.response?.data || error.message || "שגיאה באישור החשבונית"
-        setError(errorMessage)
-      }
     } finally {
       setConfirmingInvoice(false)
     }

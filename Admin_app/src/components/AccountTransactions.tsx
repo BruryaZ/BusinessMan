@@ -102,36 +102,6 @@ const AccountTransactions: React.FC = () => {
       { key: type, label: type, color: "#8c8c8c", icon: <FileTextOutlined /> }
   }
 
-  // פונקציה לחישוב חובה/זכות לפי סוג התנועה
-  const calculateDebitCredit = (type: string, amount: number) => {
-    let amountDebit = 0
-    let amountCredit = 0
-
-    switch (type) {
-      case "Income":
-      case "Revenue":
-      case "OtherIncome":
-      case "AssetDecrease":
-      case "LiabilityIncrease":
-      case "EquityIncrease":
-        amountDebit = 0
-        amountCredit = amount
-        break
-      case "Expense":
-      case "CostOfGoodsSold":
-      case "OtherExpense":
-      case "AssetIncrease":
-      case "LiabilityDecrease":
-      case "EquityDecrease":
-      default:
-        amountDebit = amount
-        amountCredit = 0
-        break
-    }
-
-    return { amountDebit, amountCredit }
-  }
-
   const fetchTotals = async (): Promise<void> => {
     try {
       const { data } = await axios.get<{ totalDebit: number; totalCredit: number }>(
@@ -181,17 +151,11 @@ const AccountTransactions: React.FC = () => {
     console.log("סכום לאחר המרה:", amount)
     console.log("סוג התנועה:", values.transactionType)
 
-    // חישוב חובה/זכות לפי סוג התנועה
-    const { amountDebit, amountCredit } = calculateDebitCredit(values.transactionType, amount)
-    
-    console.log("חובה מחושבת:", amountDebit)
-    console.log("זכות מחושבת:", amountCredit)
-
     const invoiceToSend: Partial<InvoiceDto> = {
       id: 0,
       amount: amount,
-      amountDebit: amountDebit,
-      amountCredit: amountCredit,
+      amountDebit: amount,
+      amountCredit: amount,
       invoiceDate: new Date(),
       status: 1,
       notes: values.description ?? "",
